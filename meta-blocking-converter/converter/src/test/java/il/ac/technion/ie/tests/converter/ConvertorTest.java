@@ -6,8 +6,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import il.ac.technion.ie.converter.Convertor;
-import il.ac.technion.ie.metablocking.Attribute;
-import il.ac.technion.ie.metablocking.EntityProfile;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,6 +23,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import DataStructures.Attribute;
+import DataStructures.EntityProfile;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConvertorTest {

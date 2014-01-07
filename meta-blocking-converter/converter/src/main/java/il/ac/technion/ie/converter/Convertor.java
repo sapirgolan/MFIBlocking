@@ -8,11 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import DataStructures.Attribute;
 import DataStructures.EntityProfile;
@@ -24,10 +27,10 @@ public class Convertor {
 	private static final String DELIMITER_VALUES_IN_FIELD = " ";
 	private static final CharSequence CSV_SEPERATOR = ",";
 	private static final CharSequence NEW_LINE = "\n";
-	private List<String> fieldsNames;
+	private SortedSet<String> fieldsNames;
 
-	public List<String> extractFieldsNames(final List<EntityProfile> list) {
-		ArrayList<String> result = new ArrayList<String>();
+	public SortedSet<String> extractFieldsNames(final List<EntityProfile> list) {
+		SortedSet<String> result = new TreeSet<String>();
 		for (EntityProfile entityProfile : list) {
 			HashSet<Attribute> attributes = entityProfile.getAttributes();
 			for (Attribute attribute : attributes) {
@@ -44,10 +47,10 @@ public class Convertor {
 	//TODO: change to map of Map<String, StringBuilder> 
 	public List<Map<String, String>> extractValues( final List<EntityProfile> entityProfiles ) {
 		ArrayList<Map<String, String>> result = new ArrayList<Map<String, String>>(entityProfiles.size());
-		List<String> fieldsNames = extractFieldsNames(entityProfiles);
+		SortedSet<String> fieldsNames = extractFieldsNames(entityProfiles);
 		
 		for (EntityProfile entityProfile : entityProfiles) {
-			HashMap<String, String> hashMap = initMap(fieldsNames);
+			SortedMap<String,String> hashMap = initMap(fieldsNames);
 			result.add(hashMap);
 			
 			HashSet<Attribute> attributes = entityProfile.getAttributes();
@@ -56,6 +59,10 @@ public class Convertor {
 				value = buildValue(attribute, value);
 				hashMap.put(attribute.getName(), value);
 			}
+			/*String imdbId = hashMap.get("imdbId");
+			if (imdbId!= null  && imdbId.equals(Integer.getInteger(imdbId).toString())  ) {
+				hashMap.put("title", imdbId);
+			}*/
 		}
 		return result;
 	}
@@ -75,12 +82,12 @@ public class Convertor {
 	 * @param fieldsNames
 	 * @return
 	 */
-	private HashMap<String, String> initMap(List<String> fieldsNames) {
-		HashMap<String, String> hashMap = new HashMap<String, String>();
+	private SortedMap<String, String> initMap(SortedSet<String> fieldsNames) {
+		SortedMap<String, String> soredMap = new TreeMap<String, String>();
 		for (String fieldsName : fieldsNames) {
-			hashMap.put(fieldsName, null);
+			soredMap.put(fieldsName, null);
 		}
-		return hashMap;
+		return soredMap;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -104,14 +111,6 @@ public class Convertor {
 		File csvFile = createCsvFile("records");
 		Writer writer = createFileHeaders(csvFile);
 		fillFileContent(writer, extractValues);
-		/*for (Map<String, String> map : extractValues) {
-//			System.out.println("Priniting new entity");
-			for (Iterator<String> iterator = map.keySet().iterator(); iterator.hasNext();) {
-				String key = (String) iterator.next();
-				String value = map.get(key) == null ? "" : map.get(key); 
-				System.out.println("   " + key + ": " + value );
-			}
-		}*/
 	}
 	
 	private void fillFileContent(Writer writer,
@@ -127,12 +126,12 @@ public class Convertor {
 					String key = (String) iterator.next();
 					String value = map.get(key) == null ? "" : map.get(key);
 
-					bufferedWriter.append(value);
+					bufferedWriter.write(value);
 					if (iterator.hasNext()) {
 						bufferedWriter.append(CSV_SEPERATOR);
 					}
 				}
-				bufferedWriter.append(NEW_LINE);
+				bufferedWriter.newLine();
 			} catch (IOException e) {
 				try {
 					bufferedWriter.close();
@@ -156,16 +155,12 @@ public class Convertor {
 		try {
 			FileWriter writer = new FileWriter(csvFile);
 			
-			int size = fieldsNames.size();
-			for (int i = 0; i < size-1; i++) {
-				writer.append(fieldsNames.get(i));
+			for (Iterator<String> iterator = fieldsNames.iterator(); iterator.hasNext();) {
+				String title = (String) iterator.next();
+				writer.append(title);
 				writer.append(CSV_SEPERATOR);
 			}
-			if (size > 0) {
-				writer.append(fieldsNames.get(size-1));
-				writer.append(NEW_LINE);
-			}
-//		    writer.
+			writer.append(NEW_LINE);
 		    return writer;
 		} catch (IOException e) {
 			System.err.println("Failed to create FileWriter");
@@ -176,18 +171,20 @@ public class Convertor {
 	}
 
 	private File createCsvFile(String name) {
-		File file = new File(name + "_dataset.csv");
-		if (file.exists()) {
-			file.delete();
+		File file = new File(name + "_dataset" + ".csv");
+		int index = 0;
+		while (file.exists() &&  !file.delete()) {
+			file = new File (name + "_dataset" + "_" +  index + ".csv");
+			index++;
 		}
 		return file;
 	}
 
-	public List<String> getFieldsNames() {
+	public SortedSet<String> getFieldsNames() {
 		return fieldsNames;
 	}
 
-	public void setFieldsNames(List<String> fieldsNames) {
+	public void setFieldsNames(SortedSet<String> fieldsNames) {
 		this.fieldsNames = fieldsNames;
 	}
 

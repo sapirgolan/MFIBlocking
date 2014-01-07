@@ -1,6 +1,8 @@
 package il.ac.technion.ie.tests.converter;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
@@ -13,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -62,7 +66,7 @@ public class ConvertorTest {
 		when(attributeTwo.getName()).thenReturn("jhon");
 		when(attributeThree.getName()).thenReturn("smith");
 		when(entityProfile.getAttributes()).thenReturn(attributes);
-		List<String> extractFieldsNames = classUnderTest.extractFieldsNames(Arrays.asList(entityProfile));
+		SortedSet<String> extractFieldsNames = classUnderTest.extractFieldsNames(Arrays.asList(entityProfile));
 		Assert.assertEquals("Result size it to big", 2, extractFieldsNames.size());
 		assertThat(extractFieldsNames, hasItems("jhon","smith"));
 	}
@@ -70,17 +74,19 @@ public class ConvertorTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testExtractValues() {
-		when(classUnderTestSpied.extractFieldsNames(Mockito.anyList())).thenReturn(Arrays.asList("staring", "writer"));
+		when(classUnderTestSpied.extractFieldsNames(Mockito.anyList())).thenReturn(new TreeSet<String>( Arrays.asList("staring", "writer") ));
 		HashSet<Attribute> hashSet = new HashSet<Attribute>();
 		hashSet.add(new Attribute("staring", "A"));
 		hashSet.add(new Attribute("writer", "B"));
 		hashSet.add(new Attribute("staring", "C"));
+		hashSet.add(new Attribute("imdbId", "stringValue"));
 		when(entityProfile.getAttributes()).thenReturn(hashSet);
 		
 		List<Map<String,String>> values = classUnderTestSpied.extractValues(Arrays.asList(entityProfile));
 		Assert.assertEquals("Created bigger result", 1, values.size());
 		Map<String, String> map = values.get(0);
 		assertThat(map.values(), hasItems("B", "A C"));
+		assertThat(map.get("title"), is(equalTo("stringValue")));
 	}
 
 	@Test

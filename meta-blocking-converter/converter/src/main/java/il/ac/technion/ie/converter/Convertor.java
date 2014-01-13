@@ -125,6 +125,12 @@ public class Convertor {
 				while (iterator.hasNext()) {
 					String key = (String) iterator.next();
 					String value = map.get(key) == null ? "" : map.get(key);
+					
+					int indexOf = value.indexOf(CSV_SEPERATOR.toString());
+					while (indexOf > -1) {
+						value = value.substring(0, indexOf) + value.substring(indexOf + 1);
+						indexOf = value.indexOf(CSV_SEPERATOR.toString());
+					}
 
 					bufferedWriter.write(value);
 					if (iterator.hasNext()) {

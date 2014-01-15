@@ -12,39 +12,40 @@ import fimEntityResolution.pools.FIRunnablePool;
 
 public class FIRunnable implements Runnable, Clearer {
 
-	private List<Integer> currIS = null;
+	private List<Integer> currentItemSet = null;
 	private int minSup;
 	private Map<Integer, Record> records = null;
 	private double NG_PARAM;
 	private Map<Integer, BitMatrix> coverageIndex;
-	private CandidatePairs CPs;
+	private CandidatePairs candidatePairs;
 
-	public FIRunnable(List<Integer> currIS, int minSup,
-			Map<Integer, Record> records, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs CPs) {
-		this.currIS = currIS;
+	public FIRunnable(List<Integer> currentItemSet, int minSup,
+			Map<Integer, Record> records, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs candidatePairs) {
+		this.currentItemSet = currentItemSet;
 		this.minSup = minSup;
 		this.records = records;
 		this.NG_PARAM = NG_PARAM;
 		this.coverageIndex = coverageIndex;
-		this.CPs = CPs;
+		this.candidatePairs = candidatePairs;
 	}
 
 	public void setParams(List<Integer> currIS, int minSup,
-			Map<Integer, Record> records, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs CPs) {
-		this.currIS = currIS;
+			Map<Integer, Record> records, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs candidatePairs) {
+		this.currentItemSet = currIS;
 		this.minSup = minSup;
 		this.records = records;
 		this.NG_PARAM = NG_PARAM;
 		this.coverageIndex = coverageIndex;
-		this.CPs = CPs;
+		this.candidatePairs = candidatePairs;
 	}
 
 	@Override
 	public void run() {
+		
 		BitSetIF support = null;
 		try{
 		
-			support = Utilities.getItemsetSupport(currIS);
+			support = Utilities.getItemsetSupport(currentItemSet);
 			if (support.getCardinality() <  minSup) {
 				Utilities.nonFIs.incrementAndGet();					
 				return; // must be the case that the item appears minSup times
@@ -53,8 +54,9 @@ public class FIRunnable implements Runnable, Clearer {
 			List<IFRecord> FISupportRecords = support.getRecords();				
 								
 			long start = System.currentTimeMillis();
+			
 			double currClusterScore = StringSimTools.softTFIDF(
-					FISupportRecords, currIS, Utilities.scoreThreshold);
+					FISupportRecords, currentItemSet, Utilities.scoreThreshold);
 			FISupportRecords = null;
 			Utilities.timeSpentCalcScore.addAndGet(System.currentTimeMillis() - start);
 
@@ -63,7 +65,7 @@ public class FIRunnable implements Runnable, Clearer {
 			if (currClusterScore > Utilities.scoreThreshold) {
 				Utilities.numOfFIs.incrementAndGet();
 				
-			support.markPairs(CPs,currClusterScore);
+			support.markPairs(candidatePairs,currClusterScore);
 			/*	int clusterCell = cellForCluster(currClusterScore);
 				synchronized (FIRunnable.class) {
 					int begIndex = Utilities.getIntForThresh(Utilities.scoreThreshold);

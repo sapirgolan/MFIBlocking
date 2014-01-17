@@ -88,6 +88,7 @@ public class BottomUp {
 		8. The set of p parameters to use as the Neighberhood Growth constraints.
 	 */
 	public static void main(String[] args){
+		System.out.println("THIS IS A MAVEN UBUID");
 		System.out.println("Entered Main");	
 		String currDir = new File(".").getAbsolutePath();
 		System.out.println("Working dir: " + currDir);	
@@ -101,8 +102,21 @@ public class BottomUp {
 		Alg alg = Alg.valueOf(args[6]);	
 		double[] NGs = getDoubles(args[7]);		
 		if(args.length > 8 && args[8] != null){
-			srcFile = args[8];
-		}	
+			if ("perf".equalsIgnoreCase(args[8])) {
+				System.out.println("You have started the application in profiling mode for performce");
+				System.out.println("Start your profiler and then hit any key on the console");
+				try {
+					System.in.read();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else {
+				srcFile = args[8];
+			}
+		}
+		
 		System.out.println("args.length : " + args.length);
 		System.out.println("Main srcFile : " + srcFile);
 		long start = System.currentTimeMillis();

@@ -17,3 +17,11 @@ mvn install:install-file -Dfile=.\src\main\resources\Classmexer\classmexer.jar -
 mvn install:install-file -Dfile=.\src\main\resources\sbs\SBS.jar -DgroupId=org.enerj.core -DartifactId=SBS -Dversion=0.0.1 -Dpackaging=jar
 mvn install:install-file -Dfile=.\src\main\resources\simmetrics\simmetrics.jar -DgroupId=uk.ac.shef.wit -DartifactId=simmetrics -Dversion=1.6.2 -Dpackaging=jar
 
+In order to run MFIBlocks Add the following VM arguments to Java Virtaul Machine (JVM):
+-Xmx1300M
+-javaagent:.\src\main\resources\Classmexer\classmexer.jar
+-Djava.library.path=.\src\main\resources\hyperic-sigar-1.6.4\sigar-bin\lib
+
+For illustration:
+java -Xmx1300M -javaagent:.\src\main\resources\Classmexer\classmexer.jar -Djava.library.path=.\src\main\resources\hyperic-sigar-1.6.4\sigar-bin\lib -jar EntityResolution.jar ...(EntityResolution parameters)
+

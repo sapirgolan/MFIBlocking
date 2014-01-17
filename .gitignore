@@ -18,7 +18,12 @@ local.properties
 .loadpath
 
 # generated files
-meta-blocking-converter/converter/target/
+meta-blocking-converter/converter/target
+MFIblocks/original/target
+
+#Converter resources
+meta-blocking-converter/converter/*.csv
+meta-blocking-converter/converter/*.xlsx
 
 # External tool builders
 .externalToolBuilders/

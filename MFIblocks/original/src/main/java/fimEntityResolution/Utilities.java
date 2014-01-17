@@ -23,24 +23,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.transaction.NotSupportedException;
-
-import javaewah.EWAHCompressedBitmap;
-import javaewah.IntIterator;
 
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
@@ -51,24 +49,25 @@ import org.neo4j.kernel.impl.util.FileUtils;
 
 import candidateMatches.CandidatePairs;
 
+import com.googlecode.javaewah.EWAHCompressedBitmap;
+import com.googlecode.javaewah.IntIterator;
 import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 
 import fimEntityResolution.bitsets.EWAH_BitSet;
 import fimEntityResolution.bitsets.EWAH_BitSet_Factory;
 import fimEntityResolution.bitsets.Java_BitSet_Factory;
-import fimEntityResolution.bitsets.SBS_BitSet;
-import fimEntityResolution.bitsets.SBS_BitSet_Factory;
 import fimEntityResolution.bitsets.SingleBSFactory;
 import fimEntityResolution.interfaces.BitSetFactory;
 import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.Clearer;
 import fimEntityResolution.interfaces.IFRecord;
 import fimEntityResolution.pools.BitMatrixPool;
 import fimEntityResolution.pools.FIRunnableDBPool;
 import fimEntityResolution.pools.FIRunnablePool;
 import fimEntityResolution.pools.GDSPool;
 import fimEntityResolution.pools.LimitedPool;
+//import javaewah.EWAHCompressedBitmap;
+//import javaewah.IntIterator;
 
 public class Utilities {
 

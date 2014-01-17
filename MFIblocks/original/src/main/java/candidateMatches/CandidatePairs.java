@@ -96,8 +96,11 @@ public class CandidatePairs implements SetPairIF{
 	public double memoryUsage(){
 		return (MemoryUtil.deepMemoryUsageOfAll(allMatches.values(), VisibilityFilter.ALL)/Math.pow(2, 30));
 	}
-	
-	public BitMatrix exportToBM(){
+	/***
+	 * Removes pairs that didn't pass the threshold (min_th) and export to BitMatrix (Jonathan Svirsky)
+	 * @return BitMatrix object
+	 */
+	public BitMatrix exportToBitMatrix(){
 		long start = System.currentTimeMillis();
 		System.out.println("DEBUG: total memory used by CandidatePairs: " +	memoryUsage() + " GB");
 		

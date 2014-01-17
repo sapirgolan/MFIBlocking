@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.crypto.spec.OAEPParameterSpec;
 import javax.transaction.NotSupportedException;
 
 import org.apache.lucene.queryParser.QueryParser.Operator;
@@ -87,7 +86,7 @@ public class Utilities {
 	public static Map<Integer, Record> readRecords(String numericRecordsFile,
 			String origRecordsFile, String srcFile) {
 
-		Map<Integer, Record> retVal = new HashMap<Integer, Record>();
+		Map<Integer, Record> outputRecords = new HashMap<Integer, Record>();
 		try {
 			BufferedReader recordsFileReader = new BufferedReader(
 					new FileReader(new File(numericRecordsFile)));
@@ -121,7 +120,6 @@ public class Utilities {
 					if (srcFileReader != null) {
 						src = srcFileReader.readLine().trim();
 					}
-
 					Record r = new Record(recordIndex, recordLine);
 					r.setSrc(src); // in the worst case this is null
 					String[] words = ws.split(numericLine);
@@ -134,7 +132,7 @@ public class Utilities {
 					}
 					minRecordLength = (r.getSize() < minRecordLength) ? r
 							.getSize() : minRecordLength;
-					retVal.put(r.getId(), r);
+					outputRecords.put(r.getId(), r);
 					recordIndex++;
 				} catch (Exception e) {
 					System.out.println("Exception while reading line "
@@ -144,8 +142,8 @@ public class Utilities {
 				}
 			}
 			recordsFileReader.close();
-			System.out.println("Num of records read: " + retVal.size());
-			DB_SIZE = retVal.size();
+			System.out.println("Num of records read: " + outputRecords.size());
+			DB_SIZE = outputRecords.size();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,7 +151,7 @@ public class Utilities {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		globalRecords = retVal;
+		globalRecords = outputRecords;
 		System.out.println("globalRecords.size() " + globalRecords.size());
 		return globalRecords;
 
@@ -453,14 +451,14 @@ public class Utilities {
 	}
 
 	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
-
+	
 	public static /*Map<Integer, BitMatrix>*/ CandidatePairs readFIs(String frequentItemsetFile,
 			Map<Integer, FrequentItem> globalItemsMap, double scoreThreshold,
 			Map<Integer, Record> records, int minSup, double NG_PARAM) {
 		System.out.println("reading FIs");
 		int numOfLines = 0;
 		BufferedReader FISReader = null;
-		StringBuilder sb = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 
 		double tooLarge = 0;
 		double scorePruned = 0;
@@ -475,7 +473,7 @@ public class Utilities {
 		resetAtomicIntegerArr(clusterScores);	
 		ConcurrentHashMap<Integer, BitMatrix> coverageIndex = new ConcurrentHashMap<Integer, BitMatrix>(21);
 		int maxSize = (int) Math.floor(minSup*NG_PARAM);
-		CandidatePairs cps = new CandidatePairs(maxSize);
+		CandidatePairs candidatePairs = new CandidatePairs(maxSize);
 		StringSimTools.numOfMFIs.set(0);
 		StringSimTools.numOfRoughMFIs.set(0);
 		StringSimTools.timeInGetClose.set(0);
@@ -486,15 +484,15 @@ public class Utilities {
 
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
-		int nrOfProcessors = runtime.availableProcessors();		
-		System.out.println("Running on a system with  " + nrOfProcessors
+		int numOfProcessors = runtime.availableProcessors();		
+		System.out.println("Running on a system with  " + numOfProcessors
 				+ " processors");
 		// ExecutorService exec =
 		// Executors.newFixedThreadPool(nrOfProcessors+1);
 		LimitedQueue<Runnable> LQ = new LimitedQueue<Runnable>(
-				2 * nrOfProcessors);
-		ExecutorService exec = new ThreadPoolExecutor((int) NR_PROCS_MULT
-				* nrOfProcessors, (int) NR_PROCS_MULT * nrOfProcessors, 0L,
+				2 * numOfProcessors);
+		ExecutorService executorService = new ThreadPoolExecutor((int) NR_PROCS_MULT
+				* numOfProcessors, (int) NR_PROCS_MULT * numOfProcessors, 0L,
 				TimeUnit.MILLISECONDS, LQ);
 		System.out.println("used memory before processing MFIS for minsup "
 				+ minSup
@@ -509,7 +507,7 @@ public class Utilities {
 			System.out.println("About to read MFIs from file "
 					+ frequentItemsetFile);
 			String currLine = "";
-			sb.append("Size").append("\t").append("Score").append(
+			stringBuilder.append("Size").append("\t").append("Score").append(
 					Utilities.NEW_LINE);
 			while (currLine != null) {
 				try {
@@ -518,21 +516,21 @@ public class Utilities {
 						break;
 					if (currLine.startsWith("(")) // the empty FI - ignore it
 						continue;
-					ParsedFI pfi = parseFILine(currLine);
-					if (pfi.supportSize > minSup * NG_PARAM) {
+					ParsedFrequentItemSet parsedFrequentItems = parseFILine(currLine);
+					if (parsedFrequentItems.supportSize > minSup * NG_PARAM) {
 						tooLarge++;
 						continue;
 					}
-					List<Integer> currIS = pfi.items;
+					List<Integer> currentItemSet = parsedFrequentItems.items;
 					double maxClusterScore = StringSimTools.MaxScore(
-							pfi.supportSize, currIS, minRecordLength);
+							parsedFrequentItems.supportSize, currentItemSet, minRecordLength);
 					if (maxClusterScore < 0.1 * Utilities.scoreThreshold) {
 						scorePruned++;
 						continue;
 					}
 					FIRunnable FIR = FIRunnablePool.getInstance().getRunnable(
-							currIS, minSup, records, NG_PARAM,coverageIndex,cps);
-					exec.execute(FIR);
+							currentItemSet, minSup, records, NG_PARAM,coverageIndex,candidatePairs);
+					executorService.execute(FIR);
 					numOfLines++;
 					if (numOfLines % 100000 == 0) {
 						System.out.println("Read " + numOfLines + " FIs");
@@ -574,8 +572,8 @@ public class Utilities {
 		} finally {
 			try {
 				FISReader.close();
-				exec.shutdown();
-				exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+				executorService.shutdown();
+				executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -616,9 +614,9 @@ public class Utilities {
 
 		System.out.println("cluster scores: " + Arrays.toString(clusterScores));
 		if (DEBUG) {
-			System.out.println(sb.toString());
+			System.out.println(stringBuilder.toString());
 		}
-		exec = null;
+		executorService = null;
 		System.gc();
 		/*
 		 * for(int i = 0 ; i <= coverageIndex.size() ; i++){ BitMatrix bm =
@@ -634,7 +632,7 @@ public class Utilities {
 		 * }
 		 */
 		//return coverageIndex;
-		return cps;
+		return candidatePairs;
 	}
 
 	private final static double NR_PROCS_MULT = 4;
@@ -703,7 +701,7 @@ public class Utilities {
 						break;
 					if (currLine.startsWith("(")) // the empty FI - ignore it
 						continue;
-					ParsedFI pfi = parseFILine(currLine);
+					ParsedFrequentItemSet pfi = parseFILine(currLine);
 					if (pfi.supportSize > minSup * NG_PARAM) {
 						tooLarge++;
 						continue;
@@ -1060,7 +1058,11 @@ public class Utilities {
 	 */
 	private static BitSetFactory bsf = Java_BitSet_Factory.getInstance();
 	private static LimitedPool limitedPool = LimitedPool.getInstance(bsf);
-
+	/***
+	 * Returns set of tuples as BitSetIF object (Jonathan Svirsky)
+	 * @param items - q-grams ids returned by FP-growth (Jonathan Svirsky)
+	 * @return
+	 */
 	public static BitSetIF getItemsetSupport(List<Integer> items) {
 		try {
 			long start = System.currentTimeMillis();
@@ -1141,7 +1143,7 @@ public class Utilities {
 
 	}
 
-	private static ParsedFI parseFILine(String line) {
+	private static ParsedFrequentItemSet parseFILine(String line) {
 		line = line.trim();
 		List<Integer> retVal = new ArrayList<Integer>();
 		Pattern ISPatters = Pattern.compile(ItemsetExpression);
@@ -1156,12 +1158,12 @@ public class Utilities {
 			retVal.add(Integer.parseInt(strItem));
 		}
 		int supportSize = Integer.parseInt(fiMatcher.group(2).trim());
-		ParsedFI pFI = (new Utilities()).new ParsedFI(retVal, supportSize);
+		ParsedFrequentItemSet pFI = (new Utilities()).new ParsedFrequentItemSet(retVal, supportSize);
 		return pFI;
 	}
 
-	private class ParsedFI {
-		public ParsedFI(List<Integer> items, int supportSize) {
+	private class ParsedFrequentItemSet {
+		public ParsedFrequentItemSet(List<Integer> items, int supportSize) {
 			this.items = items;
 			this.supportSize = supportSize;
 		}

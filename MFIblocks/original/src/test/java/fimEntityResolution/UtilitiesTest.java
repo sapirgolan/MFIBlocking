@@ -4,7 +4,10 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,7 +31,11 @@ public class UtilitiesTest {
 	@Test
 	public void testGetUnixMFICmdLine() throws Exception {
 		String unixMFICmdLine = Utilities.getUnixMFICmdLine();
-		assertThat(unixMFICmdLine, allOf( containsString("target/classes"), containsString("fpgrowth/fpgrowth.exe") ));
+		assertThat(unixMFICmdLine, allOf( containsString("exe"), containsString("fpgrowth") ));
+		int commandParameterInsex = unixMFICmdLine.indexOf(" -tm -s-%d %s %s");
+		File resource = new File(unixMFICmdLine.substring(0, commandParameterInsex).trim());
+		Assert.assertTrue(resource.exists());
+		Assert.assertTrue(resource.canExecute());
 	}
 
 }

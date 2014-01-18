@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +12,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import javax.transaction.NotSupportedException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
@@ -374,13 +375,24 @@ public class Utilities {
 	}
 
 	public static String getUnixMFICmdLine() {
-		URL resource = Utilities.class.getClassLoader().getResource("fpgrowth/fpgrowth.exe");
-		String path = resource.getPath();
-		path = path + " -tm -s-%d %s %s";
-		return path;
-		
+		InputStream resourceAsStream = Utilities.class.getClassLoader().getResourceAsStream("fpgrowth/fpgrowth.exe");
+		try {
+			File file = File.createTempFile("fpgrowth",".exe");
+			file.deleteOnExit();
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			IOUtils.copy(resourceAsStream, fileOutputStream);
+			fileOutputStream.flush();
+			resourceAsStream.close();
+			fileOutputStream.close();
+			String path = file.getPath();
+			path = path + " -tm -s-%d %s %s";
+			return path;
+		} catch (IOException e) {
+			System.err.println("Failed to extract fpgrowth from exe");
+			e.printStackTrace();
+		}
+		return null;
 	}
-	private final static String UnixMFICmdLine = getUnixMFICmdLine();
 
 	public static File RunMFIAlg(int minSup, String recordsFile, File MFIDir) {
 		System.out.println("free mem before activating FPMax: "
@@ -398,7 +410,7 @@ public class Utilities {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		file.deleteOnExit();
+//		file.deleteOnExit();
 		System.out.println("recordsFile= " + recordsFile);
 		// String cmd = String.format(MFICmdLine, minSup, recordsFile,
 		// file.getAbsolutePath());

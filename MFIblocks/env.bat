@@ -1,1 +1,1 @@
-set PATH=%PATH%;C:\workspace\apache-maven-3.1.1\bin
+set PATH=%PATH%;C:\apache-maven-3.1.1\bin

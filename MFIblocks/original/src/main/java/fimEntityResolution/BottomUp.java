@@ -19,7 +19,10 @@ import candidateMatches.CandidatePairs;
 import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 import fimEntityResolution.pools.BitMatrixPool;
+import fimEntityResolution.statistics.BlockingResultsSummary;
+import fimEntityResolution.statistics.BlockingRunResult;
 //import cern.colt.matrix.impl.SparseObjectMatrix2D;
+import fimEntityResolution.statistics.StatisticMeasuremnts;
 
 public class BottomUp {
 	
@@ -148,15 +151,16 @@ public class BottomUp {
 	 * @param minSups
 	 * @param minBlockingThresholds
 	 * @param alg
-	 * @param NGs
+	 * @param neiborhoodGrows
 	 */
 	public static void mfiBlocksCore(Map<Integer,Record> records, String matchFile,int[] minSups, 
-			double[] minBlockingThresholds, Alg alg, double[] NGs){
+			double[] minBlockingThresholds, Alg alg, double[] neiborhoodGrows){
 		Arrays.sort(minSups);
 		System.out.println("order of minsups used: " + Arrays.toString(minSups));
-		List<BlockingRunResult> BlockingRunResults= new ArrayList<BlockingRunResult>();				
-		for(double NG: NGs){
-			NG_LIMIT = NG;
+		List<BlockingRunResult> blockingRunResults= new ArrayList<BlockingRunResult>();
+		//iterate for each neighborhood grow value that was set in input 
+		for(double neiborhoodGrow: neiborhoodGrows){
+			NG_LIMIT = neiborhoodGrow;
 			for (double minBlockingThreshold : minBlockingThresholds) { // test for each minimum blocking threshold
 				coveredRecords = new BitSet(records.size()+1);
 				coveredRecords.set(0,true); // no such record
@@ -168,6 +172,7 @@ public class BottomUp {
 						" and NGLimit: " + NG_LIMIT);			
 				long start = System.currentTimeMillis();
 				//BitMatrix resultMatrix = getClustersToUse(records,minSups,minBlockingThreshold);
+				//obtain all the clusters that has the minimum score
 				CandidatePairs cps = getClustersToUse(records,minSups,minBlockingThreshold);
 				//getClustersToUseDB(records,minSups,minBlockingThreshold,trueClusters);
 				long startMaxRecall = System.currentTimeMillis();		
@@ -175,19 +180,19 @@ public class BottomUp {
 				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
 				
 				//double[] results = calculateFinalResults(trueClusters.groundTruth(), resultMatrix, records.size());
-				double[] results = calculateFinalResults(trueClusters.groundTruthCandidatePairs(), cps, records.size());
+				StatisticMeasuremnts results = calculateFinalResults(trueClusters.groundTruthCandidatePairs(), cps, records.size());
 				//double[] results = calculateFinalResults(trueClusters,records,coveredRecords,records.size());
 				long totalMaxRecallCalculation = System.currentTimeMillis()-startMaxRecall;				
-				BlockingRunResult blockingRR = (new BottomUp()).new BlockingRunResult(results[0],results[1],results[2],results[3],
-						minBlockingThreshold,lastUsedBlockingThreshold,NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculation)/1000.0);
-				BlockingRunResults.add(blockingRR);
+				BlockingRunResult blockingRR = new BlockingRunResult(results, minBlockingThreshold, lastUsedBlockingThreshold,
+						NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculation)/1000.0);
+				blockingRunResults.add(blockingRR);
 				System.out.println("");
 				System.out.println("");
 			}
 		}
 			
-		if(BlockingRunResults != null && BlockingRunResults.size() > 0){
-			String resultsString = writeBlockingRR(BlockingRunResults);
+		if(blockingRunResults != null && blockingRunResults.size() > 0){
+			String resultsString = writeBlockingRR(blockingRunResults);
 			System.out.println();
 			System.out.println(resultsString);
 		}
@@ -328,7 +333,6 @@ public class BottomUp {
 
 	private static CandidatePairs getClustersToUse(Map<Integer,Record> records,int[] minSups, double minBlockingThreshold){
 		Arrays.sort(minSups);
-	//	int totalNumOfClusters = 0;				
 		coveredRecords.set(0,true); // no such record
 		double[] usedThresholds = new double[minSups.length];		
 		File mfiDir = new File(FI_DIR);
@@ -336,13 +340,12 @@ public class BottomUp {
 			if(!mfiDir.mkdir())
 				System.out.println("Failed to create directory " + mfiDir.getAbsolutePath());
 		}
-		//BitMatrix resultMatrix = new BitMatrix(Utilities.DB_SIZE);
 		CandidatePairs allResults = new CandidatePairs(); //unlimited
 		for(int i=(minSups.length - 1) ; i >=0  && coveredRecords.cardinality() < records.size(); i--){ // array is sorted in ascending order -
 			//begin with largest minSup
 			//continue until all records have been covered OR we have completed running over all minSups			
-			Map<Integer, BitMatrix> coverageMap = null;			
 			long start = System.currentTimeMillis();
+			//TODO: check content of file
 			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords,records, minSups[i]);	
 			System.out.println("Time to createRecordFileFromRecords" +Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 				
@@ -353,45 +356,24 @@ public class BottomUp {
 					" is " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 		
 			start = System.currentTimeMillis();
-			//coverageMap = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
 			CandidatePairs candidatePairs = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
 			System.out.println("Time to read MFIs: " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
 			
-			/*		
-			start = System.currentTimeMillis();
-			int SNIndex = getSNIndex(coverageMap, records, minSups[i]*NG_LIMIT,minBlockingThreshold);			
-			System.out.println("index returned: " + SNIndex + " corresponds to " + (SNIndex-1)*0.05 + " < score <= " + SNIndex*0.05);
-			
-			System.out.println("Time to get clustering which maintains NG(t)<=" + NG_LIMIT + "*minsup is: " + 
-					Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-			*/
 					
-	//		if(SNIndex <= 20){
-				start = System.currentTimeMillis();
-	//			BitMatrix coveragematrix = coverageMap.get(SNIndex);
-				BitMatrix coveragematrix = candidatePairs.exportToBitMatrix();
-				updateCoveredRecords(coveredRecords,coveragematrix.getCoveredRows());
-				System.out.println("Time to updateCoveredRecords " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");				
-				start = System.currentTimeMillis();				
-			//	updateResultMatrix(resultMatrix,coveragematrix);
-				updateCandidatePairs(allResults,candidatePairs );
-				coveragematrix = null; coverageMap = null; 
-				System.out.println("Time to updateBlockingEfficiency " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-	//			usedThresholds[i]=(SNIndex-1)*0.05;
-				usedThresholds[i] = candidatePairs.getMinThresh();
+			start = System.currentTimeMillis();
+			BitMatrix coveragematrix = candidatePairs.exportToBitMatrix();
+			updateCoveredRecords(coveredRecords,coveragematrix.getCoveredRows());
+			System.out.println("Time to updateCoveredRecords " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");				
+			start = System.currentTimeMillis();				
+			updateCandidatePairs(allResults,candidatePairs );
+			coveragematrix = null; 
+			System.out.println("Time to updateBlockingEfficiency " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
+			usedThresholds[i] = candidatePairs.getMinThresh();
+
+			lastUsedBlockingThreshold = candidatePairs.getMinThresh();
+			candidatePairs = null;
+			System.out.println("lastUsedBlockingThreshold: " + lastUsedBlockingThreshold);
 				
-	//			lastUsedBlockingThreshold = (SNIndex-1)*0.05;
-				lastUsedBlockingThreshold = candidatePairs.getMinThresh();
-				candidatePairs = null;
-				System.out.println("lastUsedBlockingThreshold: " + lastUsedBlockingThreshold);
-				
-	/*		}
-			else{				
-					System.out.println("No threshold exists such that the NG contraint NG < " + NG_LIMIT*minSups[i] +
-							" is satisfied for minsup = " + minSups[i]);
-					lastUsedBlockingThreshold = usedThresholds[i] = 1.0;								
-			}
-	*/	
 			
 			System.out.println("Number of covered records after running with Minsup=" +
 					minSups[i] +  " is " + coveredRecords.cardinality() + " out of " + records.size());
@@ -590,14 +572,13 @@ public class BottomUp {
 		System.out.println("Directory TempDir= " + TempDir + " TempDir.getAbsolutePath()" + TempDir.getAbsolutePath());
 		try {
 			if(!TempDir.exists()){
-				if(!TempDir.mkdir())						
-					System.out.println("failed to create directory " + TempDir.getAbsolutePath());				
+				if(!TempDir.mkdir()) {						
+					System.out.println("failed to create directory " + TempDir.getAbsolutePath());
+				}
 			}
-			
 			outputFle = File.createTempFile("records", null, TempDir);
 			System.out.println("retVal= " + outputFle + " retVal.getAbsolutePath()=" + outputFle.getAbsolutePath());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}	
 		outputFle.deleteOnExit();
@@ -621,15 +602,7 @@ public class BottomUp {
 				writer.newLine();
 				numOfWrittenLines++;
 			}			
-			/*
-			//release unused records
-			for(int i=coveredRecords.nextSetBit(1); i>=0 && i <= records.size() ; i=coveredRecords.nextSetBit(i+1)){
-				records.remove(i);				
-			}
-			Runtime.getRuntime().gc(); 
-			*/
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally{
@@ -638,7 +611,6 @@ public class BottomUp {
 				writer.flush();
 				writer.close();		
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -702,7 +674,7 @@ public class BottomUp {
 	private final static double MAX_SUPP_CONST = 1.0;//0.005;
 	private static Map<Integer,Integer> appitems(BitSet coveredRecords, Map<Integer,Record> records, int minSup){
 		Map<Integer,Integer> retVal = new HashMap<Integer, Integer>();
-		for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= records.size() ; i=coveredRecords.nextClearBit(i+1)){
+		for( int i=coveredRecords.nextClearBit(0); i>=0 && i <= records.size() ; i=coveredRecords.nextClearBit(i+1) ){
 			Record currRecord = records.get(i);		
 			Set<Integer> recordItems = currRecord.getItemsToFrequency().keySet();
 			for (Integer recorditem : recordItems) {
@@ -934,30 +906,38 @@ public class BottomUp {
 		return retVal;
 	}
 	
-	private static double[] calculateFinalResults(CandidatePairs GroundTruth,CandidatePairs ResultMatrix,int numOfRecords)
+	/**
+	 * Calculate output measurements: F-measure, Precision (PC), Recall 
+	 * @param GroundTruth
+	 * @param ResultMatrix
+	 * @param numOfRecords
+	 * @return
+	 */
+	private static StatisticMeasuremnts calculateFinalResults(CandidatePairs GroundTruth,CandidatePairs ResultMatrix,int numOfRecords)
 	{
 		long start = System.currentTimeMillis();
 		long numRecords = (long)numOfRecords;
 		double[] TPFP = CandidatePairs.TrueAndFalsePositives(GroundTruth, ResultMatrix);
-		double TP = TPFP[0];		
-		double FP = TPFP[1];
-		double FN = CandidatePairs.FalseNegatives(GroundTruth, ResultMatrix);	
-		double precision = TP/(TP+FP);
-		double recall = TP/(TP+FN);
+		double truePositive = TPFP[0];		
+		double falsePositive = TPFP[1];
+		double falseNegative = CandidatePairs.FalseNegatives(GroundTruth, ResultMatrix);	
+		double precision = truePositive/(truePositive+falsePositive);
+		double recall = truePositive/(truePositive+falseNegative);
 		double pr_f_measure = (2*precision*recall)/(precision+recall);	
 		double totalComparisons = ((numRecords * (numRecords - 1))*0.5);	
-		double RR = Math.max(0.0, (1.0-((TP+FP)/totalComparisons)));		
+		double reductionRatio = Math.max(0.0, (1.0-((truePositive+falsePositive)/totalComparisons)));		
 		System.out.println("num of same source pairs: " + sameSource);
 	//	System.out.println(" ResultMatrix.numOfSet() " + ResultMatrix.numOfSet());
-		System.out.println("TP = " + TP +", FP= " + FP + ", FN="+ FN  + " totalComparisons= " + totalComparisons);
-		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + RR);	
-		double[] retVal = new double[4];
-		retVal[0] = recall;
-		retVal[1] = precision;
-		retVal[2]=  pr_f_measure;
-		retVal[3]=  RR;		
+		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisons);
+		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + reductionRatio);
+		StatisticMeasuremnts statisticMeasuremnts = new StatisticMeasuremnts();
+		statisticMeasuremnts.setRecall(recall);
+		statisticMeasuremnts.setPrecision(precision);
+		statisticMeasuremnts.setFMeasure(pr_f_measure);
+		statisticMeasuremnts.setRR(reductionRatio);
+		statisticMeasuremnts.setDuplicatesFound(truePositive);
 		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-		return retVal;
+		return statisticMeasuremnts;
 	}
 	
 	/*
@@ -1166,20 +1146,22 @@ public class BottomUp {
 		append("minBlockingThresh").append("\t").
 		append("usedThresh").append("\t").
 		append("Recall").append("\t").
-		append("precision").append("\t").
-		append("f-measure").append("\t").
+		append("Precision (PC)").append("\t").
+		append("F-measure").append("\t").
 		append("RR").append("\t").
+		append("Duplicates found").append("\t").
 		append("time to run").append(Utilities.NEW_LINE);
 		for (BlockingRunResult blockingRunResult : runResults) {
 			sb.append(blockingRunResult.toString()).append(Utilities.NEW_LINE);
 		}
-		//calculate averages and min/Max
-		BlockingResultsSummary brs =(new BottomUp()). new BlockingResultsSummary(runResults);
+		//calculate average, Min & Max for all runs
+		BlockingResultsSummary brs = new BlockingResultsSummary(runResults);
 		sb.append(Utilities.NEW_LINE);
 		sb.append(brs.getSummary()).append(Utilities.NEW_LINE);		
 		sb.append(Utilities.NEW_LINE).append(Utilities.NEW_LINE);
 		return sb.toString();
 	}
+	
 	public static String writeRunResults(Collection<RunResult> runResults, double[] blockingThresholds, int[] minSups){
 		StringBuilder sb = new StringBuilder();
 		sb.append("blocking_thresh").append("\t").append("\t").append("dedup_thresh").append("\t").append("\t").append("precision")
@@ -1279,155 +1261,4 @@ public class BottomUp {
 		}
 	}
 	
-	public class BlockingResultsSummary{
-		double[] pairsCompletenessSummary; //0
-		double[] reductionRatioSummary; //1
-		double[] modifiedRRSummary;		//2
-		double[] f_measureSummary; //3
-		double[] modifiedFMeasureSummary; //4
-		double blockingThresh; 
-		long[] timeToRunInSecSummary; 
-		double[] dedupPrecisionSummary; //5
-		double[] dedupRecallSummary; //6
-		double[] dedupFSummary; //7
-		
-		double[][] resultsSummary;
-		double[] runTimeSummary;
-		
-		private double getAverage(double[] arr){
-			double retval = 0;
-			for (double d : arr) {
-				retval += d;
-			}
-			return (retval/arr.length);	
-		}
-		private double getMin(double[] arr){
-			double retval = Double.MAX_VALUE;
-			for (double d : arr) {
-				retval = Math.min(retval,d);
-			}
-			return retval;		
-		}
-		
-		private double getMax(double[] arr){
-			double retval = Double.MIN_VALUE;
-			for (double d : arr) {
-				retval = Math.max(retval,d);
-			}
-			return retval;			
-		}
-		
-		private long getAverage(long[] arr){
-			long retval = 0;
-			for (long d : arr) {
-				retval += d;
-			}
-			return (retval/arr.length);
-			
-		}
-		private long getMin(long[] arr){
-			long retval = Long.MAX_VALUE;
-			for (long d : arr) {
-				retval = Math.min(retval,d);
-			}
-			return retval;			
-		}
-		
-		private long getMax(long[] arr){
-			long retval = Long.MIN_VALUE;
-			for (long d : arr) {
-				retval = Math.max(retval,d);
-			}
-			return retval;			
-		}
-		
-		public String getSummary(){
-			StringBuilder sb = new StringBuilder();
-			
-			sb.append("Recall - summary:").append(Utilities.NEW_LINE);
-			sb.append(getMin(resultsSummary[0])).append(" ").append(getAverage(resultsSummary[0])).append(" ")
-				.append(getMax(resultsSummary[0])).append(Utilities.NEW_LINE);
-			
-			sb.append("Precision - PQ summary:").append(Utilities.NEW_LINE);
-			sb.append(getMin(resultsSummary[1])).append(" ").append(getAverage(resultsSummary[1])).append(" ")
-				.append(getMax(resultsSummary[1])).append(Utilities.NEW_LINE);
-			
-			sb.append("F-measure summary:").append(Utilities.NEW_LINE);
-			sb.append(getMin(resultsSummary[2])).append(" ").append(getAverage(resultsSummary[2])).append(" ")
-				.append(getMax(resultsSummary[2])).append(Utilities.NEW_LINE);
-			
-			
-			sb.append("RR summary:").append(Utilities.NEW_LINE);
-			sb.append(getMin(resultsSummary[3])).append(" ").append(getAverage(resultsSummary[3])).append(" ")
-				.append(getMax(resultsSummary[3])).append(Utilities.NEW_LINE);			
-		
-			sb.append("Runtime/secs - summary:").append(Utilities.NEW_LINE);
-			sb.append(getMin(runTimeSummary)).append(" ").append(getAverage(runTimeSummary)).append(" ")
-				.append(getMax(runTimeSummary));
-			
-			
-			return sb.toString();
-		}
-		public BlockingResultsSummary(Collection<BlockingRunResult> results){
-			resultsSummary = new double[4][results.size()];
-			runTimeSummary = new double[results.size()];
-			int resIndex=0;
-			for (BlockingRunResult result : results) {
-				double[] asArr = result.asArray();
-				for (int i = 3; i < 7; i++) {
-					resultsSummary[i-3][resIndex] = asArr[i];
-				}
-				runTimeSummary[resIndex] = result.timeToRunInSec;
-				resIndex++;
-			}			
-		}
-	}
-	public class BlockingRunResult{
-		double maxNG;
-		double minBlockingThreshold;
-		double actualUsedThreshold;		
-		double recall; //0
-		double precision; //1
-		double f_measure; //2
-		double reductionRatio; //3	
-		double timeToRunInSec; //4	
-		
-		public double[] asArray(){
-			double[] retVal = new double[8];
-			retVal[0] = maxNG;
-			retVal[1] = minBlockingThreshold;
-			retVal[2] = actualUsedThreshold;			
-			retVal[3] = recall;
-			retVal[4] = precision;
-			retVal[5] = f_measure;
-			retVal[6] = reductionRatio;			
-			retVal[7] = timeToRunInSec;
-			return retVal;
-		}
-		public BlockingRunResult(double recall, double precision, double f_measure, double reductionRatio, double minBlockingThresh, 
-				double actualUsedThreshold, double maxNG, double timeToRunInSec){
-			this.maxNG = maxNG;
-			this.minBlockingThreshold = minBlockingThresh;
-			this.actualUsedThreshold = actualUsedThreshold;
-			this.recall = recall;
-			this.precision = precision;
-			this.f_measure = f_measure;
-			this.reductionRatio = reductionRatio;					
-			this.timeToRunInSec = timeToRunInSec;			
-		}
-		
-		public String toString(){
-			StringBuilder sb = new StringBuilder();			
-			sb.append(maxNG).append("\t")
-		      .append(String.format("%.3f", minBlockingThreshold)).append("\t")
-			  .append(String.format("%.3f",actualUsedThreshold)).append("\t")
-			  .append(String.format("%.3f",recall)).append("\t")
-			  .append(String.format("%.3f",precision)).append("\t")
-			  .append(String.format("%.3f",f_measure)).append("\t")
-			  .append(String.format("%.3f",reductionRatio)).append("\t") 
-			  .append(timeToRunInSec);
-			  
-			return sb.toString();
-		}	
-	}
 }

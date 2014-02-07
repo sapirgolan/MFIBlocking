@@ -11,6 +11,11 @@ import fimEntityResolution.BitMatrix;
 import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.SetPairIF;
 
+/**
+ * {@link #allMatches} is a {@link ConcurrentHashMap} with key representing record ID and value is {@link RecordMatches} which is all records that highest
+ * similarity to current record ID
+ *
+ */
 public class CandidatePairs implements SetPairIF{
 
 	private ConcurrentHashMap<Integer,RecordMatches> allMatches;
@@ -116,16 +121,24 @@ public class CandidatePairs implements SetPairIF{
 		return bm;
 	}
 	
-	public boolean isPairSet(int i, int j){
+	/**
+	 * Checks if either <b>sourceRecordId</b> as a matching who is <b>comparedRecordId</b> or the other way.<br>
+	 * It is possible that record i won't have any matches, but record j will have a match who is record i 
+	 * @param sourceRecordId
+	 * @param comparedRecordId
+	 * @return
+	 */
+	public boolean isPairSet(int sourceRecordId, int comparedRecordId){
 		boolean retVal = false;
-		if(allMatches.containsKey(i)){
-			RecordMatches rmi = allMatches.get(i);
-			retVal = rmi.isMatched(j);
+		//if has any matches for sourceRecordId
+		if( allMatches.containsKey(sourceRecordId) ){
+			RecordMatches recordMatches = allMatches.get(sourceRecordId);
+			retVal = recordMatches.isMatched(comparedRecordId);
 		}
 		if(!retVal){
-			if(allMatches.containsKey(j)){
-				RecordMatches rmj = allMatches.get(j);
-				retVal = retVal || rmj.isMatched(i);
+			if(allMatches.containsKey(comparedRecordId)){
+				RecordMatches recordMatches = allMatches.get(comparedRecordId);
+				retVal = retVal || recordMatches.isMatched(sourceRecordId);
 			}
 		}
 		return retVal;
@@ -133,23 +146,23 @@ public class CandidatePairs implements SetPairIF{
 	
 	//TP+ FP - 1 in both the Ground Truth and in the result
 	public static double[] TrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
-		long TP = 0;
-		long FP = 0;
-		for (Entry<Integer,RecordMatches> entry: actualCPs.allMatches.entrySet()) { //run over all records
-			int recId = entry.getKey();
-			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
-				int otherRecId = cm.getRecordId();
+		long truePositive = 0;
+		long falsePositive = 0;
+		for (Entry<Integer,RecordMatches> candidatePair: actualCPs.allMatches.entrySet()) { //run over all records
+			int recId = candidatePair.getKey();
+			for (CandidateMatch candidateMatch : candidatePair.getValue().getCandidateMatches()) { //for each record, check out its matches
+				int otherRecId = candidateMatch.getRecordId();
 				if(recId < otherRecId){ //we assume this is how trueCPs is built
 					if(trueCPs.isPairSet(recId, otherRecId)){
-						TP++;
+						truePositive++;
 					}
 					else{
-						FP++;
+						falsePositive++;
 					}
 				}
 			}
 		}
-		return new double[]{TP,FP};	
+		return new double[]{truePositive,falsePositive};	
 		
 	}
 	

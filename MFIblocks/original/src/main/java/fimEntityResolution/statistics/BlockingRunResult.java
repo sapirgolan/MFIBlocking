@@ -1,5 +1,7 @@
 package fimEntityResolution.statistics;
 
+import java.text.DecimalFormat;
+
 
 public class BlockingRunResult {
 
@@ -12,7 +14,27 @@ public class BlockingRunResult {
 	double reductionRatio; //3	
 	double timeToRunInSec; //4	
 	private double duplicatesFound;
+	private double totalDuplicates;
+	private double comparisonsMade;
+	private final DecimalFormat decimalFormat = new DecimalFormat("#.####");
 
+	private double format(double number){
+		return Double.valueOf(decimalFormat.format(number));
+	}
+	public String[] getCoulmnsName() {
+		return new String[] {"MaxNG", "minBlockingThresh", "usedThresh", 
+			"Recall", "Precision (PC)", "F-measure", "RR", 
+			"Duplicates found", "#Duplicates in dataset", "Comparisons made",
+			"time to run"};
+	}
+	
+	public Object[] getValues() {
+		return new Object[] {maxNG, minBlockingThreshold, format(actualUsedThreshold),
+				format(recall), format(precision), format(f_measure), format(reductionRatio),
+				duplicatesFound, totalDuplicates, comparisonsMade,
+				timeToRunInSec};
+	}	
+	
 	public double[] asArray(){
 		double[] retVal = new double[8];
 		retVal[0] = maxNG;
@@ -35,7 +57,9 @@ public class BlockingRunResult {
 		this.precision = statisticMeasuremnts.getPrecision();
 		this.f_measure = statisticMeasuremnts.getFMeasure();
 		this.duplicatesFound = statisticMeasuremnts.getDuplicatesFound();
-		this.reductionRatio = statisticMeasuremnts.getReductionRatio();					
+		this.reductionRatio = statisticMeasuremnts.getReductionRatio();
+		this.totalDuplicates = statisticMeasuremnts.getTotalDuplicates();
+		this.comparisonsMade = statisticMeasuremnts.getComparisonsMade();
 		this.timeToRunInSec = timeToRunInSec;			
 	}
 
@@ -49,6 +73,8 @@ public class BlockingRunResult {
 		.append(String.format("%.3f",f_measure)).append("\t")
 		.append(String.format("%.3f",reductionRatio)).append("\t") 
 		.append(String.format("%.3f",duplicatesFound)).append("\t")
+		.append(String.format("%.3f",totalDuplicates)).append("\t")
+		.append(String.format("%.3f",comparisonsMade)).append("\t")
 		.append(timeToRunInSec);
 
 		return sb.toString();
@@ -56,5 +82,5 @@ public class BlockingRunResult {
 
 	public double getTimeToRunInSec() {
 		return timeToRunInSec;
-	}	
+	}
 }

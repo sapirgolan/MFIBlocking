@@ -34,11 +34,17 @@
 	</build>
 	
 	<repositories>
-	  <repository>
-        <id>thirdparty-uploads</id>
-        <name>JBoss Thirdparty Uploads</name>
-        <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads</url>
-      </repository>
+		<repository>
+			<id>d-maven</id>
+			<name>j-text-utils</name>
+			<url>http://d-maven.googlecode.com/svn/trunk/repo</url>
+        </repository>
+		<repository>
+			<id>thirdparty-uploads</id>
+			<name>JBoss Thirdparty Uploads</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads</url>
+		</repository>
+		
 	</repositories>
 
   <dependencies>

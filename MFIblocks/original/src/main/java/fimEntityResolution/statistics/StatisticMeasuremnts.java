@@ -14,6 +14,8 @@ public class StatisticMeasuremnts {
 	private double fMeasure;
 	private double reductionRatio;
 	private double duplicatesFound;
+	private double totalDuplicates;
+	private double comparisonsMade;
 
 	public StatisticMeasuremnts() {
 		recall = 0;
@@ -21,6 +23,7 @@ public class StatisticMeasuremnts {
 		fMeasure = 0;
 		reductionRatio = 0;
 		duplicatesFound = 0;
+		totalDuplicates = 0;
 	}
 
 	public double getRecall() {
@@ -69,6 +72,22 @@ public class StatisticMeasuremnts {
 
 	public void setReductionRatio(double reductionRatio) {
 		this.reductionRatio = reductionRatio;
+	}
+
+	public void setTotalDuplicates(double totalDuplicates) {
+		this.totalDuplicates = totalDuplicates;
+	}
+
+	public double getTotalDuplicates() {
+		return totalDuplicates;
+	}
+
+	public void setComparisonsMade(double comparisonsMade) {
+		this.comparisonsMade = comparisonsMade;
+	}
+
+	public double getComparisonsMade() {
+		return comparisonsMade;
 	}
 
 }

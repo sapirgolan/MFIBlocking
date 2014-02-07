@@ -18,6 +18,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import candidateMatches.CandidatePairs;
 import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
+
+import dnl.utils.text.table.TextTable;
+import dnl.utils.text.table.TextTableModel;
 import fimEntityResolution.pools.BitMatrixPool;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
@@ -192,6 +195,7 @@ public class BottomUp {
 		}
 			
 		if(blockingRunResults != null && blockingRunResults.size() > 0){
+			printExperimentMeasurments(blockingRunResults);
 			String resultsString = writeBlockingRR(blockingRunResults);
 			System.out.println();
 			System.out.println(resultsString);
@@ -201,6 +205,25 @@ public class BottomUp {
 		}		
 	}
 	
+	private static void printExperimentMeasurments( List<BlockingRunResult> blockingRunResults) {
+		String[] columnNames = {"MaxNG", "minBlockingThresh", "usedThresh", 
+				"Recall", "Precision (PC)", "F-measure", "RR", 
+				"Duplicates found", "#Duplicates in dataset", "Comparisons made",
+				"time to run"}; 
+		Object[][] rows = new Object [blockingRunResults.size()][columnNames.length];
+		int index = 0;
+		
+		for (BlockingRunResult blockingRunResult : blockingRunResults) {
+			Object[] row = blockingRunResult.getValues();
+			rows[index] = row;
+			index++;
+		}
+		
+		TextTable textTable = new TextTable(columnNames, rows);
+		textTable.setAddRowNumbering(true);
+		textTable.printTable();
+	}
+
 	private static double[] getThresholds(String strDoubles){
 		String[] thresholds = strDoubles.split(",");
 		double[] dThresholds = new double[thresholds.length];
@@ -920,15 +943,17 @@ public class BottomUp {
 		double[] TPFP = CandidatePairs.TrueAndFalsePositives(GroundTruth, ResultMatrix);
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
+		double comparisonsMade = truePositive + falsePositive;
 		double falseNegative = CandidatePairs.FalseNegatives(GroundTruth, ResultMatrix);	
-		double precision = truePositive/(truePositive+falsePositive);
-		double recall = truePositive/(truePositive+falseNegative);
+		double totalDuplicates = truePositive + falseNegative;
+		double precision = truePositive/(comparisonsMade);
+		double recall = truePositive/(totalDuplicates);
 		double pr_f_measure = (2*precision*recall)/(precision+recall);	
-		double totalComparisons = ((numRecords * (numRecords - 1))*0.5);	
-		double reductionRatio = Math.max(0.0, (1.0-((truePositive+falsePositive)/totalComparisons)));		
+		double totalComparisonsAvailable = ((numRecords * (numRecords - 1))*0.5);	
+		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMade)/totalComparisonsAvailable)));		
 		System.out.println("num of same source pairs: " + sameSource);
 	//	System.out.println(" ResultMatrix.numOfSet() " + ResultMatrix.numOfSet());
-		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisons);
+		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisonsAvailable);
 		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + reductionRatio);
 		StatisticMeasuremnts statisticMeasuremnts = new StatisticMeasuremnts();
 		statisticMeasuremnts.setRecall(recall);
@@ -936,6 +961,8 @@ public class BottomUp {
 		statisticMeasuremnts.setFMeasure(pr_f_measure);
 		statisticMeasuremnts.setRR(reductionRatio);
 		statisticMeasuremnts.setDuplicatesFound(truePositive);
+		statisticMeasuremnts.setTotalDuplicates(totalDuplicates);
+		statisticMeasuremnts.setComparisonsMade(comparisonsMade);
 		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 		return statisticMeasuremnts;
 	}
@@ -1142,18 +1169,6 @@ public class BottomUp {
 
 	public static String writeBlockingRR(Collection<BlockingRunResult> runResults){
 		StringBuilder sb = new StringBuilder();
-		sb.append("MaxNG").append("\t").
-		append("minBlockingThresh").append("\t").
-		append("usedThresh").append("\t").
-		append("Recall").append("\t").
-		append("Precision (PC)").append("\t").
-		append("F-measure").append("\t").
-		append("RR").append("\t").
-		append("Duplicates found").append("\t").
-		append("time to run").append(Utilities.NEW_LINE);
-		for (BlockingRunResult blockingRunResult : runResults) {
-			sb.append(blockingRunResult.toString()).append(Utilities.NEW_LINE);
-		}
 		//calculate average, Min & Max for all runs
 		BlockingResultsSummary brs = new BlockingResultsSummary(runResults);
 		sb.append(Utilities.NEW_LINE);

@@ -20,6 +20,8 @@ public class CandidatePairs implements SetPairIF{
 
 	private ConcurrentHashMap<Integer,RecordMatches> allMatches;
 	private int maxMatches;
+
+
 	private double minThresh = 0.0;
 	private boolean limited = true;
 	
@@ -33,6 +35,10 @@ public class CandidatePairs implements SetPairIF{
 		allMatches = new ConcurrentHashMap<Integer, RecordMatches>();
 		this.maxMatches = Integer.MAX_VALUE;
 		limited = false;
+	}
+	
+	public ConcurrentHashMap<Integer, RecordMatches> getAllMatches() {
+		return allMatches;
 	}
 	
 	public void addAll(final CandidatePairs other){

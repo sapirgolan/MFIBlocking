@@ -9,6 +9,7 @@ public class RecordMatches {
 	private LimitedMinHeap<CandidateMatch> limitedMinHeap;
 	private int maxSize;
 	private double minThresh = 0.0;
+	private final static String NEWLINE =System.getProperty("line.separator");
 	
 	public RecordMatches(int maxSize){
 		this.maxSize = maxSize;
@@ -22,7 +23,6 @@ public class RecordMatches {
 		limitedMinHeap = new LimitedMinHeap(CandidateMatchComparator.getInstance());		
 	}
 	
-	
 	public int size(){
 		return candidateSet.size();
 	}
@@ -35,30 +35,33 @@ public class RecordMatches {
 	 * @return the min score match for this record
 	 */
 	public synchronized boolean addCandidate(int recordId, double score){
-		CandidateMatch cand = null;
 		boolean added = true;
+		//if candidate exists
 		if(candidateSet.containsKey(recordId)){		
 			added = false;
-			cand = candidateSet.get(recordId);
-			if(cand.getScore() < score){ //update score only if larger
-				cand.setScore(score);
-				limitedMinHeap.increaseKey(cand.getHeapPos());				
+			CandidateMatch exisitingCandidate = candidateSet.get(recordId);
+			// update score only if larger - can happen if both records exists in several clusters
+			// and in one of them, the cluster's score is greater.
+			// (the resemblance score of two records is the cluster score)
+			if(exisitingCandidate.getScore() < score){ 
+				exisitingCandidate.setScore(score);
+				limitedMinHeap.increaseKey(exisitingCandidate.getHeapPos());				
 			}
 		}
 		else{
-			//will not be added. heap is already at max size
-			//and won't accept candidates of smaller scores
+			// If heap is at the max size and the resemblance score of given candidate is smaller
+			// than the minimum resemblance score in the heap, candidate will not be added
 			if(limitedMinHeap.size() >= maxSize && score <= minThresh){ 
 				return added;
 			}
-			CandidateMatch cm = new CandidateMatch(recordId, score);
+			CandidateMatch newCandidate = new CandidateMatch(recordId, score);
 			if(limitedMinHeap.size() >= maxSize){ //means that score > minScore()
 				//first delete former minimum from the hashSet
 				int minId = minRecId();
 				candidateSet.remove(minId);
 			}							
-			limitedMinHeap.insert(cm);			
-			candidateSet.put(recordId, cm);			
+			limitedMinHeap.insert(newCandidate);			
+			candidateSet.put(recordId, newCandidate);			
 		}
 		if(limitedMinHeap.size() >= maxSize){
 			minThresh = minScore();
@@ -82,7 +85,7 @@ public class RecordMatches {
 	private int minRecId(){
 		return ((CandidateMatch)limitedMinHeap.top()).getRecordId();
 	}
-	private final static String NEWLINE =System.getProperty("line.separator");
+	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("Min thresh " + minThresh).append(NEWLINE);
@@ -96,6 +99,10 @@ public class RecordMatches {
 	
 	public Collection<CandidateMatch> getCandidateMatches(){
 		return candidateSet.values();
+	}
+	
+	public ConcurrentHashMap<Integer,CandidateMatch> getCandidateSet() {
+		return this.candidateSet;
 	}
 	
 	public boolean isMatched(int recId){

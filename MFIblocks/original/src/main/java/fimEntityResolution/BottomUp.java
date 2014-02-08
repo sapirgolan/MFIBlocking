@@ -178,17 +178,19 @@ public class BottomUp {
 				//obtain all the clusters that has the minimum score
 				CandidatePairs cps = getClustersToUse(records,minSups,minBlockingThreshold);
 				//getClustersToUseDB(records,minSups,minBlockingThreshold,trueClusters);
-				long startMaxRecall = System.currentTimeMillis();		
+				long actionStart = System.currentTimeMillis();
+				writeCandidatePairs(cps);
+				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
+				
+				actionStart = System.currentTimeMillis();
 				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, matchFile);
 				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
-				
-				//double[] results = calculateFinalResults(trueClusters.groundTruth(), resultMatrix, records.size());
 				StatisticMeasuremnts results = calculateFinalResults(trueClusters.groundTruthCandidatePairs(), cps, records.size());
-				//double[] results = calculateFinalResults(trueClusters,records,coveredRecords,records.size());
-				long totalMaxRecallCalculation = System.currentTimeMillis()-startMaxRecall;				
+				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;				
 				BlockingRunResult blockingRR = new BlockingRunResult(results, minBlockingThreshold, lastUsedBlockingThreshold,
-						NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculation)/1000.0);
+						NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculationDuration-writeBlocksDuration)/1000.0);
 				blockingRunResults.add(blockingRR);
+				
 				System.out.println("");
 				System.out.println("");
 			}
@@ -205,6 +207,24 @@ public class BottomUp {
 		}		
 	}
 	
+	/**
+	 * the method write the blocking output to a file for later usage
+	 * @param cps
+	 */
+	private static void writeCandidatePairs(CandidatePairs cps) {
+		ResultWriter resultWriter = new ResultWriter();
+		File outputFile = resultWriter.createOutputFile();
+		try {
+			resultWriter.writeBlocks(outputFile, cps);
+		} catch (IOException e) {
+			System.err.println("***Failed to write blocks***");
+			e.printStackTrace();
+			return;
+		}
+		System.out.println("Outfile was written to: " + outputFile.getAbsolutePath());
+	}
+
+
 	private static void printExperimentMeasurments( List<BlockingRunResult> blockingRunResults) {
 		String[] columnNames = {"MaxNG", "minBlockingThresh", "usedThresh", 
 				"Recall", "Precision (PC)", "F-measure", "RR", 

@@ -1,4 +1,4 @@
-MFIBlocking
+MFIBlockingParallelized
 ===========
 
 MFI Blocking repository

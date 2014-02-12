@@ -227,7 +227,7 @@ public class BottomUp {
 
 	private static void printExperimentMeasurments( List<BlockingRunResult> blockingRunResults) {
 		String[] columnNames = {"MaxNG", "minBlockingThresh", "usedThresh", 
-				"Recall", "Precision (PC)", "F-measure", "RR", 
+				"Recall (PC)", "Precision (PQ)", "F-measure", "RR", 
 				"Duplicates found", "#Duplicates in dataset", "Comparisons made",
 				"time to run"}; 
 		Object[][] rows = new Object [blockingRunResults.size()][columnNames.length];

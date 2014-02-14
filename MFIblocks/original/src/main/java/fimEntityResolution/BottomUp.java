@@ -951,20 +951,20 @@ public class BottomUp {
 	
 	/**
 	 * Calculate output measurements: F-measure, Precision (PC), Recall 
-	 * @param GroundTruth
-	 * @param ResultMatrix
+	 * @param groundTruth
+	 * @param resultMatrix
 	 * @param numOfRecords
 	 * @return
 	 */
-	private static StatisticMeasuremnts calculateFinalResults(CandidatePairs GroundTruth,CandidatePairs ResultMatrix,int numOfRecords)
+	private static StatisticMeasuremnts calculateFinalResults(CandidatePairs groundTruth,CandidatePairs resultMatrix, int numOfRecords)
 	{
 		long start = System.currentTimeMillis();
 		long numRecords = (long)numOfRecords;
-		double[] TPFP = CandidatePairs.TrueAndFalsePositives(GroundTruth, ResultMatrix);
+		double[] TPFP = groundTruth.calcTrueAndFalsePositives(groundTruth, resultMatrix);
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
 		double comparisonsMade = truePositive + falsePositive;
-		double falseNegative = CandidatePairs.FalseNegatives(GroundTruth, ResultMatrix);	
+		double falseNegative = CandidatePairs.FalseNegatives(groundTruth, resultMatrix);	
 		double totalDuplicates = truePositive + falseNegative;
 		double precision = truePositive/(comparisonsMade);
 		double recall = truePositive/(totalDuplicates);

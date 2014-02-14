@@ -1,6 +1,7 @@
 package candidateMatches;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +40,10 @@ public class CandidatePairs implements SetPairIF{
 	
 	public ConcurrentHashMap<Integer, RecordMatches> getAllMatches() {
 		return allMatches;
+	}
+	
+	public Set<Entry<Integer, RecordMatches>> getAllMatchedEntries(){
+		return allMatches.entrySet();
 	}
 	
 	public void addAll(final CandidatePairs other){
@@ -151,23 +156,20 @@ public class CandidatePairs implements SetPairIF{
 	}
 	
 	//TP+ FP - 1 in both the Ground Truth and in the result
-	public static double[] TrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
+	public double[] calcTrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
 		long truePositive = 0;
 		long falsePositive = 0;
 		//loop for each recored that you have found some items that might represent the same entity as he.
-		for (Entry<Integer,RecordMatches> candidatePair: actualCPs.allMatches.entrySet()) { //run over all records
-			int recId = candidatePair.getKey();
+		for ( Entry<Integer,RecordMatches> entry: actualCPs.getAllMatchedEntries() ) { //run over all records
+			int recId = entry.getKey();
 			//obtain all the records that might refer the same entity as current record
-			for (CandidateMatch candidateMatch : candidatePair.getValue().getCandidateMatches()) { //for each record, check out its matches
-				int otherRecId = candidateMatch.getRecordId();
-				//the if will prevent us from comparing the same pair ot triple several times
-				if(recId < otherRecId){ //we assume this is how trueCPs is built
-					if(trueCPs.isPairSet(recId, otherRecId)){
-						truePositive++;
-					}
-					else{
-						falsePositive++;
-					}
+			for (CandidateMatch candidateMatches : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
+				int otherRecId = candidateMatches.getRecordId();
+				if(trueCPs.isPairSet(recId, otherRecId)){
+					truePositive++;
+				}
+				else{
+					falsePositive++;
 				}
 			}
 		}
@@ -177,7 +179,7 @@ public class CandidatePairs implements SetPairIF{
 	
 	public static double FalseNegatives(CandidatePairs trueCPs, CandidatePairs actualCPs){		
 		long FN = 0;
-		for (Entry<Integer,RecordMatches> entry: trueCPs.allMatches.entrySet()) { //run over all records
+		for (Entry<Integer,RecordMatches> entry: trueCPs.getAllMatches().entrySet()) { //run over all records
 			int recId = entry.getKey();
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
 				int otherRecId = cm.getRecordId();
@@ -217,7 +219,7 @@ public class CandidatePairs implements SetPairIF{
 		gt.setPair(5, 6,0);
 		f = gt.isPairSet(2,7);
 		f= gt.isPairSet(7,2);
-		double[] TPFP = TrueAndFalsePositives(gt, cps);
+		double[] TPFP = gt.calcTrueAndFalsePositives(gt, cps);
 		double FN = FalseNegatives(gt,cps);
 		System.out.println("TPFP: " + Arrays.toString(TPFP));
 		System.out.println("FN: " + FN);

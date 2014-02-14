@@ -62,6 +62,26 @@ public class CandidatePairs implements SetPairIF{
 		}
 	}
 	
+	/**
+	 * Tries to create a pair of records with IDs <b>i</b> and <b>j</b>.<br>
+	 * It tries to add to the block of record <b>i</b> record <b>j</b> and to the block of record <b>j</b> record <b>i</b><br>
+	 * If record with ID <b>i</b> already has a record with id <b>j</b> than does nothing.<br>
+	 * <p>
+	 * If block with seed ID <b>i</b> reached the maximum of records than does the following:<br>
+	 * <ul>
+	 * <li>
+	 * 	if there is a record whose score < <code>score</code> than:
+	 * 	<ol>
+	 * 		<li>this record is removed and record j is added</li>
+	 * 		<li>minThresh of block whose seed is record i is modified</li>
+	 * 	</ol>
+	 * </li>
+	 * <li>if <code>score</code> < all records score of block, does nothing</li>
+	 * </ul>
+	 * 
+	 * 
+	 * </p>
+	 **/
 	@Override
 	public void setPair(int i, int j, double score) {
 		if(score < minThresh)

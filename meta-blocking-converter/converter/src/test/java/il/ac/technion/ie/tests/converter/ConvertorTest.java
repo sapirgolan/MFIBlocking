@@ -5,8 +5,6 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import il.ac.technion.ie.converter.Convertor;
 
 import java.net.URL;
@@ -24,32 +22,39 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 import DataStructures.Attribute;
 import DataStructures.EntityProfile;
 
-@RunWith(MockitoJUnitRunner.class)
+@PrepareForTest(Convertor.class)
+@RunWith(PowerMockRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
 public class ConvertorTest {
+//	@Rule
+//    public PowerMockRule rule = new PowerMockRule();
+	
 	private Convertor classUnderTest;
 	private Convertor classUnderTestSpied;
 
-	@Mock
-	private EntityProfile entityProfile;
+//	@Mock
+	private EntityProfile entityProfile  = PowerMockito.mock(EntityProfile.class);
 	
-	@Mock 
-	private Attribute attributeOne;
-	@Mock 
-	private Attribute attributeTwo;
-	@Mock 
-	private Attribute attributeThree;
+//	@Mock 
+	private Attribute attributeOne = PowerMockito.mock(Attribute.class);
+//	@Mock 
+	private Attribute attributeTwo = PowerMockito.mock(Attribute.class);
+//	@Mock 
+	private Attribute attributeThree = PowerMockito.mock(Attribute.class);
 	
 	@Before
 	public void setUp() throws Exception {
 		classUnderTest = new Convertor();
-		classUnderTestSpied = spy(classUnderTest);
+		classUnderTestSpied = PowerMockito.spy(classUnderTest);
 	}
 
 	@After
@@ -62,10 +67,10 @@ public class ConvertorTest {
 		attributes.add(attributeOne);
 		attributes.add(attributeTwo);
 		attributes.add(attributeThree);
-		when(attributeOne.getName()).thenReturn("jhon");
-		when(attributeTwo.getName()).thenReturn("jhon");
-		when(attributeThree.getName()).thenReturn("smith");
-		when(entityProfile.getAttributes()).thenReturn(attributes);
+		PowerMockito.when(attributeOne.getName()).thenReturn("jhon");
+		PowerMockito.when(attributeTwo.getName()).thenReturn("jhon");
+		PowerMockito.when(attributeThree.getName()).thenReturn("smith");
+		PowerMockito.when(entityProfile.getAttributes()).thenReturn(attributes);
 		SortedSet<String> extractFieldsNames = classUnderTest.extractFieldsNames(Arrays.asList(entityProfile));
 		Assert.assertEquals("Result size it to big", 2, extractFieldsNames.size());
 		assertThat(extractFieldsNames, hasItems("jhon","smith"));
@@ -74,13 +79,13 @@ public class ConvertorTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testExtractValues() {
-		when(classUnderTestSpied.extractFieldsNames(Mockito.anyList())).thenReturn(new TreeSet<String>( Arrays.asList("staring", "writer") ));
+		PowerMockito.when(classUnderTestSpied.extractFieldsNames(Mockito.anyList())).thenReturn(new TreeSet<String>( Arrays.asList("staring", "writer") ));
 		HashSet<Attribute> hashSet = new HashSet<Attribute>();
 		hashSet.add(new Attribute("staring", "A"));
 		hashSet.add(new Attribute("writer", "B"));
 		hashSet.add(new Attribute("staring", "C"));
 		hashSet.add(new Attribute("imdbId", "stringValue"));
-		when(entityProfile.getAttributes()).thenReturn(hashSet);
+		PowerMockito.when(entityProfile.getAttributes()).thenReturn(hashSet);
 		
 		List<Map<String,String>> values = classUnderTestSpied.extractValues(Arrays.asList(entityProfile));
 		Assert.assertEquals("Created bigger result", 1, values.size());
@@ -103,4 +108,12 @@ public class ConvertorTest {
 		fail("Not yet implemented");
 	}
 
+	@Test
+	public void testBuildMapIndex() throws Exception {
+		SortedSet<String> fieldsNames = new TreeSet<String>();
+		fieldsNames.add("one");
+		fieldsNames.add("two");
+		Map<String, Integer> map = Whitebox.invokeMethod(classUnderTest, "buildMapIndex", fieldsNames);
+		assertThat(map.size(), is(2));
+	}
 }

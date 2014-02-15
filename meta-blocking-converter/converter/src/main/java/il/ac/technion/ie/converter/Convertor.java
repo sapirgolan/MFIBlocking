@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,10 +35,7 @@ public class Convertor {
 		for (EntityProfile entityProfile : list) {
 			HashSet<Attribute> attributes = entityProfile.getAttributes();
 			for (Attribute attribute : attributes) {
-				String name = attribute.getName();
-				if (result.contains(name) == false) {
-					result.add(name);
-				}
+				result.add( attribute.getName() );
 			}
 		}
 		this.setFieldsNames(result);
@@ -102,38 +100,71 @@ public class Convertor {
 	}
 	
 	public void doAlgorithm(String filePath) {
+		//loading data from file
 		ArrayList<EntityProfile> entityProfiles = loadEntityProfile( filePath );
-		List<Map<String,String>> extractValues = extractValues(entityProfiles);
-		print(extractValues);
+		//obtaining field names
+		SortedSet<String> fieldsNames = extractFieldsNames(entityProfiles);
+		Map<String, Integer> map = buildMapIndex(fieldsNames);
+		List<String[]> valuesList = extractValuesList(map, entityProfiles);
+		this.print(valuesList);
 	}
 
-	private void print(List<Map<String, String>> extractValues) {
+	private Map<String, Integer> buildMapIndex(SortedSet<String> fieldsNames) {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		int index = 0;
+		for (String fieldsName : fieldsNames) {
+			map.put(fieldsName, index);
+			index++;
+		}
+		return map;
+	}
+
+	private List<String[]> extractValuesList(Map<String, Integer> map,
+			ArrayList<EntityProfile> entityProfiles) {
+		List<String[]> lists = new ArrayList<String[]>();
+		//iterate for each profile
+		for (EntityProfile profile : entityProfiles) {
+			//obtain profile's values
+			List<Attribute> attributes = new ArrayList<Attribute>(profile.getAttributes());
+			String[] values = new String[map.size()];
+			//place each value in its position
+			for (int i = 0; i < attributes.size(); i++) {
+				String name = attributes.get(i).getName();
+				String value = attributes.get(i).getValue();
+				Integer valuePosition = map.get(name);
+				values[valuePosition] = value;
+			}
+			lists.add(values);
+		}
+		return lists;
+	}
+
+	private void print(List<String[]> valuesList) {
 		File csvFile = createCsvFile("records");
+		//create file headers
 		Writer writer = createFileHeaders(csvFile);
-		fillFileContent(writer, extractValues);
+		//fill content
+		fillFileContent(writer, valuesList);
 	}
 	
 	private void fillFileContent(Writer writer,
-			List<Map<String, String>> extractValues) {
+			List<String[]> valuesList) {
 		if (writer == null) {
 			return;
 		}
 		BufferedWriter bufferedWriter = new BufferedWriter(writer);
-		for (Map<String, String> map : extractValues) {
-			Iterator<String> iterator = map.keySet().iterator();
+		for (String[] record : valuesList) {
 			try {
-				while (iterator.hasNext()) {
-					String key = (String) iterator.next();
-					String value = map.get(key) == null ? "" : map.get(key);
-					
-					int indexOf = value.indexOf(CSV_SEPERATOR.toString());
-					while (indexOf > -1) {
-						value = value.substring(0, indexOf) + value.substring(indexOf + 1);
-						indexOf = value.indexOf(CSV_SEPERATOR.toString());
+				for (int i = 0; i < record.length; i++) {
+					String value = record[i];
+					if (value==null) {
+						value = "";
+					} else {
+						value = removeCsvSeperatorFromValue(value);
 					}
-
 					bufferedWriter.write(value);
-					if (iterator.hasNext()) {
+					//if not last value add CSV separator
+					if (i != (record.length-1)) {
 						bufferedWriter.append(CSV_SEPERATOR);
 					}
 				}
@@ -155,6 +186,16 @@ public class Convertor {
 			System.out.println("Failed to close BufferedWriter");
 			e.printStackTrace();
 		}
+	}
+
+	private String removeCsvSeperatorFromValue(String value) {
+		int indexOf = value.indexOf(CSV_SEPERATOR.toString());
+		//if CSV_SEPERATOR is not present in 'value' the while loop will not take place
+		while (indexOf > -1) {
+			value = value.substring(0, indexOf) + value.substring(indexOf + 1);
+			indexOf = value.indexOf(CSV_SEPERATOR.toString());
+		}
+		return value;
 	}
 
 	private Writer createFileHeaders(File csvFile) {

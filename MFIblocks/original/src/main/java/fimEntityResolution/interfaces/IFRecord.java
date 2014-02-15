@@ -1,9 +1,10 @@
 package fimEntityResolution.interfaces;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-public interface IFRecord {
+public interface IFRecord extends Serializable{
 
 	public String getRecordStr();
 	public void addItem(int itemId);

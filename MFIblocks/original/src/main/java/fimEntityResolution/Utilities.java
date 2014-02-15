@@ -35,12 +35,9 @@ import java.util.regex.Pattern;
 
 import javax.transaction.NotSupportedException;
 
-<<<<<<< HEAD
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.IntIterator;
 
-=======
->>>>>>> ef675a22c010ed2836c98dbcfb44e8ddab03fef8
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;

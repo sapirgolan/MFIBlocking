@@ -1,4 +1,4 @@
-package common;
+package fimEntityResolution;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ import org.apache.spark.api.java.function.PairFlatMapFunction;
 //import com.javamex.classmexer.MemoryUtil;
 //import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 
-import common.JavaHdfsLR.DataPoint;
+
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,14 +41,14 @@ import fimEntityResolution.pools.BitMatrixPool;
 import fimEntityResolution.pools.FIRunnablePool;
 
 
-public class App {
+public class SparkBlocksReader {
 	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
 
 	//public static boolean DEBUG = false;
 	//public static boolean WRITE_ALL_ERRORS = false;
-	static Map<Integer,Record> records;
-	final static int minSup=3;
-	private static double NG_LIMIT = 3;
+	//static Map<Integer,Record> records;
+	//final static int minSup=3;
+	//private static double NG_LIMIT = 3;
 	public static int DB_SIZE;
 	public static String NEW_LINE = System.getProperty("line.separator");
 	//public static Map<Integer, FrequentItem> globalItemsMap;
@@ -64,7 +64,9 @@ public class App {
 	private static AtomicInteger numOfBMs = new AtomicInteger(0);
 	public static AtomicInteger numOfGDs = new AtomicInteger(0);
 	private static AtomicInteger numSet = new AtomicInteger(0);
-	public static double scoreThreshold;
+	//static double tooLarge = 0;
+	//static double scorePruned = 0;
+	//public static double scoreThreshold;
 	
 	private static void resetAtomicIntegerArr(AtomicInteger[] arr) {
 		for (int i = 0; i < arr.length; i++) {
@@ -72,55 +74,76 @@ public class App {
 		}
 	}
 
-	public static void main(String[] args){
-	
-		//============================EXMAPLE=================================================================
-		//		String logFile = "C:/workspace/spark-0.8.1-incubating/README.md"; // Should be some file on your system
-		//		JavaSparkContext sc = new JavaSparkContext("local[5]", "App",
-		//				"C:/workspace/spark-0.8.1-incubating/README.md", new String[]{"target/SparkTest-1.0-SNAPSHOT.jar"});
-		//		JavaRDD<String> logData = sc.textFile(logFile).cache();
-		//		long numAs = logData.filter(new Function<String, Boolean>() {
-		//			public Boolean call(String s) { return s.contains("a"); }
-		//		}).count();
-		//
-		//		long numBs = logData.filter(new Function<String, Boolean>() {
-		//			public Boolean call(String s) { return s.contains("b"); }
-		//		}).count();
-		//
-		//		System.out.println("Lines with a: " + numAs + ", lines with b: " + numBs);
-		//=========================END OF EXAMPLE==============================================================
+	public static CandidatePairs readFIs(String frequentItemsetFile,
+			Map<Integer, FrequentItem> globalItemsMap, double scoreThreshold,
+			Map<Integer, Record> records, int minSup, double NG_PARAM){
+		double tooLarge = 0;
+		double scorePruned = 0;
+		//SparkBlocksReader.scoreThreshold = this.scoreThreshold;
+		// reset all parameters
+		nonFIs.set(0);
+		numOfFIs.set(0);
+		timeSpentCalcScore.set(0);
+		numOfBMs.set(0);
+		numSet.set(0);
+		//time_in_supp_calc.set(0);
+		resetAtomicIntegerArr(clusterScores);	
+		//ConcurrentHashMap<Integer, BitMatrix> coverageIndex = new ConcurrentHashMap<Integer, BitMatrix>(21);
 
-		/* Pseudo code:
-		 * 1. Load file
-		 * 2. Partition file into blocks according to number of processors 
-		 * 3. On each processor:
-		 * 	3.1 Check support condition 
-		 * 	3.2 Check ClusterJaccard score
-		 * 	3.3 Check sparse neighborhood condition
-		 * 4. Accumulate the blocks
-		 * 5. Derive CandidatePairs from blocks
-		 */
+		//int maxSize = (int) Math.floor(minSup*NG_PARAM);
+
+		//CandidatePairs candidatePairs = new CandidatePairs(maxSize);
+		StringSimTools.numOfMFIs.set(0);
+		StringSimTools.numOfRoughMFIs.set(0);
+		StringSimTools.timeInGetClose.set(0);
+		StringSimTools.timeInRough.set(0);
+		timeSpentUpdatingCoverage.set(0);
+		//BitMatrixPool.getInstance().restart();
+		//FIRunnablePool.getInstance().restart();
+		
+		
 		//0. Load records files:
-		records = Utilities.readRecords("C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_numeric.txt",
-				"C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_NoSW.txt",null);
-		Utilities.parseLexiconFile("C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_lexicon_3grams.txt");
+		//records = Utilities.readRecords("C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_numeric.txt",
+		//		"C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_NoSW.txt",null);
+		//Utilities.parseLexiconFile("C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_lexicon_3grams.txt");
 		//1. Load file
-		String fmiFile = "C:/workspace/MFIs6674994509185988344.tmp";
-		JavaSparkContext sc = new JavaSparkContext("local[5]", "App",
+		//String fmiFile = "C:/workspace/MFIs6674994509185988344.tmp";
+		JavaSparkContext sc = new JavaSparkContext("local[8]", "App",
 				"$SPARK_HOME", new String[]{"target/SparkTest-1.0-SNAPSHOT.jar"});
-		JavaRDD<String> fmiSets = sc.textFile(fmiFile).cache();
+		JavaRDD<String> fmiSets = sc.textFile(frequentItemsetFile).cache();
 		//2. Partition file into blocks
 		//TODO: check how the distribution works
+		
+		int maxSize = (int) Math.floor(minSup*NG_PARAM);
+		CandidatePairs candidatePairs = new CandidatePairs(maxSize);
+		
 		JavaRDD<ParsedFrequentItemSet> parsedFIs = fmiSets.map(new ParseFILine());
-		JavaRDD<ParsedFrequentItemSet> checkedFIs=parsedFIs.filter(new ExctractBlocks(Utilities.globalItemsMap,
-				scoreThreshold, records,minSup, NG_LIMIT)).cache();
+		JavaRDD<ParsedFrequentItemSet> checkedFIs=parsedFIs.cache().filter(new ExctractBlocks(globalItemsMap,
+				scoreThreshold, records,minSup, NG_PARAM, candidatePairs)).cache();
 		long trueBlocks=checkedFIs.count();
 		System.out.print("True blocks: "+trueBlocks);
 		//JavaRDD<ParsedFrequentItemSet> 
-		CandidatePairs candidatePairs=new CandidatePairs();
+		
+		
+		
+		//candidatePairs=checkedFIs.reduce(new BuildCandidatePair());
+		
+		
+		
+		//CandidatePairs candidatePairs=checkedFIs
+		return candidatePairs;
 	}
 	
-	
+	static class BuildCandidatePair extends Function2<ParsedFrequentItemSet, ParsedFrequentItemSet, CandidatePairs>{
+
+		@Override
+		public CandidatePairs call(ParsedFrequentItemSet firstBlock,
+				ParsedFrequentItemSet secondBlock) throws Exception {
+			
+			return null;
+		}
+		
+	}
 	
 	static class ExctractBlocks extends Function<ParsedFrequentItemSet,Boolean> {
 
@@ -129,46 +152,22 @@ public class App {
 		Map<Integer, Record> records; 
 		int minSup;
 		double NG_PARAM;
+		CandidatePairs candidatePairs;
 
 		public ExctractBlocks(Map<Integer, FrequentItem> globalItemsMap,
 				double scoreThreshold, Map<Integer, Record> records,
-				int minSup, double nG_PARAM) {
+				int minSup, double nG_PARAM,CandidatePairs candidatePairs) {
 			super();
 			this.globalItemsMap = globalItemsMap;
 			this.scoreThreshold = scoreThreshold;
 			this.records = records;
 			this.minSup = minSup;
 			NG_PARAM = nG_PARAM;
+			this.candidatePairs=candidatePairs;
 		}
 		
 		@Override
 		public Boolean call(ParsedFrequentItemSet freqItemSet) throws Exception {
-			//original:
-				//=============================================================================================
-			double tooLarge = 0;
-			double scorePruned = 0;
-			App.scoreThreshold = this.scoreThreshold;
-			// reset all parameters
-			nonFIs.set(0);
-			numOfFIs.set(0);
-			timeSpentCalcScore.set(0);
-			numOfBMs.set(0);
-			numSet.set(0);
-			//time_in_supp_calc.set(0);
-			resetAtomicIntegerArr(clusterScores);	
-			//ConcurrentHashMap<Integer, BitMatrix> coverageIndex = new ConcurrentHashMap<Integer, BitMatrix>(21);
-
-			int maxSize = (int) Math.floor(minSup*NG_PARAM);
-
-			//CandidatePairs candidatePairs = new CandidatePairs(maxSize);
-			StringSimTools.numOfMFIs.set(0);
-			StringSimTools.numOfRoughMFIs.set(0);
-			StringSimTools.timeInGetClose.set(0);
-			StringSimTools.timeInRough.set(0);
-			timeSpentUpdatingCoverage.set(0);
-			//BitMatrixPool.getInstance().restart();
-			//FIRunnablePool.getInstance().restart();
-
 			// 3.1 support condition 
 			if (freqItemSet.supportSize > minSup * NG_PARAM) {
 				//tooLarge++;
@@ -180,7 +179,7 @@ public class App {
 			double maxClusterScore = StringSimTools.MaxScore(
 					freqItemSet.supportSize, currentItemSet, minRecordLength);
 
-			if (maxClusterScore < 0.1 * App.scoreThreshold) {
+			if (maxClusterScore < 0.1 * scoreThreshold) {
 				//scorePruned++;
 				return false;
 			}
@@ -193,22 +192,24 @@ public class App {
 			BitSetIF support = null;
 			support = Utilities.getItemsetSupport(currentItemSet);
 			if (support.getCardinality() <  minSup) {
-				App.nonFIs.incrementAndGet();					
+				SparkBlocksReader.nonFIs.incrementAndGet();					
 				return false; // must be the case that the item appears minSup times
 						// but in a number of records < minsup
 			}			
 			List<IFRecord> FISupportRecords = support.getRecords();
 			//long start = System.currentTimeMillis();
 			double currClusterScore = StringSimTools.softTFIDF(
-					FISupportRecords, currentItemSet, App.scoreThreshold);
+					FISupportRecords, currentItemSet, scoreThreshold);
 			FISupportRecords = null;
 			//Utilities.timeSpentCalcScore.addAndGet(System.currentTimeMillis() - start);
 
-			App.clusterScores[cellForCluster(currClusterScore)].incrementAndGet();
-
-			if (currClusterScore > App.scoreThreshold) {
-				App.numOfFIs.incrementAndGet();
-				//support.markPairs(candidatePairs,currClusterScore);			
+			SparkBlocksReader.clusterScores[cellForCluster(currClusterScore)].incrementAndGet();
+			//BitSetIF support = null;
+			//support = Utilities.getItemsetSupport(currentItemSet);
+			//support.markPairs(candidatePairs,currClusterScore);
+			if (currClusterScore > scoreThreshold) {
+				SparkBlocksReader.numOfFIs.incrementAndGet();
+				support.markPairs(candidatePairs,currClusterScore);			
 				return true;
 			}
 			//FROM========FIRunnable.java==========END===================================

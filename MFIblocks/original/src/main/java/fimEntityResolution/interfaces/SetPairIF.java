@@ -1,6 +1,8 @@
 package fimEntityResolution.interfaces;
 
-public interface SetPairIF {
+import java.io.Serializable;
+
+public interface SetPairIF extends Serializable {
 
 	public void setPair(int i, int j, double score);
 }

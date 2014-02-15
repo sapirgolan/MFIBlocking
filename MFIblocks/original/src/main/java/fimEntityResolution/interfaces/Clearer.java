@@ -1,6 +1,8 @@
 package fimEntityResolution.interfaces;
 
-public interface Clearer {
+import java.io.Serializable;
+
+public interface Clearer extends Serializable {
 	public void clearAll();
 	
 }

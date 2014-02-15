@@ -48,7 +48,11 @@
 		<artifactId>JavaEWAH</artifactId>
 		<version>0.7.9</version>
 	</dependency>
-            
+    <dependency> <!-- Spark dependency -->
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_2.9.3</artifactId>
+      <version>0.8.1-incubating</version>
+    </dependency>        
             
 	<!-- JARS that were installed manually -->
 	<dependency>

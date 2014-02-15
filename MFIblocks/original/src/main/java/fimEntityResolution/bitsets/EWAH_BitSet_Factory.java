@@ -1,9 +1,11 @@
 package fimEntityResolution.bitsets;
 
+import java.io.Serializable;
+
 import fimEntityResolution.interfaces.BitSetFactory;
 import fimEntityResolution.interfaces.BitSetIF;
 
-public class EWAH_BitSet_Factory implements BitSetFactory{
+public class EWAH_BitSet_Factory implements BitSetFactory,Serializable{
 
 	private static EWAH_BitSet_Factory self = null;
 

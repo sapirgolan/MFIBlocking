@@ -1,11 +1,13 @@
 package fimEntityResolution;
 
 
+import java.io.Serializable;
+
 import fimEntityResolution.interfaces.BitSetFactory;
 import fimEntityResolution.interfaces.BitSetIF;
 
 
-public class FrequentItem implements Comparable<FrequentItem>{
+public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 
 	private int id;
 	private String item;

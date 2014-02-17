@@ -82,7 +82,9 @@ public class Utilities {
 	public static Map<Integer, FrequentItem> globalItemsMap;
 	public static Map<Integer, Record> globalRecords;
 	public static boolean WRITE_ALL_ERRORS = false;
-	private static int minRecordLength = Integer.MAX_VALUE;
+	//JS:changed to public
+	//private static int minRecordLength = Integer.MAX_VALUE;
+	public static int minRecordLength = Integer.MAX_VALUE;
 	public static GraphDatabaseService recordDB;
 	private static final String RECORD_DB_PATH = "target/records-db";
 

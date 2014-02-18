@@ -1,7 +1,7 @@
 package fimEntityResolution;
 
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 
-@PrepareForTest(Utilities.class)
+@PrepareForTest(System.class)
 public class UtilitiesTest {
 	
 	@Rule
@@ -28,6 +28,7 @@ public class UtilitiesTest {
 	public void tearDown() throws Exception {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetUnixMFICmdLine() throws Exception {
 		String unixMFICmdLine = Utilities.getUnixMFICmdLine();

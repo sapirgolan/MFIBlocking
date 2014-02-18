@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +34,6 @@ import java.util.regex.Pattern;
 
 import javax.transaction.NotSupportedException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
@@ -374,48 +372,81 @@ public class Utilities {
 		return exitVal;
 	}
 
-	public static String getUnixMFICmdLine() {
-		InputStream resourceAsStream = Utilities.class.getClassLoader().getResourceAsStream("fpgrowth/fpgrowth.exe");
-		try {
-			File file = File.createTempFile("fpgrowth",".exe");
-			file.deleteOnExit();
-			FileOutputStream fileOutputStream = new FileOutputStream(file);
-			IOUtils.copy(resourceAsStream, fileOutputStream);
-			fileOutputStream.flush();
-			resourceAsStream.close();
-			fileOutputStream.close();
-			String path = file.getPath();
-			path = path + " -tm -s-%d %s %s";
-			return path;
-		} catch (IOException e) {
-			System.err.println("Failed to extract fpgrowth from exe");
-			e.printStackTrace();
+//	public static String getUnixMFICmdLine() {
+//		String operatingSystem = getOSName();
+//		InputStream resourceAsStream;
+//		String fileSuffix = "";
+//		boolean isWindows = operatingSystem.toLowerCase().contains("windows");
+//		if (isWindows) {
+//			resourceAsStream = Utilities.class.getClassLoader().getResourceAsStream("fpgrowth/fpgrowth.exe");
+//			fileSuffix = ".exe";
+//		} else {
+//			resourceAsStream = Utilities.class.getClassLoader().getResourceAsStream("fpgrowth/fpgrowth");
+//		}
+//		try {
+//			File file = File.createTempFile("fpgrowth",fileSuffix);
+//			file.deleteOnExit();
+//			FileOutputStream fileOutputStream = new FileOutputStream(file);
+//			IOUtils.copy(resourceAsStream, fileOutputStream);
+//			fileOutputStream.flush();
+//			resourceAsStream.close();
+//			fileOutputStream.close();
+//			String path = file.getPath();
+//			path = path + " -tm -s-%d %s %s";
+//			return path;
+//		} catch (IOException e) {
+//			System.err.println("Failed to extract fpgrowth from exe");
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
+	
+	public static String getUnixMFICmdLine() throws FileNotFoundException {
+		String operatingSystem = getOSName();
+		boolean isWindows = operatingSystem.toLowerCase().contains("windows");
+		File file;
+		if (isWindows) {
+			file = new File("./fpgrowth.exe");
+		} else {
+			file = new File("./fpgrowth");
 		}
-		return null;
+		if (!file.exists()) {
+			FileNotFoundException exception = new FileNotFoundException("fpgrowth not found at: " + file.getAbsolutePath());
+			throw exception;
+		}
+		String path = file.getPath();
+		path = path + " -tm -s-%d %s %s";
+		return path;
 	}
 
-	public static File RunMFIAlg(int minSup, String recordsFile, File MFIDir) {
-		System.out.println("free mem before activating FPMax: "
-				+ Runtime.getRuntime().freeMemory());
+	private static String getOSName() {
+		return System.getProperty("os.name");
+	}
+
+	public static File RunMFIAlg(int minSup, String recordsFile, File MFIDir){
+		System.out.println("free mem before activating FPMax: "	+ Runtime.getRuntime().freeMemory());
 		File file = null;
 		if (!MFIDir.exists()) {
-			if (!MFIDir.mkdir())
-				System.out.println("Directory " + MFIDir.getAbsolutePath()
+			if ( !MFIDir.mkdir() ) {
+				System.err.println("Directory " + MFIDir.getAbsolutePath()
 						+ " doesn't exist and failed to create it");
-
+			}
 		}
 		try {
 			file = File.createTempFile("MFIs", null, MFIDir);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		file.deleteOnExit();
+		file.deleteOnExit();
 		System.out.println("recordsFile= " + recordsFile);
-		// String cmd = String.format(MFICmdLine, minSup, recordsFile,
-		// file.getAbsolutePath());
-		String cmd = String.format(getUnixMFICmdLine(), minSup, recordsFile, file
-				.getAbsolutePath());
+		String cmd = null;
+		try {
+			cmd = String.format(getUnixMFICmdLine(), minSup, recordsFile, file.getAbsolutePath());
+		} catch (FileNotFoundException e1) {
+			System.err.println("Failed to execute UnixMFICmd");
+			e1.printStackTrace();
+			System.exit(1);
+		}
 		System.out.println("About to execute: " + cmd);
 		try {
 			Socket client = new Socket("localhost", 7899);
@@ -433,14 +464,10 @@ public class Utilities {
 			os.close();
 			client.close();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		// runAlg(cmd,file.getAbsolutePath());
 		return file;
 	}
 

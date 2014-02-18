@@ -1,6 +1,7 @@
 package candidateMatches;
 import java.util.Collection;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RecordMatches {
@@ -103,6 +104,10 @@ public class RecordMatches {
 	
 	public ConcurrentHashMap<Integer,CandidateMatch> getCandidateSet() {
 		return this.candidateSet;
+	}
+	
+	public Set<Integer> getMatchedIds(){
+		return candidateSet.keySet();
 	}
 	
 	public boolean isMatched(int recId){

@@ -24,6 +24,7 @@ import dnl.utils.text.table.TextTableModel;
 import fimEntityResolution.pools.BitMatrixPool;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
+import fimEntityResolution.statistics.DuplicateBusinessLayer;
 //import cern.colt.matrix.impl.SparseObjectMatrix2D;
 import fimEntityResolution.statistics.StatisticMeasuremnts;
 
@@ -960,19 +961,22 @@ public class BottomUp {
 	{
 		long start = System.currentTimeMillis();
 		long numRecords = (long)numOfRecords;
+		//calculate TP and FP
 		double[] TPFP = groundTruth.calcTrueAndFalsePositives(groundTruth, resultMatrix);
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
 		double comparisonsMade = truePositive + falsePositive;
-		double falseNegative = CandidatePairs.FalseNegatives(groundTruth, resultMatrix);	
-		double totalDuplicates = truePositive + falseNegative;
-		double precision = truePositive/(comparisonsMade);
-		double recall = truePositive/(totalDuplicates);
+		double falseNegative = CandidatePairs.FalseNegatives(groundTruth, resultMatrix);
+		
+		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth,resultMatrix);
+		double totalDuplicates = duplicateBusinessLayer.getNumberOfDuplicatesInDataset();
+		int duplicatesFound = duplicateBusinessLayer.getNumberOfDuplicatesFound();
+		double precision = duplicatesFound/(comparisonsMade);
+		double recall = duplicatesFound/totalDuplicates;
 		double pr_f_measure = (2*precision*recall)/(precision+recall);	
 		double totalComparisonsAvailable = ((numRecords * (numRecords - 1))*0.5);	
 		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMade)/totalComparisonsAvailable)));		
 		System.out.println("num of same source pairs: " + sameSource);
-	//	System.out.println(" ResultMatrix.numOfSet() " + ResultMatrix.numOfSet());
 		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisonsAvailable);
 		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + reductionRatio);
 		StatisticMeasuremnts statisticMeasuremnts = new StatisticMeasuremnts();
@@ -980,7 +984,8 @@ public class BottomUp {
 		statisticMeasuremnts.setPrecision(precision);
 		statisticMeasuremnts.setFMeasure(pr_f_measure);
 		statisticMeasuremnts.setRR(reductionRatio);
-		statisticMeasuremnts.setDuplicatesFound(truePositive);
+		
+		statisticMeasuremnts.setDuplicatesFound(duplicatesFound);
 		statisticMeasuremnts.setTotalDuplicates(totalDuplicates);
 		statisticMeasuremnts.setComparisonsMade(comparisonsMade);
 		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));

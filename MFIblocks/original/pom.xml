@@ -126,6 +126,12 @@
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-mockito</artifactId>
       <version>${powermock.version}</version>
+	  <exclusions>
+			<exclusion>
+				<artifactId>hamcrest-core</artifactId>
+				<groupId>org.hamcrest</groupId>
+			</exclusion>
+		</exclusions>
       <scope>test</scope>
    </dependency>
 	

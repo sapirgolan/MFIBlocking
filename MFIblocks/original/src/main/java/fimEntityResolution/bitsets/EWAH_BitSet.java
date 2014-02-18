@@ -5,16 +5,17 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 
+import org.apache.commons.lang.NotImplementedException;
+
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.IntIterator;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-//import javaewah.EWAHCompressedBitmap;
-//import javaewah.IntIterator;
 import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.BitSetIF;
 import fimEntityResolution.interfaces.IFRecord;
 import fimEntityResolution.interfaces.SetPairIF;
+//import javaewah.EWAHCompressedBitmap;
+//import javaewah.IntIterator;
 
 public class EWAH_BitSet implements BitSetIF{
 
@@ -29,7 +30,6 @@ public class EWAH_BitSet implements BitSetIF{
 		EWAH_BitSet otherEWAH = (EWAH_BitSet)other;
 		comBS = comBS.and(otherEWAH.comBS);
 		return this;
-		
 	}
 
 	@Override

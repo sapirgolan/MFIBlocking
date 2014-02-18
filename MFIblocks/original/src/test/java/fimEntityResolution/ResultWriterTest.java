@@ -1,9 +1,9 @@
 package fimEntityResolution;
 
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,6 +40,7 @@ public class ResultWriterTest {
 	public void tearDown() throws Exception {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateOutputFile() {
 		File outputFile = classUnderTest.createOutputFile();
@@ -54,6 +55,7 @@ public class ResultWriterTest {
 		assertThat(fileName, allOf( containsString(day), containsString(month), containsString(year)));
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testWriteSingleBlock() throws IOException {
 		File file = new File("result.txt");
@@ -76,6 +78,7 @@ public class ResultWriterTest {
 		assertThat(fileContent, allOf(containsString("1"),containsString("4"), containsString("2") ));
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testWriteSeveralBlocks() throws IOException{
 		File file = new File("result.txt");

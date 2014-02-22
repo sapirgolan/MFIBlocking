@@ -11,11 +11,13 @@ public class Duplicate {
 	private Set<Integer> duplicatedEntityRecordIDs;
 	private boolean wasDuplicateDetected;
 	private boolean isFinishedTesting;
+	private int comparisonsMade;
 	
 	public Duplicate(Set<Integer> ids) {
 		this.duplicatedEntityRecordIDs = ids;
 		this.wasDuplicateDetected = false;
 		this.isFinishedTesting = false;
+		this.comparisonsMade = 0;
 	}
 	
 	//call contractor that obtain Set
@@ -38,6 +40,7 @@ public class Duplicate {
 	public void decideIfDetected(RecordMatches recordMatches, Integer recordId ) {
 		if (!isFinishedTesting) {
 			Set<Integer> matchedIds = new HashSet<Integer>(recordMatches.getMatchedIds());
+			comparisonsMade += matchedIds.size();
 			matchedIds.add(recordId);
 			wasDuplicateDetected = matchedIds.containsAll(duplicatedEntityRecordIDs);
 			//Once we find that a duplicate was detected in any block we consider the duplicate to be found
@@ -53,6 +56,16 @@ public class Duplicate {
 	 */
 	public boolean wasDuplicateDetected() {
 		return wasDuplicateDetected;
+	}
+
+	/**
+	 * Return number of comparisons made till the duplicate entity was detected.<br>
+	 * If the duplicate was not detected, then return total number of comparisons 
+	 * 
+	 * @return
+	 */
+	public int getComparisonsMade() {
+		return comparisonsMade;
 	}
 	
 }

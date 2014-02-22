@@ -17,6 +17,7 @@ public class BlockingRunResult {
 	private double totalDuplicates;
 	private double comparisonsMade;
 	private final DecimalFormat decimalFormat = new DecimalFormat("#.####");
+	private StatisticMeasuremnts measuremnts;
 
 	private double format(double number){
 		return Double.valueOf(decimalFormat.format(number));
@@ -24,14 +25,14 @@ public class BlockingRunResult {
 	public String[] getCoulmnsName() {
 		return new String[] {"MaxNG", "minBlockingThresh", "usedThresh", 
 			"Recall", "Precision (PC)", "F-measure", "RR", 
-			"Duplicates found", "#Duplicates in dataset", "Comparisons made",
+			"Duplicates found", "#Duplicates in dataset", "Comparisons made", "Comparisons could have made",
 			"time to run"};
 	}
 	
 	public Object[] getValues() {
 		return new Object[] {maxNG, minBlockingThreshold, format(actualUsedThreshold),
 				format(recall), format(precision), format(f_measure), format(reductionRatio),
-				duplicatesFound, totalDuplicates, comparisonsMade,
+				duplicatesFound, totalDuplicates, comparisonsMade, measuremnts.getComparisonsCouldHaveMake(),
 				timeToRunInSec};
 	}	
 	
@@ -60,7 +61,8 @@ public class BlockingRunResult {
 		this.reductionRatio = statisticMeasuremnts.getReductionRatio();
 		this.totalDuplicates = statisticMeasuremnts.getTotalDuplicates();
 		this.comparisonsMade = statisticMeasuremnts.getComparisonsMade();
-		this.timeToRunInSec = timeToRunInSec;			
+		this.timeToRunInSec = timeToRunInSec;	
+		this.measuremnts = statisticMeasuremnts;
 	}
 
 	public String toString(){

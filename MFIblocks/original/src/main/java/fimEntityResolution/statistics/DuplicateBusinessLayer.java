@@ -16,6 +16,7 @@ public class DuplicateBusinessLayer {
 	private int numberOfDuplicatesInDataset;
 	private Map<Integer, Duplicate> duplicateDetectorMap;
 	private int numberOfDuplicatesFound;
+	private int numberOfComparisons;
 	
 	
 	
@@ -26,6 +27,7 @@ public class DuplicateBusinessLayer {
 		this.duplicateDetectorMap = new HashMap<Integer, Duplicate>();
 		this.numberOfDuplicatesInDataset = 0;
 		this.numberOfDuplicatesFound = 0;
+		this.numberOfComparisons = 0;
 		
 		init();
 	}
@@ -38,10 +40,12 @@ public class DuplicateBusinessLayer {
 		ConcurrentHashMap<Integer,RecordMatches> allMatches = algorithmOutput.getAllMatches();
 		checkIfDuplicatesFound(allMatches);
 		
+		//collect statistics: #DuplicatesFound, #comparisons
 		HashSet<Duplicate> duplicatesInExperiment = new HashSet<Duplicate>(duplicateDetectorMap.values());
 		for (Duplicate duplicate : duplicatesInExperiment) {
 			if (duplicate.wasDuplicateDetected()) {
 				numberOfDuplicatesFound++;
+				numberOfComparisons += duplicate.getComparisonsMade();
 			}
 		}
 		
@@ -85,5 +89,9 @@ public class DuplicateBusinessLayer {
 	
 	public int getNumberOfDuplicatesFound() {
 		return numberOfDuplicatesFound;
+	}
+
+	public int getNumberOfComparisons() {
+		return numberOfComparisons;
 	}
 }

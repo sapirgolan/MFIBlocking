@@ -227,10 +227,10 @@ public class BottomUp {
 
 
 	private static void printExperimentMeasurments( List<BlockingRunResult> blockingRunResults) {
-		String[] columnNames = {"MaxNG", "minBlockingThresh", "usedThresh", 
-				"Recall (PC)", "Precision (PQ)", "F-measure", "RR", 
-				"Duplicates found", "#Duplicates in dataset", "Comparisons made",
-				"time to run"}; 
+		String[] columnNames = {}; 
+		if (blockingRunResults.size()>0) {
+			columnNames = blockingRunResults.get(0).getCoulmnsName();
+		}
 		Object[][] rows = new Object [blockingRunResults.size()][columnNames.length];
 		int index = 0;
 		
@@ -965,17 +965,18 @@ public class BottomUp {
 		double[] TPFP = groundTruth.calcTrueAndFalsePositives(groundTruth, resultMatrix);
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
-		double comparisonsMade = truePositive + falsePositive;
 		double falseNegative = CandidatePairs.FalseNegatives(groundTruth, resultMatrix);
 		
 		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth,resultMatrix);
 		double totalDuplicates = duplicateBusinessLayer.getNumberOfDuplicatesInDataset();
+		double comparisonsMadeTPFP = truePositive + falsePositive;
+		int comparisonsCouldHaveMade = duplicateBusinessLayer.getNumberOfComparisons();
 		int duplicatesFound = duplicateBusinessLayer.getNumberOfDuplicatesFound();
-		double precision = duplicatesFound/(comparisonsMade);
+		double precision = duplicatesFound/(comparisonsMadeTPFP);
 		double recall = duplicatesFound/totalDuplicates;
 		double pr_f_measure = (2*precision*recall)/(precision+recall);	
 		double totalComparisonsAvailable = ((numRecords * (numRecords - 1))*0.5);	
-		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMade)/totalComparisonsAvailable)));		
+		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMadeTPFP)/totalComparisonsAvailable)));		
 		System.out.println("num of same source pairs: " + sameSource);
 		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisonsAvailable);
 		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + reductionRatio);
@@ -987,7 +988,8 @@ public class BottomUp {
 		
 		statisticMeasuremnts.setDuplicatesFound(duplicatesFound);
 		statisticMeasuremnts.setTotalDuplicates(totalDuplicates);
-		statisticMeasuremnts.setComparisonsMade(comparisonsMade);
+		statisticMeasuremnts.setComparisonsMade(comparisonsMadeTPFP);
+		statisticMeasuremnts.setComparisonsCouldHaveMake(comparisonsCouldHaveMade);
 		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 		return statisticMeasuremnts;
 	}

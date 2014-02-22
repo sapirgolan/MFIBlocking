@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -48,6 +49,7 @@ public class DuplicateTest {
 		
 		classUnderTest.decideIfDetected(recordMatchesMocked, 1);
 		assertThat(true, is(classUnderTest.wasDuplicateDetected()));
+		Assert.assertEquals("didn't do all cimpariosns that should have", 2, classUnderTest.getComparisonsMade());
 	}
 	
 	@Test
@@ -67,6 +69,7 @@ public class DuplicateTest {
 		
 		classUnderTest.decideIfDetected(recordMatchesMocked,4);
 		assertThat(false, is(classUnderTest.wasDuplicateDetected()));
+		Assert.assertEquals("didn't do all cimpariosns that should have", 2, classUnderTest.getComparisonsMade());
 	}
 	
 	@Test
@@ -77,7 +80,7 @@ public class DuplicateTest {
 			@Override
 			public Set<Integer> answer(InvocationOnMock invocation) throws Throwable {
 				HashSet<Integer> set = new HashSet<Integer>();
-				set.add(1);
+				set.add(3);
 				set.add(2);
 				return set;
 			}
@@ -109,6 +112,8 @@ public class DuplicateTest {
 		classUnderTest.decideIfDetected(recordMatchesToIdThree,3);
 
 		assertThat(true, is(classUnderTest.wasDuplicateDetected()));
+		Assert.assertEquals("didn't do all cimpariosns that should have", 2, classUnderTest.getComparisonsMade());
+
 	}
 	
 	@Test
@@ -151,6 +156,8 @@ public class DuplicateTest {
 		classUnderTest.decideIfDetected(recordMatchesToIdThree,3);
 
 		assertThat(true, is(classUnderTest.wasDuplicateDetected()));
+		Assert.assertEquals("didn't do all cimpariosns that should have", 5, classUnderTest.getComparisonsMade());
+
 	}
 	
 }

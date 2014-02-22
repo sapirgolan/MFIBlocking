@@ -16,6 +16,7 @@ public class StatisticMeasuremnts {
 	private double duplicatesFound;
 	private double totalDuplicates;
 	private double comparisonsMade;
+	private int comparisonsCouldHaveMake;
 
 	public StatisticMeasuremnts() {
 		recall = 0;
@@ -24,6 +25,7 @@ public class StatisticMeasuremnts {
 		reductionRatio = 0;
 		duplicatesFound = 0;
 		totalDuplicates = 0;
+		comparisonsCouldHaveMake = 0;
 	}
 
 	public double getRecall() {
@@ -88,6 +90,14 @@ public class StatisticMeasuremnts {
 
 	public double getComparisonsMade() {
 		return comparisonsMade;
+	}
+
+	public void setComparisonsCouldHaveMake(int comparisonsCouldHaveMade) {
+		this.comparisonsCouldHaveMake = comparisonsCouldHaveMade;
+	}
+	
+	public int getComparisonsCouldHaveMake() {
+		return this.comparisonsCouldHaveMake;
 	}
 
 }

@@ -101,11 +101,11 @@ public class App {
 		 * 5. Derive CandidatePairs from blocks
 		 */
 		//0. Load records files:
-		records = Utilities.readRecords("C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_numeric.txt",
-				"C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_NoSW.txt",null);
-		Utilities.parseLexiconFile("C:/workspace/mfiblocks/MFIBlocksImp(2)/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_lexicon_3grams.txt");
+		records = Utilities.readRecords("/MFIBlocksImp/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_numeric.txt",
+				"/MFIBlocksImp/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_NoSW.txt",null);
+		Utilities.parseLexiconFile("/MFIBlocksImp/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_lexicon_3grams.txt");
 		//1. Load file
-		String fmiFile = "C:/workspace/MFIs6674994509185988344.tmp";
+		String fmiFile = "/MFIBlocksImp/MFIs6674994509185988344.tmp";
 		JavaSparkContext sc = new JavaSparkContext("local[5]", "App",
 				"$SPARK_HOME", new String[]{"target/SparkTest-1.0-SNAPSHOT.jar"});
 		JavaRDD<String> fmiSets = sc.textFile(fmiFile).cache();

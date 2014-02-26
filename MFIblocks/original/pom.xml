@@ -52,8 +52,7 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.9.3</artifactId>
       <version>0.8.1-incubating</version>
-    </dependency>        
-            
+    </dependency>         
 	<!-- JARS that were installed manually -->
 	<dependency>
 		<groupId>com.javamex</groupId>

@@ -7,10 +7,47 @@
   </parent>
   <artifactId>original</artifactId>
   <name>original</name>
-  
   <properties>
       <powermock.version>1.5.2</powermock.version>
+	  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>fimEntityResolution.BottomUp</mainClass>
+                </transformer>
+				<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+					<resource>reference.conf</resource>                  
+				</transformer>
+              </transformers>
+				<filters>
+				<filter>
+					<artifact>*:*</artifact>
+					<excludes>
+						<exclude>META-INF/*.SF</exclude>
+						<exclude>META-INF/*.DSA</exclude>
+						<exclude>META-INF/*.RSA</exclude>
+					</excludes>
+				</filter>
+				</filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   
   <dependencies>
     <dependency>
@@ -69,8 +106,6 @@
 		<artifactId>simmetrics</artifactId>
 		<version>1.6.2</version>
 	</dependency>
-	
-	
 	<!-- Testing dependincies -->
 	<dependency>
     	<groupId>org.powermock</groupId>
@@ -84,7 +119,6 @@
      	<version>${powermock.version}</version>
      	<scope>test</scope>  
     </dependency>  
-	
 	<dependency>
 	    <groupId>org.powermock</groupId>
 		<artifactId>powermock-module-junit4-rule</artifactId>
@@ -97,8 +131,5 @@
 		<version>${powermock.version}</version>
 		<scope>test</scope>
 	</dependency>
-	
-            
-            
   </dependencies>
 </project>

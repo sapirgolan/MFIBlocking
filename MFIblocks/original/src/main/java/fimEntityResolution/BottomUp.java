@@ -34,6 +34,9 @@ public class BottomUp {
 		CFI,
 		MFI
 	}
+	public enum Configuration{
+		SPARK,DEFAULT
+	}
 	/**
 	 * This method will perform a DFS on the trie and collect clusters which oblige to the following terms:
 	 * 1. the cluster itemset passes the score threshold
@@ -81,6 +84,7 @@ public class BottomUp {
 	 * The Main of the MFIBlocking Algorithm
 	 * @param args
 	 * The parameters are as follows:
+	 *  0. Cofiguration - SPARK or DEFAULT
 		1. Path to the lexicon file created in the previous stage (out parameter 6).
 		2. The dataset of item ids created in the previous stage (out parameter 2).
 		3. The set of min_th parameters you would like the algorithm to run on. This parameter is optional and 0 can be provided as the only parameter effectively eliminating the threshold.
@@ -91,30 +95,36 @@ public class BottomUp {
 		8. The set of p parameters to use as the Neighberhood Growth constraints.
 	 */
 	public static void main(String[] args){
-		System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
-		System.setProperty("spark.executor.memory", "5g");
-		
-		sc=new JavaSparkContext("local[8]", "App",
-				"$SPARK_HOME", new String[]{"target/original-0.0.1.jar"});
-		
+		Configuration config = Configuration.valueOf(args[0]);
+		if (config.equals(Configuration.SPARK)) {
+			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+			System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
+			System.setProperty("spark.executor.memory", "5g");
+			//System.getProperty("spark.akka.askTimeout","50000");
+			Runtime runtime = Runtime.getRuntime();
+			runtime.gc();
+			int numOfCores = runtime.availableProcessors();
+			sc=new JavaSparkContext("local["+numOfCores+"]", "App",
+					"$SPARK_HOME", new String[]{"target/original-0.0.1.jar"});
+			//System.out.println("spark.akka.askTimeout = " + System.getProperty("spark.akka.askTimeout"));
+		}
 		System.out.println("Entered Main");	
 		String currDir = new File(".").getAbsolutePath();
 		System.out.println("Working dir: " + currDir);	
-		String lexiconFile = args[0];
+		String lexiconFile = args[1];
 		StringSimToolsLocal.LEXICON_FILE=lexiconFile;
-		String recordsFile = args[1];
+		String recordsFile = args[2];
 		StringSimToolsLocal.RECORDS_FILE=recordsFile;
-		String minBlockingThresholds = args[2];				
+		String minBlockingThresholds = args[3];				
 		double[] dMinBlockingThresholds = getThresholds(minBlockingThresholds);
-		String matchFile = args[3];
-		String origRecordsFile = args[4];
+		String matchFile = args[4];
+		String origRecordsFile = args[5];
 		StringSimToolsLocal.ORIGRECORDS_FILE=origRecordsFile;
-		int[] minSups = getInts(args[5]);
-		Alg alg = Alg.valueOf(args[6]);	
-		double[] NGs = getDoubles(args[7]);		
-		if(args.length > 8 && args[8] != null){
-			srcFile = args[8];
+		int[] minSups = getInts(args[6]);
+		Alg alg = Alg.valueOf(args[7]);	
+		double[] NGs = getDoubles(args[8]);		
+		if(args.length > 9 && args[9] != null){
+			srcFile = args[9];
 		}	
 		System.out.println("args.length : " + args.length);
 		System.out.println("Main srcFile : " + srcFile);
@@ -133,7 +143,7 @@ public class BottomUp {
 		System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
 		start = System.currentTimeMillis();
-		mfiBlocksCore(records,matchFile,minSups,dMinBlockingThresholds,alg,NGs,lexiconFile,recordsFile,origRecordsFile);
+		mfiBlocksCore(config,records,matchFile,minSups,dMinBlockingThresholds,alg,NGs,lexiconFile,recordsFile,origRecordsFile);
 		//iterativeFIsDB(records,trueClusters,minSups,dMinBlockingThresholds,alg,NGs);
 		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
 	}
@@ -150,7 +160,7 @@ public class BottomUp {
 	 * @param alg
 	 * @param NGs
 	 */
-	public static void mfiBlocksCore(Map<Integer,Record> records, String matchFile,int[] minSups, 
+	public static void mfiBlocksCore(Configuration config,Map<Integer,Record> records, String matchFile,int[] minSups, 
 			double[] minBlockingThresholds, Alg alg, double[] NGs, String lexiconFile,
 			String recordsFile,String origRecordsFile){
 		Arrays.sort(minSups);
@@ -170,7 +180,7 @@ public class BottomUp {
 						" and NGLimit: " + NG_LIMIT);			
 				long start = System.currentTimeMillis();
 				//BitMatrix resultMatrix = getClustersToUse(records,minSups,minBlockingThreshold);
-				CandidatePairs cps = getClustersToUse(records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
+				CandidatePairs cps = getClustersToUse(config,records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
 				//getClustersToUseDB(records,minSups,minBlockingThreshold,trueClusters);
 				long startMaxRecall = System.currentTimeMillis();		
 				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, matchFile);
@@ -328,7 +338,7 @@ public class BottomUp {
 	}
 	*/
 
-	private static CandidatePairs getClustersToUse(Map<Integer,Record> records,int[] minSups, double minBlockingThreshold, String lexiconFile,String recordsFile, String origRecordsFile){
+	private static CandidatePairs getClustersToUse(Configuration config,Map<Integer,Record> records,int[] minSups, double minBlockingThreshold, String lexiconFile,String recordsFile, String origRecordsFile){
 		Arrays.sort(minSups);
 	//	int totalNumOfClusters = 0;				
 		coveredRecords.set(0,true); // no such record
@@ -357,10 +367,13 @@ public class BottomUp {
 		
 			start = System.currentTimeMillis();
 			//coverageMap = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
-			
-			//CandidatePairs candidatePairs = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
-			CandidatePairs candidatePairs = SparkBlocksReader.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT,lexiconFile,recordsFile,origRecordsFile);
-
+			CandidatePairs candidatePairs=null;
+			if (config.equals(Configuration.SPARK)){	
+				candidatePairs = SparkBlocksReader.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT,lexiconFile,recordsFile,origRecordsFile);
+			}
+			else {
+				candidatePairs = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
+			}
 			System.out.println("Time to read MFIs: " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
 			
 			/*		

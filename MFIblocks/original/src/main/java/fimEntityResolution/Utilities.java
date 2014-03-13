@@ -377,15 +377,43 @@ public class Utilities {
 		}
 		return exitVal;
 	}
-
-	public static String getUnixMFICmdLine() {
-		URL resource = Utilities.class.getClassLoader().getResource("fpgrowth/fpgrowth.exe");
-		String path = resource.getPath();
+	public static String getUnixMFICmdLine() throws FileNotFoundException {
+		String operatingSystem = getOSName();
+		boolean isWindows = operatingSystem.toLowerCase().contains("windows");
+		URL url=null;
+		File file=null;
+		String path=null;
+		if (isWindows) {
+			url = Utilities.class.getClassLoader().getResource("fpgrowth/fpgrowth.exe");
+			path=url.getPath();
+		} else {
+			file = new File("./fpgrowth");
+			path=file.getPath();
+		}
+		//String path = url.getPath();
+		//File file=new File (url.getFile());
+//		if (!file.exists()) {
+//			FileNotFoundException exception = new FileNotFoundException("fpgrowth not found at: " + file.getAbsolutePath());
+//			throw exception;
+//		}
+		//String path = url.getPath();
+		if (!isWindows)
+			System.out.println("DEBUG: "+ file.getAbsolutePath());
 		path = path + " -tm -s-%d %s %s";
 		return path;
-		
 	}
-	private final static String UnixMFICmdLine = getUnixMFICmdLine();
+
+	private static String getOSName() {
+		return System.getProperty("os.name");
+	}
+//	public static String getUnixMFICmdLine() {
+//		URL resource = Utilities.class.getClassLoader().getResource("fpgrowth/fpgrowth.exe");
+//		String path = resource.getPath();
+//		path = path + " -tm -s-%d %s %s";
+//		return path;
+//		
+//	}
+	//private final static String UnixMFICmdLine = getUnixMFICmdLine();
 
 	public static File RunMFIAlg(int minSup, String recordsFile, File MFIDir) {
 		System.out.println("free mem before activating FPMax: "
@@ -407,8 +435,16 @@ public class Utilities {
 		System.out.println("recordsFile= " + recordsFile);
 		// String cmd = String.format(MFICmdLine, minSup, recordsFile,
 		// file.getAbsolutePath());
-		String cmd = String.format(getUnixMFICmdLine(), minSup, recordsFile, file
-				.getAbsolutePath());
+		String cmd =null;
+		try {
+			cmd = String.format(getUnixMFICmdLine(), minSup, recordsFile, file.getAbsolutePath());
+		} catch (FileNotFoundException e1) {
+			System.err.println("Failed to execute UnixMFICmd");
+			e1.printStackTrace();
+			System.exit(1);
+		}
+		
+		
 		System.out.println("About to execute: " + cmd);
 		try {
 			Socket client = new Socket("localhost", 7899);

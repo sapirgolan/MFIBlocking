@@ -40,7 +40,7 @@ public class SparkBlocksReader {
 	public static String NEW_LINE = System.getProperty("line.separator");
 	static CandidatePairs candidatePairs;
 	//must be defined on other nodes:
-	public static final String LEXICON_FILE="C:/workspace/mfiblocking/MFIBlocking/MFIblocks/original/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_lexicon_3grams.txt";
+	//public static final String LEXICON_FILE="C:/workspace/mfiblocking/MFIBlocking/MFIblocks/original/exampleInputOutputFiles/DS_800_200_3_1_3_po_clean_lexicon_3grams.txt";
 	
 	//TODO: change to distributed environment (add option to switch between environments)
 	

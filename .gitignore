@@ -25,6 +25,10 @@ MFIblocks/original/target
 meta-blocking-converter/converter/*.csv
 meta-blocking-converter/converter/*.xlsx
 
+#Input files
+MFIblocks/original/exampleInputOutputFiles/*.csv
+MFIblocks/original/exampleInputOutputFiles/*.txt
+
 # External tool builders
 .externalToolBuilders/
 

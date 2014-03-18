@@ -201,8 +201,6 @@ public class BottomUp {
 				long start = System.currentTimeMillis();
 				//BitMatrix resultMatrix = getClustersToUse(records,minSups,minBlockingThreshold);
 				//obtain all the clusters that has the minimum score
-				CandidatePairs cps = getClustersToUse(records,minSups,minBlockingThreshold);
-				//obtain all the clusters that has the minimum score
 				CandidatePairs cps = getClustersToUse(config,records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
 				//getClustersToUseDB(records,minSups,minBlockingThreshold,trueClusters);
 				long actionStart = System.currentTimeMillis();

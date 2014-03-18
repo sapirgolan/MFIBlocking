@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>1.5.2</version>
+      <version>1.5.3</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -60,7 +60,7 @@
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-easymock</artifactId>
-      <version>1.5.2</version>
+      <version>1.5.3</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -71,8 +71,28 @@
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <version>1.5.3</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>hamcrest-core</artifactId>
+          <groupId>org.hamcrest</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>mockito-all</artifactId>
+          <groupId>org.mockito</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>powermock-api-support</artifactId>
+          <groupId>org.powermock</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4-rule</artifactId>
-      <version>1.5.2</version>
+      <version>1.5.3</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -88,7 +108,7 @@
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-classloading-xstream</artifactId>
-      <version>1.5.2</version>
+      <version>1.5.3</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -133,8 +153,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <powermock.version>1.5.2</powermock.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <powermock.version>1.5.3</powermock.version>
   </properties>
 </project>
 

@@ -1,4 +1,4 @@
-MFIBlockingParallelized
+MFIBlocking ( with SPARK 0.8.1)
 ===========
 
 MFI Blocking repository
@@ -23,5 +23,5 @@ In order to run MFIBlocks Add the following VM arguments to Java Virtaul Machine
 -Djava.library.path=.\src\main\resources\hyperic-sigar-1.6.4\sigar-bin\lib
 
 For illustration:
-java -Xmx1300M -javaagent:.\src\main\resources\Classmexer\classmexer.jar -Djava.library.path=.\src\main\resources\hyperic-sigar-1.6.4\sigar-bin\lib -jar EntityResolution.jar ...(EntityResolution parameters)
+java -Xmx1300M -javaagent:.\src\main\resources\Classmexer\classmexer.jar -Djava.library.path=.\src\main\resources\hyperic-sigar-1.6.4\sigar-bin\lib -jar EntityResolution.jar <SPARK/DEFAULT> (EntityResolution parameters)
 

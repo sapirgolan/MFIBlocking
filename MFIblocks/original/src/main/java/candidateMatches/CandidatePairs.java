@@ -1,6 +1,7 @@
 package candidateMatches;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,10 +12,17 @@ import fimEntityResolution.BitMatrix;
 import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.SetPairIF;
 
+/**
+ * {@link #allMatches} is a {@link ConcurrentHashMap} with key representing record ID and value is {@link RecordMatches} which is all records that highest
+ * similarity to current record ID
+ *
+ */
 public class CandidatePairs implements SetPairIF{
 
 	private ConcurrentHashMap<Integer,RecordMatches> allMatches;
 	private int maxMatches;
+
+
 	private double minThresh = 0.0;
 	private boolean limited = true;
 	
@@ -28,6 +36,14 @@ public class CandidatePairs implements SetPairIF{
 		allMatches = new ConcurrentHashMap<Integer, RecordMatches>();
 		this.maxMatches = Integer.MAX_VALUE;
 		limited = false;
+	}
+	
+	public ConcurrentHashMap<Integer, RecordMatches> getAllMatches() {
+		return allMatches;
+	}
+	
+	public Set<Entry<Integer, RecordMatches>> getAllMatchedEntries(){
+		return allMatches.entrySet();
 	}
 	
 	public void addAll(final CandidatePairs other){
@@ -46,6 +62,26 @@ public class CandidatePairs implements SetPairIF{
 		}
 	}
 	
+	/**
+	 * Tries to create a pair of records with IDs <b>i</b> and <b>j</b>.<br>
+	 * It tries to add to the block of record <b>i</b> record <b>j</b> and to the block of record <b>j</b> record <b>i</b><br>
+	 * If record with ID <b>i</b> already has a record with id <b>j</b> than does nothing.<br>
+	 * <p>
+	 * If block with seed ID <b>i</b> reached the maximum of records than does the following:<br>
+	 * <ul>
+	 * <li>
+	 * 	if there is a record whose score < <code>score</code> than:
+	 * 	<ol>
+	 * 		<li>this record is removed and record j is added</li>
+	 * 		<li>minThresh of block whose seed is record i is modified</li>
+	 * 	</ol>
+	 * </li>
+	 * <li>if <code>score</code> < all records score of block, does nothing</li>
+	 * </ul>
+	 * 
+	 * 
+	 * </p>
+	 **/
 	@Override
 	public void setPair(int i, int j, double score) {
 		if(score < minThresh)
@@ -116,46 +152,54 @@ public class CandidatePairs implements SetPairIF{
 		return bm;
 	}
 	
-	public boolean isPairSet(int i, int j){
+	/**
+	 * Checks if either <b>sourceRecordId</b> as a matching who is <b>comparedRecordId</b> or the other way.<br>
+	 * It is possible that record i won't have any matches, but record j will have a match who is record i 
+	 * @param sourceRecordId
+	 * @param comparedRecordId
+	 * @return
+	 */
+	public boolean isPairSet(int sourceRecordId, int comparedRecordId){
 		boolean retVal = false;
-		if(allMatches.containsKey(i)){
-			RecordMatches rmi = allMatches.get(i);
-			retVal = rmi.isMatched(j);
+		//if has any matches for sourceRecordId
+		if( allMatches.containsKey(sourceRecordId) ){
+			RecordMatches recordMatches = allMatches.get(sourceRecordId);
+			retVal = recordMatches.isMatched(comparedRecordId);
 		}
 		if(!retVal){
-			if(allMatches.containsKey(j)){
-				RecordMatches rmj = allMatches.get(j);
-				retVal = retVal || rmj.isMatched(i);
+			if(allMatches.containsKey(comparedRecordId)){
+				RecordMatches recordMatches = allMatches.get(comparedRecordId);
+				retVal = retVal || recordMatches.isMatched(sourceRecordId);
 			}
 		}
 		return retVal;
 	}
 	
 	//TP+ FP - 1 in both the Ground Truth and in the result
-	public static double[] TrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
-		long TP = 0;
-		long FP = 0;
-		for (Entry<Integer,RecordMatches> entry: actualCPs.allMatches.entrySet()) { //run over all records
+	public double[] calcTrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
+		long truePositive = 0;
+		long falsePositive = 0;
+		//loop for each recored that you have found some items that might represent the same entity as he.
+		for ( Entry<Integer,RecordMatches> entry: actualCPs.getAllMatchedEntries() ) { //run over all records
 			int recId = entry.getKey();
-			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
-				int otherRecId = cm.getRecordId();
-				if(recId < otherRecId){ //we assume this is how trueCPs is built
-					if(trueCPs.isPairSet(recId, otherRecId)){
-						TP++;
-					}
-					else{
-						FP++;
-					}
+			//obtain all the records that might refer the same entity as current record
+			for (CandidateMatch candidateMatches : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
+				int otherRecId = candidateMatches.getRecordId();
+				if(trueCPs.isPairSet(recId, otherRecId)){
+					truePositive++;
+				}
+				else{
+					falsePositive++;
 				}
 			}
 		}
-		return new double[]{TP,FP};	
+		return new double[]{truePositive,falsePositive};	
 		
 	}
 	
 	public static double FalseNegatives(CandidatePairs trueCPs, CandidatePairs actualCPs){		
 		long FN = 0;
-		for (Entry<Integer,RecordMatches> entry: trueCPs.allMatches.entrySet()) { //run over all records
+		for (Entry<Integer,RecordMatches> entry: trueCPs.getAllMatches().entrySet()) { //run over all records
 			int recId = entry.getKey();
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
 				int otherRecId = cm.getRecordId();
@@ -195,7 +239,7 @@ public class CandidatePairs implements SetPairIF{
 		gt.setPair(5, 6,0);
 		f = gt.isPairSet(2,7);
 		f= gt.isPairSet(7,2);
-		double[] TPFP = TrueAndFalsePositives(gt, cps);
+		double[] TPFP = gt.calcTrueAndFalsePositives(gt, cps);
 		double FN = FalseNegatives(gt,cps);
 		System.out.println("TPFP: " + Arrays.toString(TPFP));
 		System.out.println("FN: " + FN);

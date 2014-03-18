@@ -141,9 +141,11 @@ public class BottomUp {
 				}
 			}
 			else {
+				srcFile = args[8];
 				srcFile = args[9];
 			}
-		}	
+		}
+		
 		System.out.println("args.length : " + args.length);
 		System.out.println("Main srcFile : " + srcFile);
 		long start = System.currentTimeMillis();
@@ -198,6 +200,7 @@ public class BottomUp {
 						" and NGLimit: " + NG_LIMIT);			
 				long start = System.currentTimeMillis();
 				//BitMatrix resultMatrix = getClustersToUse(records,minSups,minBlockingThreshold);
+				//obtain all the clusters that has the minimum score
 				CandidatePairs cps = getClustersToUse(records,minSups,minBlockingThreshold);
 				//obtain all the clusters that has the minimum score
 				CandidatePairs cps = getClustersToUse(config,records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
@@ -424,6 +427,7 @@ public class BottomUp {
 					" is " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 		
 			start = System.currentTimeMillis();
+			//coverageMap = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
 			CandidatePairs candidatePairs=null;
 			if (config.equals(Configuration.SPARK)){	
 				candidatePairs = SparkBlocksReader.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT,lexiconFile,recordsFile,origRecordsFile);

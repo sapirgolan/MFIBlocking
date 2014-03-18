@@ -123,8 +123,8 @@
      <dependency>
         <groupId>net.sf.opencsv</groupId>
         <artifactId>opencsv</artifactId>
-        <version>1.7</version>
-      </dependency>         
+        <version>1.7</version>   
+    </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.9.3</artifactId>

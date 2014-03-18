@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -444,14 +443,7 @@ public class Utilities {
 		}
 		file.deleteOnExit();
 		System.out.println("recordsFile= " + recordsFile);
-		// String cmd = String.format(MFICmdLine, minSup, recordsFile,
-		// file.getAbsolutePath());
-		String cmd = String.format(getUnixMFICmdLine(), minSup, recordsFile, file
-				.getAbsolutePath());
 		String cmd = null;
-		// String cmd = String.format(MFICmdLine, minSup, recordsFile,
-		// file.getAbsolutePath());
-		String cmd =null;
 		try {
 			cmd = String.format(getUnixMFICmdLine(), minSup, recordsFile, file.getAbsolutePath());
 		} catch (FileNotFoundException e1) {
@@ -459,7 +451,6 @@ public class Utilities {
 			e1.printStackTrace();
 			System.exit(1);
 		}
-		
 		
 		System.out.println("About to execute: " + cmd);
 		try {

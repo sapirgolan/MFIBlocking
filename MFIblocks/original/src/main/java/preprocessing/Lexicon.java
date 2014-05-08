@@ -73,7 +73,7 @@ public class Lexicon {
 		return attIdToPrefixLength.get(attId);
 	}
 	
-	public double getColumnWeight(int columnIndex){
+	public double getColumnWeight(int columnIndex)  {
 		int attId = getAttId(columnIndex);
 		return attIdToWeights.get(attId);
 	}
@@ -121,7 +121,7 @@ public class Lexicon {
 			int wordId = currItemId++;
 			wordsToIds.put(word, wordId);
 			//wordItem = new SparseFrequentItem(wordId, word,attIdToWeights.get(attId));
-			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*csvFile.DB_Size));
+			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*ProfileReader.DB_Size));
 		}
 		wordItem.addSupport(recordId);
 		attFIs.getItems().put(wordItem.getId(), wordItem);

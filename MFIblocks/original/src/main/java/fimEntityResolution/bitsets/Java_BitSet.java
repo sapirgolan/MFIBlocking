@@ -14,6 +14,10 @@ import fimEntityResolution.interfaces.SetPairIF;
 
 public class Java_BitSet implements BitSetIF{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3694882243554443784L;
 	private BitSet bs = null;
 	public Java_BitSet(){
 		bs = new BitSet();

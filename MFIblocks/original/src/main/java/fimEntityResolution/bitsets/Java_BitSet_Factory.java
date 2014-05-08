@@ -4,6 +4,10 @@ import fimEntityResolution.interfaces.BitSetFactory;
 import fimEntityResolution.interfaces.BitSetIF;
 
 public class Java_BitSet_Factory implements BitSetFactory {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8610454563329669590L;
 	private static Java_BitSet_Factory self = null;
 
 	private Java_BitSet_Factory() {

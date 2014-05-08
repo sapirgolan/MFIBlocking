@@ -19,6 +19,10 @@ import fimEntityResolution.interfaces.SetPairIF;
 
 public class EWAH_BitSet implements BitSetIF{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2522966848401355528L;
 	EWAHCompressedBitmap comBS = null;
 
 	public EWAH_BitSet(){

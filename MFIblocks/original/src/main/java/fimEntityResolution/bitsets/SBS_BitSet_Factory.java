@@ -4,6 +4,10 @@ import fimEntityResolution.interfaces.BitSetFactory;
 import fimEntityResolution.interfaces.BitSetIF;
 
 public class SBS_BitSet_Factory implements BitSetFactory{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7728625456113494341L;
 	private static SBS_BitSet_Factory self = null;
 	private int size = 0;
 	

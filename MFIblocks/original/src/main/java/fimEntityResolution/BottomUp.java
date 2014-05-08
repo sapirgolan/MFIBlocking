@@ -1004,8 +1004,10 @@ public class BottomUp {
 		double comparisonsMadeTPFP = truePositive + falsePositive;
 		int comparisonsCouldHaveMade = duplicateBusinessLayer.getNumberOfComparisons();
 		int duplicatesFound = duplicateBusinessLayer.getNumberOfDuplicatesFound();
-		double precision = duplicatesFound/(comparisonsMadeTPFP);
-		double recall = duplicatesFound/totalDuplicates;
+		//double precision = duplicatesFound/(comparisonsMadeTPFP);
+		double precision = truePositive/(truePositive+falsePositive);
+		double recall = truePositive/(truePositive+falseNegative);
+		//double recall = duplicatesFound/totalDuplicates;
 		double pr_f_measure = (2*precision*recall)/(precision+recall);	
 		double totalComparisonsAvailable = ((numRecords * (numRecords - 1))*0.5);	
 		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMadeTPFP)/totalComparisonsAvailable)));		

@@ -174,26 +174,42 @@ public class CandidatePairs implements SetPairIF{
 		}
 		return retVal;
 	}
-	
+	//TODO: CHECK IT
 	//TP+ FP - 1 in both the Ground Truth and in the result
 	public double[] calcTrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
-		long truePositive = 0;
-		long falsePositive = 0;
+		long TP = 0;
+		long FP = 0;
+		
 		//loop for each recored that you have found some items that might represent the same entity as he.
-		for ( Entry<Integer,RecordMatches> entry: actualCPs.getAllMatchedEntries() ) { //run over all records
+//		for ( Entry<Integer,RecordMatches> entry: actualCPs.getAllMatchedEntries() ) { //run over all records
+//			int recId = entry.getKey();
+//			//obtain all the records that might refer the same entity as current record
+//			for (CandidateMatch candidateMatches : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
+//				int otherRecId = candidateMatches.getRecordId();
+//				if(trueCPs.isPairSet(recId, otherRecId)){
+//					truePositive++;
+//				}
+//				else{
+//					falsePositive++;
+//				}
+//				
+//			}
+//		}
+		for (Entry<Integer,RecordMatches> entry: actualCPs.allMatches.entrySet()) { //run over all records
 			int recId = entry.getKey();
-			//obtain all the records that might refer the same entity as current record
-			for (CandidateMatch candidateMatches : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
-				int otherRecId = candidateMatches.getRecordId();
-				if(trueCPs.isPairSet(recId, otherRecId)){
-					truePositive++;
-				}
-				else{
-					falsePositive++;
+			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
+				int otherRecId = cm.getRecordId();
+				if(recId < otherRecId){ //we assume this is how trueCPs is built
+					if(trueCPs.isPairSet(recId, otherRecId)){
+						TP++;
+					}
+					else{
+						FP++;
+					}
 				}
 			}
 		}
-		return new double[]{truePositive,falsePositive};	
+		return new double[]{TP,FP};	
 		
 	}
 	

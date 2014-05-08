@@ -24,7 +24,7 @@ public class BlockingRunResult {
 	}
 	public String[] getCoulmnsName() {
 		return new String[] {"MaxNG", "minBlockingThresh", "usedThresh", 
-			"Recall", "Precision (PC)", "F-measure", "RR", 
+			"Recall (PC)", "Precision (PQ)", "F-measure", "RR", 
 			"Duplicates found", "#Duplicates in dataset", "Comparisons made", "Comparisons could have made",
 			"time to run"};
 	}

@@ -17,6 +17,10 @@ import fimEntityResolution.interfaces.IFRecord;
 import fimEntityResolution.interfaces.SetPairIF;
 
 public class SBS_BitSet implements BitSetIF{	 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5342431995617151960L;
 	private SparseBitSet sbs = null;
 	private int cardinality = 0;	
 	

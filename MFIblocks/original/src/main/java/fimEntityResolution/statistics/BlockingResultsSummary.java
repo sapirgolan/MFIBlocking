@@ -69,7 +69,7 @@ public class BlockingResultsSummary {
 	public String getSummary(){
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("Recall - summary:").append(Utilities.NEW_LINE);
+		sb.append("Recall - PC summary:").append(Utilities.NEW_LINE);
 		sb.append(getMin(resultsSummary[0])).append(" ").append(getAverage(resultsSummary[0])).append(" ")
 		.append(getMax(resultsSummary[0])).append(Utilities.NEW_LINE);
 

@@ -7,6 +7,10 @@ import fimEntityResolution.interfaces.BitSetIF;
 
 public class EWAH_BitSet_Factory implements BitSetFactory,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1862016563021472746L;
 	private static EWAH_BitSet_Factory self = null;
 
 	private EWAH_BitSet_Factory() {

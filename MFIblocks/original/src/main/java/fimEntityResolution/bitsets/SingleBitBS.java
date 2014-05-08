@@ -11,6 +11,10 @@ import fimEntityResolution.interfaces.IFRecord;
 import fimEntityResolution.interfaces.SetPairIF;
 
 public class SingleBitBS implements BitSetIF{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5141946182144718806L;
 	private int index=-1;
 	private boolean set = false;
 

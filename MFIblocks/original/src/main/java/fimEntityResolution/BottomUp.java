@@ -210,7 +210,7 @@ public class BottomUp {
 				actionStart = System.currentTimeMillis();
 				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, matchFile);
 				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
-				StatisticMeasuremnts results = calculateFinalResults(trueClusters.groundTruthCandidatePairs(), cps, records.size());
+				StatisticMeasuremnts results = calculateFinalResults(trueClusters, cps, records.size());
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;				
 				BlockingRunResult blockingRR = new BlockingRunResult(results, minBlockingThreshold, lastUsedBlockingThreshold,
 						NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculationDuration-writeBlocksDuration)/1000.0);
@@ -989,21 +989,23 @@ public class BottomUp {
 	 * @param numOfRecords
 	 * @return
 	 */
-	private static StatisticMeasuremnts calculateFinalResults(CandidatePairs groundTruth,CandidatePairs resultMatrix, int numOfRecords)
+	private static StatisticMeasuremnts calculateFinalResults(TrueClusters groundTruth,CandidatePairs resultMatrix, int numOfRecords)
 	{
 		long start = System.currentTimeMillis();
 		long numRecords = (long)numOfRecords;
 		//calculate TP and FP
-		double[] TPFP = groundTruth.calcTrueAndFalsePositives(groundTruth, resultMatrix);
+		double[] TPFP = groundTruth.groundTruthCandidatePairs().calcTrueAndFalsePositives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
-		double falseNegative = CandidatePairs.FalseNegatives(groundTruth, resultMatrix);
+		double falseNegative = CandidatePairs.FalseNegatives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
 		
-		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth,resultMatrix);
-		double totalDuplicates = duplicateBusinessLayer.getNumberOfDuplicatesInDataset();
+		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth.groundTruthCandidatePairs(),resultMatrix);
+		//double totalDuplicates = duplicateBusinessLayer.getNumberOfDuplicatesInDataset();
+		double totalDuplicates = groundTruth.getCardinality();
 		double comparisonsMadeTPFP = truePositive + falsePositive;
 		int comparisonsCouldHaveMade = duplicateBusinessLayer.getNumberOfComparisons();
-		int duplicatesFound = duplicateBusinessLayer.getNumberOfDuplicatesFound();
+		//int duplicatesFound = duplicateBusinessLayer.getNumberOfDuplicatesFound();
+		int duplicatesFound = (int)comparisonsMadeTPFP;
 		//double precision = duplicatesFound/(comparisonsMadeTPFP);
 		double precision = truePositive/(truePositive+falsePositive);
 		double recall = truePositive/(truePositive+falseNegative);

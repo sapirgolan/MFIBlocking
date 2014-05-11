@@ -16,7 +16,7 @@ import candidateMatches.CandidatePairs;
 public class TrueClusters {
 
 	private static String transactionSeperator = " ";
-		
+	private static int cardinality;	
 /*	public double minClusterPairScore = Double.MAX_VALUE;
 	public double averageClusterPairScore = 0;
 	*/
@@ -85,6 +85,7 @@ public class TrueClusters {
 				}				
 			}
 		//	getPairScoreVals();
+			cardinality=numOfTruePairs;
 			System.out.println("num of pairs: groundTruth.cardinality "  + numOfTruePairs/*groundTruth.numOfSet()*/);			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -92,7 +93,9 @@ public class TrueClusters {
 		}		
 	}
 	
-	
+	public int getCardinality(){
+		return cardinality;
+	}
 	
 	private static Set<Pair> getPairs(Collection<Integer> group){
 		Set<Pair> pairs = new HashSet<Pair>();

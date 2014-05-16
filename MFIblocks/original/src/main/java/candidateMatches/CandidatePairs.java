@@ -1,6 +1,11 @@
 package candidateMatches;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -179,37 +184,38 @@ public class CandidatePairs implements SetPairIF{
 	public double[] calcTrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
 		long TP = 0;
 		long FP = 0;
-		
-		//loop for each recored that you have found some items that might represent the same entity as he.
-//		for ( Entry<Integer,RecordMatches> entry: actualCPs.getAllMatchedEntries() ) { //run over all records
-//			int recId = entry.getKey();
-//			//obtain all the records that might refer the same entity as current record
-//			for (CandidateMatch candidateMatches : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
-//				int otherRecId = candidateMatches.getRecordId();
-//				if(trueCPs.isPairSet(recId, otherRecId)){
-//					truePositive++;
-//				}
-//				else{
-//					falsePositive++;
-//				}
-//				
-//			}
-//		}
+		long FN = 0;
+	
+		Set<Set<Integer>> truePairs=new HashSet<>();
+		Set<Set<Integer>> actualPairs=new HashSet<>();
 		for (Entry<Integer,RecordMatches> entry: actualCPs.allMatches.entrySet()) { //run over all records
-			int recId = entry.getKey();
-			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its matches
-				int otherRecId = cm.getRecordId();
-				if(recId < otherRecId){ //we assume this is how trueCPs is built
-					if(trueCPs.isPairSet(recId, otherRecId)){
-						TP++;
-					}
-					else{
-						FP++;
-					}
-				}
+			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
+				Set<Integer> temp=new HashSet<Integer>();
+				temp.add(cm.getRecordId());
+				temp.add(entry.getKey());
+				actualPairs.add(temp);
 			}
 		}
-		return new double[]{TP,FP};	
+		for (Entry<Integer,RecordMatches> entry: trueCPs.allMatches.entrySet()) { //run over all records
+			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
+				//count++;
+				Set<Integer> temp=new HashSet<Integer>();
+				temp.add(cm.getRecordId());
+				temp.add(entry.getKey());
+				truePairs.add(temp);
+			}
+		}
+		//intersection between truePairs and actualPairs
+		Set<Set<Integer>> tempTruePairs=new HashSet<>();
+		tempTruePairs.addAll(truePairs);
+		tempTruePairs.removeAll(actualPairs);
+		FN=tempTruePairs.size();
+		truePairs.retainAll(actualPairs);
+		TP=truePairs.size();
+		//remove intersection from actualPairs
+		actualPairs.removeAll(truePairs);
+		FP=actualPairs.size();
+		return new double[]{TP,FP, FN};	
 		
 	}
 	

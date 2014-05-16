@@ -997,7 +997,8 @@ public class BottomUp {
 		double[] TPFP = groundTruth.groundTruthCandidatePairs().calcTrueAndFalsePositives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
-		double falseNegative = CandidatePairs.FalseNegatives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
+		double falseNegative =TPFP[2];
+		//double falseNegative = CandidatePairs.FalseNegatives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
 		
 		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth.groundTruthCandidatePairs(),resultMatrix);
 		//double totalDuplicates = duplicateBusinessLayer.getNumberOfDuplicatesInDataset();

@@ -205,11 +205,12 @@ public class CandidatePairs implements SetPairIF{
 				truePairs.add(temp);
 			}
 		}
-		//intersection between truePairs and actualPairs
+		
 		Set<Set<Integer>> tempTruePairs=new HashSet<>();
 		tempTruePairs.addAll(truePairs);
 		tempTruePairs.removeAll(actualPairs);
 		FN=tempTruePairs.size();
+		//intersection between truePairs and actualPairs
 		truePairs.retainAll(actualPairs);
 		TP=truePairs.size();
 		//remove intersection from actualPairs

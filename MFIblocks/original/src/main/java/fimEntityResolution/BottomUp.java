@@ -717,13 +717,13 @@ public class BottomUp {
 		long start = System.currentTimeMillis();
 		long numRecords = (long)numOfRecords;
 		//calculate TP and FP
-		double[] TPFP = groundTruth.groundTruthCandidatePairs().calcTrueAndFalsePositives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
+		double[] TPFP = groundTruth.getGroundTruthCandidatePairs().calcTrueAndFalsePositives(groundTruth.getGroundTruthCandidatePairs(), resultMatrix);
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
 		double falseNegative =TPFP[2];
 		//double falseNegative = CandidatePairs.FalseNegatives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
 		
-		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth.groundTruthCandidatePairs(),resultMatrix);
+		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth.getGroundTruthCandidatePairs(),resultMatrix);
 		//double totalDuplicates = duplicateBusinessLayer.getNumberOfDuplicatesInDataset();
 		double totalDuplicates = groundTruth.getCardinality();
 		double comparisonsMadeTPFP = truePositive + falsePositive;

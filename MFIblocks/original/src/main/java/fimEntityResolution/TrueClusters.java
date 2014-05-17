@@ -14,12 +14,10 @@ public class TrueClusters {
 
 	private static String transactionSeperator = " ";
 	private static int cardinality;	
-	
 	private CandidatePairs cps;
-	
 
 	
-	public CandidatePairs groundTruthCandidatePairs(){
+	public CandidatePairs getGroundTruthCandidatePairs(){
 		return cps;
 	}
 	

@@ -114,8 +114,6 @@ public class BottomUp {
 		System.out.println("After reading records numOfrecords=" + numOfrecords);
 		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		System.out.println("DEBUG: Size of recods: " + MemoryUtil.deepMemoryUsageOfAll(records.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-		//GraphDatabaseService recordsDB = Utilities.readRecordsToDB(recordsFile,origRecordsFile,srcFile);
-		//int numOfrecords = records.size();
 		start = System.currentTimeMillis();
 		Utilities.parseLexiconFile(lexiconFile);
 		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
@@ -123,7 +121,6 @@ public class BottomUp {
 				
 		start = System.currentTimeMillis();
 		mfiBlocksCore(config,records,matchFile,minSups,dMinBlockingThresholds,alg,NGs,lexiconFile,recordsFile,origRecordsFile);
-		//iterativeFIsDB(records,trueClusters,minSups,dMinBlockingThresholds,alg,NGs);
 		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
 	}
 	
@@ -154,15 +151,12 @@ public class BottomUp {
 				coveredRecords.set(0,true); // no such record
 				FP = 0;
 				numComparisons = 0;
-				//ResultMatrix.clearAll();
 				//clearTrueClusters(trueClusters);
 				System.out.println("running iterative " + alg.toString() + "s with minimum blocking threshold " + minBlockingThreshold +
 						" and NGLimit: " + NG_LIMIT);			
 				long start = System.currentTimeMillis();
-				//BitMatrix resultMatrix = getClustersToUse(records,minSups,minBlockingThreshold);
 				//obtain all the clusters that has the minimum score
 				CandidatePairs cps = getClustersToUse(config,records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
-				//getClustersToUseDB(records,minSups,minBlockingThreshold,trueClusters);
 				long actionStart = System.currentTimeMillis();
 				writeCandidatePairs(cps);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;

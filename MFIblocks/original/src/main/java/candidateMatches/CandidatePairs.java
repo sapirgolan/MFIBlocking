@@ -234,7 +234,6 @@ public class CandidatePairs implements SetPairIF{
 	
 	
 	public static void main(String[] args){
-		boolean f;
 		CandidatePairs cps = new CandidatePairs(10);
 		cps.setPair(1, 2, 0.3);
 		cps.setPair(1, 3, 0.4);
@@ -242,10 +241,10 @@ public class CandidatePairs implements SetPairIF{
 		cps.setPair(1, 7, 0.5);		
 		cps.setPair(2, 7, 0.5);
 		cps.setPair(2, 4, 0.3);
-		f=cps.isPairSet(2, 1);
-		f=cps.isPairSet(2, 7);
-		f=cps.isPairSet(4, 7);
-		f=cps.isPairSet(1, 4);		
+		cps.isPairSet(2, 1);
+		cps.isPairSet(2, 7);
+		cps.isPairSet(4, 7);
+		cps.isPairSet(1, 4);		
 		System.out.println("minth: " + cps.getMinThresh());
 		
 		CandidatePairs gt = new CandidatePairs();
@@ -255,20 +254,20 @@ public class CandidatePairs implements SetPairIF{
 		gt.setPair(4, 2,0);
 		gt.setPair(4, 5,0);
 		gt.setPair(5, 6,0);
-		f = gt.isPairSet(2,7);
-		f= gt.isPairSet(7,2);
+		gt.isPairSet(2,7);
+		gt.isPairSet(7,2);
 		double[] TPFP = gt.calcTrueAndFalsePositives(gt, cps);
 		double FN = FalseNegatives(gt,cps);
 		System.out.println("TPFP: " + Arrays.toString(TPFP));
 		System.out.println("FN: " + FN);
 		
 		cps.addAll(gt);
-		f = cps.isPairSet(5, 4);
-		f = cps.isPairSet(4,5);
-		f = cps.isPairSet(6,5);
-		f = cps.isPairSet(1,7);
-		f = cps.isPairSet(4,2);
-		f = cps.isPairSet(4,8);
+		cps.isPairSet(5, 4);
+		cps.isPairSet(4,5);
+		cps.isPairSet(6,5);
+		cps.isPairSet(1,7);
+		cps.isPairSet(4,2);
+		cps.isPairSet(4,8);
 		
 	}
 }

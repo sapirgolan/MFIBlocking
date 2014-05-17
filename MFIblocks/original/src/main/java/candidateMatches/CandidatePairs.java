@@ -20,6 +20,7 @@ import fimEntityResolution.interfaces.SetPairIF;
  */
 public class CandidatePairs implements SetPairIF{
 
+	private static final long serialVersionUID = -3723310157735251353L;
 	private ConcurrentHashMap<Integer,RecordMatches> allMatches;
 	private int maxMatches;
 	private double minThresh = 0.0;

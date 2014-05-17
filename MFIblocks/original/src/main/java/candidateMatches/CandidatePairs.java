@@ -1,13 +1,9 @@
 package candidateMatches;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.javamex.classmexer.MemoryUtil;
@@ -26,8 +22,6 @@ public class CandidatePairs implements SetPairIF{
 
 	private ConcurrentHashMap<Integer,RecordMatches> allMatches;
 	private int maxMatches;
-
-
 	private double minThresh = 0.0;
 	private boolean limited = true;
 	

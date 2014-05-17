@@ -58,7 +58,7 @@ public class TrueClusters {
 				}				
 			}
 			cardinality=numOfTruePairs;
-			System.out.println("num of pairs: groundTruth.cardinality "  + numOfTruePairs/*groundTruth.numOfSet()*/);			
+			System.out.println("num of pairs: groundTruth.cardinality "  + numOfTruePairs);			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

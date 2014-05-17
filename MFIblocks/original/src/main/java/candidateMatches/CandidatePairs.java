@@ -181,7 +181,7 @@ public class CandidatePairs implements SetPairIF{
 	}
 	//TODO: CHECK IT
 	//TP+ FP - 1 in both the Ground Truth and in the result
-	public double[] calcTrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs){
+	public double[] calcTrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs) throws NullPointerException{
 		long TP = 0;
 		long FP = 0;
 		long FN = 0;

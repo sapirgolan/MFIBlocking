@@ -24,6 +24,10 @@ import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 
 import dnl.utils.text.table.TextTable;
+import fimEntityResolution.entityResulution.EntityResolutionFactory;
+import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
+import fimEntityResolution.entityResulution.ExecuteJaccardComparisons;
+import fimEntityResolution.entityResulution.IComparison;
 import fimEntityResolution.pools.BitMatrixPool;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
@@ -156,16 +160,18 @@ public class BottomUp {
 						" and NGLimit: " + NG_LIMIT);			
 				long start = System.currentTimeMillis();
 				//obtain all the clusters that has the minimum score
-				CandidatePairs cps = getClustersToUse(config,records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
+				CandidatePairs algorithmObtainedPairs = getClustersToUse(config,records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
 				long actionStart = System.currentTimeMillis();
-				writeCandidatePairs(cps);
+				writeCandidatePairs(algorithmObtainedPairs);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
 				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, matchFile);
 				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
-				StatisticMeasuremnts results = calculateFinalResults(trueClusters, cps, records.size());
-				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;				
+				StatisticMeasuremnts results = calculateFinalResults(trueClusters, algorithmObtainedPairs, records.size());
+				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
+				IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard);
+				long timeOfComparison = comparison.measureComparisonExecution(trueClusters.getGroundTruthCandidatePairs(), algorithmObtainedPairs);
 				BlockingRunResult blockingRR = new BlockingRunResult(results, minBlockingThreshold, lastUsedBlockingThreshold,
 						NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculationDuration-writeBlocksDuration)/1000.0);
 				blockingRunResults.add(blockingRR);

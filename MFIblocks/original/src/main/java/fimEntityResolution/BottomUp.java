@@ -12,21 +12,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.spark.api.java.JavaSparkContext;
 import org.neo4j.graphdb.GraphDatabaseService;
+
 import candidateMatches.CandidatePairs;
+
 import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 
 import dnl.utils.text.table.TextTable;
-import dnl.utils.text.table.TextTableModel;
 import fimEntityResolution.pools.BitMatrixPool;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
 import fimEntityResolution.statistics.DuplicateBusinessLayer;
-//import cern.colt.matrix.impl.SparseObjectMatrix2D;
 import fimEntityResolution.statistics.StatisticMeasuremnts;
 
 public class BottomUp {
@@ -43,47 +44,6 @@ public class BottomUp {
 	public enum Configuration{
 		SPARK,DEFAULT
 	}
-	/**
-	 * This method will perform a DFS on the trie and collect clusters which oblige to the following terms:
-	 * 1. the cluster itemset passes the score threshold
-	 * 2. the cluster is the most inclusive itemset which does this
-	 * @param cfiTree
-	 * @param scoreThreshold
-	 * @param retVal
-	 * @return
-	 */
-	/*	private static List<Cluster> getClustersToUse(FITree cfiTree, double scoreThreshold){
-		List<Cluster> retVal = new ArrayList<Cluster>();
-		BitSet items = new BitSet();
-		BitSet support = new BitSet(Utilities.globalRecords.size()+1);
-		support.set(1, Utilities.globalRecords.size()+1,true);		
-		recursiveGetClustersToUse(cfiTree, scoreThreshold, retVal,support,items);
-		return retVal;	
-	}
-	private static List<Cluster> recursiveGetClustersToUse(FITree cfiTree, double scoreThreshold, 
-			List<Cluster> retVal, BitSet currSupport, BitSet currItems){
-		double currClusterScore =0;
-		if(currItems.cardinality() > 0){		
-			currClusterScore = StringSimTools.softTFIDF(Utilities.getRecords(currSupport));		
-		}
-		if(currClusterScore >= scoreThreshold){
-			Cluster newCluster = new Cluster((BitSet)currSupport.clone(), (BitSet)currItems.clone(),
-					Utilities.globalItemsMap, DEDUP_MIN_SUP, Utilities.globalRecords);
-			retVal.add(newCluster);			
-		}
-		else{
-			BitSet origSupport = (BitSet) currSupport.clone();
-			for (FITree childNode : cfiTree.getChildren()) {
-				currItems.set(childNode.getValue()); //add item to cluster
-				BitSet childSupport = Utilities.globalItemsMap.get(childNode.getValue()).getSupport();
-				currSupport.and(childSupport);
-				recursiveGetClustersToUse(childNode,scoreThreshold,retVal,currSupport,currItems);
-				currItems.clear(childNode.getValue());
-				currSupport.or(origSupport);
-			}
-		}
-		return retVal;
-	} */
 	
 	public static String srcFile = null;
 	/**
@@ -297,55 +257,6 @@ public class BottomUp {
 	}
 	
 	
-	
-	/**
-	 * Clears the record supports between runs with different minsups
-	 * @param records
-	 */
-/*	private static void clearRecordsNGs(Map<Integer,Record> records){
-		for (Record record : records.values()) {
-			record.clearNG();
-		}
-	}*/
-	
-/*	private static boolean checkSNConstraint(Map<Integer, List<Cluster>> clusterMap,Map<Integer,Record> records, double ngLimit, int fromIndex){
-		clearRecordsNGs(records);
-		for(int i=fromIndex ; i<=20; i++){
-			List<Cluster> clusters = clusterMap.get(i);
-			if(clusters == null) continue;
-			for (Cluster cluster : clusters) {
-				//SparseBitSet clusterSupp = cluster.getSupport();
-				BitSet clusterSupp = cluster.getSupport();
-				for(int recInd=clusterSupp.nextSetBit(0); recInd>=0; recInd=clusterSupp.nextSetBit(recInd+1)) {
-					Record r = records.get(recInd);
-					r.updateNG(clusterSupp);
-					if(r.getNG() > ngLimit){
-						return false;
-					}
-				}
-			}			
-		}
-		return true;		
-	}
-	*/
-	
-/*	private static int getSNIndex(Map<Integer, List<Cluster>> clusterMap, Map<Integer,Record> records, double ngLimit, double minThresh){
-		int low=Math.max(1,(int) Math.ceil(minThresh/0.05));
-		int high=21;
-		while(high -low > 1){
-			int med = low + (high-low)/2;
-			boolean snConstraint = checkSNConstraint(clusterMap,records,ngLimit,med);
-			System.out.println("checkSNConstraint(" + low + "," + med + "," + high + ") returned " + snConstraint);
-			if(snConstraint){
-				high= med;
-			}
-			else{
-				low = med;
-			}			
-		}		
-		return high;
-	}*/
-	
 	public final static double THRESH_STEP = 0.05;
 	private final static int HIGH_VAL = (int) (1/THRESH_STEP+1);
 	
@@ -386,19 +297,6 @@ public class BottomUp {
 		return (int) (1/THRESH_STEP+1);
 	}
 		
-	/*
-	private static List<Cluster> uniteFromIndex(int index, Map<Integer, List<Cluster>> clusterMap){
-		List<Cluster> retVal = new ArrayList<Cluster>();
-		for(int i=index ; i<=20; i++){
-			List<Cluster> toAdd = clusterMap.get(i);
-			if(toAdd != null){
-				retVal.addAll(clusterMap.get(i));
-			}
-		}
-		return retVal;
-	}
-	*/
-
 	private static CandidatePairs getClustersToUse(Configuration config,Map<Integer,Record> records,int[] minSups, double minBlockingThreshold, String lexiconFile,String recordsFile, String origRecordsFile){
 		Arrays.sort(minSups);
 		coveredRecords.set(0,true); // no such record
@@ -560,36 +458,6 @@ public class BottomUp {
 			}
 		}
 	}
-	/*
-	private static List<Cluster> removeBelowScore(List<Cluster> currRoundClusters, double scoreThresh){
-		List<Cluster> retval = new ArrayList<Cluster>();	
-		for (Cluster cluster : currRoundClusters) {			
-			if(cluster.getScore() >= scoreThresh){
-				retval.add(cluster);
-			}
-		}
-		System.out.println("Threshold:  " + scoreThresh + " caused the removal of " + 
-				(currRoundClusters.size()-retval.size()) + " clusters");
-		return retval;
-	}
-	*/
-	
-	/*
-	private static boolean checkSNConstraint(List<Cluster> currRoundClusters,Map<Integer,Record> records, int ngLimit){
-		clearRecordsNGs(records);
-		for (Cluster cluster : currRoundClusters) {
-			BitSet clusterSupp = cluster.getSupport();
-			for(int i=clusterSupp.nextSetBit(0); i>=0; i=clusterSupp.nextSetBit(i+1)) {
-				Record r = records.get(i);
-				r.updateNG(clusterSupp);
-				if(r.getNG() > ngLimit){
-					return false;
-				}
-			}
-		}
-		return true;		
-	}
-	*/
 	
 	private static boolean checkSNConstraint(BitMatrix coverageMatrix,Map<Integer,Record> records, double ngLimit){
 		return (coverageMatrix.getMaxNG() <= ngLimit);	
@@ -598,44 +466,6 @@ public class BottomUp {
 		return (coverageMatrix.getMaxNG() <= ngLimit);	
 	}
 	
-	/*
-	private static int numOfPairsToTest(Collection<Cluster> clusters){
-		int retval = 0;
-		for (Cluster cluster : clusters) {
-			int supportSize = cluster.getSupport().cardinality();
-			retval += supportSize*(supportSize-1)/2;
-		}
-		return retval;
-	}
-	*/
-	
-/*	private static void updateCoveredRecords(BitSet coveredRecords, Collection<Cluster> newClusters){
-		for (Cluster cluster : newClusters) {
-			org.enerj.core.SparseBitSet.Iterator It = cluster.getSupport().getIterator();
-			while(It.hasNext()){
-				int next = (int) It.next();
-				coveredRecords.set(next);
-			}
-		}
-	}
-	*/
-	
-/*	private static void updateCoveredRecords(BitSet coveredRecords, Collection<Cluster> newClusters){
-		for (Cluster cluster : newClusters) {
-			coveredRecords.or(cluster.getSupport());
-		}
-	}
-*/	
-/*	private static void updateCoveredRecords(BitSet coveredRecords, SparseObjectMatrix2D som){
-		for(int row = 1 ; row < som.rows() ; row++){
-			for(int col = row+1; col < som.columns() ; col++){
-				if(som.getQuick(row,col) != null){
-					coveredRecords.set(row);
-				}
-			}
-		}
-	}
-*/	
 	private static void updateCoveredRecords(BitSet coveredRecords, BitSet coveredRows){
 		coveredRecords.or(coveredRows);
 	}
@@ -810,67 +640,8 @@ public class BottomUp {
 		return retVal;
 	}
 	
-	/*
-	private static boolean containedInCluster(List<Cluster> clusters, Pair pair){
-		for (Cluster cluster : clusters) {
-			if(cluster.getSupport().get(pair.r1) &&
-					cluster.getSupport().get(pair.r2)){
-				return true;
-			}
-		}
-		return false;
-	}
-	*/
 	private static int sameSource = 0;
 	private static int numSet = 0;
-/*	private static void updateResultMatrix(List<Cluster> clusters,TrueClusters trueClusters, Map<Integer,Record> records){	
-		for (Cluster cluster : clusters) {
-			//SparseBitSet supp = cluster.getSupport();
-			BitSet supp = cluster.getSupport();
-			//long[] supp_long = new long[new Long(supp.getNumBitsSet()).intValue()];
-			long[] supp_long = new long[supp.cardinality()];
-			//org.enerj.core.SparseBitSet.Iterator It1 = supp.getIterator();
-			
-			int index=0;
-			
-			for(int recId=supp.nextSetBit(0); recId>=0; recId=supp.nextSetBit(recId+1)) {
-				supp_long[index++]=recId;
-			}
-			
-			int cnt=0;
-			for (int i = 0; i < supp_long.length; i++) {
-				for (int j = i+1; j < supp_long.length; j++) {	
-					boolean toSet =  !sameSource(supp_long[i], supp_long[j]);
-					cnt++;
-					if(!toSet){ sameSource++;}
-					if(toSet){
-						ResultMatrix.setPair(supp_long[i], supp_long[j]);
-						numSet++;
-					}
-				}
-			}			
-			int val = (int) Math.ceil(cluster.getSupportSize()*(cluster.getSupportSize()-1)*0.5);
-			if(cnt != val){
-				System.out.println("cnt = " + cnt + " val = " + val);
-			}
-		}		
-	}
-	*/
-/*	private static void updateResultMatrix(SparseObjectMatrix2D som ,TrueClusters trueClusters, Map<Integer,Record> records){	
-		for(int row =1 ; row < som.rows() ; row ++){
-			for(int col = row+1 ; col < som.columns() ; col++){
-				if(som.getQuick(row, col) != null){
-					boolean toSet = !sameSource(row,col);
-					if(!toSet){ sameSource++;}
-					if(toSet){
-						ResultMatrix.setPair(row,col);
-						numSet++;
-					}
-				}
-			}
-		}
-	}
-*/	
 	private static void updateResultMatrix(GDS_NG resultMatrix, final BitMatrix coverageMatrix){	
 		//ResultMatrix.or(coverageMatrix);
 		resultMatrix.writeToDB(coverageMatrix);
@@ -910,48 +681,6 @@ public class BottomUp {
 		return (src1.equalsIgnoreCase(src2));
 	}
 	
-	/*
-	private static Set<Pair> updateBlockingEfficiency(List<Cluster> clusters, 
-			TrueClusters trueClusters, Map<Integer,Record> records){
-		Set<Pair> newlyCovered = new HashSet<Pair>();
-		Set<Pair> truePairs = trueClusters.getClusters();
-		for (Pair pair : truePairs) {
-			if (containedInCluster(clusters, pair)) { //will enable testing TP and FN
-				if(pair.getCovered() == false){
-					newlyCovered.add(pair);
-					pair.setCovered(true);
-				}
-			}
-		}
-		//now calculate FP
-		Collection<Set<Pair>> s_pairs = getClusterPairs(clusters, records).values();
-		Set<Pair> allpairs = new HashSet<Pair>();
-		//form all sets to a larger set
-		for (Set<Pair> set : s_pairs) {
-			allpairs.addAll(set);
-		}
-		numComparisons+=allpairs.size();
-		int ctr = 0;
-		int sameSrcPairs = 0;
-		for (Pair pair : allpairs) {
-			if(pair.sameSource()){
-				sameSrcPairs++;
-				continue;//for the google-Amazon products. we do not want to return pairs from the same source, because
-				//those aren/t represented in the match file --> precision goes down
-			}
-			if(!truePairs.contains(pair)){
-				FP++;					
-				if(DEBUG && (ctr++ % 100) == 0){
-					System.out
-					 .println("False positive pair: " + pair.toString());
-				}
-			}		
-		}
-		System.out
-		 .println("num of same source pairs: " + sameSrcPairs);
-		return newlyCovered;
-	}
-	*/
 	
 	private static double[] calculateFinalResults(BitMatrix GroundTruth,BitMatrix ResultMatrix,int numOfRecords)
 	{
@@ -1031,197 +760,6 @@ public class BottomUp {
 		return statisticMeasuremnts;
 	}
 	
-	/*
-	private static double[] calculateFinalResults(TrueClusters trueClusters, Map<Integer,Record> records, BitSet coveredRecords, int numOfRecords){
-		long FN =0;
-		BufferedWriter outputWriter = null;
-		long TP = 0;
-		Set<Pair> truePairs = trueClusters.getClusters();
-		try {
-				outputWriter = new BufferedWriter(new FileWriter(new File(
-					WRONG_ANNOTATION_FILE)));
-				for (Pair pair : truePairs) {
-					if(pair.getCovered()){
-						TP++;
-					}
-					else{ // FN pair
-						FN++;
-						if(DEBUG){
-							System.out.println(pair.toString());
-							if(pair.getScore() < 0.07){
-								outputWriter.write(pair.simpleToString());
-								outputWriter.newLine();
-							}
-							if (coveredRecords != null) {
-								if (coveredRecords.get(pair.r1) == false
-										|| coveredRecords.get(pair.r2) == false) {
-									if (coveredRecords.get(pair.r1) == false
-											&& coveredRecords.get(pair.r2) == false) {
-										System.out
-												.println("reason pair is uncovered is that BOTH of the records weren't covered at all");
-									} else {
-										System.out
-												.println("reason pair is uncovered is that one of the records wasn't covered at all");
-									}
-								} else {
-									System.out
-											.println("reason pair is uncovered is that they were seperated in one of the iterations");
-								}
-							}
-						}
-					}
-				}
-		}catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		
-		double precision = (double)TP/(double)(TP+FP);
-		double recall = (double)TP/(double)(TP+FN);
-		double pr_f_measure = (2*precision*recall)/(precision+recall);
-		long totalComparisons = (long) (((long)numOfRecords * ((long)numOfRecords - 1))*0.5);	
-		double RR = Math.max(0.0, (1.0-((double)(TP+FP)/(double)totalComparisons)));
-		System.out.println("TP = " + TP +", FP= " + FP + ", FN="+ FN + " totalComparisons= " + totalComparisons);
-		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + RR);
-		
-
-		double[] retVal = new double[4];
-		retVal[0] = recall;
-		retVal[1] = precision;
-		retVal[2]=  pr_f_measure;
-		retVal[3]=  RR;
-			
-		return retVal;
-	}
-	*/
-	
-	/*
-	private static boolean DEBUG = false;
-	private final static String WRONG_ANNOTATION_FILE = "WrongAnnotationFile.txt";	
-	private static double[] calculateBlockingEfficiency(List<Cluster> clusters, 
-			TrueClusters trueClusters,BitSet coveredRecords, int numOfRecords,Map<Integer,Record> records){
-		BufferedWriter outputWriter = null;
-		Set<Pair> truePairs = null;
-		float TP = 0, FN = 0, FP = 0;;
-
-		try {
-			outputWriter = new BufferedWriter(new FileWriter(new File(
-					WRONG_ANNOTATION_FILE)));
-			
-			truePairs = trueClusters.getClusters();
-			for (Pair pair : truePairs) {
-				if (containedInCluster(clusters, pair)) {
-					TP++;
-				} else {
-					FN++;
-					if(DEBUG){
-							System.out.println(pair.toString());
-							if(pair.getScore() < 0.07){
-								outputWriter.write(pair.simpleToString());
-								outputWriter.newLine();
-							}
-							if (coveredRecords != null) {
-								if (coveredRecords.get(pair.r1) == false
-										|| coveredRecords.get(pair.r2) == false) {
-									if (coveredRecords.get(pair.r1) == false
-											&& coveredRecords.get(pair.r2) == false) {
-										System.out
-												.println("reason pair is uncovered is that BOTH of the records weren't covered at all");
-									} else {
-										System.out
-												.println("reason pair is uncovered is that one of the records wasn't covered at all");
-									}
-								} else {
-									System.out
-											.println("reason pair is uncovered is that they were seperated in one of the iterations");
-								}
-							}
-						}
-				}
-			}
-			//now calculate FP
-			Collection<Set<Pair>> s_pairs = getClusterPairs(clusters, records).values();
-			Set<Pair> allpairs = new HashSet<Pair>();
-			//form all sets to a larger set
-			for (Set<Pair> set : s_pairs) {
-				allpairs.addAll(set);
-			}
-			int ctr = 0;
-			int sameSrcPairs = 0;
-			for (Pair pair : allpairs) {
-				if(pair.sameSource()){
-					sameSrcPairs++;
-					continue;//for the google-Amazon products. we do not want to return pairs from the same source, because
-					//those aren/t represented in the match file --> precision goes down
-				}
-				if(!truePairs.contains(pair)){
-					FP++;					
-					if(DEBUG && (ctr++ % 100) == 0){
-						System.out
-						 .println("False positive pair: " + pair.toString());
-					}
-				}
-			}
-			
-			System.out
-			 .println("num of same source pairs: " + sameSrcPairs);
-			outputWriter.close();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		double precision = TP/(TP+FP);
-		double recall = TP/(TP+FN);
-		double pr_f_measure = (2*precision*recall)/(precision+recall);
-		
-		long actualComparisons = 0;
-		for (Cluster cluster : clusters) {
-			actualComparisons += (cluster.getSupportSize() * (cluster
-					.getSupportSize() - 1)) * 0.5;
-		}		
-		long totalComparisons = (long) (((long)numOfRecords * ((long)numOfRecords - 1))*0.5);		
-		double RR = Math.max(0.0, (1.0-((double)actualComparisons/(double)totalComparisons)));
-		if(RR > 1){
-			System.out.println("numOfRecords: " + numOfRecords);
-			System.out.println("actualComparisons: " + actualComparisons);
-			System.out.println("totalComparisons" + totalComparisons);
-		}
-		
-		
-		double[] retVal = new double[4];
-		retVal[0] = recall;
-		retVal[1] = precision;
-		retVal[2]=  pr_f_measure;
-		retVal[3]=  RR;
-			
-		return retVal;
-	}
-	*/
-	/*
-	private static Map<Integer,Set<Pair>> getClusterPairs(Collection <Cluster> clusters,
-			Map<Integer,Record> records){
-		//pairs already collected, so each pair is examined exactly once 
-		Set<Pair> collectedPairs = new HashSet<Pair>();
-		Map<Integer,Set<Pair>> retVal = new HashMap<Integer, Set<Pair>>();
-
-		for (Cluster cluster : clusters) {
-			//possible pairs
-			Set<Pair> currClusterPairs = Utilities.getPairs(Utilities.getRecords(cluster.getSupport()),records);
-			//pairs created only by this cluster (or the first to be created by it)
-			Set<Pair> distinctClusterPairs =  new HashSet<Pair>();
-			for (Pair pair : currClusterPairs) {
-				if(!collectedPairs.contains(pair)){ //pair has yet to be created
-					collectedPairs.add(pair);	// add it
-					distinctClusterPairs.add(pair); // ad to distinct set
-				}				
-			}
-			retVal.put(cluster.getId(), distinctClusterPairs);
-		}
-		return retVal;				
-	}
-	
-	*/
 	
 	private static Map<Integer,Cluster> getClustermap(Collection<Cluster> clustCollection){
 		Map<Integer,Cluster> retVal = new HashMap<Integer, Cluster>(clustCollection.size());

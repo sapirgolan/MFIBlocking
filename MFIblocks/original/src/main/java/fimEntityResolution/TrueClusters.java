@@ -6,10 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import candidateMatches.CandidatePairs;
 
@@ -17,42 +14,21 @@ public class TrueClusters {
 
 	private static String transactionSeperator = " ";
 	private static int cardinality;	
-/*	public double minClusterPairScore = Double.MAX_VALUE;
-	public double averageClusterPairScore = 0;
-	*/
 	
-//	private BitMatrix groundTruth;
 	private CandidatePairs cps;
 	
 
-/*	public BitMatrix groundTruth(){
-		return groundTruth;
-	}*/
 	
 	public CandidatePairs groundTruthCandidatePairs(){
 		return cps;
 	}
 	
-/*
-	private void getPairScoreVals(){
-		for (Pair pair: truePairs) {
-			//CHANGE
-			if(!Utilities.globalRecords.containsKey(pair.r1) || !Utilities.globalRecords.containsKey(pair.r2)){
-				System.out.println("Either " + pair.r1 + " or " + pair.r2 + " is not in the globalRecords. ");
-			}
-			double currScore = StringSimTools.softTFIDF(Utilities.globalRecords.get(pair.r1), Utilities.globalRecords.get(pair.r2));
-			averageClusterPairScore += currScore;
-			minClusterPairScore = Math.min(minClusterPairScore, currScore);			
-		}
-		averageClusterPairScore=averageClusterPairScore/truePairs.size();
-	}
-*/
 	public TrueClusters(int numOftransactions, String clustersFile){
-	//	groundTruth = new BitMatrix(numOftransactions);		
 		cps = new CandidatePairs(); //no limit
 		int numOfTruePairs = 0;
+		BufferedReader clustersFilereader = null;
 		try {
-			BufferedReader clustersFilereader = new BufferedReader(new FileReader(
+			clustersFilereader = new BufferedReader(new FileReader(
 					new File(clustersFile)));
 			String currLine = "";
 			while (currLine != null) {
@@ -78,36 +54,29 @@ public class TrueClusters {
 				
 				for(int i=0 ; i < cluster.size() ; i++){
 					for(int j=i+1; j < cluster.size() ; j++){						
-					//	groundTruth.setPair(cluster.get(i), cluster.get(j));
 						cps.setPair(cluster.get(i), cluster.get(j), 0.0);
 						numOfTruePairs++;
 					}
 				}				
 			}
-		//	getPairScoreVals();
 			cardinality=numOfTruePairs;
 			System.out.println("num of pairs: groundTruth.cardinality "  + numOfTruePairs/*groundTruth.numOfSet()*/);			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+		finally {
+			if (clustersFilereader!= null) {
+				try {
+					clustersFilereader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	public int getCardinality(){
 		return cardinality;
 	}
-	
-	private static Set<Pair> getPairs(Collection<Integer> group){
-		Set<Pair> pairs = new HashSet<Pair>();
-		List<Integer> temp = new ArrayList<Integer>(group.size());
-		temp.addAll(group);
-		for(int i=0 ; i < temp.size() ; i++){
-			for(int j=i+1; j < temp.size() ; j++){
-				Pair pair = new Pair(temp.get(i),temp.get(j));								
-				pairs.add(pair);				
-			}			
-		}
-		return pairs;
-	}
-	
 }

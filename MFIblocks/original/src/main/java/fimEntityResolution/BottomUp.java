@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.spark.api.java.JavaSparkContext;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import candidateMatches.CandidatePairs;
 
@@ -26,9 +25,7 @@ import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 import dnl.utils.text.table.TextTable;
 import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
-import fimEntityResolution.entityResulution.ExecuteJaccardComparisons;
 import fimEntityResolution.entityResulution.IComparison;
-import fimEntityResolution.pools.BitMatrixPool;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
 import fimEntityResolution.statistics.DuplicateBusinessLayer;
@@ -36,11 +33,17 @@ import fimEntityResolution.statistics.StatisticMeasuremnts;
 
 public class BottomUp {
 	
-	public static JavaSparkContext sc;
-	public static int DEDUP_MIN_SUP = 2;
 	private final static String FI_DIR = "FIs";
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
+	private static int sameSource = 0;
+	
+	public final static double THRESH_STEP = 0.05;
+	public static JavaSparkContext sc;
+	public static int DEDUP_MIN_SUP = 2;
+	public static BitSet coveredRecords= null;
+	public static String srcFile = null;
+	
 	public enum Alg{
 		CFI,
 		MFI
@@ -49,7 +52,7 @@ public class BottomUp {
 		SPARK,DEFAULT
 	}
 	
-	public static String srcFile = null;
+	
 	/**
 	 * The Main of the MFIBlocking Algorithm
 	 * @param args
@@ -128,9 +131,7 @@ public class BottomUp {
 		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
 	}
 	
-	public static BitSet coveredRecords= null;
-	private static int FP = 0;	
-	private static int numComparisons = 0;
+	
 	/**
 	 * Core of the MFIBlocks algorithm
 	 * @param records
@@ -153,8 +154,6 @@ public class BottomUp {
 			for (double minBlockingThreshold : minBlockingThresholds) { // test for each minimum blocking threshold
 				coveredRecords = new BitSet(records.size()+1);
 				coveredRecords.set(0,true); // no such record
-				FP = 0;
-				numComparisons = 0;
 				//clearTrueClusters(trueClusters);
 				System.out.println("running iterative " + alg.toString() + "s with minimum blocking threshold " + minBlockingThreshold +
 						" and NGLimit: " + NG_LIMIT);			
@@ -256,47 +255,6 @@ public class BottomUp {
 		return dbs;
 	}
 	
-	
-	public final static double THRESH_STEP = 0.05;
-	private final static int HIGH_VAL = (int) (1/THRESH_STEP+1);
-	
-	private static int getSNIndex(Map<Integer, BitMatrix> coverageMap, Map<Integer,Record> records, double ngLimit, double minThresh){
-		int begIndex = Utilities.getIntForThresh(minThresh);
-		System.out.println("entered  getSNIndex minThresh= " + minThresh + " beggining from " + begIndex);	
-		System.out.println("coverageMap.size() =" + coverageMap.size());
-		
-		for(int i= begIndex ; i < 1/THRESH_STEP+1 ; i++){
-			if(coverageMap.containsKey(i) && coverageMap.get(i) != null){
-				if(checkSNConstraint(coverageMap.get(i),records,ngLimit)){		
-					System.out.println("about to return " + i);
-					System.out.println("(coverageMap.get(i) == null) " + (coverageMap.get(i) == null));
-					return i;
-				}
-			}
-		}
-		
-		System.out.println("returnin coverageMap.size() " + 1/THRESH_STEP+1);
-		return (int) (1/THRESH_STEP+1);
-	}
-	
-	private static int getSNIndexDB(Map<Integer, GDS_NG> coverageMap, double ngLimit, double minThresh){
-		int begIndex = Utilities.getIntForThresh(minThresh);
-		System.out.println("entered  getSNIndex minThresh= " + minThresh + " beggining from " + begIndex);	
-		System.out.println("coverageMap.size() =" + coverageMap.size());
-		for(int i= begIndex ; i < 1/THRESH_STEP+1 ; i++){
-			if(coverageMap.containsKey(i) && coverageMap.get(i) != null){
-				if(checkSNConstraintDB(coverageMap.get(i),ngLimit)){		
-					System.out.println("about to return " + i);
-					System.out.println("(coverageMap.get(i) == null) " + (coverageMap.get(i) == null));
-					return i;
-				}
-			}
-		}
-		
-		System.out.println("returnin coverageMap.size() " + 1/THRESH_STEP+1);
-		return (int) (1/THRESH_STEP+1);
-	}
-		
 	private static CandidatePairs getClustersToUse(Configuration config,Map<Integer,Record> records,int[] minSups, double minBlockingThreshold, String lexiconFile,String recordsFile, String origRecordsFile){
 		Arrays.sort(minSups);
 		coveredRecords.set(0,true); // no such record
@@ -372,100 +330,6 @@ public class BottomUp {
 		
 	}
 	
-	private static GDS_NG getClustersToUseDB(Map<Integer,Record> records,int[] minSups, double minBlockingThreshold){
-		Arrays.sort(minSups);
-	//	int totalNumOfClusters = 0;				
-		coveredRecords.set(0,true); // no such record
-		double[] usedThresholds = new double[minSups.length];		
-		File mfiDir = new File(FI_DIR);
-		if(!mfiDir.exists()){
-			if(!mfiDir.mkdir())
-				System.out.println("Failed to create directory " + mfiDir.getAbsolutePath());
-		}
-		GDS_NG resultMatrix = new GDS_NG();
-		for(int i=(minSups.length - 1) ; i >=0  && coveredRecords.cardinality() < Utilities.DB_SIZE; i--){ // array is sorted in ascending order -
-			resultMatrix.setNGLimit(NG_LIMIT*minSups[i]);
-			//begin with largest minSup
-			//continue until all records have been covered OR we have completed running over all minSups			
-			Map<Integer, GDS_NG> coverageMapDB = null;			
-			long start = System.currentTimeMillis();
-			//File uncoveredRecordsFile = createRecordFileFromRecordsDB(coveredRecords,recordsDB, minSups[i]);
-			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords,records, minSups[i]);
-			System.out.println("Time to createRecordFileFromRecords" +Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-				
-			start = System.currentTimeMillis();
-			File mfiFile = Utilities.RunMFIAlg(minSups[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
-			System.out.println("Time to run MFI with minsup="+minSups[i] +
-					" on table of size " + (Utilities.DB_SIZE-coveredRecords.cardinality()) + 
-					" is " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-		
-			start = System.currentTimeMillis();
-			//coverageMapDB = Utilities.readFIsDB(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,recordsDB,minSups[i],NG_LIMIT);
-			coverageMapDB = Utilities.readFIsDB(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
-			System.out.println("Time to read MFIs: " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-			
-					
-			start = System.currentTimeMillis();
-			int SNIndex = getSNIndexDB(coverageMapDB, minSups[i]*NG_LIMIT,minBlockingThreshold);
-			
-			System.out.println("index returned: " + SNIndex + " corresponds to " + (SNIndex-1)*0.05 + " < score <= " + SNIndex*0.05);			
-		//	List<Cluster> currRoundClusters = uniteFromIndex(SNIndex,clusterMap);
-			System.out.println("Time to get clustering which maintains NG(t)<=" + NG_LIMIT + "*minsup is: " + 
-					Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-			
-			
-			if(SNIndex <= 20){
-				start = System.currentTimeMillis();
-				GDS_NG coveragematrix = coverageMapDB.get(SNIndex);
-				updateCoveredRecords(coveredRecords,coveragematrix.getCoveredRows());
-				System.out.println("Time to updateCoveredRecords " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");				
-				start = System.currentTimeMillis();				
-				updateResultMatrix(resultMatrix,coveragematrix.exportToBM());				
-				coveragematrix = null; coverageMapDB = null;
-				System.out.println("Time to updateBlockingEfficiency " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-				usedThresholds[i]=(SNIndex-1)*0.05;
-				lastUsedBlockingThreshold = (SNIndex-1)*0.05;
-				System.gc();
-			}
-			else{				
-					System.out.println("No threshold exists such that the NG contraint NG < " + NG_LIMIT*minSups[i] +
-							" is satisfied for minsup = " + minSups[i]);
-					lastUsedBlockingThreshold = usedThresholds[i] = 1.0;								
-			}
-		
-			
-			System.out.println("Number of covered records after running with Minsup=" +
-					minSups[i] +  " is " + coveredRecords.cardinality() + " out of " + Utilities.DB_SIZE);
-		}
-		System.out.println("Minsups used " + Arrays.toString(minSups));
-		System.out.println("Total number of covered records under minimum blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minSups) + " is: " + coveredRecords.cardinality() + " out of " + Utilities.DB_SIZE + 
-				" which are: " + 100*(coveredRecords.cardinality()/Utilities.DB_SIZE) + "%");		
-
-		System.out.println("After adding uncovered records: Total number of covered records under blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minSups) + " is: " + coveredRecords.cardinality() + " out of " + Utilities.DB_SIZE + 
-				" which are: " + 100*(coveredRecords.cardinality()/Utilities.DB_SIZE) + "%");
-		
-			
-		return resultMatrix;
-		
-	}
-
-	private static void checkInBMs(Map<Integer, BitMatrix> coverageMap){
-		for (BitMatrix bm : coverageMap.values()) {
-			if(bm != null){ // already returned
-				BitMatrixPool.getInstance().returnMatrix(bm);
-			}
-		}
-	}
-	
-	private static boolean checkSNConstraint(BitMatrix coverageMatrix,Map<Integer,Record> records, double ngLimit){
-		return (coverageMatrix.getMaxNG() <= ngLimit);	
-	}
-	private static boolean checkSNConstraintDB(GDS_NG coverageMatrix, double ngLimit){
-		return (coverageMatrix.getMaxNG() <= ngLimit);	
-	}
-	
 	private static void updateCoveredRecords(BitSet coveredRecords, BitSet coveredRows){
 		coveredRecords.or(coveredRows);
 	}
@@ -523,58 +387,6 @@ public class BottomUp {
 		return outputFle;			
 	}
 	
-	private static File createRecordFileFromRecordsDB(BitSet coveredRecords, GraphDatabaseService records, int minSup){		
-		File retVal = null;
-		System.out.println("Directory TempDir= " + TempDir + " TempDir.getAbsolutePath()" + TempDir.getAbsolutePath());
-		try {
-			if(!TempDir.exists()){
-				if(!TempDir.mkdir())						
-					System.out.println("failed to create directory " + TempDir.getAbsolutePath());				
-			}
-			
-			retVal = File.createTempFile("records", null, TempDir);
-			System.out.println("retVal= " + retVal + " retVal.getAbsolutePath()=" + retVal.getAbsolutePath());
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}	
-		retVal.deleteOnExit();
-		if(retVal.exists()){
-			System.out.println("File " + retVal.getAbsolutePath() + " exists right after deleteOnExit");
-		}
-		
-		Map<Integer,Integer> appItems = appitemsDB(coveredRecords, records, minSup);
-		
-		BufferedWriter writer = null;
-		int written=0;
-		try {
-			retVal.delete();
-			retVal.createNewFile();
-			writer = new BufferedWriter(new FileWriter(retVal));
-			
-			for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= Utilities.DB_SIZE ; i=coveredRecords.nextClearBit(i+1)){
-				DBRecord currRecord = new DBRecord(i);				
-				String toWrite = currRecord.getNumericline(appItems.keySet());
-				writer.write(toWrite);
-				writer.newLine();
-				written++;
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally{
-			try {
-				System.out.println("Number of records written: " + written);
-				writer.flush();
-				writer.close();		
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return retVal;			
-	}
 	
 	
 	private final static double MAX_SUPP_CONST = 1.0;//0.005;
@@ -609,50 +421,8 @@ public class BottomUp {
 		return retVal;
 	}
 	
-	private static Map<Integer,Integer> appitemsDB(BitSet coveredRecords, GraphDatabaseService records, int minSup){
-		Map<Integer,Integer> retVal = new HashMap<Integer, Integer>();
-		for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= Utilities.DB_SIZE ; i=coveredRecords.nextClearBit(i+1)){
-			DBRecord currRecord = new DBRecord(i);
-			Set<Integer> recordItems = currRecord.getItemsToFrequency().keySet();
-			for (Integer recorditem : recordItems) {
-				int itemSuppSize = 1;
-				if(retVal.containsKey(recorditem)){
-					itemSuppSize = retVal.get(recorditem) + 1;
-				}
-				retVal.put(recorditem, itemSuppSize);
-			}
-		}
-		int origSize =  retVal.size();
-		System.out.println("Number of items before pruning too frequent items: " + origSize);
-		double DBSize = Utilities.DB_SIZE  - coveredRecords.cardinality();
-		if(DBSize > 10000){			
-			double removal = ((double)minSup)*DBSize*MAX_SUPP_CONST;
-			Iterator<Entry<Integer,Integer>> retValIterator = retVal.entrySet().iterator();
-			while(retValIterator.hasNext()){
-				Entry<Integer,Integer> currItem =  retValIterator.next();
-				if(currItem.getValue() > removal){
-					retValIterator.remove();
-				}
-			}
-		}
-		System.out.println("Number of items AFTER pruning too frequent items: " + retVal.size());
-		System.out.println("A total of : " + (origSize-retVal.size()) + " items were pruned");
-		return retVal;
-	}
-	
-	private static int sameSource = 0;
-	private static int numSet = 0;
-	private static void updateResultMatrix(GDS_NG resultMatrix, final BitMatrix coverageMatrix){	
-		//ResultMatrix.or(coverageMatrix);
-		resultMatrix.writeToDB(coverageMatrix);
-	}
-	
 	private static void updateCandidatePairs(CandidatePairs allResults, final CandidatePairs coveragePairs){	
 		allResults.addAll(coveragePairs);
-	}
-	
-	private static void updateResultMatrix(BitMatrix resultMatrix, final BitMatrix coverageMatrix){
-		resultMatrix.or(coverageMatrix);
 	}
 	
 	public static void comparePairSets(Set<Pair> prev, Set<Pair> next){
@@ -760,15 +530,6 @@ public class BottomUp {
 		return statisticMeasuremnts;
 	}
 	
-	
-	private static Map<Integer,Cluster> getClustermap(Collection<Cluster> clustCollection){
-		Map<Integer,Cluster> retVal = new HashMap<Integer, Cluster>(clustCollection.size());
-		for (Cluster cluster : clustCollection) {
-			retVal.put(cluster.getId(), cluster);
-		}
-		return retVal;	
-	}
-
 	public static String writeBlockingRR(Collection<BlockingRunResult> runResults){
 		StringBuilder sb = new StringBuilder();
 		//calculate average, Min & Max for all runs

@@ -87,9 +87,11 @@ public class Utilities {
 	public static GraphDatabaseService recordDB;
 	private static final String RECORD_DB_PATH = "target/records-db";
 
-	public static Map<Integer, Record> readRecords(String numericRecordsFile,
-			String origRecordsFile, String srcFile) {
+	public static Map<Integer, Record> readRecords(MfiContext context) {
 
+		String numericRecordsFile = context.getRecordsFile();
+		String origRecordsFile = context.getOriginalFile();
+		String srcFile = context.getSrcFile();
 		Map<Integer, Record> outputRecords = new HashMap<Integer, Record>();
 		try {
 			BufferedReader recordsFileReader = new BufferedReader(

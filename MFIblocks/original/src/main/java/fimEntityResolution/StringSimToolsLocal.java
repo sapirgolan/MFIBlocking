@@ -301,12 +301,6 @@ public class StringSimToolsLocal {
 		return retVal;
 	}
 	
-	private static double RSJWeight(int wordId){
-		double n_t=(double)globalItemsMap.get(wordId).getSupportSize();
-		double N = (double)globalRecords.size();
-		return ((N - n_t + 0.5)/n_t+0.5);
-	}
-	
 	private static double IDF(int wordId){
 		return ((double)globalRecords.size()/
 					(double)globalItemsMap.get(wordId).getSupportSize());
@@ -383,19 +377,6 @@ public class StringSimToolsLocal {
 		records.add(S);
 		records.add(T);
 		return softTFIDF(records,null,1.0);
-	/*	Map<Integer,Double> closeTerms = getCloseTerms3(records);
-	
-		for (Entry<Integer,Double> term : closeTerms.entrySet()) {			
-			nominator += Word_TFIDF(term.getKey(),records)
-								*term.getValue();
-		}
-		Set<Integer> unCommonTerms = getUnionItems(records);
-		unCommonTerms.removeAll(closeTerms.keySet());
-		double denominator = nominator;
-		for (Integer term  : unCommonTerms) {
-			denominator += Word_TFIDF(term,records);
-		}
-		return (nominator/denominator); */
 	}
 	
 	@SuppressWarnings("unused")
@@ -482,31 +463,16 @@ public class StringSimToolsLocal {
 				minTermScore = termScore;
 			}
 			nominator += termScore; //"rough - as in - assume term appears only once in a record
-		
 		}
-		
 		
 		double denominator = recordsSize*minRecordSize*minTermScore;	
 		return (nominator/denominator);
 	}
-	
-/*	public static double roughSoftTFIDF2(Collection<Record> records){
-		double nominator = 0;
-		//contains common terms as well as terms which are similar to the common terms 
-		HashMap<Integer, Double> closeTerms = getCloseTerms2(records);
-		
-		for (Integer term : closeTerms.keySet()) {			
-			double coeff = closeTerms.get(term);
-			nominator += Word_TFIDF(term,records)
-							*coeff; //if term is common then this will be 1.0
-		}
-		Set<Integer> unCommonTerms = getUnionItems(records);
-		unCommonTerms.removeAll(closeTerms.keySet());
-		double denominator = nominator;
-		for (Integer term  : unCommonTerms) {
-			denominator += Word_TFIDF(term,records);
-		}
-		return (nominator/denominator);
+
+	public static void init(MfiContext c) {
+		LEXICON_FILE = c.getLexiconFile();
+		RECORDS_FILE = c.getRecordsFile();
+		ORIGRECORDS_FILE = c.getOriginalFile();
 	}
-	*/
+	
 }

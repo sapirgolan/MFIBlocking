@@ -18,7 +18,6 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,10 +33,6 @@ import java.util.regex.Pattern;
 
 import javax.transaction.NotSupportedException;
 
-import com.googlecode.javaewah.EWAHCompressedBitmap;
-import com.googlecode.javaewah.IntIterator;
-
-import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -46,7 +41,6 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
-import org.neo4j.index.lucene.QueryContext;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.util.FileUtils;
 
@@ -69,9 +63,6 @@ import fimEntityResolution.pools.FIRunnableDBPool;
 import fimEntityResolution.pools.FIRunnablePool;
 import fimEntityResolution.pools.GDSPool;
 import fimEntityResolution.pools.LimitedPool;
-//This were local classes
-//import javaewah.EWAHCompressedBitmap;
-//import javaewah.IntIterator;
 
 public class Utilities {
 
@@ -86,10 +77,14 @@ public class Utilities {
 	public static int minRecordLength = Integer.MAX_VALUE;
 	public static GraphDatabaseService recordDB;
 	private static final String RECORD_DB_PATH = "target/records-db";
+	private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\}";
+	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
 
-	public static Map<Integer, Record> readRecords(String numericRecordsFile,
-			String origRecordsFile, String srcFile) {
+	public static Map<Integer, Record> readRecords(MfiContext context) {
 
+		String numericRecordsFile = context.getRecordsFile();
+		String origRecordsFile = context.getOriginalFile();
+		String srcFile = context.getSrcFile();
 		Map<Integer, Record> outputRecords = new HashMap<Integer, Record>();
 		try {
 			BufferedReader recordsFileReader = new BufferedReader(
@@ -269,9 +264,6 @@ public class Utilities {
 
 	}
 
-	// private final static String lexiconItemExpression = "(\\S+),\\[(.+)\\]";
-	private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\}";
-
 	public static Map<Integer, FrequentItem> parseLexiconFile(String lexiconFile) {
 		globalItemsMap = new HashMap<Integer, FrequentItem>();
 		Pattern lexiconPattern = Pattern.compile(lexiconItemExpression);
@@ -376,34 +368,6 @@ public class Utilities {
 		}
 		return exitVal;
 	}
-//	public static String getUnixMFICmdLine() {
-//		String operatingSystem = getOSName();
-//		InputStream resourceAsStream;
-//		String fileSuffix = "";
-//		boolean isWindows = operatingSystem.toLowerCase().contains("windows");
-//		if (isWindows) {
-//			resourceAsStream = Utilities.class.getClassLoader().getResourceAsStream("fpgrowth/fpgrowth.exe");
-//			fileSuffix = ".exe";
-//		} else {
-//			resourceAsStream = Utilities.class.getClassLoader().getResourceAsStream("fpgrowth/fpgrowth");
-//		}
-//		try {
-//			File file = File.createTempFile("fpgrowth",fileSuffix);
-//			file.deleteOnExit();
-//			FileOutputStream fileOutputStream = new FileOutputStream(file);
-//			IOUtils.copy(resourceAsStream, fileOutputStream);
-//			fileOutputStream.flush();
-//			resourceAsStream.close();
-//			fileOutputStream.close();
-//			String path = file.getPath();
-//			path = path + " -tm -s-%d %s %s";
-//			return path;
-//		} catch (IOException e) {
-//			System.err.println("Failed to extract fpgrowth from exe");
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
 	
 	public static String getUnixMFICmdLine() throws FileNotFoundException {
 		String operatingSystem = getOSName();
@@ -494,18 +458,19 @@ public class Utilities {
 		return retVal;
 	}
 
-	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
-	
-	public static /*Map<Integer, BitMatrix>*/ CandidatePairs readFIs(String frequentItemsetFile,
-			Map<Integer, FrequentItem> globalItemsMap, double scoreThreshold,
-			Map<Integer, Record> records, int minSup, double NG_PARAM) {
-		System.out.println("reading FIs");
+	public static CandidatePairs readFIs(FrequentItemsetContext itemsetContext) {
+		
+		int minSup = itemsetContext.getMinimumSupport();
+		double NG_PARAM = itemsetContext.getNeiborhoodGrowthLimit();
+		String frequentItemsetFile = itemsetContext.getFrequentItemssetFilePath();
 		int numOfLines = 0;
 		BufferedReader FISReader = null;
 		StringBuilder stringBuilder = new StringBuilder();
-
 		double tooLarge = 0;
 		double scorePruned = 0;
+		
+		System.out.println("reading FIs");
+
 		Utilities.scoreThreshold = scoreThreshold;
 		// reset all parameters
 		nonFIs.set(0);
@@ -531,28 +496,20 @@ public class Utilities {
 		int numOfProcessors = runtime.availableProcessors();		
 		System.out.println("Running on a system with  " + numOfProcessors
 				+ " processors");
-		// ExecutorService exec =
-		// Executors.newFixedThreadPool(nrOfProcessors+1);
 		LimitedQueue<Runnable> LQ = new LimitedQueue<Runnable>(
 				2 * numOfProcessors);
 		ExecutorService executorService = new ThreadPoolExecutor((int) NR_PROCS_MULT
 				* numOfProcessors, (int) NR_PROCS_MULT * numOfProcessors, 0L,
 				TimeUnit.MILLISECONDS, LQ);
-		System.out.println("used memory before processing MFIS for minsup "
-				+ minSup
-				+ " is "
-				+ (double) ((double) GDS_NG.getMem().getActualUsed() / Math
-						.pow(2, 30)) + " GB");
+		System.out.println("used memory before processing MFIS for minsup " + minSup + " is "
+				+ (double) ((double) GDS_NG.getMem().getActualUsed() / Math.pow(2, 30)) + " GB");
 
 		long start = System.currentTimeMillis();
 		try {
-			FISReader = new BufferedReader(new FileReader(new File(
-					frequentItemsetFile)));
-			System.out.println("About to read MFIs from file "
-					+ frequentItemsetFile);
+			FISReader = new BufferedReader(new FileReader(new File(frequentItemsetFile)));
+			System.out.println("About to read MFIs from file "+ frequentItemsetFile);
 			String currLine = "";
-			stringBuilder.append("Size").append("\t").append("Score").append(
-					Utilities.NEW_LINE);
+			stringBuilder.append("Size").append("\t").append("Score").append(Utilities.NEW_LINE);
 			while (currLine != null) {
 				try {
 					currLine = FISReader.readLine();
@@ -573,7 +530,7 @@ public class Utilities {
 						continue;
 					}
 					FIRunnable FIR = FIRunnablePool.getInstance().getRunnable(
-							currentItemSet, minSup, records, NG_PARAM,coverageIndex,candidatePairs);
+							currentItemSet, minSup, itemsetContext.getMfiContext().getReccords(), NG_PARAM, coverageIndex, candidatePairs);
 					executorService.execute(FIR);
 					numOfLines++;
 					if (numOfLines % 100000 == 0) {
@@ -662,20 +619,6 @@ public class Utilities {
 		}
 		executorService = null;
 		System.gc();
-		/*
-		 * for(int i = 0 ; i <= coverageIndex.size() ; i++){ BitMatrix bm =
-		 * coverageIndex.get(i); if(bm != null){
-		 * System.out.println("coverageIndex.get(" + i + ").getNumBitsSet=" +
-		 * bm.getSBS().getNumBitsSet()); System.out.println("coverageIndex.get("
-		 * + i + ").getCoveredRows().cardinality()=" +
-		 * bm.getCoveredRows().cardinality());
-		 * System.out.println("coverageIndex.get(" + i + ").getMaxNG()=" +
-		 * bm.getMaxNG()); } else{ System.out.println("coverageIndex.get(" + i +
-		 * ")==null"); }
-		 * 
-		 * }
-		 */
-		//return coverageIndex;
 		return candidatePairs;
 	}
 
@@ -897,91 +840,6 @@ public class Utilities {
 
 	}
 
-	private static int markPairs(BitSet clustSupport, BitMatrix bm) {
-		int cnt = 0;
-		for (int i = clustSupport.nextSetBit(0); i >= 0; i = clustSupport
-				.nextSetBit(i + 1)) {
-			for (int j = clustSupport.nextSetBit(i + 1); j >= 0; j = clustSupport
-					.nextSetBit(j + 1)) {
-				bm.setPair(i, j);
-				cnt++;
-			}
-		}
-		return cnt;
-	}
-
-	private static int markPairs(List<IFRecord> records, GDS_NG gds) {
-		long start = System.currentTimeMillis();
-		int cnt = 0;
-		for (int i = 0; i < records.size(); i++) {
-			for (int j = i + 1; j < records.size(); j++) {
-				gds.setPair(records.get(i).getId(), records.get(j).getId(),0);
-				cnt++;
-			}
-
-		}
-		int shouldSet = (records.size() * (records.size() - 1) / 2);
-		if (cnt != shouldSet) {
-			System.out.println("not all pairs were set, should be " + shouldSet
-					+ " actually: " + cnt);
-		}
-		Utilities.timeSpentUpdatingCoverage.addAndGet(System
-				.currentTimeMillis()
-				- start);
-		return cnt;
-	}
-
-	private static int markPairs(EWAHCompressedBitmap clustSupport, GDS_NG gds) {
-		long start = System.currentTimeMillis();
-		int cnt = 0;
-		List<Integer> positions = clustSupport.getPositions();
-		for (int i = 0; i < positions.size(); i++) {
-			for (int j = i + 1; j < positions.size(); j++) {
-				gds.setPair(positions.get(i), positions.get(j),0);
-				cnt++;
-			}
-		}
-
-		int shouldSet = (clustSupport.cardinality()
-				* (clustSupport.cardinality() - 1) / 2);
-		if (cnt != shouldSet) {
-			System.out.println("not all pairs were set, should be " + shouldSet
-					+ " actually: " + cnt);
-		}
-		Utilities.timeSpentUpdatingCoverage.addAndGet(System
-				.currentTimeMillis()
-				- start);
-		return cnt;
-	}
-
-	private static int markPairs(EWAHCompressedBitmap clustSupport, BitMatrix bm) {
-		long start = System.currentTimeMillis();
-		int cnt = 0;
-		List<Integer> positions = clustSupport.getPositions();
-		for (int i = 0; i < positions.size(); i++) {
-			for (int j = i + 1; j < positions.size(); j++) {
-				bm.setPair(positions.get(i), positions.get(j));
-				cnt++;
-			}
-		}
-		/*
-		 * IntIterator it1 = clustSupport.intIterator(); IntIterator it2 =
-		 * clustSupport.intIterator(); int i,j; while(it1.hasNext()){ i =
-		 * it1.next(); while(it2.hasNext()){ j = it2.next(); if(j > i){
-		 * bm.setPair(i, j); cnt++; } } }
-		 */
-		int shouldSet = (clustSupport.cardinality()
-				* (clustSupport.cardinality() - 1) / 2);
-		if (cnt != shouldSet) {
-			System.out.println("not all pairs were set, should be " + shouldSet
-					+ " actually: " + cnt);
-		}
-		Utilities.timeSpentUpdatingCoverage.addAndGet(System
-				.currentTimeMillis()
-				- start);
-		return cnt;
-	}
-
 	public static List<Record> getRecords(SparseBitSet support) {
 		int size = new Long(support.getNumBitsSet()).intValue();
 		List<Record> retVal = new ArrayList<Record>(size);
@@ -1052,54 +910,7 @@ public class Utilities {
 
 	private static AtomicLong time_in_supp_calc = new AtomicLong(0);
 
-	/*
-	 * private static SparseBitSet getItemsetSupport(List<Integer> items,
-	 * SparseBitSet retVal){ long start = System.currentTimeMillis();
-	 * FrequentItem minItem = Utilities.globalItemsMap.get(items.get(0)); for
-	 * (Integer item : items) { FrequentItem currItem =
-	 * Utilities.globalItemsMap.get(item); if(currItem.getSupportSize() <
-	 * minItem.getSupportSize()){ minItem = currItem; } }
-	 * 
-	 * retVal.clear(); Iterator It = minItem.getSupport().getIterator();
-	 * while(It.hasNext()){ retVal.set(It.next()); }
-	 * 
-	 * for(int i=1 ; i < items.size() ; i++){ int item = items.get(i);
-	 * SparseBitSet itemSupport =
-	 * Utilities.globalItemsMap.get(item).getSupport(); retVal =
-	 * BitMatrix.and(retVal, itemSupport); } time_in_supp_calc +=
-	 * System.currentTimeMillis() - start; return retVal; }
-	 */
 
-	private static EWAHCompressedBitmap transformFromBS(BitSet BS, int size) {
-		EWAHCompressedBitmap retVal = new EWAHCompressedBitmap(size);
-		for (int i = BS.nextSetBit(0); i >= 0 && i <= BS.size(); i = BS
-				.nextSetBit(i + 1)) {
-			retVal.set(i);
-		}
-		return retVal;
-
-	}
-
-	/*
-	 * private static EWAHCompressedBitmap
-	 * getItemsetSupport_commpressed(List<Integer> items){ long start =
-	 * System.currentTimeMillis(); EWAHCompressedBitmap suppCalcBS_commpressed =
-	 * null;
-	 * 
-	 * EWAHCompressedBitmap firstItemSupport =
-	 * ((FrequentItem_ewah)Utilities.globalItemsMap
-	 * .get(items.get(0))).getCompressedSupport(); suppCalcBS_commpressed =
-	 * firstItemSupport;
-	 * 
-	 * for(int i=1 ; i < items.size() ; i++){ int item = items.get(i);
-	 * EWAHCompressedBitmap itemSupport =
-	 * ((FrequentItem_ewah)Utilities.globalItemsMap
-	 * .get(item)).getCompressedSupport(); suppCalcBS_commpressed =
-	 * suppCalcBS_commpressed.and(itemSupport); }
-	 * 
-	 * time_in_supp_calc.addAndGet(System.currentTimeMillis() - start); return
-	 * suppCalcBS_commpressed; }
-	 */
 	private static BitSetFactory bsf = Java_BitSet_Factory.getInstance();
 	private static LimitedPool limitedPool = LimitedPool.getInstance(bsf);
 	/***
@@ -1137,35 +948,6 @@ public class Utilities {
 			return null;
 		}
 
-	}
-
-	private static List<IFRecord> getItemsetSupportDB(List<Integer> items,
-			GraphDatabaseService recordsDB) {
-		long start = System.currentTimeMillis();
-		List<IFRecord> retval = new LinkedList<IFRecord>();
-		StringBuilder queryBuilder = new StringBuilder();
-		boolean first = true;
-		for (Integer itemId : items) {
-			if (!first) {
-				queryBuilder.append("AND ");
-			} else {
-				first = false;
-			}
-			queryBuilder.append(DBRecord.ITEM_ID_PREFIX).append(
-					Integer.toString(itemId)).append(":1").append(" ");
-		}
-		// System.out.println("DEBUG: the query: " + queryBuilder.toString());
-		IndexManager IM = recordsDB.index();
-		Index<Node> recordIndex = IM.forNodes(DBRecord.ITEM_INDEX_NAME);
-		QueryContext CQ = new QueryContext(queryBuilder.toString().trim())
-				.defaultOperator(Operator.AND);
-		IndexHits<Node> support = recordIndex.query(CQ);
-		for (Node recordNode : support) {
-			retval.add(new DBRecord(recordNode));
-		}
-		// System.out.println("DEBUG: supportsize: " + retval.size());
-		time_in_supp_calc.addAndGet(System.currentTimeMillis() - start);
-		return retval;
 	}
 
 	@SuppressWarnings("unused")
@@ -1216,38 +998,6 @@ public class Utilities {
 		public int supportSize;
 	}
 
-	/*
-	 * @SuppressWarnings("unused") private static FrequentItemset
-	 * getItemsetFromLine(String line,Map<Integer, FrequentItem> globalItemsMap,
-	 * int minSup){ Pattern ISPatters = Pattern.compile(ItemsetExpression);
-	 * Matcher fiMatcher = ISPatters.matcher(line); boolean matchFound =
-	 * fiMatcher.find(); if(!matchFound){
-	 * System.out.println("no match found in " + line); } String itemsAsString =
-	 * fiMatcher.group(1); String[] items = itemsAsString.split(" "); BitSet
-	 * itemIds = new BitSet(); for (String item : items) {
-	 * itemIds.set(Integer.parseInt(item)); } BitSet support =
-	 * calculateItemsetSupport(itemIds, globalItemsMap, minSup); FrequentItemset
-	 * fi = new FrequentItemset(itemIds,support ); return fi; }
-	 */
-	/*
-	 * private static BitSet calculateItemsetSupport(BitSet itemIds,
-	 * Map<Integer, FrequentItem> globalItemsMap, int minSup){ BitSet support =
-	 * null; boolean first = true; for(Integer itemId=itemIds.nextSetBit(0);
-	 * itemId>=0; itemId=itemIds.nextSetBit(itemId+1)) {
-	 * if(globalItemsMap.get(itemId) == null){ System.out.println("item " +
-	 * itemId + " was not updated with its support"); } if(first){
-	 * support=(BitSet) globalItemsMap.get(itemId).getSupport().clone(); first =
-	 * false; } else{ support.and(globalItemsMap.get(itemId).getSupport()); } }
-	 * assert support.cardinality() >= minSup; return support; }
-	 */
-	/*
-	 * public static Map<Integer,Set<Integer>> getSupports(Collection<Cluster>
-	 * fimClusters){ Map<Integer,Set<Integer>> supports = new
-	 * HashMap<Integer,Set<Integer>>(fimClusters.size()); for (Cluster cluster :
-	 * fimClusters) { if(cluster != null){
-	 * supports.put(cluster.getId(),convertFromBitSet(cluster.getSupport())); }
-	 * } return supports; }
-	 */
 	public static Set<Integer> convertFromBitSet(BitSet bs) {
 		Set<Integer> retVal = new HashSet<Integer>(bs.cardinality());
 		for (Integer transaction = bs.nextSetBit(0); transaction >= 0; transaction = bs
@@ -1301,15 +1051,6 @@ public class Utilities {
 			}
 		}
 		return pairs;
-	}
-
-	private static SparseBitSet getBitSetFromIntSet(
-			Collection<Integer> integers, SparseBitSet bs) {
-		bs.clear();
-		for (Integer integer : integers) {
-			bs.set(integer);
-		}
-		return bs;
 	}
 
 	public static Collection<Integer> getIntSetFromBitSet(BitSet bs) {

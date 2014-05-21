@@ -18,7 +18,6 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,10 +33,6 @@ import java.util.regex.Pattern;
 
 import javax.transaction.NotSupportedException;
 
-import com.googlecode.javaewah.EWAHCompressedBitmap;
-import com.googlecode.javaewah.IntIterator;
-
-import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -46,7 +41,6 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
-import org.neo4j.index.lucene.QueryContext;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.util.FileUtils;
 
@@ -1137,35 +1131,6 @@ public class Utilities {
 			return null;
 		}
 
-	}
-
-	private static List<IFRecord> getItemsetSupportDB(List<Integer> items,
-			GraphDatabaseService recordsDB) {
-		long start = System.currentTimeMillis();
-		List<IFRecord> retval = new LinkedList<IFRecord>();
-		StringBuilder queryBuilder = new StringBuilder();
-		boolean first = true;
-		for (Integer itemId : items) {
-			if (!first) {
-				queryBuilder.append("AND ");
-			} else {
-				first = false;
-			}
-			queryBuilder.append(DBRecord.ITEM_ID_PREFIX).append(
-					Integer.toString(itemId)).append(":1").append(" ");
-		}
-		// System.out.println("DEBUG: the query: " + queryBuilder.toString());
-		IndexManager IM = recordsDB.index();
-		Index<Node> recordIndex = IM.forNodes(DBRecord.ITEM_INDEX_NAME);
-		QueryContext CQ = new QueryContext(queryBuilder.toString().trim())
-				.defaultOperator(Operator.AND);
-		IndexHits<Node> support = recordIndex.query(CQ);
-		for (Node recordNode : support) {
-			retval.add(new DBRecord(recordNode));
-		}
-		// System.out.println("DEBUG: supportsize: " + retval.size());
-		time_in_supp_calc.addAndGet(System.currentTimeMillis() - start);
-		return retval;
 	}
 
 	@SuppressWarnings("unused")

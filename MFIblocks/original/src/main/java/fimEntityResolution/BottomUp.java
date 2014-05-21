@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,9 @@ import java.util.Set;
 
 import org.apache.spark.api.java.JavaSparkContext;
 
+import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
+import candidateMatches.RecordMatches;
 
 import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
@@ -43,6 +46,7 @@ public class BottomUp {
 	public static int DEDUP_MIN_SUP = 2;
 	public static BitSet coveredRecords= null;
 	public static String srcFile = null;
+	public static int FIRST_DB_SIZE=0;
 	
 	public enum Alg{
 		CFI,
@@ -95,23 +99,26 @@ public class BottomUp {
 		StringSimToolsLocal.ORIGRECORDS_FILE=origRecordsFile;
 		int[] minSups = getInts(args[6]);
 		Alg alg = Alg.valueOf(args[7]);	
-		double[] NGs = getDoubles(args[8]);		
+		double[] NGs = getDoubles(args[8]);	
 		if(args.length > 9 && args[9] != null){
-			if ("perf".equalsIgnoreCase(args[9])) {
-				System.out.println("You have started the application in profiling mode for performce");
-				System.out.println("Start your profiler and then hit any key on the console");
-				try {
-					System.in.read();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			else {
-				srcFile = args[8];
-				srcFile = args[9];
-			}
+			FIRST_DB_SIZE=Integer.parseInt(args[9]); 
 		}
+//		if(args.length > 9 && args[9] != null){
+//			if ("perf".equalsIgnoreCase(args[9])) {
+//				System.out.println("You have started the application in profiling mode for performce");
+//				System.out.println("Start your profiler and then hit any key on the console");
+//				try {
+//					System.in.read();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//			else {
+//				srcFile = args[8];
+//				srcFile = args[9];
+//			}
+//		}
 		
 		System.out.println("args.length : " + args.length);
 		System.out.println("Main srcFile : " + srcFile);
@@ -325,11 +332,37 @@ public class BottomUp {
 		System.out.println("After adding uncovered records: Total number of covered records under blocking threshold " + minBlockingThreshold + 
 				" and minsups " + Arrays.toString(minSups) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
 				" which are: " + 100*(coveredRecords.cardinality()/records.size()) + "%");
+		if (FIRST_DB_SIZE>0) {
+			allResults=removePairsSameSet(allResults);
+		}
 		
 		return allResults;
 		
 	}
 	
+	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs) {
+		System.out.println("Excluding pairs if records from different sets..");
+		CandidatePairs updatedPairs=new CandidatePairs();
+		long start=System.currentTimeMillis();
+		//Set<Set<Integer>> actualPairs=new HashSet<>();
+		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
+			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
+				if ( 	(entry.getKey()>FIRST_DB_SIZE && cm.getRecordId()<FIRST_DB_SIZE) ||
+						(entry.getKey()<FIRST_DB_SIZE && cm.getRecordId()>FIRST_DB_SIZE)) 
+					continue;
+				else 
+					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
+				//Set<Integer> temp=new HashSet<Integer>();
+				//temp.add(cm.getRecordId());
+				//temp.add(entry.getKey());
+				//actualPairs.add(temp);
+			}
+		}
+		System.out.println("Time exclude pairs : " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
+		return updatedPairs;
+	}
+
+
 	private static void updateCoveredRecords(BitSet coveredRecords, BitSet coveredRows){
 		coveredRecords.or(coveredRows);
 	}

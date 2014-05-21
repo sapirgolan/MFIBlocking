@@ -39,7 +39,7 @@ public class ProfileReader {
 	private static Lexicon lexicon;
 	private static String stopWordsFile;
 	private static WordProcessor wordProcessor;	
-	public static int DB_Size;
+	//public static int DB_Size;
 	public static HashSet<IdDuplicates> groundTruth;
 	public static ArrayList<EntityProfile>[] entityProfiles;
 	public static SortedSet<String> attributeNames;
@@ -50,8 +50,10 @@ public class ProfileReader {
 	public static final String COMMA=",";
 	public static final String DEFAULT_COLUMN_WIEGHT="0.1"; //for DS_Weights file
 	public static final String PREFIX_LENGTH="30";   //for DS_Weights file
-	//public static final int DENSE_THRESHOLD=100000;
-	public static int COLUMNS=0;
+	public static int COLUMNS=5;
+	public static boolean IS_DBPedia=false;
+	public static String MOVIES_DS_FILE=null; //"DS_weights_movies.properties";
+	public static DBSize dbSize;
 	//BufferWriters
 	private static BufferedWriter numericOutputWriter;
 	private static BufferedWriter stringOutputWriter;
@@ -114,14 +116,16 @@ public class ProfileReader {
 		String sourceMapFilePath = (args.length > 9 ? args[9] : null);
 		start = System.currentTimeMillis();
 		//loading data
-		DB_Size=0;
+		
 		entityProfiles=new ArrayList[inputFiles.length];
+		dbSize=new DBSize(inputFiles.length);
+		
 		for (int i=0;i<inputFiles.length;i++){
 			entityProfiles[i] = loadEntityProfile(inputFiles[i]);
-			System.out.println("File "+(i+1)+" loaded.");
-			DB_Size+=entityProfiles[i].size();
+			dbSize.setSize(i, entityProfiles[i].size());
+			System.out.println("File "+(i+1)+" loaded. Size: " +dbSize.getSize(i));
 		}
-		System.out.println("Processing file with " + DB_Size + " records");
+		System.out.println("Processing file with " +dbSize.getTotalSize()  + " records");
 		System.out.println("Time to load profiles "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 		groundTruth=loadGroundTruth(groundTruthOutFilePath);
 		System.out.println("Ground truth file loaded.");
@@ -138,55 +142,58 @@ public class ProfileReader {
 				}
 			}
 		}
-		if (COLUMNS==0){
-			COLUMNS=attributeNames.size();
-			System.out.println("Number of columns as in original schema ("+COLUMNS+")");
-		}
-		else{
+		if (IS_DBPedia){
 			System.out.println("Number of columns is set to "+COLUMNS+" .");
 		}
+		
 		System.out.println("Attribute names were extracted. Total: "+attributeCounter+" attributes");
 		System.out.println("Time to extract attributess "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 		//2. build the map for numeric column indexing
 		map = buildMapIndex(attributeNames);
 		
 		wordProcessor = new WordProcessor(new File(stopWordsFile),n_gramsParam,n_gramsParam);
-		
-		//3. choose dense columns only
-		start = System.currentTimeMillis();
-		int maximalAttributeNumber=0;
-		denseCounter=new int[attributeNames.size()];
-		sortedDensity=new TreeSet<ComparableColumnsDensity>();
-		for (ArrayList<EntityProfile> profiles:entityProfiles){
-			for (EntityProfile entityProfile : profiles){
-				HashSet<Attribute> attributes = entityProfile.getAttributes();
-				maximalAttributeNumber=Math.max(maximalAttributeNumber, entityProfile.getAttributes().size());
-				for (Attribute attribute : attributes) {
-					if (attribute.getValue()!=null && getCleanString(attribute.getValue())!=null) 
-						denseCounter[map.get(attribute.getName())]++;
-						
+		if (IS_DBPedia){
+			//3. choose dense columns only
+			start = System.currentTimeMillis();
+			int maximalAttributeNumber=0;
+			denseCounter=new int[attributeNames.size()];
+			sortedDensity=new TreeSet<ComparableColumnsDensity>();
+			for (ArrayList<EntityProfile> profiles:entityProfiles){
+				for (EntityProfile entityProfile : profiles){
+					HashSet<Attribute> attributes = entityProfile.getAttributes();
+					maximalAttributeNumber=Math.max(maximalAttributeNumber, entityProfile.getAttributes().size());
+					for (Attribute attribute : attributes) {
+						if (attribute.getValue()!=null && getCleanString(attribute.getValue())!=null) 
+							denseCounter[map.get(attribute.getName())]++;
+							
+					}
 				}
 			}
+			//System.out.println("attributeNames size= "+attributeNames.size());
+			for (int i=0; i<attributeNames.size();i++){
+				sortedDensity.add(new ComparableColumnsDensity(i, denseCounter[i]));
+				//System.out.println(i + ","+denseCounter[i]+" ==========");
+				
+			}
+			System.out.println("Time to calculate density: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+			System.out.println("Maximum number of attributes in profile: "+maximalAttributeNumber);
 		}
-		//System.out.println("attributeNames size= "+attributeNames.size());
-		for (int i=0; i<attributeNames.size();i++){
-			sortedDensity.add(new ComparableColumnsDensity(i, denseCounter[i]));
-			//System.out.println(i + ","+denseCounter[i]+" ==========");
+		
+		if (MOVIES_DS_FILE==null){
+			//4. create DS_weights.properties file
+			start = System.currentTimeMillis();
+			
+			File DS_weightsFile= createDS_weightsFile();
+			writeMapToDS_weightsFile(DS_weightsFile);
+			System.out.println("Time to create DS_weights.properties file: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+			//5. construct lexicon object
+			lexicon = new Lexicon(DS_weightsFile);
+			DS_weightsFile=null;
+		
 		}
-		//System.out.println("sortedDensity size= "+sortedDensity.size());
-		
-		//if (Math.max(denseCounter))
-		System.out.println("Time to calculate density: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
-		System.out.println("Maximum number of attributes in profile: "+maximalAttributeNumber);
-		
-		//4. create DS_weights.properties file
-		start = System.currentTimeMillis();
-		File DS_weightsFile= createDS_weightsFile();
-		writeMapToDS_weightsFile(DS_weightsFile);
-		System.out.println("Time to create DS_weights.properties file: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
-		//5. construct lexicon object
-		lexicon = new Lexicon(DS_weightsFile);
-		DS_weightsFile=null;
+		else {
+			lexicon = new Lexicon(new File (MOVIES_DS_FILE));
+		}
 		
 		numericOutputWriter = new BufferedWriter(new FileWriter(new File(numericOutFilePath)));
 		matchWriter = new BufferedWriter( new FileWriter(new File(matchOutFilePath)));
@@ -200,17 +207,20 @@ public class ProfileReader {
 			createMatchingFile(inputFiles.length);
 			System.out.println("MatchingFile was created");
 			groundTruth=null; //JS: not used anymore 20140506
-			removeTooFrequentItems(DB_Size,idfThreshParam );
+			removeTooFrequentItems(dbSize.getTotalSize(),idfThreshParam );
 			System.out.println("Frequent items were removed!");
-			//reloading data - JS: 20140509
-			start = System.currentTimeMillis();
-			entityProfiles=new ArrayList[inputFiles.length];
-			for (int i=0;i<inputFiles.length;i++){
-				entityProfiles[i] = loadEntityProfile(inputFiles[i]);
-				System.out.println("File "+(i+1)+" reloaded.");
+			if (IS_DBPedia){
+				//reloading data - JS: 20140509
+				start = System.currentTimeMillis();
+				entityProfiles=new ArrayList[inputFiles.length];
+				for (int i=0;i<inputFiles.length;i++){
+					entityProfiles[i] = loadEntityProfile(inputFiles[i]);
+					System.out.println("File "+(i+1)+" reloaded.");
+				}
+				System.out.println("Profiles were reloaded.");
+				System.out.println("Time to reload profiles: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			}
-			System.out.println("Profiles were reloaded.");
-			System.out.println("Time to reload profiles: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+			
 			int recordId = 1;
 			//boolean previousEntityList=true;
 			for (ArrayList<EntityProfile> profiles : entityProfiles){
@@ -313,6 +323,7 @@ public class ProfileReader {
 
 	private static void removeTooFrequentItems( double DBSize, double IDFThresh){
 		int recordId = 1;
+		
 		for (ArrayList<EntityProfile> profiles :entityProfiles){
 			for (EntityProfile entityProfile : profiles){
 				for (Attribute attribute : entityProfile.getAttributes()){
@@ -332,10 +343,10 @@ public class ProfileReader {
 					}
 					//uses functions that in the end call to Lexicon.addWord that updates lexicon
 					getNGramIdString(recordId, toWrite,map.get(attribute.getName()), false);
-					attribute=null;  //JS: 20140509
+					if (IS_DBPedia) attribute=null;  //JS: 20140509
 				}
 				recordId++;
-				entityProfile=null; // JS: 20140509
+				if (IS_DBPedia) entityProfile=null; // JS: 20140509
 				
 			}
 			System.out.println("removeTooFrequentItems: "+recordId+" records done.");
@@ -352,8 +363,8 @@ public class ProfileReader {
 	
 	private static String getNGramIdString(int recordId, String value, int propertyId, boolean removedFrequent){
 		List<Integer> NGramsIds = new ArrayList<Integer>();
-		String[] values = value.split("\\s+");
-		//String[] values = value.split("[+\\-*/\\^ .,?!]+"); //JS 20140506 for DBPEDIA only
+		//String[] values = value.split("\\s+");
+		String[] values = value.split("[+\\-*/\\^ .,?!]+");
 		for(int i=0; i < values.length ;i++){
 			if (values[i]==null) continue; //JS 20140506
 			List<String> valueNgrams = getNGrams(values[i]);
@@ -393,28 +404,41 @@ public class ProfileReader {
 			Writer writer = new FileWriter(file);
 			BufferedWriter bufferedWriter = new BufferedWriter(writer);	
 			int counter=0;
-			String columnWeight=""; //JS: 20140508 if the density of the column is less than threshold the column's weight is zero.
-			List<Integer> denseColumnsIDs=new ArrayList<Integer>();
-			int i=0;
-			for(ComparableColumnsDensity object: sortedDensity){
-				if(i<COLUMNS){
-					System.out.println("Density "+(i+1)+" is "+object.density);
-					denseColumnsIDs.add(i, object.columnID);
-					i++;
-				}
-				else break;
+			if (IS_DBPedia){
 				
-			}
-			for (String field: attributeNames){
-				if (denseColumnsIDs.contains(map.get(field))){
-					columnWeight=DEFAULT_COLUMN_WIEGHT;
+				String columnWeight=""; //JS: 20140508 if the density of the column is less than threshold the column's weight is zero.
+				List<Integer> denseColumnsIDs=new ArrayList<Integer>();
+				int i=0;
+				for(ComparableColumnsDensity object: sortedDensity){
+					if(i<COLUMNS){
+						System.out.println("Density "+(i+1)+" is "+object.density);
+						denseColumnsIDs.add(i, object.columnID);
+						i++;
+					}
+					else break;
+					
 				}
-				else columnWeight="0";
-				bufferedWriter.write("#"+field);
-				bufferedWriter.newLine();
-				bufferedWriter.write(counter+"="+counter+","+columnWeight+","+PREFIX_LENGTH);
-				bufferedWriter.newLine();
-				counter++;
+				for (String field: attributeNames){
+					if (denseColumnsIDs.contains(map.get(field))){
+						columnWeight=DEFAULT_COLUMN_WIEGHT;
+					}
+					else columnWeight="0";
+					bufferedWriter.write("#"+field);
+					bufferedWriter.newLine();
+					bufferedWriter.write(counter+"="+counter+","+columnWeight+","+PREFIX_LENGTH);
+					bufferedWriter.newLine();
+					counter++;
+				}	
+			}
+			else {
+				for (String field: attributeNames){
+					bufferedWriter.write("#"+field);
+					bufferedWriter.newLine();
+					bufferedWriter.write(counter+"="+counter+","+DEFAULT_COLUMN_WIEGHT+","+PREFIX_LENGTH);
+					bufferedWriter.newLine();
+					counter++;
+				}
+				
 			}
 			try {
 				bufferedWriter.close();

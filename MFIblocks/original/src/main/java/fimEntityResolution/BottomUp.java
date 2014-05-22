@@ -17,7 +17,9 @@ import java.util.Set;
 
 import org.apache.spark.api.java.JavaSparkContext;
 
+import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
+import candidateMatches.RecordMatches;
 
 import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
@@ -53,8 +55,7 @@ public class BottomUp {
 		MFI
 	}
 	public enum Configuration{
-		SPARK,DEFAULT;
-
+		SPARK,DEFAULT
 	}
 	
 	
@@ -76,8 +77,7 @@ public class BottomUp {
 		MfiContext context = readArguments(args);
 		StringSimToolsLocal.init(context);
 		
-		Configuration config = Configuration.valueOf(args[0]);
-		context.setConfig(config);
+		Configuration config = context.getConfig();
 		
 		if (config.equals(Configuration.SPARK)) {
 			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -133,6 +133,7 @@ public class BottomUp {
 
 	private static MfiContext readArguments(String[] args) {
 		MfiContext context = new MfiContext();
+		context.setConfiguration(args[0]);
 		context.setLexiconFile(args[1]);
 		context.setRecordsFile(args[2]);
 		context.setMinBlockingThresholds(args[3]);
@@ -141,8 +142,8 @@ public class BottomUp {
 		context.setMinSup(args[6]);
 		context.setAlgorithm(Alg.MFI);
 		context.setNGs(args[8]);
-		context.setSrcFile(args[9]);
-		context.setPerformanceFlag(args, args.length);
+		context.setFirstDbSize(args);
+		context.setPerformanceFlag(args);
 		return context;
 	}
 
@@ -315,6 +316,10 @@ public class BottomUp {
 		System.out.println("After adding uncovered records: Total number of covered records under blocking threshold " + minBlockingThreshold + 
 				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
 				" which are: " + 100*(coveredRecords.cardinality()/records.size()) + "%");
+		int firstDbSize = context.getFirstDbSize();
+		if (firstDbSize>0) {
+			allResults=removePairsSameSet(allResults, firstDbSize);
+		}
 		
 		return allResults;
 		
@@ -332,6 +337,28 @@ public class BottomUp {
 		itemsetContext.setNeiborhoodGrowthLimit(NG_LIMIT);
 		
 		return itemsetContext;
+	}
+	
+	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs, int firstDbSize) {
+		System.out.println("Excluding pairs if records from different sets..");
+		CandidatePairs updatedPairs=new CandidatePairs();
+		long start=System.currentTimeMillis();
+		//Set<Set<Integer>> actualPairs=new HashSet<>();
+		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
+			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
+				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()<firstDbSize) ||
+						(entry.getKey()<firstDbSize && cm.getRecordId()>firstDbSize)) 
+					continue;
+				else 
+					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
+				//Set<Integer> temp=new HashSet<Integer>();
+				//temp.add(cm.getRecordId());
+				//temp.add(entry.getKey());
+				//actualPairs.add(temp);
+			}
+		}
+		System.out.println("Time exclude pairs : " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
+		return updatedPairs;
 	}
 
 

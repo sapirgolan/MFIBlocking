@@ -7,6 +7,11 @@ import fimEntityResolution.BottomUp.Alg;
 import fimEntityResolution.BottomUp.Configuration;
 
 public class MfiContext {
+	
+	public MfiContext() {
+		this.firstDbSize = 0;
+		this.configuration = Configuration.DEFAULT;
+	}
 
 	private double[] minBlockingThresholds;
 	private int[] minSup;
@@ -18,12 +23,8 @@ public class MfiContext {
 	private String recordsFile;
 	private String origRecordsFile;
 	private Map<Integer, Record> records;
-	private String srcFile;
 	private boolean inPerformanceMode;
-
-	public void setConfig(Configuration config) {
-		this.configuration = config;
-	}
+	private int firstDbSize;
 
 	public void setMatchFile(String matchFile) {
 		this.matchFile = matchFile;
@@ -66,13 +67,9 @@ public class MfiContext {
 		this.records = records;
 	}
 	
-	public void setSrcFile(String srcFile) {
-		this.srcFile = srcFile;
-	}
-	
-	public void setPerformanceFlag(String[] args, int length) {
+	public void setPerformanceFlag(String[] args) {
 		this.inPerformanceMode = false;
-		int lastArgument = length -1;
+		int lastArgument = args.length;
 		if ("perf".equalsIgnoreCase(args[lastArgument])) {
 			this.inPerformanceMode = true;
 		}
@@ -117,10 +114,6 @@ public class MfiContext {
 		return dbs;
 	}
 
-	public String getSrcFile() {
-		return srcFile;
-	}
-
 	public double[] getMinBlockingThresholds() {
 		return this.minBlockingThresholds;
 	}
@@ -155,6 +148,25 @@ public class MfiContext {
 
 	public boolean isInPerformanceMode() {
 		return this.inPerformanceMode;
+	}
+
+	public void setFirstDbSize(String[] args) {
+		if(args.length > 9 && args[9] != null){
+			this.firstDbSize = Integer.parseInt(args[9]);
+		}
+	}
+
+	public int getFirstDbSize() {
+		return firstDbSize;
+	}
+
+	public void setConfiguration(String configuration) {
+		try {
+			this.configuration = Configuration.valueOf(configuration);
+		} catch (Exception e) {
+			System.err.println(String.format("Failed to read value of configuration, will use %s instead", Configuration.DEFAULT.toString()));
+		}
+		
 	}
 
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.lucene.analysis.ngram.NGramTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
 
 
@@ -23,11 +23,7 @@ public class WordProcessor {
 	private int max_ngram_size = MAX_NGRAM_SIZE;
 		
 	public WordProcessor(File stopwordsFile){
-		try {
-			analyzer = new StandardAnalyzer(Version.LUCENE_30, stopwordsFile);
-		} catch (IOException e) {			
-			e.printStackTrace();
-		}
+		analyzer = new StandardAnalyzer(Version.LUCENE_48);
 	}
 	
 	public WordProcessor(File stopwordsFile, int minNgramSize, int maxNgramSize){
@@ -38,45 +34,52 @@ public class WordProcessor {
 	
 	public List<String> processValue(String value){
 		List<String> retVal = new ArrayList<String>();
-		value = value.replaceAll(replaceExpr, "");
-		StringReader sr = new StringReader(value);
-		StringReader sr_short = new StringReader(value);
-		TokenStream ts = analyzer.tokenStream(value, sr);
-		TokenStream ts_shortWords = analyzer.tokenStream(value, sr_short);
-		
-		NGramTokenFilter ngtf = new NGramTokenFilter(ts,min_ngram_size,max_ngram_size);		
 		try {
+			value = value.replaceAll(replaceExpr, "");
+			StringReader sr = new StringReader(value);
+			StringReader sr_short = new StringReader(value);
+			TokenStream ts = analyzer.tokenStream(value, sr);
+			TokenStream ts_shortWords = analyzer.tokenStream(value, sr_short);
+			
+			NGramTokenFilter ngtf = new NGramTokenFilter(Version.LUCENE_48, ts, min_ngram_size, max_ngram_size);		
 			while(ts_shortWords.incrementToken()){
-				TermAttribute m = ts_shortWords.getAttribute(TermAttribute.class);
-				if(m.term().length() < min_ngram_size){
-					retVal.add(m.term().trim().toLowerCase());
+				ts_shortWords.getAttribute(CharTermAttribute.class);
+				String term = convertTokenStreamToString(ts_shortWords);
+				if(term.length() < min_ngram_size){
+					retVal.add(term.trim().toLowerCase());
 				}
 			}
 			while(ngtf.incrementToken()){
-				TermAttribute m = ts.getAttribute(TermAttribute.class);
-				retVal.add(m.term().trim().toLowerCase());
+				String term = convertTokenStreamToString(ngtf);
+				retVal.add(term.trim().toLowerCase());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to parse: " + value);
 			e.printStackTrace();
 		}
 		return retVal;
+	}
+
+	private String convertTokenStreamToString(TokenStream ts_shortWords) {
+		CharTermAttribute m = ts_shortWords.getAttribute(CharTermAttribute.class);
+		String term = new String(m.buffer());
+		return term;
 	}
 	
 	public final static String replaceExpr = "-|\\|/|\\/|\\.|,|\'|(|)";
 	public List<String> removeStopwordsAndSpecialChars(String value){
 		List<String> retVal = new ArrayList<String>();
-		value = value.replaceAll(replaceExpr, "");
-		
-		StringReader sr = new StringReader(value);
-		TokenStream ts = analyzer.tokenStream(value, sr);		
 		try {
+			value = value.replaceAll(replaceExpr, "");
+			
+			StringReader sr = new StringReader(value);
+			TokenStream ts = analyzer.tokenStream(value, sr);		
 			while(ts.incrementToken()){
-				TermAttribute m = ts.getAttribute(TermAttribute.class);
-				retVal.add(m.term());
+				String term = convertTokenStreamToString(ts);
+				retVal.add(term);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to parse: " + value);
 			e.printStackTrace();
 		}
 		return retVal;

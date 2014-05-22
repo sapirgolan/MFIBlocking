@@ -84,7 +84,7 @@ public class Utilities {
 
 		String numericRecordsFile = context.getRecordsFile();
 		String origRecordsFile = context.getOriginalFile();
-		String srcFile = context.getSrcFile();
+		String srcFile = context.getRecordsFile();
 		Map<Integer, Record> outputRecords = new HashMap<Integer, Record>();
 		try {
 			BufferedReader recordsFileReader = new BufferedReader(

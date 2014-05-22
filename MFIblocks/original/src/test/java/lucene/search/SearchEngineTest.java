@@ -3,8 +3,10 @@ package lucene.search;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +33,7 @@ import fimEntityResolution.exception.TooManySearchResults;
 import static org.hamcrest.Matchers.*;*/
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Document.class)
+@PrepareForTest({Document.class, SearchEngine.class})
 public class SearchEngineTest {
 	private SearchEngine engine;
 	
@@ -105,11 +107,16 @@ public class SearchEngineTest {
 	}
 
 	private BufferedReader getBufferReaderToResutrantsQgramsFile() throws URISyntaxException, Exception {
+		File file = getResturantsFile();
+		BufferedReader reader = Whitebox.<BufferedReader>invokeMethod(engine, "connectToFile", file.getAbsolutePath());
+		return reader;
+	}
+
+	private File getResturantsFile() throws URISyntaxException {
 		String pathToFile = "/resturants_ids.txt";
 		URL resourceUrl = getClass().getResource(pathToFile);
 		File file = new File(resourceUrl.toURI());
-		BufferedReader reader = Whitebox.<BufferedReader>invokeMethod(engine, "connectToFile", file.getAbsolutePath());
-		return reader;
+		return file;
 	}
 	
 	@Test
@@ -121,6 +128,30 @@ public class SearchEngineTest {
 		Whitebox.invokeMethod(engine, "indexFileContent", bufferedReader, indexWriter);
 		int numDocsAfterAddingToIndex = indexWriter.numDocs();
 		Assert.assertNotEquals("didn't index any documents",numDocsBeforeAddingToIndex, numDocsAfterAddingToIndex);
+	}
+	
+	@Test
+	public void testGetRecordAttributes_EndToEnd() throws URISyntaxException, IOException {
+		File resturantsFile = getResturantsFile();
+		engine.addRecords(resturantsFile.getCanonicalPath());
+		List<String> recordAttributes = engine.getRecordAttributes(Integer.toString(49));
+		ArrayList<String> expected = new ArrayList<String>( Arrays.asList("587", "35", "36", "37", "38", "39", "173", "404", "405", "588", "589", "590", "591") );
+		Assert.assertTrue("Didn't get all records", recordAttributes.containsAll(expected));
+		
+		recordAttributes.removeAll(expected);
+		Assert.assertTrue("Obtained more records than needed", recordAttributes.size() == 0);
+	}
+	
+	@Test
+	public void testGetRecordAttributes_recordNotExists() throws URISyntaxException, IOException {
+		//suppress Indexing phase
+		PowerMock.suppress(PowerMock.method(SearchEngine.class, "indexFileContent"));
+		engine = new SearchEngine();
+		
+		File resturantsFile = getResturantsFile();
+		engine.addRecords(resturantsFile.getCanonicalPath());
+		List<String> recordAttributes = engine.getRecordAttributes(Integer.toString(49));
+		Assert.assertTrue("Obtained attributes for recordId that was not indexed", recordAttributes.isEmpty());
 	}
 	
 

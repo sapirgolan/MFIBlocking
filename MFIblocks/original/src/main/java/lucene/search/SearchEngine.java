@@ -40,11 +40,30 @@ public class SearchEngine {
 		index = new RAMDirectory();
 	}
 	
+	public List<String> getRecordAttributes(String recordId) {
+		List<String> attributes = new ArrayList<String>();
+		try {
+			Query query = createQuery(recordId);
+			attributes = retriveRecord(query);
+		} catch (ParseException e) {
+			System.err.println("Failed to create query for recordId: " + recordId);
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("Failed to perform search operaion for recordId: " + recordId);
+			e.printStackTrace();
+		} catch (TooManySearchResults e) {
+			System.err.println("Didn't find record with given ID: " + recordId);
+			e.printStackTrace();
+		}
+		return attributes;
+	}
+	
 	public void addRecords(String pathToFile){
 		//try-with-resources - new in JDK7 (http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
 		try (BufferedReader reader = connectToFile(pathToFile)) {
 			IndexWriter indexWriter = createInderWeiter();
 			indexFileContent(reader, indexWriter);
+			indexWriter.close();
 		} catch (IOException e) {
 			System.err.println("Failed to create IndexWriter");
 			e.printStackTrace();
@@ -94,12 +113,13 @@ public class SearchEngine {
 		return query;
 	}
 	
-	private void retriveRecord(Query query) throws IOException, TooManySearchResults {
+	private List<String> retriveRecord(Query query) throws IOException, TooManySearchResults {
 		IndexReader reader = DirectoryReader.open(index);
 		IndexSearcher searcher = new IndexSearcher(reader);
 		
 		ScoreDoc[] hits = performSearch(query, searcher);
-		obtainTopResult(searcher, hits);
+		List<String> attributes = obtainTopResult(searcher, hits);
+		return attributes;
 	}
 
 	//tested

@@ -76,22 +76,9 @@ public class BottomUp {
 	public static void main(String[] args){
 		MfiContext context = readArguments(args);
 		StringSimToolsLocal.init(context);
-		
-		Configuration config = context.getConfig();
-		
-		if (config.equals(Configuration.SPARK)) {
-			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-			System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
-			System.setProperty("spark.executor.memory", "5g");
-			//System.getProperty("spark.akka.askTimeout","50000");
-			Runtime runtime = Runtime.getRuntime();
-			runtime.gc();
-			int numOfCores = runtime.availableProcessors();
-			sc=new JavaSparkContext("local["+numOfCores+"]", "App",
-					"$SPARK_HOME", new String[]{"target/original-0.0.1.jar"});
-			//System.out.println("spark.akka.askTimeout = " + System.getProperty("spark.akka.askTimeout"));
-		}
 		enterPerformanceModeIfNeeded( context.isInPerformanceMode() );
+		
+		createSparkContext( context.getConfig() );
 		
 		System.out.println("Entered Main");	
 		String currDir = new File(".").getAbsolutePath();
@@ -114,6 +101,21 @@ public class BottomUp {
 		start = System.currentTimeMillis();
 		mfiBlocksCore(context);
 		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
+	}
+
+
+	private static void createSparkContext(Configuration config) {
+		if (config.equals(Configuration.SPARK)) {
+			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+			System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
+			System.setProperty("spark.executor.memory", "5g");
+			//System.getProperty("spark.akka.askTimeout","50000");
+			Runtime runtime = Runtime.getRuntime();
+			runtime.gc();
+			int numOfCores = runtime.availableProcessors();
+			sc = new JavaSparkContext("local["+numOfCores+"]", "App",
+					"$SPARK_HOME", new String[]{"target/original-0.0.1.jar"});
+		}
 	}
 	
 	

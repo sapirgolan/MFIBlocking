@@ -69,7 +69,7 @@ public class MfiContext {
 	
 	public void setPerformanceFlag(String[] args) {
 		this.inPerformanceMode = false;
-		int lastArgument = args.length;
+		int lastArgument = args.length - 1;
 		if ("perf".equalsIgnoreCase(args[lastArgument])) {
 			this.inPerformanceMode = true;
 		}

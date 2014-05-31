@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import lucene.search.SearchEngine;
+
 import org.apache.spark.api.java.JavaSparkContext;
 
 import candidateMatches.CandidateMatch;
@@ -28,9 +30,9 @@ import dnl.utils.text.table.TextTable;
 import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
 import fimEntityResolution.entityResulution.IComparison;
+import fimEntityResolution.statistics.BlockingResultContext;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
-import fimEntityResolution.statistics.DuplicateBusinessLayer;
 import fimEntityResolution.statistics.StatisticMeasuremnts;
 
 public class BottomUp {
@@ -163,9 +165,12 @@ public class BottomUp {
 		
 		int recordsSize = context.getRecordsSize();
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
-		List<BlockingRunResult> blockingRunResults= new ArrayList<BlockingRunResult>();
+		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
+		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
+		
+		IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
 		for(double neiborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neiborhoodGrow;
 		
@@ -187,10 +192,11 @@ public class BottomUp {
 				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
 				StatisticMeasuremnts results = calculateFinalResults(trueClusters, algorithmObtainedPairs, recordsSize);
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard);
-				long timeOfComparison = comparison.measureComparisonExecution(trueClusters.getGroundTruthCandidatePairs(), algorithmObtainedPairs);
-				BlockingRunResult blockingRR = new BlockingRunResult(results, minBlockingThreshold, lastUsedBlockingThreshold,
-						NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculationDuration-writeBlocksDuration)/1000.0);
+				
+				long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
+				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
+				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
 				blockingRunResults.add(blockingRR);
 				
 				System.out.println("");
@@ -209,6 +215,29 @@ public class BottomUp {
 		}		
 	}
 	
+	private static double calcExecutionTime(long start,
+			long totalMaxRecallCalculationDuration, long writeBlocksDuration,
+			long timeOfComparison) {
+		long totalRunTime = System.currentTimeMillis() - start;
+		totalRunTime = reduceIreleventTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
+		double totalRunTimeSeconds = (double)(totalRunTime/1000.0);
+		return totalRunTimeSeconds;
+	}
+
+
+	private static long reduceIreleventTimes(long totalRunTime,
+			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
+		return (totalRunTime - (totalMaxRecallCalculationDuration + writeBlocksDuration));
+	}
+
+
+	private static SearchEngine createAndInitSearchEngine(String recordsFile) {
+		SearchEngine engine = new SearchEngine();
+		engine.addRecords(recordsFile);
+		return engine;
+	}
+
+
 	/**
 	 * the method write the blocking output to a file for later usage
 	 * @param cps
@@ -525,10 +554,8 @@ public class BottomUp {
 		double falsePositive = TPFP[1];
 		double falseNegative =TPFP[2];
 		
-		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth.getGroundTruthCandidatePairs(),resultMatrix);
 		double totalDuplicates = groundTruth.getCardinality();
 		double comparisonsMadeTPFP = truePositive + falsePositive;
-		int comparisonsCouldHaveMade = duplicateBusinessLayer.getNumberOfComparisons();
 		int duplicatesFound = (int)comparisonsMadeTPFP;
 		double precision = truePositive/(truePositive+falsePositive);
 		double recall = truePositive/(truePositive+falseNegative);
@@ -547,7 +574,6 @@ public class BottomUp {
 		statisticMeasuremnts.setDuplicatesFound(duplicatesFound);
 		statisticMeasuremnts.setTotalDuplicates(totalDuplicates);
 		statisticMeasuremnts.setComparisonsMade(comparisonsMadeTPFP);
-		statisticMeasuremnts.setComparisonsCouldHaveMake(comparisonsCouldHaveMade);
 		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 		return statisticMeasuremnts;
 	}

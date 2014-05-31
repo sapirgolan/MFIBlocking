@@ -509,34 +509,6 @@ public class BottomUp {
 	}
 	
 	
-	private static double[] calculateFinalResults(BitMatrix GroundTruth,BitMatrix ResultMatrix,int numOfRecords)
-	{
-		long start = System.currentTimeMillis();
-		long numRecords = (long)numOfRecords;
-		double[] TPFP = BitMatrix.TrueAndFalsePositives(GroundTruth, ResultMatrix);
-		double TP = TPFP[0];		
-		double FP = TPFP[1];
-		double FN = BitMatrix.FalseNegatives(GroundTruth, ResultMatrix);
-		
-		
-		double precision = TP/(TP+FP);
-		double recall = TP/(TP+FN);
-		double pr_f_measure = (2*precision*recall)/(precision+recall);
-		
-		double totalComparisons = ((numRecords * (numRecords - 1))*0.5);	
-		double RR = Math.max(0.0, (1.0-((TP+FP)/totalComparisons)));		
-		System.out.println("num of same source pairs: " + sameSource);
-		System.out.println("TP = " + TP +", FP= " + FP + ", FN="+ FN  + " totalComparisons= " + totalComparisons);
-		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + RR);	
-		double[] retVal = new double[4];
-		retVal[0] = recall;
-		retVal[1] = precision;
-		retVal[2]=  pr_f_measure;
-		retVal[3]=  RR;	
-		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-		return retVal;
-	}
-	
 	/**
 	 * Calculate output measurements: F-measure, Precision (PC), Recall 
 	 * @param groundTruth

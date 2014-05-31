@@ -42,8 +42,8 @@ public class StatisticMeasuremnts {
 		this.precision = precision;
 	}
 
-	public void setFMeasure(double pr_f_measure) {
-		this.fMeasure = pr_f_measure;
+	public void setFMeasure(double fmeasure) {
+		this.fMeasure = fmeasure;
 	}
 
 	public void setRR(double reductionRatio) {
@@ -60,10 +60,6 @@ public class StatisticMeasuremnts {
 
 	public double getFMeasure() {
 		return fMeasure;
-	}
-
-	public void setfMeasure(double fMeasure) {
-		this.fMeasure = fMeasure;
 	}
 
 	public double getReductionRatio() {

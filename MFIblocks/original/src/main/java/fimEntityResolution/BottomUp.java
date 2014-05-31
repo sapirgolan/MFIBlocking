@@ -33,6 +33,7 @@ import fimEntityResolution.entityResulution.IComparison;
 import fimEntityResolution.statistics.BlockingResultContext;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
+import fimEntityResolution.statistics.ExperimentResult;
 import fimEntityResolution.statistics.StatisticMeasuremnts;
 
 public class BottomUp {
@@ -43,7 +44,6 @@ public class BottomUp {
 	private final static double MAX_SUPP_CONST = 1.0;//0.005;
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
-	private static int sameSource = 0;
 	
 	public final static double THRESH_STEP = 0.05;
 	public static JavaSparkContext sc;
@@ -189,10 +189,12 @@ public class BottomUp {
 				
 				actionStart = System.currentTimeMillis();
 				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, context.getMatchFile());
-				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
-				StatisticMeasuremnts results = calculateFinalResults(trueClusters, algorithmObtainedPairs, recordsSize);
-				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
+				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
+				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
+				StatisticMeasuremnts results = experimentResult.calculate();
+				
+				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
 				long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
 				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
 				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
@@ -506,48 +508,6 @@ public class BottomUp {
 			return false;
 		}
 		return (src1.equalsIgnoreCase(src2));
-	}
-	
-	
-	/**
-	 * Calculate output measurements: F-measure, Precision (PC), Recall 
-	 * @param groundTruth
-	 * @param resultMatrix
-	 * @param numOfRecords
-	 * @return
-	 */
-	private static StatisticMeasuremnts calculateFinalResults(TrueClusters groundTruth,CandidatePairs resultMatrix, int numOfRecords)
-	{
-		long start = System.currentTimeMillis();
-		long numRecords = (long)numOfRecords;
-		//calculate TP and FP
-		double[] TPFP = groundTruth.getGroundTruthCandidatePairs().calcTrueAndFalsePositives(groundTruth.getGroundTruthCandidatePairs(), resultMatrix);
-		double truePositive = TPFP[0];		
-		double falsePositive = TPFP[1];
-		double falseNegative =TPFP[2];
-		
-		double totalDuplicates = groundTruth.getCardinality();
-		double comparisonsMadeTPFP = truePositive + falsePositive;
-		int duplicatesFound = (int)comparisonsMadeTPFP;
-		double precision = truePositive/(truePositive+falsePositive);
-		double recall = truePositive/(truePositive+falseNegative);
-		double pr_f_measure = (2*precision*recall)/(precision+recall);	
-		double totalComparisonsAvailable = ((numRecords * (numRecords - 1))*0.5);	
-		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMadeTPFP)/totalComparisonsAvailable)));		
-		System.out.println("num of same source pairs: " + sameSource);
-		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisonsAvailable);
-		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + reductionRatio);
-		StatisticMeasuremnts statisticMeasuremnts = new StatisticMeasuremnts();
-		statisticMeasuremnts.setRecall(recall);
-		statisticMeasuremnts.setPrecision(precision);
-		statisticMeasuremnts.setFMeasure(pr_f_measure);
-		statisticMeasuremnts.setRR(reductionRatio);
-		
-		statisticMeasuremnts.setDuplicatesFound(duplicatesFound);
-		statisticMeasuremnts.setTotalDuplicates(totalDuplicates);
-		statisticMeasuremnts.setComparisonsMade(comparisonsMadeTPFP);
-		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-		return statisticMeasuremnts;
 	}
 	
 	public static String writeBlockingRR(Collection<BlockingRunResult> runResults){

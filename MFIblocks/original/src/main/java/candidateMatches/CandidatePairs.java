@@ -181,7 +181,7 @@ public class CandidatePairs implements SetPairIF{
 	}
 	//TODO: CHECK IT
 	//TP+ FP - 1 in both the Ground Truth and in the result
-	public double[] calcTrueAndFalsePositives(CandidatePairs trueCPs, CandidatePairs actualCPs) throws NullPointerException{
+	public long[] calcTrueAndFalsePositives(CandidatePairs actualCPs) throws NullPointerException{
 		long TP = 0;
 		long FP = 0;
 		long FN = 0;
@@ -196,7 +196,7 @@ public class CandidatePairs implements SetPairIF{
 				actualPairs.add(temp);
 			}
 		}
-		for (Entry<Integer,RecordMatches> entry: trueCPs.allMatches.entrySet()) { //run over all records
+		for (Entry<Integer,RecordMatches> entry: this.allMatches.entrySet()) { //run over all records
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
 				//count++;
 				Set<Integer> temp=new HashSet<Integer>();
@@ -216,7 +216,7 @@ public class CandidatePairs implements SetPairIF{
 		//remove intersection from actualPairs
 		actualPairs.removeAll(truePairs);
 		FP=actualPairs.size();
-		return new double[]{TP,FP, FN};	
+		return new long[]{TP,FP, FN};	
 		
 	}
 	
@@ -261,7 +261,7 @@ public class CandidatePairs implements SetPairIF{
 		gt.setPair(5, 6,0);
 		gt.isPairSet(2,7);
 		gt.isPairSet(7,2);
-		double[] TPFP = gt.calcTrueAndFalsePositives(gt, cps);
+		long[] TPFP = gt.calcTrueAndFalsePositives(cps);
 		double FN = FalseNegatives(gt,cps);
 		System.out.println("TPFP: " + Arrays.toString(TPFP));
 		System.out.println("FN: " + FN);

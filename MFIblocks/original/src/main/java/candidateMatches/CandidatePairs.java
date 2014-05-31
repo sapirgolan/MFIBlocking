@@ -2,6 +2,7 @@ package candidateMatches;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,6 +45,10 @@ public class CandidatePairs implements SetPairIF{
 	
 	public Set<Entry<Integer, RecordMatches>> getAllMatchedEntries(){
 		return allMatches.entrySet();
+	}
+	
+	public Iterator<Entry<Integer, RecordMatches>> getIterator() {
+		return allMatches.entrySet().iterator();
 	}
 	
 	public void addAll(final CandidatePairs other){

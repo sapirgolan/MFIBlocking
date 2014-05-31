@@ -28,6 +28,9 @@ public class RecordMatches {
 		return candidateSet.size();
 	}
 	
+	public final Set<Integer> getMatchedRecordsIds() {
+		return candidateSet.keySet();
+	}
 	
 	/**
 	 * 

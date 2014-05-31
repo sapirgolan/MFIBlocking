@@ -1,22 +1,27 @@
 package fimEntityResolution.entityResulution;
 
-import static org.mockito.Mockito.spy;
+import static org.mockito.Matchers.eq;
+
+import java.util.Arrays;
+
+import lucene.search.SearchEngine;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.reflect.Whitebox;
 
 import candidateMatches.CandidatePairs;
 
-public class ExecuteJaccardComparisonsTest {
+public class JaccardComparisonsTest {
 
-	private ExecuteJaccardComparisons jaccardComparisons;
-	private ExecuteJaccardComparisons spyJaccardComparisons ;
+	private JaccardComparisons jaccardComparisons;
 	@Before
 	public void setUp() throws Exception {
-		jaccardComparisons = new ExecuteJaccardComparisons();
-		spyJaccardComparisons = spy(jaccardComparisons);
+		SearchEngine engine = PowerMockito.mock(SearchEngine.class);
+		jaccardComparisons = new JaccardComparisons(engine);
 	}
 
 	@After
@@ -25,16 +30,19 @@ public class ExecuteJaccardComparisonsTest {
 
 	@Test
 	public void testMeasureComparisonExecution() {
-		CandidatePairs trueIds = new CandidatePairs();
-		trueIds.setPair(1, 2, 0.1);
-		trueIds.setPair(1, 3, 0.1);
 		
 		CandidatePairs algorithmIds = new CandidatePairs();
 		algorithmIds.setPair(1, 2, 0.1);
 		algorithmIds.setPair(1, 3, 0.1);
 		
+		SearchEngine engine = PowerMockito.mock(SearchEngine.class);
+		PowerMockito.when(engine.getRecordAttributes(eq("1"))).thenReturn(Arrays.asList("a", "b", "c"));
+		PowerMockito.when(engine.getRecordAttributes(eq("2"))).thenReturn(Arrays.asList("a", "d", "e"));
+		PowerMockito.when(engine.getRecordAttributes(eq("3"))).thenReturn(Arrays.asList("d", "c", "b"));
+		Whitebox.setInternalState(jaccardComparisons, "engine", engine);
+		
 		long startingTime = System.currentTimeMillis();
-		long executionTime = spyJaccardComparisons.measureComparisonExecution(trueIds, algorithmIds);
+		long executionTime = jaccardComparisons.measureComparisonExecution(algorithmIds);
 		Assert.assertTrue(" Method didn't execute", startingTime!=executionTime);
 		
 	}

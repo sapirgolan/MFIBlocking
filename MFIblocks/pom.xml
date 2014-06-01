@@ -54,9 +54,19 @@
 		</repository>
 		
 	</repositories>
+	<dependencyManagement>
+		<dependencies>
+		  <dependency>
+			<groupId>il.ac.technion.ie</groupId>
+			<artifactId>original</artifactId>
+			<version>0.0.1</version>
+		  </dependency>
+	  </dependencies>
+  </dependencyManagement>
+	
 
   <dependencies>
-  	
+	<!-- Tests -->
 	<dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

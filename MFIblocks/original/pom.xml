@@ -62,6 +62,9 @@
 		<version>3.0.3</version>
 	</dependency>
 	 -->
+	 
+	 
+	 
 	<dependency>
 		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-kernel</artifactId>
@@ -107,7 +110,8 @@
       <artifactId>spark-core_2.9.3</artifactId>
       <version>0.8.1-incubating</version>
     </dependency>
-    <!-- Lucene -->
+	
+		<!-- Lucene -->
 	<dependency>
 		<groupId>org.apache.lucene</groupId>
 		<artifactId>lucene-core</artifactId>
@@ -123,7 +127,6 @@
 		<artifactId>lucene-queryparser</artifactId>
 		<version>4.8.0</version>
 	</dependency>
-            
 	<dependency>
 		<groupId>org.apache.lucene</groupId>
 		<artifactId>lucene-analyzers-common</artifactId>
@@ -134,6 +137,7 @@
 		<artifactId>lucene-analyzers</artifactId>
 		<version>3.6.2</version>
 	</dependency>
+    
 	<!-- JARS that were installed manually -->
 	<dependency>
 		<groupId>com.javamex</groupId>

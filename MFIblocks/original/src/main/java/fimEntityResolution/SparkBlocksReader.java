@@ -1,27 +1,20 @@
 package fimEntityResolution;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.PairFunction;
-import scala.Tuple2;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function2;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.transaction.NotSupportedException;
 
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFunction;
+
+import scala.Tuple2;
 import candidateMatches.CandidatePairs;
-import fimEntityResolution.FrequentItem;
-import fimEntityResolution.Record;
-import fimEntityResolution.StringSimTools;
-import fimEntityResolution.Utilities;
 import fimEntityResolution.bitsets.EWAH_BitSet;
 import fimEntityResolution.interfaces.BitSetIF;
 import fimEntityResolution.interfaces.IFRecord;
@@ -54,30 +47,31 @@ public class SparkBlocksReader {
 	 * @param NG_PARAM
 	 * @return CandidatePairs object
 	 */
-	public static CandidatePairs readFIs(String frequentItemsetFile,
-			Map<Integer, FrequentItem> globalItemsMap, double scoreThreshold,
-			Map<Integer, Record> records, int minSup, double NG_PARAM,String lexiconFile,
-			String recordsFile,String origRecordsFile){
-		StringSimToolsLocal.globalItemsMap=Utilities.parseLexiconFile(StringSimToolsLocal.LEXICON_FILE);
-		StringSimToolsLocal.globalRecords=Utilities.readRecords(StringSimToolsLocal.RECORDS_FILE,StringSimToolsLocal.ORIGRECORDS_FILE,"");
+	public static CandidatePairs readFIs(FrequentItemsetContext itemsetContext){
+		
+		MfiContext context = itemsetContext.getMfiContext();
+		int minSup = itemsetContext.getMinimumSupport();
+		double NG_PARAM = itemsetContext.getNeiborhoodGrowthLimit();
+		
+		StringSimToolsLocal.globalItemsMap = Utilities.parseLexiconFile(context .getLexiconFile());
+		StringSimToolsLocal.globalRecords = Utilities.readRecords(context);
 
 		resetAtomicIntegerArr(Utilities.clusterScores);	
 		StringSimTools.numOfMFIs.set(0);
 		StringSimTools.numOfRoughMFIs.set(0);
 		StringSimTools.timeInGetClose.set(0);
 		StringSimTools.timeInRough.set(0);
-		//timeSpentUpdatingCoverage.set(0);
 		BitMatrixPool.getInstance().restart();
 	
-		int maxSize = (int) Math.floor(minSup*NG_PARAM);
+		int maxSize = (int) Math.floor(minSup *NG_PARAM );
 		candidatePairs = new CandidatePairs(maxSize);
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		int numOfCores = runtime.availableProcessors();
-		JavaRDD<String> fmiSets = BottomUp.sc.textFile(frequentItemsetFile,numOfCores*3); //JS: Spark tuning: minSplits=numOfCores*3
-		JavaRDD<CandidateBlock> parsedBlocks=fmiSets.map(new ParseFILine());
-		JavaPairRDD<CandidateBlock,Double> blocksWithScores=parsedBlocks.map(new CalculateScores(lexiconFile,recordsFile,
-				origRecordsFile,scoreThreshold, minSup, NG_PARAM));
+		JavaRDD<String> fmiSets = BottomUp.sc.textFile(itemsetContext.getFrequentItemssetFilePath(), numOfCores*3); //JS: Spark tuning: minSplits=numOfCores*3
+		JavaRDD<CandidateBlock> parsedBlocks = fmiSets.map(new ParseFILine());
+		JavaPairRDD<CandidateBlock,Double> blocksWithScores = parsedBlocks.map( new CalculateScores(context.getLexiconFile(),
+				context.getRecordsFile(), context.getOriginalFile(), itemsetContext.getMinBlockingThreshold(), minSup, NG_PARAM));
 		JavaPairRDD<CandidateBlock,Double> trueBlocks=blocksWithScores.filter(new TrueBlocks());
 		trueBlocks.count(); //JS:there is no need for the result, but we have to perform ACTION in order to apply our mapping
 							//and make distributed calculations in Spark

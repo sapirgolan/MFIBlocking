@@ -22,12 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import org.apache.commons.collections.list.TreeList;
-
-//import com.javamex.classmexer.MemoryUtil;
-//import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
-
 import DataStructures.Attribute;
 import DataStructures.EntityProfile;
 import DataStructures.IdDuplicates;
@@ -170,8 +164,9 @@ public class ProfileReader {
 				}
 			}
 			//System.out.println("attributeNames size= "+attributeNames.size());
-			for (int i=0; i<attributeNames.size();i++){
-				sortedDensity.add(new ComparableColumnsDensity(i, denseCounter[i]));
+			
+			for (int i=0; i<attributeNames.size()-1;i++){ //JS: 25052014
+				sortedDensity.add(new ComparableColumnsDensity(i, denseCounter[i+1])); //JS: 25052014
 				//System.out.println(i + ","+denseCounter[i]+" ==========");
 				
 			}
@@ -344,9 +339,13 @@ public class ProfileReader {
 					//uses functions that in the end call to Lexicon.addWord that updates lexicon
 					getNGramIdString(recordId, toWrite,map.get(attribute.getName()), false);
 					if (IS_DBPedia) attribute=null;  //JS: 20140509
+					
+					//System.out.println("=============="+attribute.toString());
 				}
 				recordId++;
 				if (IS_DBPedia) entityProfile=null; // JS: 20140509
+				
+				//System.out.println("=============="+entityProfile.toString());
 				
 			}
 			System.out.println("removeTooFrequentItems: "+recordId+" records done.");
@@ -408,10 +407,10 @@ public class ProfileReader {
 				
 				String columnWeight=""; //JS: 20140508 if the density of the column is less than threshold the column's weight is zero.
 				List<Integer> denseColumnsIDs=new ArrayList<Integer>();
-				int i=0;
+				int i=0; 
 				for(ComparableColumnsDensity object: sortedDensity){
 					if(i<COLUMNS){
-						System.out.println("Density "+(i+1)+" is "+object.density);
+						System.out.println("Density "+ (i+1) +" is "+object.density);
 						denseColumnsIDs.add(i, object.columnID);
 						i++;
 					}

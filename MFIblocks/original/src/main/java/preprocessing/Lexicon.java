@@ -121,7 +121,7 @@ public class Lexicon {
 			int wordId = currItemId++;
 			wordsToIds.put(word, wordId);
 			//wordItem = new SparseFrequentItem(wordId, word,attIdToWeights.get(attId));
-			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*ProfileReader.dbSize.getTotalSize()));
+			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*ProfileReaderDBP.dbSize.getTotalSize()));
 		}
 		wordItem.addSupport(recordId);
 		attFIs.getItems().put(wordItem.getId(), wordItem);

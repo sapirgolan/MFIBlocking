@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,9 @@ import fimEntityResolution.statistics.StatisticMeasuremnts;
 public class BottomUp {
 	
 	private final static String FI_DIR = "FIs";
+	private final static String TEMP_RECORD_DIR = "TEMP_RECORD_DIR";
+	private final static File TempDir = new File(TEMP_RECORD_DIR);
+	private final static double MAX_SUPP_CONST = 1.0;//0.005;
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
 	private static int sameSource = 0;
@@ -46,7 +48,7 @@ public class BottomUp {
 	public static int DEDUP_MIN_SUP = 2;
 	public static BitSet coveredRecords= null;
 	public static String srcFile = null;
-	public static int FIRST_DB_SIZE=0;
+	
 	
 	public enum Alg{
 		CFI,
@@ -72,7 +74,37 @@ public class BottomUp {
 		8. The set of p parameters to use as the Neighberhood Growth constraints.
 	 */
 	public static void main(String[] args){
-		Configuration config = Configuration.valueOf(args[0]);
+		MfiContext context = readArguments(args);
+		StringSimToolsLocal.init(context);
+		enterPerformanceModeIfNeeded( context.isInPerformanceMode() );
+		
+		createSparkContext( context.getConfig() );
+		
+		System.out.println("Entered Main");	
+		String currDir = new File(".").getAbsolutePath();
+		System.out.println("Working dir: " + currDir);	
+		System.out.println("args.length : " + args.length);
+		System.out.println("Main srcFile : " + srcFile);
+		long start = System.currentTimeMillis();
+		
+		Map<Integer,Record> records = Utilities.readRecords(context);
+		context.setRecords(records);
+		int numOfrecords = Utilities.DB_SIZE;
+		System.out.println("After reading records numOfrecords=" + numOfrecords);
+		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
+		System.out.println("DEBUG: Size of recods: " + MemoryUtil.deepMemoryUsageOfAll(records.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+		start = System.currentTimeMillis();
+		Utilities.parseLexiconFile(context.getLexiconFile());
+		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
+		System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+				
+		start = System.currentTimeMillis();
+		mfiBlocksCore(context);
+		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
+	}
+
+
+	private static void createSparkContext(Configuration config) {
 		if (config.equals(Configuration.SPARK)) {
 			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 			System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
@@ -81,64 +113,43 @@ public class BottomUp {
 			Runtime runtime = Runtime.getRuntime();
 			runtime.gc();
 			int numOfCores = runtime.availableProcessors();
-			sc=new JavaSparkContext("local["+numOfCores+"]", "App",
+			sc = new JavaSparkContext("local["+numOfCores+"]", "App",
 					"$SPARK_HOME", new String[]{"target/original-0.0.1.jar"});
-			//System.out.println("spark.akka.askTimeout = " + System.getProperty("spark.akka.askTimeout"));
 		}
-		System.out.println("Entered Main");	
-		String currDir = new File(".").getAbsolutePath();
-		System.out.println("Working dir: " + currDir);	
-		String lexiconFile = args[1];
-		StringSimToolsLocal.LEXICON_FILE=lexiconFile;
-		String recordsFile = args[2];
-		StringSimToolsLocal.RECORDS_FILE=recordsFile;
-		String minBlockingThresholds = args[3];				
-		double[] dMinBlockingThresholds = getThresholds(minBlockingThresholds);
-		String matchFile = args[4];
-		String origRecordsFile = args[5];
-		StringSimToolsLocal.ORIGRECORDS_FILE=origRecordsFile;
-		int[] minSups = getInts(args[6]);
-		Alg alg = Alg.valueOf(args[7]);	
-		double[] NGs = getDoubles(args[8]);	
-		if(args.length > 9 && args[9] != null){
-			FIRST_DB_SIZE=Integer.parseInt(args[9]); 
-		}
-//		if(args.length > 9 && args[9] != null){
-//			if ("perf".equalsIgnoreCase(args[9])) {
-//				System.out.println("You have started the application in profiling mode for performce");
-//				System.out.println("Start your profiler and then hit any key on the console");
-//				try {
-//					System.in.read();
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//			else {
-//				srcFile = args[8];
-//				srcFile = args[9];
-//			}
-//		}
-		
-		System.out.println("args.length : " + args.length);
-		System.out.println("Main srcFile : " + srcFile);
-		long start = System.currentTimeMillis();
-		Map<Integer,Record> records = Utilities.readRecords(recordsFile,origRecordsFile,srcFile);
-		int numOfrecords = Utilities.DB_SIZE;
-		System.out.println("After reading records numOfrecords=" + numOfrecords);
-		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
-		System.out.println("DEBUG: Size of recods: " + MemoryUtil.deepMemoryUsageOfAll(records.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-		start = System.currentTimeMillis();
-		Utilities.parseLexiconFile(lexiconFile);
-		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
-		System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-				
-		start = System.currentTimeMillis();
-		mfiBlocksCore(config,records,matchFile,minSups,dMinBlockingThresholds,alg,NGs,lexiconFile,recordsFile,origRecordsFile);
-		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
 	}
 	
 	
+	private static void enterPerformanceModeIfNeeded(boolean inPerformanceMode) {
+		if( inPerformanceMode ){
+			System.out.println("You have started the application in profiling mode for performce");
+			System.out.println("Start your profiler and then hit any key on the console");
+			try {
+				System.in.read();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+
+	private static MfiContext readArguments(String[] args) {
+		MfiContext context = new MfiContext();
+		context.setConfiguration(args[0]);
+		context.setLexiconFile(args[1]);
+		context.setRecordsFile(args[2]);
+		context.setMinBlockingThresholds(args[3]);
+		context.setMatchFile(args[4]);
+		context.setOrigRecordsFile(args[5]);
+		context.setMinSup(args[6]);
+		context.setAlgorithm(Alg.MFI);
+		context.setNGs(args[8]);
+		context.setFirstDbSize(args);
+		context.setPerformanceFlag(args);
+		return context;
+	}
+
+
 	/**
 	 * Core of the MFIBlocks algorithm
 	 * @param records
@@ -148,33 +159,33 @@ public class BottomUp {
 	 * @param alg
 	 * @param NGs
 	 */
-	public static void mfiBlocksCore(Configuration config,Map<Integer,Record> records, String matchFile,int[] minSups, 
-			double[] minBlockingThresholds, Alg alg, double[] NGs, String lexiconFile,
-			String recordsFile,String origRecordsFile){
-		Arrays.sort(minSups);
-		System.out.println("order of minsups used: " + Arrays.toString(minSups));
+	public static void mfiBlocksCore(MfiContext context) {
+		
+		int recordsSize = context.getRecordsSize();
+		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
 		List<BlockingRunResult> blockingRunResults= new ArrayList<BlockingRunResult>();
-		//iterate for each neighborhood grow value that was set in input 
-		for(double neiborhoodGrow: NGs){
+		//iterate for each neighborhood grow value that was set in input
+		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
+		for(double neiborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neiborhoodGrow;
 		
+			double[] minBlockingThresholds = context.getMinBlockingThresholds();
 			for (double minBlockingThreshold : minBlockingThresholds) { // test for each minimum blocking threshold
-				coveredRecords = new BitSet(records.size()+1);
+				coveredRecords = new BitSet(recordsSize+1);
 				coveredRecords.set(0,true); // no such record
-				//clearTrueClusters(trueClusters);
-				System.out.println("running iterative " + alg.toString() + "s with minimum blocking threshold " + minBlockingThreshold +
+				System.out.println("running iterative " + context.getAlgName() + "s with minimum blocking threshold " + minBlockingThreshold +
 						" and NGLimit: " + NG_LIMIT);			
 				long start = System.currentTimeMillis();
 				//obtain all the clusters that has the minimum score
-				CandidatePairs algorithmObtainedPairs = getClustersToUse(config,records,minSups,minBlockingThreshold,lexiconFile,recordsFile,origRecordsFile);
+				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
 				long actionStart = System.currentTimeMillis();
 				writeCandidatePairs(algorithmObtainedPairs);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
-				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, matchFile);
+				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, context.getMatchFile());
 				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
-				StatisticMeasuremnts results = calculateFinalResults(trueClusters, algorithmObtainedPairs, records.size());
+				StatisticMeasuremnts results = calculateFinalResults(trueClusters, algorithmObtainedPairs, recordsSize);
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
 				IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard);
 				long timeOfComparison = comparison.measureComparisonExecution(trueClusters.getGroundTruthCandidatePairs(), algorithmObtainedPairs);
@@ -235,66 +246,43 @@ public class BottomUp {
 		textTable.printTable();
 	}
 
-	private static double[] getThresholds(String strDoubles){
-		String[] thresholds = strDoubles.split(",");
-		double[] dThresholds = new double[thresholds.length];
-		for(int i=0 ; i < thresholds.length ; i++ ){
-			dThresholds[i] = Double.parseDouble(thresholds[i].trim());
-		}
-		return dThresholds;
-	}
-	
-	private static int[] getInts(String strInts){
-		String[] intStrs = strInts.trim().split(",");
-		int[] ints = new int[intStrs.length];
-		for(int i=0 ; i < intStrs.length ; i++ ){
-			ints[i] = Integer.parseInt(intStrs[i].trim());
-		}
-		return ints;
-	}
-	
-	private static double[] getDoubles(String strDbs){
-		String[] dbStrs = strDbs.trim().split(",");
-		double[] dbs = new double[dbStrs.length];
-		for(int i=0 ; i < dbStrs.length ; i++ ){
-			dbs[i] = Double.parseDouble(dbStrs[i].trim());
-		}
-		return dbs;
-	}
-	
-	private static CandidatePairs getClustersToUse(Configuration config,Map<Integer,Record> records,int[] minSups, double minBlockingThreshold, String lexiconFile,String recordsFile, String origRecordsFile){
-		Arrays.sort(minSups);
+	private static CandidatePairs getClustersToUse(MfiContext context, double minBlockingThreshold){
 		coveredRecords.set(0,true); // no such record
-		double[] usedThresholds = new double[minSups.length];		
+		
+		int[] minimumSupports = context.getMinSup();
+		double[] usedThresholds = new double[minimumSupports.length];
+		Map<Integer, Record> records = context.getReccords();
+		
+		
 		File mfiDir = new File(FI_DIR);
 		if(!mfiDir.exists()){
 			if(!mfiDir.mkdir())
 				System.out.println("Failed to create directory " + mfiDir.getAbsolutePath());
 		}
+		
 		CandidatePairs allResults = new CandidatePairs(); //unlimited
 		
-		for(int i=(minSups.length - 1) ; i >=0  && coveredRecords.cardinality() < records.size(); i--){ // array is sorted in ascending order -
+		for(int i=(minimumSupports.length - 1) ; i >=0  && coveredRecords.cardinality() < records.size(); i--){ // array is sorted in ascending order -
 			//begin with largest minSup
 			//continue until all records have been covered OR we have completed running over all minSups			
 			long start = System.currentTimeMillis();
 			//TODO: check content of file
-			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords,records, minSups[i]);	
+			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords,records, minimumSupports[i]);	
 			System.out.println("Time to createRecordFileFromRecords" +Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 				
 			start = System.currentTimeMillis();
-			File mfiFile = Utilities.RunMFIAlg(minSups[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
-			System.out.println("Time to run MFI with minsup="+minSups[i] +
+			File mfiFile = Utilities.RunMFIAlg(minimumSupports[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
+			System.out.println("Time to run MFI with minsup="+minimumSupports[i] +
 					" on table of size " + (records.size()-coveredRecords.cardinality()) + 
 					" is " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 		
 			start = System.currentTimeMillis();
-			//coverageMap = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
-			CandidatePairs candidatePairs=null;
-			if (config.equals(Configuration.SPARK)){	
-				candidatePairs = SparkBlocksReader.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT,lexiconFile,recordsFile,origRecordsFile);
-			}
-			else {
-				candidatePairs = Utilities.readFIs(mfiFile.getAbsolutePath(),Utilities.globalItemsMap, minBlockingThreshold,records,minSups[i],NG_LIMIT);
+			FrequentItemsetContext itemsetContext = createFrequentItemsetContext( mfiFile.getAbsolutePath(), minBlockingThreshold, minimumSupports[i], context);
+			CandidatePairs candidatePairs = null;
+			if (Configuration.SPARK.equals(context.getConfig())) {
+				candidatePairs = SparkBlocksReader.readFIs(itemsetContext);
+			} else {
+				candidatePairs = Utilities.readFIs(itemsetContext);
 			}
 			System.out.println("Time to read MFIs: " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
 			
@@ -312,27 +300,27 @@ public class BottomUp {
 			lastUsedBlockingThreshold = candidatePairs.getMinThresh();
 			candidatePairs = null;
 			System.out.println("lastUsedBlockingThreshold: " + lastUsedBlockingThreshold);
-				
 			
 			System.out.println("Number of covered records after running with Minsup=" +
-					minSups[i] +  " is " + coveredRecords.cardinality() + " out of " + records.size());
+					minimumSupports[i] +  " is " + coveredRecords.cardinality() + " out of " + records.size());
 			
 			System.out.println("memory statuses:");
 			System.out.println("DEBUG: Size of coveredRecords: " + MemoryUtil.deepMemoryUsageOf(coveredRecords,VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-			//System.out.println("DEBUG: Size of resultMatrix: " + MemoryUtil.deepMemoryUsageOf(resultMatrix,VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 			System.out.println("DEBUG: Size of allResults: " + allResults.memoryUsage() + " GB");
 			
 				
 		}
-		System.out.println("Minsups used " + Arrays.toString(minSups));
+		System.out.println("Minsups used " + Arrays.toString(minimumSupports));
 		System.out.println("Total number of covered records under minimum blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minSups) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
+				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
 				" which are: " + 100*(coveredRecords.cardinality()/records.size()) + "%");		
 
 		System.out.println("After adding uncovered records: Total number of covered records under blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minSups) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
+				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
 				" which are: " + 100*(coveredRecords.cardinality()/records.size()) + "%");
-		if (FIRST_DB_SIZE>0) {
+		int firstDbSize = context.getFirstDbSize();
+		if (firstDbSize>0) {
+			//allResults=removePairsSameSet(allResults, firstDbSize);
 			allResults=removePairsSameSet(allResults);
 		}
 		
@@ -340,15 +328,29 @@ public class BottomUp {
 		
 	}
 	
-	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs) {
+	private static FrequentItemsetContext createFrequentItemsetContext(
+			String absolutePath, double minBlockingThreshold, int minimumSupport,
+			MfiContext mfiContext) {
+		FrequentItemsetContext itemsetContext = new FrequentItemsetContext();
+		itemsetContext.setAbsolutePath(absolutePath);
+		itemsetContext.setMinBlockingThreshold(minBlockingThreshold);
+		itemsetContext.setMinimumSupport(minimumSupport);
+		itemsetContext.setMfiContext(mfiContext);
+		itemsetContext.setGolbalItemsMap(Utilities.globalItemsMap);
+		itemsetContext.setNeiborhoodGrowthLimit(NG_LIMIT);
+		
+		return itemsetContext;
+	}
+	
+	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs, int firstDbSize) {
 		System.out.println("Excluding pairs if records from different sets..");
 		CandidatePairs updatedPairs=new CandidatePairs();
 		long start=System.currentTimeMillis();
 		//Set<Set<Integer>> actualPairs=new HashSet<>();
 		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
-				if ( 	(entry.getKey()>FIRST_DB_SIZE && cm.getRecordId()<FIRST_DB_SIZE) ||
-						(entry.getKey()<FIRST_DB_SIZE && cm.getRecordId()>FIRST_DB_SIZE)) 
+				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()<firstDbSize) ||
+						(entry.getKey()<firstDbSize && cm.getRecordId()>firstDbSize)) 
 					continue;
 				else 
 					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
@@ -362,13 +364,31 @@ public class BottomUp {
 		return updatedPairs;
 	}
 
+	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs) {
+		System.out.println("Excluding pairs if records from different sets..");
+		CandidatePairs updatedPairs=new CandidatePairs();
+		long start=System.currentTimeMillis();
+		//Set<Set<Integer>> actualPairs=new HashSet<>();
+		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
+			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
+				if ( 	(entry.getKey()%2==0 && cm.getRecordId()%2==0) ||
+						(entry.getKey()%2!=0 && cm.getRecordId()%2!=0)) 
+					continue;
+				else 
+					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
+				//Set<Integer> temp=new HashSet<Integer>();
+				//temp.add(cm.getRecordId());
+				//temp.add(entry.getKey());
+				//actualPairs.add(temp);
+			}
+		}
+		System.out.println("Time exclude pairs : " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
+		return updatedPairs;
+	}
 
 	private static void updateCoveredRecords(BitSet coveredRecords, BitSet coveredRows){
 		coveredRecords.or(coveredRows);
 	}
-	
-	private final static String TEMP_RECORD_DIR = "TEMP_RECORD_DIR";
-	private final static File TempDir = new File(TEMP_RECORD_DIR);
 	
 	private static File createRecordFileFromRecords(BitSet coveredRecords, Map<Integer,Record> records, int minSup){		
 		File outputFle = null;
@@ -420,9 +440,6 @@ public class BottomUp {
 		return outputFle;			
 	}
 	
-	
-	
-	private final static double MAX_SUPP_CONST = 1.0;//0.005;
 	private static Map<Integer,Integer> appitems(BitSet coveredRecords, Map<Integer,Record> records, int minSup){
 		Map<Integer,Integer> retVal = new HashMap<Integer, Integer>();
 		for( int i=coveredRecords.nextClearBit(0); i>=0 && i <= records.size() ; i=coveredRecords.nextClearBit(i+1) ){
@@ -502,7 +519,6 @@ public class BottomUp {
 		double totalComparisons = ((numRecords * (numRecords - 1))*0.5);	
 		double RR = Math.max(0.0, (1.0-((TP+FP)/totalComparisons)));		
 		System.out.println("num of same source pairs: " + sameSource);
-	//	System.out.println(" ResultMatrix.numOfSet() " + ResultMatrix.numOfSet());
 		System.out.println("TP = " + TP +", FP= " + FP + ", FN="+ FN  + " totalComparisons= " + totalComparisons);
 		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + RR);	
 		double[] retVal = new double[4];
@@ -530,19 +546,14 @@ public class BottomUp {
 		double truePositive = TPFP[0];		
 		double falsePositive = TPFP[1];
 		double falseNegative =TPFP[2];
-		//double falseNegative = CandidatePairs.FalseNegatives(groundTruth.groundTruthCandidatePairs(), resultMatrix);
 		
 		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth.getGroundTruthCandidatePairs(),resultMatrix);
-		//double totalDuplicates = duplicateBusinessLayer.getNumberOfDuplicatesInDataset();
 		double totalDuplicates = groundTruth.getCardinality();
 		double comparisonsMadeTPFP = truePositive + falsePositive;
 		int comparisonsCouldHaveMade = duplicateBusinessLayer.getNumberOfComparisons();
-		//int duplicatesFound = duplicateBusinessLayer.getNumberOfDuplicatesFound();
 		int duplicatesFound = (int)comparisonsMadeTPFP;
-		//double precision = duplicatesFound/(comparisonsMadeTPFP);
 		double precision = truePositive/(truePositive+falsePositive);
 		double recall = truePositive/(truePositive+falseNegative);
-		//double recall = duplicatesFound/totalDuplicates;
 		double pr_f_measure = (2*precision*recall)/(precision+recall);	
 		double totalComparisonsAvailable = ((numRecords * (numRecords - 1))*0.5);	
 		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMadeTPFP)/totalComparisonsAvailable)));		

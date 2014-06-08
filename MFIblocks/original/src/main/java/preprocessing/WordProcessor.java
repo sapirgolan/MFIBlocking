@@ -82,14 +82,14 @@ public class WordProcessor {
 		return retVal;
 	}
 	
-	public static void main(String[] args){
-		File f = new File("D:\\Batya\\EntityResolution\\tools\\cora-all-id\\stopwords.txt");
-		WordProcessor wp = new WordProcessor(f);
-		String value = "sony vegas 6";
-		List<String> ngrams = wp.processValue(value);
-		System.out.println(ngrams);
-		
-	}
+//	public static void main(String[] args){
+//		File f = new File("D:\\Batya\\EntityResolution\\tools\\cora-all-id\\stopwords.txt");
+//		WordProcessor wp = new WordProcessor(f);
+//		String value = "sony vegas 6";
+//		List<String> ngrams = wp.processValue(value);
+//		System.out.println(ngrams);
+//		
+//	}
 	
 	public static <T> String concatListMembers(List<T> list){
 		StringBuilder sb = new StringBuilder();

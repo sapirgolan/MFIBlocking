@@ -1,10 +1,12 @@
 package fimEntityResolution.entityResulution;
 
+import lucene.search.SearchEngine;
+
 public class EntityResolutionFactory {
-	public static IComparison createComparison(EntityResulutionComparisonType type) {
+	public static IComparison createComparison(EntityResulutionComparisonType type, SearchEngine engine) {
 		switch (type) {
 		case Jaccard:
-			return new ExecuteJaccardComparisons();
+			return new JaccardComparisons(engine);
 		default:
 			break;
 		}

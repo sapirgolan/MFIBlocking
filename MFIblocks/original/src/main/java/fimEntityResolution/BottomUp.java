@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import lucene.search.SearchEngine;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -30,9 +32,10 @@ import dnl.utils.text.table.TextTable;
 import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
 import fimEntityResolution.entityResulution.IComparison;
+import fimEntityResolution.statistics.BlockingResultContext;
 import fimEntityResolution.statistics.BlockingResultsSummary;
 import fimEntityResolution.statistics.BlockingRunResult;
-import fimEntityResolution.statistics.DuplicateBusinessLayer;
+import fimEntityResolution.statistics.ExperimentResult;
 import fimEntityResolution.statistics.StatisticMeasuremnts;
 
 public class BottomUp {
@@ -43,7 +46,6 @@ public class BottomUp {
 	private final static double MAX_SUPP_CONST = 1.0;//0.005;
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
-	private static int sameSource = 0;
 	
 	public final static double THRESH_STEP = 0.05;
 	public static JavaSparkContext sc;
@@ -170,9 +172,12 @@ public class BottomUp {
 		
 		int recordsSize = context.getRecordsSize();
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
-		List<BlockingRunResult> blockingRunResults= new ArrayList<BlockingRunResult>();
+		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
+		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
+		
+		IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
 		for(double neiborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neiborhoodGrow;
 		
@@ -191,13 +196,16 @@ public class BottomUp {
 				
 				actionStart = System.currentTimeMillis();
 				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, context.getMatchFile());
-				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");				
-				StatisticMeasuremnts results = calculateFinalResults(trueClusters, algorithmObtainedPairs, recordsSize);
+				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+				
+				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
+				StatisticMeasuremnts results = experimentResult.calculate();
+				
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard);
-				long timeOfComparison = comparison.measureComparisonExecution(trueClusters.getGroundTruthCandidatePairs(), algorithmObtainedPairs);
-				BlockingRunResult blockingRR = new BlockingRunResult(results, minBlockingThreshold, lastUsedBlockingThreshold,
-						NG_LIMIT,(double)(System.currentTimeMillis()-start-totalMaxRecallCalculationDuration-writeBlocksDuration)/1000.0);
+				long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
+				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
+				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
 				blockingRunResults.add(blockingRR);
 				
 				System.out.println("");
@@ -216,6 +224,29 @@ public class BottomUp {
 		}		
 	}
 	
+	private static double calcExecutionTime(long start,
+			long totalMaxRecallCalculationDuration, long writeBlocksDuration,
+			long timeOfComparison) {
+		long totalRunTime = System.currentTimeMillis() - start;
+		totalRunTime = reduceIreleventTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
+		double totalRunTimeSeconds = (double)(totalRunTime/1000.0);
+		return totalRunTimeSeconds;
+	}
+
+
+	private static long reduceIreleventTimes(long totalRunTime,
+			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
+		return (totalRunTime - (totalMaxRecallCalculationDuration + writeBlocksDuration));
+	}
+
+
+	private static SearchEngine createAndInitSearchEngine(String recordsFile) {
+		SearchEngine engine = new SearchEngine();
+		engine.addRecords(recordsFile);
+		return engine;
+	}
+
+
 	/**
 	 * the method write the blocking output to a file for later usage
 	 * @param cps
@@ -327,7 +358,6 @@ public class BottomUp {
 				" which are: " + 100*(coveredRecords.cardinality()/records.size()) + "%");
 		int firstDbSize = context.getFirstDbSize();
 		if (firstDbSize>0) {
-			//allResults=removePairsSameSet(allResults, firstDbSize);
 			allResults=removePairsSameSet(allResults);
 		}
 		
@@ -508,79 +538,6 @@ public class BottomUp {
 		return (src1.equalsIgnoreCase(src2));
 	}
 	
-	
-	private static double[] calculateFinalResults(BitMatrix GroundTruth,BitMatrix ResultMatrix,int numOfRecords)
-	{
-		long start = System.currentTimeMillis();
-		long numRecords = (long)numOfRecords;
-		double[] TPFP = BitMatrix.TrueAndFalsePositives(GroundTruth, ResultMatrix);
-		double TP = TPFP[0];		
-		double FP = TPFP[1];
-		double FN = BitMatrix.FalseNegatives(GroundTruth, ResultMatrix);
-		
-		
-		double precision = TP/(TP+FP);
-		double recall = TP/(TP+FN);
-		double pr_f_measure = (2*precision*recall)/(precision+recall);
-		
-		double totalComparisons = ((numRecords * (numRecords - 1))*0.5);	
-		double RR = Math.max(0.0, (1.0-((TP+FP)/totalComparisons)));		
-		System.out.println("num of same source pairs: " + sameSource);
-		System.out.println("TP = " + TP +", FP= " + FP + ", FN="+ FN  + " totalComparisons= " + totalComparisons);
-		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + RR);	
-		double[] retVal = new double[4];
-		retVal[0] = recall;
-		retVal[1] = precision;
-		retVal[2]=  pr_f_measure;
-		retVal[3]=  RR;	
-		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-		return retVal;
-	}
-	
-	/**
-	 * Calculate output measurements: F-measure, Precision (PC), Recall 
-	 * @param groundTruth
-	 * @param resultMatrix
-	 * @param numOfRecords
-	 * @return
-	 */
-	private static StatisticMeasuremnts calculateFinalResults(TrueClusters groundTruth,CandidatePairs resultMatrix, int numOfRecords)
-	{
-		long start = System.currentTimeMillis();
-		long numRecords = (long)numOfRecords;
-		//calculate TP and FP
-		double[] TPFP = groundTruth.getGroundTruthCandidatePairs().calcTrueAndFalsePositives(groundTruth.getGroundTruthCandidatePairs(), resultMatrix);
-		double truePositive = TPFP[0];		
-		double falsePositive = TPFP[1];
-		double falseNegative =TPFP[2];
-		
-		DuplicateBusinessLayer duplicateBusinessLayer = new DuplicateBusinessLayer(groundTruth.getGroundTruthCandidatePairs(),resultMatrix);
-		double totalDuplicates = groundTruth.getCardinality();
-		double comparisonsMadeTPFP = truePositive + falsePositive;
-		int comparisonsCouldHaveMade = duplicateBusinessLayer.getNumberOfComparisons();
-		int duplicatesFound = (int)comparisonsMadeTPFP;
-		double precision = truePositive/(truePositive+falsePositive);
-		double recall = truePositive/(truePositive+falseNegative);
-		double pr_f_measure = (2*precision*recall)/(precision+recall);	
-		double totalComparisonsAvailable = ((numRecords * (numRecords - 1))*0.5);	
-		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMadeTPFP)/totalComparisonsAvailable)));		
-		System.out.println("num of same source pairs: " + sameSource);
-		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisonsAvailable);
-		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ pr_f_measure + " RR= " + reductionRatio);
-		StatisticMeasuremnts statisticMeasuremnts = new StatisticMeasuremnts();
-		statisticMeasuremnts.setRecall(recall);
-		statisticMeasuremnts.setPrecision(precision);
-		statisticMeasuremnts.setFMeasure(pr_f_measure);
-		statisticMeasuremnts.setRR(reductionRatio);
-		
-		statisticMeasuremnts.setDuplicatesFound(duplicatesFound);
-		statisticMeasuremnts.setTotalDuplicates(totalDuplicates);
-		statisticMeasuremnts.setComparisonsMade(comparisonsMadeTPFP);
-		statisticMeasuremnts.setComparisonsCouldHaveMake(comparisonsCouldHaveMade);
-		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-		return statisticMeasuremnts;
-	}
-	
 	public static String writeBlockingRR(Collection<BlockingRunResult> runResults){
 		StringBuilder sb = new StringBuilder();
 		//calculate average, Min & Max for all runs
@@ -589,105 +546,6 @@ public class BottomUp {
 		sb.append(brs.getSummary()).append(Utilities.NEW_LINE);		
 		sb.append(Utilities.NEW_LINE).append(Utilities.NEW_LINE);
 		return sb.toString();
-	}
-	
-	public static String writeRunResults(Collection<RunResult> runResults, double[] blockingThresholds, int[] minSups){
-		StringBuilder sb = new StringBuilder();
-		sb.append("blocking_thresh").append("\t").append("\t").append("dedup_thresh").append("\t").append("\t").append("precision")
-		.append("\t").append("\t").append("recall").append("\t").append("\t").append("f-measure").append("\t").append("\t").
-		append("time").append("\t").append("\t").append("max_recall")
-		.append("\t").append("\t").append("CFIThresh").append(Utilities.NEW_LINE);
-		for (RunResult runResult : runResults) {
-			sb.append(runResult.toString()).append(Utilities.NEW_LINE);
-		}
-		
-		sb.append(Utilities.NEW_LINE).append(Utilities.NEW_LINE);
-		//write summary
-		sb.append(maxRecallByBlockingThresh(runResults,blockingThresholds,minSups)).append(Utilities.NEW_LINE).append(Utilities.NEW_LINE);
-		sb.append(timeByBlockingThresh(runResults,blockingThresholds,minSups));
-		return sb.toString();
-	}
-	
-	private static String maxRecallByBlockingThresh(Collection<RunResult> runResults, double[] blockingThresholds, int[] minSups){
-		StringBuilder sb = new StringBuilder();
-		sb.append("\t");
-		for (int minSup : minSups) {
-			sb.append(minSup).append("\t");
-		}
-		sb.append(Utilities.NEW_LINE);
-		for (double blockingThresh : blockingThresholds) {
-			sb.append(blockingThresh).append("\t");
-			for (int minSup : minSups) {				
-				for (RunResult rr : runResults) {
-					if(rr.blockingThresh==blockingThresh && rr.cfiThresh==(double)minSup/(double)Utilities.globalRecords.size()){
-						sb.append(rr.maxRecall).append("\t");
-						break;
-					}
-				}
-			}
-			sb.append(Utilities.NEW_LINE);
-		}
-		return sb.toString();
-	}
-	
-	private static String timeByBlockingThresh(Collection<RunResult> runResults, double[] blockingThresholds, int[] minSups){
-		StringBuilder sb = new StringBuilder();
-		sb.append("\t");
-		for (int minSup : minSups) {
-			sb.append(minSup).append("\t");
-		}
-		sb.append(Utilities.NEW_LINE);
-		
-		for (double blockingThresh : blockingThresholds) {
-			sb.append(blockingThresh).append("\t");
-			for (int minSup : minSups) {
-				double timeToWrite = Integer.MAX_VALUE;
-				for (RunResult rr : runResults) {					
-					if(rr.blockingThresh==blockingThresh && rr.cfiThresh==(double)minSup/(double)Utilities.globalRecords.size()){
-						timeToWrite = Math.min(timeToWrite, rr.timeToRunInSec);
-					}
-				}
-				sb.append(timeToWrite).append("\t");
-			}
-			sb.append(Utilities.NEW_LINE);
-		}
-		return sb.toString();
-	}
-	
-	public class RunResult{
-		double precision;
-		double recall;
-		double f_measure;
-		double blockingThresh;
-		double internalThresh;
-		long timeToRunInSec;
-		double maxRecall;
-		double cfiThresh;
-		
-		public RunResult(double[] score, double blockingThresh, double internalThresh, long timeToRunInSec, double maxRecall,
-				double cfiThresh){
-			this.precision = score[0];
-			this.recall = score[1];
-			this.f_measure = score[2];
-			this.blockingThresh = blockingThresh;
-			this.internalThresh = internalThresh;
-			this.timeToRunInSec = timeToRunInSec;
-			this.maxRecall = maxRecall;
-			this.cfiThresh = cfiThresh;
-		}
-		
-		public String toString(){
-			StringBuilder sb = new StringBuilder();
-			sb.append(blockingThresh).append("\t")
-			  .append(internalThresh).append("\t")
-			  .append(precision).append("\t")
-			  .append(recall).append("\t")
-			  .append(f_measure).append("\t")
-			  .append(timeToRunInSec).append("\t")
-			  .append(maxRecall).append("\t")
-			  .append(cfiThresh);
-			return sb.toString();
-		}
 	}
 	
 }

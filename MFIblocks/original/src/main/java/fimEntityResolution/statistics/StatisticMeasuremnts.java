@@ -16,7 +16,6 @@ public class StatisticMeasuremnts {
 	private double duplicatesFound;
 	private double totalDuplicates;
 	private double comparisonsMade;
-	private int comparisonsCouldHaveMake;
 
 	public StatisticMeasuremnts() {
 		recall = 0;
@@ -25,7 +24,6 @@ public class StatisticMeasuremnts {
 		reductionRatio = 0;
 		duplicatesFound = 0;
 		totalDuplicates = 0;
-		comparisonsCouldHaveMake = 0;
 	}
 
 	public double getRecall() {
@@ -44,8 +42,8 @@ public class StatisticMeasuremnts {
 		this.precision = precision;
 	}
 
-	public void setFMeasure(double pr_f_measure) {
-		this.fMeasure = pr_f_measure;
+	public void setFMeasure(double fmeasure) {
+		this.fMeasure = fmeasure;
 	}
 
 	public void setRR(double reductionRatio) {
@@ -62,10 +60,6 @@ public class StatisticMeasuremnts {
 
 	public double getFMeasure() {
 		return fMeasure;
-	}
-
-	public void setfMeasure(double fMeasure) {
-		this.fMeasure = fMeasure;
 	}
 
 	public double getReductionRatio() {
@@ -90,14 +84,6 @@ public class StatisticMeasuremnts {
 
 	public double getComparisonsMade() {
 		return comparisonsMade;
-	}
-
-	public void setComparisonsCouldHaveMake(int comparisonsCouldHaveMade) {
-		this.comparisonsCouldHaveMake = comparisonsCouldHaveMade;
-	}
-	
-	public int getComparisonsCouldHaveMake() {
-		return this.comparisonsCouldHaveMake;
 	}
 
 }

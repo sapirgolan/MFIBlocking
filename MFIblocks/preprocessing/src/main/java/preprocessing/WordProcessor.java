@@ -34,14 +34,16 @@ public class WordProcessor {
 	
 	public List<String> processValue(String value){
 		List<String> retVal = new ArrayList<String>();
+		TokenStream ts_shortWords = null;
 		try {
 			value = value.replaceAll(replaceExpr, "");
 			StringReader sr = new StringReader(value);
 			StringReader sr_short = new StringReader(value);
 			TokenStream ts = analyzer.tokenStream(value, sr);
-			TokenStream ts_shortWords = analyzer.tokenStream(value, sr_short);
+			ts_shortWords = analyzer.tokenStream(value, sr_short);
 			
-			NGramTokenFilter ngtf = new NGramTokenFilter(Version.LUCENE_48, ts, min_ngram_size, max_ngram_size);		
+			NGramTokenFilter ngtf = new NGramTokenFilter(Version.LUCENE_48, ts, min_ngram_size, max_ngram_size);
+			ts_shortWords.reset();
 			while(ts_shortWords.incrementToken()){
 				ts_shortWords.getAttribute(CharTermAttribute.class);
 				String term = convertTokenStreamToString(ts_shortWords);
@@ -49,6 +51,7 @@ public class WordProcessor {
 					retVal.add(term.trim().toLowerCase());
 				}
 			}
+			ts_shortWords.end();
 			while(ngtf.incrementToken()){
 				String term = convertTokenStreamToString(ngtf);
 				retVal.add(term.trim().toLowerCase());
@@ -56,6 +59,16 @@ public class WordProcessor {
 		} catch (IOException e) {
 			System.err.println("Failed to parse: " + value);
 			e.printStackTrace();
+		}
+		finally {
+			if (ts_shortWords != null) {
+				try {
+					ts_shortWords.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		return retVal;
 	}
@@ -69,30 +82,41 @@ public class WordProcessor {
 	public final static String replaceExpr = "-|\\|/|\\/|\\.|,|\'|(|)";
 	public List<String> removeStopwordsAndSpecialChars(String value){
 		List<String> retVal = new ArrayList<String>();
+		TokenStream ts = null;
 		try {
 			value = value.replaceAll(replaceExpr, "");
-			
 			StringReader sr = new StringReader(value);
-			TokenStream ts = analyzer.tokenStream(value, sr);		
+			ts = analyzer.tokenStream(value, sr);
+			ts.reset();
 			while(ts.incrementToken()){
 				String term = convertTokenStreamToString(ts);
 				retVal.add(term);
 			}
+			ts.end();
 		} catch (IOException e) {
 			System.err.println("Failed to parse: " + value);
 			e.printStackTrace();
+		} finally {
+			if (ts != null) {
+				try {
+					ts.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		return retVal;
 	}
 	
-//	public static void main(String[] args){
-//		File f = new File("D:\\Batya\\EntityResolution\\tools\\cora-all-id\\stopwords.txt");
-//		WordProcessor wp = new WordProcessor(f);
-//		String value = "sony vegas 6";
-//		List<String> ngrams = wp.processValue(value);
-//		System.out.println(ngrams);
-//		
-//	}
+	public static void main(String[] args){
+		File f = new File("D:\\Batya\\EntityResolution\\tools\\cora-all-id\\stopwords.txt");
+		WordProcessor wp = new WordProcessor(f);
+		String value = "sony vegas 6";
+		List<String> ngrams = wp.processValue(value);
+		System.out.println(ngrams);
+		
+	}
 	
 	public static <T> String concatListMembers(List<T> list){
 		StringBuilder sb = new StringBuilder();

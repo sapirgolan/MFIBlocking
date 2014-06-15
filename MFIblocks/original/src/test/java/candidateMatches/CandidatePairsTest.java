@@ -53,9 +53,9 @@ public class CandidatePairsTest {
 		CandidatePairs trueCPs = spy(new CandidatePairs(1));
 		trueCPs.setPair(9, 7, 0.4);
 		
-		double[] calcTrueAndFalsePositives = candidatePairsSpy.calcTrueAndFalsePositives(trueCPs, actualCPs);
-		assertThat(1.0, is(calcTrueAndFalsePositives[0]) );
-		assertThat(1.0, is(calcTrueAndFalsePositives[1]) );
+		long[] calcTrueAndFalsePositives = candidatePairsSpy.calcTrueAndFalsePositives(actualCPs);
+		assertThat(1l, is(calcTrueAndFalsePositives[0]) );
+		assertThat(1l, is(calcTrueAndFalsePositives[1]) );
 //		assertThat("Number of True Positive should be 1", 1==calcTrueAndFalsePositives[0]);
 //		assertThat("Number of False Positive should be 1", 1==calcTrueAndFalsePositives[1]);
 	}
@@ -81,9 +81,9 @@ public class CandidatePairsTest {
 		CandidatePairs trueCPs = spy(new CandidatePairs(1));
 		trueCPs.setPair(9, 2, 0.3);
 		
-		double[] calcTrueAndFalsePositives = candidatePairsSpy.calcTrueAndFalsePositives(trueCPs, actualCPs);
-		assertThat(1.0, is(calcTrueAndFalsePositives[0]) );
-		assertThat(6.0, is(calcTrueAndFalsePositives[1]) );
+		long[] calcTrueAndFalsePositives = candidatePairsSpy.calcTrueAndFalsePositives( actualCPs);
+		assertThat(1l, is(calcTrueAndFalsePositives[0]) );
+		assertThat(6l, is(calcTrueAndFalsePositives[1]) );
 	}
 
 }

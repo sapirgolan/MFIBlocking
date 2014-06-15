@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 
 public class BlockingRunResult {
 
-	double maxNG;
+	double ngLimit;
 	double minBlockingThreshold;
 	double actualUsedThreshold;		
 	double recall; //0
@@ -17,28 +17,31 @@ public class BlockingRunResult {
 	private double totalDuplicates;
 	private double comparisonsMade;
 	private final DecimalFormat decimalFormat = new DecimalFormat("#.####");
-	private StatisticMeasuremnts measuremnts;
 
+	public double getTimeToRunInSec() {
+		return timeToRunInSec;
+	}
+	
 	private double format(double number){
 		return Double.valueOf(decimalFormat.format(number));
 	}
+	
 	public String[] getCoulmnsName() {
 		return new String[] {"MaxNG", "minBlockingThresh", "usedThresh", 
 			"Recall (PC)", "Precision (PQ)", "F-measure", "RR", 
-			"Duplicates found", "#Duplicates in dataset", "Comparisons made", "Comparisons could have made",
+			"Duplicates found", "#Duplicates in dataset", "Comparisons made",
 			"time to run"};
 	}
 	
 	public Object[] getValues() {
-		return new Object[] {maxNG, minBlockingThreshold, format(actualUsedThreshold),
+		return new Object[] {ngLimit, minBlockingThreshold, format(actualUsedThreshold),
 				format(recall), format(precision), format(f_measure), format(reductionRatio),
-				duplicatesFound, totalDuplicates, comparisonsMade, measuremnts.getComparisonsCouldHaveMake(),
-				timeToRunInSec};
+				duplicatesFound, totalDuplicates, comparisonsMade,	timeToRunInSec};
 	}	
 	
 	public double[] asArray(){
 		double[] retVal = new double[8];
-		retVal[0] = maxNG;
+		retVal[0] = ngLimit;
 		retVal[1] = minBlockingThreshold;
 		retVal[2] = actualUsedThreshold;			
 		retVal[3] = recall;
@@ -49,25 +52,23 @@ public class BlockingRunResult {
 		return retVal;
 	}
 
-	public BlockingRunResult(StatisticMeasuremnts statisticMeasuremnts, double minBlockingThresh, 
-			double actualUsedThreshold, double maxNG, double timeToRunInSec){
-		this.maxNG = maxNG;
-		this.minBlockingThreshold = minBlockingThresh;
-		this.actualUsedThreshold = actualUsedThreshold;
-		this.recall = statisticMeasuremnts.getRecall();
-		this.precision = statisticMeasuremnts.getPrecision();
-		this.f_measure = statisticMeasuremnts.getFMeasure();
-		this.duplicatesFound = statisticMeasuremnts.getDuplicatesFound();
-		this.reductionRatio = statisticMeasuremnts.getReductionRatio();
-		this.totalDuplicates = statisticMeasuremnts.getTotalDuplicates();
-		this.comparisonsMade = statisticMeasuremnts.getComparisonsMade();
-		this.timeToRunInSec = timeToRunInSec;	
-		this.measuremnts = statisticMeasuremnts;
+	public BlockingRunResult(BlockingResultContext resultContext) {
+		this.ngLimit = resultContext.getNgLimit();
+		this.minBlockingThreshold = resultContext.getMinBlockingThreshold();
+		this.actualUsedThreshold = resultContext.getLastUsedBlockingThreshold();
+		this.timeToRunInSec = resultContext.getExecutionTime();	
+		this.recall = resultContext.getStatisticMeasuremnts().getRecall();
+		this.precision = resultContext.getStatisticMeasuremnts().getPrecision();
+		this.f_measure = resultContext.getStatisticMeasuremnts().getFMeasure();
+		this.duplicatesFound = resultContext.getStatisticMeasuremnts().getDuplicatesFound();
+		this.reductionRatio = resultContext.getStatisticMeasuremnts().getReductionRatio();
+		this.totalDuplicates = resultContext.getStatisticMeasuremnts().getTotalDuplicates();
+		this.comparisonsMade = resultContext.getStatisticMeasuremnts().getComparisonsMade();
 	}
-
+	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();			
-		sb.append(maxNG).append("\t")
+		sb.append(ngLimit).append("\t")
 		.append(String.format("%.3f", minBlockingThreshold)).append("\t")
 		.append(String.format("%.3f",actualUsedThreshold)).append("\t")
 		.append(String.format("%.3f",recall)).append("\t")
@@ -82,7 +83,4 @@ public class BlockingRunResult {
 		return sb.toString();
 	}
 
-	public double getTimeToRunInSec() {
-		return timeToRunInSec;
-	}
 }

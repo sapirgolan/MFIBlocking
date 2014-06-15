@@ -68,7 +68,6 @@ public class SparkBlocksReader {
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		int numOfCores = runtime.availableProcessors();
-		//=============================
 		JavaRDD<String> fmiSets = BottomUp.sc.textFile(itemsetContext.getFrequentItemssetFilePath(), numOfCores*3); //JS: Spark tuning: minSplits=numOfCores*3
 		JavaRDD<CandidateBlock> parsedBlocks = fmiSets.map(new ParseFILine());
 		JavaPairRDD<CandidateBlock,Double> blocksWithScores = parsedBlocks.mapToPair( new CalculateScores(context.getLexiconFile(),
@@ -76,7 +75,6 @@ public class SparkBlocksReader {
 		JavaPairRDD<CandidateBlock,Double> trueBlocks=blocksWithScores.filter(new TrueBlocks());
 		trueBlocks.count(); //JS:there is no need for the result, but we have to perform ACTION in order to apply our mapping
 							//and make distributed calculations in Spark
-		//================================
 		return candidatePairs;
 	}
 	/**

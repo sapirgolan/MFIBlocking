@@ -37,6 +37,8 @@ public class WordProcessor {
 		try {
 			value = value.replaceAll(replaceExpr, "");
 			StringReader sr = new StringReader(value);
+			//JS: TokenStream protocol requirement: 1. define, 2. reset, 3. increment, 4.end, 5. close  20140515
+			
 			StringReader sr_short = new StringReader(value);
 			TokenStream ts_shortWords = analyzer.tokenStream(value, sr_short);
 			ts_shortWords.reset();
@@ -60,6 +62,8 @@ public class WordProcessor {
 			
 			ts.end();
 			ts.close();
+			
+			
 		} catch (IOException e) {
 			System.err.println("Failed to parse: " + value);
 			e.printStackTrace();
@@ -69,9 +73,16 @@ public class WordProcessor {
 
 	private String convertTokenStreamToString(TokenStream ts_shortWords) {
 		CharTermAttribute m = ts_shortWords.getAttribute(CharTermAttribute.class);
-		String term = new String(m.buffer());
-		return term;
+		//String term = new String(m.buffer());
+		return m.toString();
 	}
+	
+//	private String convertTokenStreamToString(TokenStream ts_shortWords) {
+//		CharTermAttribute m = ts_shortWords.getAttribute(CharTermAttribute.class);
+//		String term = new String(m.buffer());
+//		return term;
+//	}
+	
 	
 	public final static String replaceExpr = "-|\\|/|\\/|\\.|,|\'|(|)";
 	public List<String> removeStopwordsAndSpecialChars(String value){

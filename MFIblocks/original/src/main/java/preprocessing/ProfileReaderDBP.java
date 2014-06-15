@@ -223,16 +223,12 @@ public class ProfileReaderDBP {
 						}
 						attribute=null;
 					}
-
 					String numericString = numericStringBuilder.toString().trim();
 					numericOutputWriter.write(numericString.trim());
 					numericOutputWriter.newLine();
 					stringOutputWriter.write(cleanStringBuilder.toString().trim());
-					stringOutputWriter.newLine();
-					
-					
+					stringOutputWriter.newLine();					
 					recordId++;
-					//entityProfiles[i].add(j,null);
 				}
 			}
 
@@ -253,7 +249,8 @@ public class ProfileReaderDBP {
 		System.out.println("Total time to convert files: " + (System.currentTimeMillis()-globalStart)/1000.0 + " seconds");
 		
 	}
-
+	
+	//JS: use to reduce dbpedia file to required limit only from ground truth
 	private static void extractMatchingTuples(int limit,boolean createGroundTruth) {
 		int count=0;
 		HashSet<IdDuplicates> newGroundTruth=new HashSet<>();
@@ -277,9 +274,6 @@ public class ProfileReaderDBP {
 		entityProfiles[0]=new ArrayList<>();
 		if (createGroundTruth) 
 			groundTruth=newGroundTruth;
-		
-		
-		
 	}
 
 	private static File createDS_weightsFile() {
@@ -370,7 +364,6 @@ public class ProfileReaderDBP {
 	
 	private static String getNGramIdString(int recordId, String value, int propertyId, boolean removedFrequent){
 		List<Integer> NGramsIds = new ArrayList<Integer>();
-		//String[] values = value.split("\\s+");
 		String[] values = value.split("[+\\-*/\\^ .,?!]+");
 		for(int i=0; i < values.length ;i++){
 			if (values[i]==null) continue; //JS 20140506

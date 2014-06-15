@@ -27,20 +27,17 @@ import DataStructures.EntityProfile;
 import DataStructures.IdDuplicates;
 
 public class ProfileReader {
-	//private static final String CLUSTER_ATT_NAME = "class";
-	//private static final String SOURCE_ATT_NAME = "source";
-	//private static Map<String,List<Integer>> matches;
+
 	private static Lexicon lexicon;
 	private static String stopWordsFile;
 	private static WordProcessor wordProcessor;	
-	//public static int DB_Size;
 	public static HashSet<IdDuplicates> groundTruth;
 	public static ArrayList<EntityProfile>[] entityProfiles;
 	public static SortedSet<String> attributeNames;
 	public static Map<String, Integer> map;
 	public static int[] denseCounter;
 	public static Set<ComparableColumnsDensity> sortedDensity;
-	//JS :CONSTs:
+	//Constants:
 	public static final String COMMA=",";
 	public static final String DEFAULT_COLUMN_WIEGHT="0.1"; //for DS_Weights file
 	public static final String PREFIX_LENGTH="30";   //for DS_Weights file
@@ -163,12 +160,8 @@ public class ProfileReader {
 					}
 				}
 			}
-			//System.out.println("attributeNames size= "+attributeNames.size());
-			
 			for (int i=0; i<attributeNames.size()-1;i++){ //JS: 25052014
 				sortedDensity.add(new ComparableColumnsDensity(i, denseCounter[i+1])); //JS: 25052014
-				//System.out.println(i + ","+denseCounter[i]+" ==========");
-				
 			}
 			System.out.println("Time to calculate density: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			System.out.println("Maximum number of attributes in profile: "+maximalAttributeNumber);
@@ -197,7 +190,6 @@ public class ProfileReader {
 		if(sourceMapFilePath != null && sourceMapFilePath.length() > 0){
 			sourceWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sourceMapFilePath)));
 		}
-		
 		try {
 			createMatchingFile(inputFiles.length);
 			System.out.println("MatchingFile was created");
@@ -217,7 +209,6 @@ public class ProfileReader {
 			}
 			
 			int recordId = 1;
-			//boolean previousEntityList=true;
 			for (ArrayList<EntityProfile> profiles : entityProfiles){
 				for (EntityProfile entityProfile : profiles){
 					

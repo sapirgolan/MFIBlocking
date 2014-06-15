@@ -38,10 +38,8 @@ public class WordProcessor {
 			value = value.replaceAll(replaceExpr, "");
 			StringReader sr = new StringReader(value);
 			StringReader sr_short = new StringReader(value);
-			TokenStream ts = analyzer.tokenStream(value, sr);
 			TokenStream ts_shortWords = analyzer.tokenStream(value, sr_short);
-			
-			NGramTokenFilter ngtf = new NGramTokenFilter(Version.LUCENE_48, ts, min_ngram_size, max_ngram_size);		
+			ts_shortWords.reset();
 			while(ts_shortWords.incrementToken()){
 				ts_shortWords.getAttribute(CharTermAttribute.class);
 				String term = convertTokenStreamToString(ts_shortWords);
@@ -49,10 +47,19 @@ public class WordProcessor {
 					retVal.add(term.trim().toLowerCase());
 				}
 			}
+			ts_shortWords.end();
+			ts_shortWords.close();
+			//JS: TokenStream protocol requirement: 1. define, 2. reset, 3. increment, 4.end, 5. close  20140515
+			TokenStream ts = analyzer.tokenStream(value, sr);
+			ts.reset();
+			NGramTokenFilter ngtf = new NGramTokenFilter(Version.LUCENE_48, ts, min_ngram_size, max_ngram_size);
 			while(ngtf.incrementToken()){
 				String term = convertTokenStreamToString(ngtf);
 				retVal.add(term.trim().toLowerCase());
 			}
+			
+			ts.end();
+			ts.close();
 		} catch (IOException e) {
 			System.err.println("Failed to parse: " + value);
 			e.printStackTrace();
@@ -73,11 +80,15 @@ public class WordProcessor {
 			value = value.replaceAll(replaceExpr, "");
 			
 			StringReader sr = new StringReader(value);
+			
 			TokenStream ts = analyzer.tokenStream(value, sr);		
+			ts.reset();
 			while(ts.incrementToken()){
 				String term = convertTokenStreamToString(ts);
 				retVal.add(term);
 			}
+			ts.end();
+			ts.close();
 		} catch (IOException e) {
 			System.err.println("Failed to parse: " + value);
 			e.printStackTrace();

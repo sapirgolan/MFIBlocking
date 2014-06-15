@@ -20,6 +20,13 @@ local.properties
 # generated files
 meta-blocking-converter/converter/target
 MFIblocks/original/target
+*.out
+DS_weights.properties
+
+#Batch/jar files
+*.bat
+*.jar
+
 
 #Converter resources
 meta-blocking-converter/converter/*.csv

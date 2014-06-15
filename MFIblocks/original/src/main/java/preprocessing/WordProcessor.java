@@ -73,16 +73,8 @@ public class WordProcessor {
 
 	private String convertTokenStreamToString(TokenStream ts_shortWords) {
 		CharTermAttribute m = ts_shortWords.getAttribute(CharTermAttribute.class);
-		//String term = new String(m.buffer());
 		return m.toString();
 	}
-	
-//	private String convertTokenStreamToString(TokenStream ts_shortWords) {
-//		CharTermAttribute m = ts_shortWords.getAttribute(CharTermAttribute.class);
-//		String term = new String(m.buffer());
-//		return term;
-//	}
-	
 	
 	public final static String replaceExpr = "-|\\|/|\\/|\\.|,|\'|(|)";
 	public List<String> removeStopwordsAndSpecialChars(String value){

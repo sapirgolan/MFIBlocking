@@ -68,13 +68,15 @@ public class SparkBlocksReader {
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		int numOfCores = runtime.availableProcessors();
+		//=============================
 		JavaRDD<String> fmiSets = BottomUp.sc.textFile(itemsetContext.getFrequentItemssetFilePath(), numOfCores*3); //JS: Spark tuning: minSplits=numOfCores*3
 		JavaRDD<CandidateBlock> parsedBlocks = fmiSets.map(new ParseFILine());
-		JavaPairRDD<CandidateBlock,Double> blocksWithScores = parsedBlocks.map( new CalculateScores(context.getLexiconFile(),
+		JavaPairRDD<CandidateBlock,Double> blocksWithScores = parsedBlocks.mapToPair( new CalculateScores(context.getLexiconFile(),
 				context.getRecordsFile(), context.getOriginalFile(), itemsetContext.getMinBlockingThreshold(), minSup, NG_PARAM));
 		JavaPairRDD<CandidateBlock,Double> trueBlocks=blocksWithScores.filter(new TrueBlocks());
 		trueBlocks.count(); //JS:there is no need for the result, but we have to perform ACTION in order to apply our mapping
 							//and make distributed calculations in Spark
+		//================================
 		return candidatePairs;
 	}
 	/**
@@ -95,7 +97,7 @@ public class SparkBlocksReader {
 	 * -400.0: not classified
 	 *
 	 */
-	static class TrueBlocks extends Function<Tuple2<CandidateBlock, Double>, Boolean>{
+	static class TrueBlocks implements Function<Tuple2<CandidateBlock, Double>, Boolean>{
 
 		@Override
 		public Boolean call(Tuple2<CandidateBlock, Double> tuple)
@@ -106,7 +108,7 @@ public class SparkBlocksReader {
 		}	
 	}
 
-	static class CalculateScores extends PairFunction<CandidateBlock, CandidateBlock, Double>{
+	static class CalculateScores implements PairFunction<CandidateBlock, CandidateBlock, Double>{
 
 		double scoreThreshold;
 		int minSup;
@@ -206,7 +208,7 @@ public class SparkBlocksReader {
 	/***
 	 * Parser extends Function<String, CandidateBlock> for parsing lines from the text files in SPARK.
 	 */
-	static class ParseFILine extends Function<String, CandidateBlock> {
+	static class ParseFILine implements Function<String, CandidateBlock> {
 
 		public CandidateBlock call(String line) {
 			if (line == null)

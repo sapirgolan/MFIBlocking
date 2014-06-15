@@ -15,7 +15,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+
 
 import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
@@ -112,9 +114,14 @@ public class BottomUp {
 			//System.getProperty("spark.akka.askTimeout","50000");
 			Runtime runtime = Runtime.getRuntime();
 			runtime.gc();
-			int numOfCores = runtime.availableProcessors();
-			sc = new JavaSparkContext("local["+numOfCores+"]", "App",
-					"$SPARK_HOME", new String[]{"target/original-0.0.1.jar"});
+			int numOfCores = runtime.availableProcessors();		
+			SparkConf conf = new SparkConf();
+			conf.setMaster("local["+numOfCores+"]");
+			conf.setAppName("MFIBlocks");
+//			sc = new JavaSparkContext("local["+numOfCores+"]",
+//					"$SPARK_HOME");
+			sc=new JavaSparkContext(conf);
+			System.out.println("SPARK HOME="+sc.getSparkHome());
 		}
 	}
 	

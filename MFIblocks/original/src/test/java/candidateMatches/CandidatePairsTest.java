@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -33,6 +34,7 @@ public class CandidatePairsTest {
 	}
 
 	@Test
+	@Ignore
 	public void testCalcTrueAndFalsePositives_Simple() {
 		CandidatePairs actualCPs = mock(CandidatePairs.class);
 		doAnswer(new Answer<Object>() {
@@ -59,6 +61,7 @@ public class CandidatePairsTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testCalcTrueAndFalsePositives_clustersNotSemetric() {
 		
 		CandidatePairs actualCPs = spy(new CandidatePairs(2));

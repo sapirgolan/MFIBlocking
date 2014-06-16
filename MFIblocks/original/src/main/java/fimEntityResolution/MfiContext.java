@@ -142,7 +142,7 @@ public class MfiContext {
 		return this.configuration;
 	}
 
-	public Map<Integer, Record> getReccords() {
+	public Map<Integer, Record> getRecords() {
 		return this.records;
 	}
 

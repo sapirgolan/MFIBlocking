@@ -46,7 +46,7 @@ public class BottomUp {
 	private final static double MAX_SUPP_CONST = 1.0;//0.005;
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
-	
+	private static MfiContext context;
 	public final static double THRESH_STEP = 0.05;
 	public static JavaSparkContext sc;
 	public static int DEDUP_MIN_SUP = 2;
@@ -78,8 +78,8 @@ public class BottomUp {
 		8. The set of p parameters to use as the Neighberhood Growth constraints.
 	 */
 	public static void main(String[] args){
-		MfiContext context = readArguments(args);
-		StringSimToolsLocal.init(context);
+		context = readArguments(args);
+		//StringSimToolsLocal.init(context);
 		enterPerformanceModeIfNeeded( context.isInPerformanceMode() );
 		
 		createSparkContext( context.getConfig() );
@@ -91,19 +91,20 @@ public class BottomUp {
 		System.out.println("Main srcFile : " + srcFile);
 		long start = System.currentTimeMillis();
 		
-		Map<Integer,Record> records = Utilities.readRecords(context);
-		context.setRecords(records);
+		//Map<Integer,Record> records = Utilities.readRecords(context);
+		//context.setRecords(records);
+		context.setRecords(Utilities.readRecords(context));
 		int numOfrecords = Utilities.DB_SIZE;
 		System.out.println("After reading records numOfrecords=" + numOfrecords);
 		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
-		System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(records.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+		System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(context.getRecords().values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 		start = System.currentTimeMillis();
 		Utilities.parseLexiconFile(context.getLexiconFile());
 		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
 		start = System.currentTimeMillis();
-		mfiBlocksCore(context);
+		mfiBlocksCore();
 		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
 	}
 
@@ -120,8 +121,6 @@ public class BottomUp {
 			SparkConf conf = new SparkConf();
 			conf.setMaster("local["+numOfCores+"]");
 			conf.setAppName("MFIBlocks");
-//			sc = new JavaSparkContext("local["+numOfCores+"]",
-//					"$SPARK_HOME");
 			sc=new JavaSparkContext(conf);
 			System.out.println("SPARK HOME="+sc.getSparkHome());
 		}
@@ -168,7 +167,7 @@ public class BottomUp {
 	 * @param alg
 	 * @param NGs
 	 */
-	public static void mfiBlocksCore(MfiContext context) {
+	public static void mfiBlocksCore() {
 		
 		int recordsSize = context.getRecordsSize();
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
@@ -289,7 +288,7 @@ public class BottomUp {
 		
 		int[] minimumSupports = context.getMinSup();
 		double[] usedThresholds = new double[minimumSupports.length];
-		Map<Integer, Record> records = context.getReccords();
+		Map<Integer, Record> records = context.getRecords();
 		
 		
 		File mfiDir = new File(FI_DIR);

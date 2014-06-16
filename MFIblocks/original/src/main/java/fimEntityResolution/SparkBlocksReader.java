@@ -53,8 +53,8 @@ public class SparkBlocksReader {
 		int minSup = itemsetContext.getMinimumSupport();
 		double NG_PARAM = itemsetContext.getNeiborhoodGrowthLimit();
 		
-		StringSimToolsLocal.globalItemsMap = Utilities.parseLexiconFile(context .getLexiconFile());
-		StringSimToolsLocal.globalRecords = Utilities.readRecords(context);
+		//StringSimToolsLocal.globalItemsMap = Utilities.parseLexiconFile(context .getLexiconFile());
+		//StringSimToolsLocal.globalRecords = Utilities.readRecords(context);
 
 		resetAtomicIntegerArr(Utilities.clusterScores);	
 		StringSimTools.numOfMFIs.set(0);
@@ -130,7 +130,7 @@ public class SparkBlocksReader {
 
 			// 3.2 ClusterJaccard score
 			List<Integer> currentItemSet = candidateBlock.items;
-			double maxClusterScore = StringSimToolsLocal.MaxScore(candidateBlock.supportSize, currentItemSet, Utilities.minRecordLength);
+			double maxClusterScore = StringSimTools.MaxScore(candidateBlock.supportSize, currentItemSet, Utilities.minRecordLength);
 			if (maxClusterScore < 0.1 * scoreThreshold) {
 				//scorePruned++;
 				return new Tuple2<CandidateBlock, Double>(candidateBlock, -200.0);
@@ -145,7 +145,7 @@ public class SparkBlocksReader {
 			}
 			
 			List<IFRecord> FISupportRecords = support.getRecords();
-			double currClusterScore = StringSimToolsLocal.softTFIDF(
+			double currClusterScore = StringSimTools.softTFIDF(
 					FISupportRecords, currentItemSet, scoreThreshold);
 			FISupportRecords = null;
 			Utilities.clusterScores[cellForCluster(currClusterScore)].incrementAndGet();
@@ -167,11 +167,11 @@ public class SparkBlocksReader {
 				long start = System.currentTimeMillis();
 				BitSetIF retVal = new EWAH_BitSet();
 				try {
-					retVal = retVal.or(StringSimToolsLocal.globalItemsMap.get(items.get(0))
+					retVal = retVal.or(Utilities.globalItemsMap.get(items.get(0))
 							.getSupport());
 					for (int i = 1; i < items.size(); i++) {
 						int item = items.get(i);
-						BitSetIF itemSupport = StringSimToolsLocal.globalItemsMap.get(item)
+						BitSetIF itemSupport = Utilities.globalItemsMap.get(item)
 								.getSupport();
 						retVal = retVal.and(itemSupport);
 					}

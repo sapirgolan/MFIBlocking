@@ -530,7 +530,7 @@ public class Utilities {
 						continue;
 					}
 					FIRunnable FIR = FIRunnablePool.getInstance().getRunnable(
-							currentItemSet, minSup, itemsetContext.getMfiContext().getReccords(), NG_PARAM, coverageIndex, candidatePairs);
+							currentItemSet, minSup, itemsetContext.getMfiContext().getRecords(), NG_PARAM, coverageIndex, candidatePairs);
 					executorService.execute(FIR);
 					numOfLines++;
 					if (numOfLines % 100000 == 0) {

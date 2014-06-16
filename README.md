@@ -1,4 +1,4 @@
-MFIBlocking ( with SPARK 0.8.1)
+MFIBlocking ( with SPARK 1.0.0)
 ===========
 
 MFI Blocking repository
@@ -16,9 +16,6 @@ inorder to do it simply run the following commands from the command line:
 mvn install:install-file -Dfile=.\src\main\resources\Classmexer\classmexer.jar -DgroupId=com.javamex -DartifactId=Classmexer -Dversion=0.03 -Dpackaging=jar
 mvn install:install-file -Dfile=.\src\main\resources\sbs\SBS.jar -DgroupId=org.enerj.core -DartifactId=SBS -Dversion=0.0.1 -Dpackaging=jar
 mvn install:install-file -Dfile=.\src\main\resources\simmetrics\simmetrics.jar -DgroupId=uk.ac.shef.wit -DartifactId=simmetrics -Dversion=1.6.2 -Dpackaging=jar
-
-If you want to run a SPARKed version, you have to install SPARK (version 0.8.1)
-http://spark.incubator.apache.org/downloads.html
 
 In order to run MFIBlocks Add the following VM arguments to Java Virtaul Machine (JVM):
 -Xmx1300M

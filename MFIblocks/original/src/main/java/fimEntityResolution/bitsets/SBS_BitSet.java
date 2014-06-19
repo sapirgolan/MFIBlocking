@@ -11,6 +11,7 @@ import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
 
 import fimEntityResolution.BitMatrix;
+import fimEntityResolution.RecordSet;
 import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.BitSetIF;
 import fimEntityResolution.interfaces.IFRecord;
@@ -30,7 +31,7 @@ public class SBS_BitSet implements BitSetIF{
 	
 	
 	public SBS_BitSet(){
-		int size = SizeForSBSImp(Utilities.DB_SIZE);		
+		int size = SizeForSBSImp(RecordSet.DB_SIZE);		
 		sbs = new SparseBitSet(size);
 		cardinality = 0;
 	}
@@ -112,7 +113,7 @@ public class SBS_BitSet implements BitSetIF{
 	public synchronized List<IFRecord> getRecords() {		
 		List<IFRecord> retVal = new ArrayList<IFRecord>(this.getCardinality());
 		for(long i=getNextSetBitIndex(0); i >= 0; i=getNextSetBitIndex(i+1)) {
-			retVal.add(Utilities.globalRecords.get((int)i));
+			retVal.add(RecordSet.values.get((int)i));
 		}
 		if(retVal.size() == 0){
 			System.out.println("inside getRecords: cardinality: " + this.getCardinality() + " retVal.size(): " + retVal.size());

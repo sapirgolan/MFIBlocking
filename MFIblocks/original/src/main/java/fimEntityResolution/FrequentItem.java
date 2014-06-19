@@ -9,6 +9,10 @@ import fimEntityResolution.interfaces.BitSetIF;
 
 public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int id;
 	private String item;
 	
@@ -89,7 +93,7 @@ public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 	}
 	
 	public void setIDFWeight(){
-		log2IDF = ((double)Utilities.DB_SIZE/getSupportSize());
+		log2IDF = ((double)RecordSet.DB_SIZE/getSupportSize());
 		log2IDF = StringSimTools.logBase2(log2IDF);
 	}
 	

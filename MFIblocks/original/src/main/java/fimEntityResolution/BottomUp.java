@@ -90,14 +90,11 @@ public class BottomUp {
 		System.out.println("args.length : " + args.length);
 		System.out.println("Main srcFile : " + srcFile);
 		long start = System.currentTimeMillis();
-		
-		//Map<Integer,Record> records = Utilities.readRecords(context);
-		//context.setRecords(records);
-		context.setRecords(Utilities.readRecords(context));
-		int numOfrecords = Utilities.DB_SIZE;
+		RecordSet.readRecords(context);
+		int numOfrecords = RecordSet.DB_SIZE;
 		System.out.println("After reading records numOfrecords=" + numOfrecords);
 		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
-		System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(context.getRecords().values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+		System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(RecordSet.values.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 		start = System.currentTimeMillis();
 		Utilities.parseLexiconFile(context.getLexiconFile());
 		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
@@ -169,7 +166,7 @@ public class BottomUp {
 	 */
 	public static void mfiBlocksCore() {
 		
-		int recordsSize = context.getRecordsSize();
+		int recordsSize = RecordSet.size;
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
 		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
 		//iterate for each neighborhood grow value that was set in input
@@ -194,7 +191,7 @@ public class BottomUp {
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
-				TrueClusters trueClusters = new TrueClusters(Utilities.DB_SIZE, context.getMatchFile());
+				TrueClusters trueClusters = new TrueClusters(RecordSet.DB_SIZE, context.getMatchFile());
 				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
 				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
@@ -288,9 +285,7 @@ public class BottomUp {
 		
 		int[] minimumSupports = context.getMinSup();
 		double[] usedThresholds = new double[minimumSupports.length];
-		Map<Integer, Record> records = context.getRecords();
-		
-		
+		//Map<Integer, Record> records = RecordSet.values;
 		File mfiDir = new File(FI_DIR);
 		if(!mfiDir.exists()){
 			if(!mfiDir.mkdir())
@@ -299,18 +294,18 @@ public class BottomUp {
 		
 		CandidatePairs allResults = new CandidatePairs(); //unlimited
 		
-		for(int i=(minimumSupports.length - 1) ; i >=0  && coveredRecords.cardinality() < records.size(); i--){ // array is sorted in ascending order -
+		for(int i=(minimumSupports.length - 1) ; i >=0  && coveredRecords.cardinality() < RecordSet.size; i--){ // array is sorted in ascending order -
 			//begin with largest minSup
 			//continue until all records have been covered OR we have completed running over all minSups			
 			long start = System.currentTimeMillis();
 			//TODO: check content of file
-			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords,records, minimumSupports[i]);	
+			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords, minimumSupports[i]);	
 			System.out.println("Time to createRecordFileFromRecords" +Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 				
 			start = System.currentTimeMillis();
 			File mfiFile = Utilities.RunMFIAlg(minimumSupports[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
 			System.out.println("Time to run MFI with minsup="+minimumSupports[i] +
-					" on table of size " + (records.size()-coveredRecords.cardinality()) + 
+					" on table of size " + (RecordSet.size-coveredRecords.cardinality()) + 
 					" is " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
 		
 			start = System.currentTimeMillis();
@@ -339,7 +334,7 @@ public class BottomUp {
 			System.out.println("lastUsedBlockingThreshold: " + lastUsedBlockingThreshold);
 			
 			System.out.println("Number of covered records after running with Minsup=" +
-					minimumSupports[i] +  " is " + coveredRecords.cardinality() + " out of " + records.size());
+					minimumSupports[i] +  " is " + coveredRecords.cardinality() + " out of " + RecordSet.size);
 			
 			System.out.println("memory statuses:");
 			System.out.println("DEBUG: Size of coveredRecords: " + MemoryUtil.deepMemoryUsageOf(coveredRecords,VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
@@ -349,12 +344,12 @@ public class BottomUp {
 		}
 		System.out.println("Minsups used " + Arrays.toString(minimumSupports));
 		System.out.println("Total number of covered records under minimum blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
-				" which are: " + 100*(coveredRecords.cardinality()/records.size()) + "%");		
+				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + RecordSet.size + 
+				" which are: " + 100*(coveredRecords.cardinality()/RecordSet.size) + "%");		
 
 		System.out.println("After adding uncovered records: Total number of covered records under blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + records.size() + 
-				" which are: " + 100*(coveredRecords.cardinality()/records.size()) + "%");
+				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + RecordSet.size + 
+				" which are: " + 100*(coveredRecords.cardinality()/RecordSet.size) + "%");
 		int firstDbSize = context.getFirstDbSize();
 		if (firstDbSize>0) {
 			allResults=removePairsSameSet(allResults);
@@ -426,7 +421,7 @@ public class BottomUp {
 		coveredRecords.or(coveredRows);
 	}
 	
-	private static File createRecordFileFromRecords(BitSet coveredRecords, Map<Integer,Record> records, int minSup){		
+	private static File createRecordFileFromRecords(BitSet coveredRecords, int minSup){		
 		File outputFle = null;
 		System.out.println("Directory TempDir= " + TempDir + " TempDir.getAbsolutePath()" + TempDir.getAbsolutePath());
 		try {
@@ -445,7 +440,7 @@ public class BottomUp {
 			System.out.println("File " + outputFle.getAbsolutePath() + " exists right after deleteOnExit");
 		}
 		
-		Map<Integer,Integer> appItems = appitems(coveredRecords, records, minSup);
+		Map<Integer,Integer> appItems = appitems(coveredRecords, minSup);
 		
 		BufferedWriter writer = null;
 		int numOfWrittenLines=0;
@@ -454,8 +449,8 @@ public class BottomUp {
 			outputFle.createNewFile();
 			writer = new BufferedWriter(new FileWriter(outputFle));
 			
-			for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= records.size() ; i=coveredRecords.nextClearBit(i+1)){
-				Record currRecord = records.get(i);				
+			for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1)){
+				Record currRecord = RecordSet.values.get(i);				
 				String toWrite = currRecord.getNumericline(appItems.keySet());
 				writer.write(toWrite);
 				writer.newLine();
@@ -476,10 +471,10 @@ public class BottomUp {
 		return outputFle;			
 	}
 	
-	private static Map<Integer,Integer> appitems(BitSet coveredRecords, Map<Integer,Record> records, int minSup){
+	private static Map<Integer,Integer> appitems(BitSet coveredRecords, int minSup){
 		Map<Integer,Integer> retVal = new HashMap<Integer, Integer>();
-		for( int i=coveredRecords.nextClearBit(0); i>=0 && i <= records.size() ; i=coveredRecords.nextClearBit(i+1) ){
-			Record currRecord = records.get(i);		
+		for( int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1) ){
+			Record currRecord = RecordSet.values.get(i);		
 			Set<Integer> recordItems = currRecord.getItemsToFrequency().keySet();
 			for (Integer recorditem : recordItems) {
 				int itemSuppSize = 1;
@@ -491,7 +486,7 @@ public class BottomUp {
 		}
 		int origSize =  retVal.size();
 		System.out.println("Number of items before pruning too frequent items: " + origSize);
-		double DBSize = records.size() - coveredRecords.cardinality();
+		double DBSize = RecordSet.size - coveredRecords.cardinality();
 		if(DBSize > 10000){			
 			double removal = ((double)minSup)*DBSize*MAX_SUPP_CONST;
 			Iterator<Entry<Integer,Integer>> retValIterator = retVal.entrySet().iterator();
@@ -529,8 +524,8 @@ public class BottomUp {
 	public static boolean sameSource(long r1_l, long r2_l){
 		int r1 = new Long(r1_l).intValue();
 		int r2 = new Long(r2_l).intValue();
-		String src1 = Utilities.globalRecords.get(r1).getSrc();
-		String src2 = Utilities.globalRecords.get(r2).getSrc();		
+		String src1 = RecordSet.values.get(r1).getSrc();
+		String src2 = RecordSet.values.get(r2).getSrc();		
 		if(src1 == null || src2 == null){ //if null then assume different sources		
 			return false;
 		}

@@ -10,6 +10,7 @@ import org.apache.commons.lang.NotImplementedException;
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.IntIterator;
 
+import fimEntityResolution.RecordSet;
 import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.BitSetIF;
 import fimEntityResolution.interfaces.IFRecord;
@@ -89,7 +90,7 @@ public class EWAH_BitSet implements BitSetIF{
 		IntIterator iterator = comBS.intIterator();
 		while(iterator.hasNext()){
 			int index = iterator.next();
-			retVal.add(Utilities.globalRecords.get(index));
+			retVal.add(RecordSet.values.get(index));
 		}		
 		return retVal;
 	}

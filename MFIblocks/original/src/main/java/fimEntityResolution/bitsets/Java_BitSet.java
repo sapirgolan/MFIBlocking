@@ -7,6 +7,7 @@ import java.util.List;
 import javax.transaction.NotSupportedException;
 
 
+import fimEntityResolution.RecordSet;
 import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.BitSetIF;
 import fimEntityResolution.interfaces.IFRecord;
@@ -69,7 +70,7 @@ public class Java_BitSet implements BitSetIF{
 	public List<IFRecord> getRecords() {
 		List<IFRecord> retVal = new ArrayList<IFRecord>(bs.cardinality());
 		for(int i=bs.nextSetBit(1); i>=0; i=bs.nextSetBit(i+1)){
-			retVal.add(Utilities.globalRecords.get(i));
+			retVal.add(RecordSet.values.get(i));
 		}
 		return retVal;
 			

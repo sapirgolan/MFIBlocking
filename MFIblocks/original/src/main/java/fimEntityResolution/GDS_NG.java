@@ -58,13 +58,13 @@ public class GDS_NG implements SetPairIF{
 	}
 
 	public GDS_NG(double NGLimit) {		
-		tempStorageMatrix = new BitMatrix(Utilities.DB_SIZE);
+		tempStorageMatrix = new BitMatrix(RecordSet.DB_SIZE);
 		maxNG = 0;
 		this.NGLimit = NGLimit;
 	}
 	
 	public GDS_NG(){
-		tempStorageMatrix = new BitMatrix(Utilities.DB_SIZE);
+		tempStorageMatrix = new BitMatrix(RecordSet.DB_SIZE);
 		maxNG = 0;
 	}
 			
@@ -244,7 +244,7 @@ public class GDS_NG implements SetPairIF{
 			writeToDB(tempStorageMatrix);
 			tempStorageMatrix= null;
 			Runtime.getRuntime().gc();
-			tempStorageMatrix = new BitMatrix(Utilities.DB_SIZE);	
+			tempStorageMatrix = new BitMatrix(RecordSet.DB_SIZE);	
 		}
 
 	}
@@ -320,8 +320,8 @@ public class GDS_NG implements SetPairIF{
 		Iterator It = GTMatrix.getSBS().getIterator();
 		while (It.hasNext()) {
 			long nextSetBit = It.next();
-			int j = (int) (nextSetBit % (long) Utilities.DB_SIZE);
-			int i = (int) ((nextSetBit - j) / (long) Utilities.DB_SIZE);
+			int j = (int) (nextSetBit % (long) RecordSet.DB_SIZE);
+			int i = (int) ((nextSetBit - j) / (long) RecordSet.DB_SIZE);
 			Node nodei = ActualGDS.getNodeFromIdx(i);
 			Node nodej = ActualGDS.getNodeFromIdx(j);
 			boolean exists = ActualGDS.doesRelationshipExist(nodei, nodej);

@@ -5,6 +5,10 @@ import fimEntityResolution.interfaces.ClearerFactory;
 
 public class BitMatrixFactory implements ClearerFactory{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static BitMatrixFactory self = null;
 	private BitMatrixFactory(){}
 	
@@ -18,7 +22,7 @@ public class BitMatrixFactory implements ClearerFactory{
 	
 	@Override
 	public Clearer createInstance() {
-		return new BitMatrix(Utilities.DB_SIZE);
+		return new BitMatrix(RecordSet.DB_SIZE);
 	}
 
 	

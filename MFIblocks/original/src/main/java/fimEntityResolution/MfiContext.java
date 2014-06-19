@@ -22,7 +22,7 @@ public class MfiContext {
 	private String lexiconFile;
 	private String recordsFile;
 	private String origRecordsFile;
-	private Map<Integer, Record> records;
+	//private Map<Integer, Record> records;
 	private boolean inPerformanceMode;
 	private int firstDbSize;
 
@@ -63,9 +63,9 @@ public class MfiContext {
 		
 	}
 
-	public void setRecords(Map<Integer, Record> records) {
-		this.records = records;
-	}
+//	public void setRecords(Map<Integer, Record> records) {
+//		this.records = records;
+//	}
 	
 	public void setPerformanceFlag(String[] args) {
 		this.inPerformanceMode = false;
@@ -134,17 +134,17 @@ public class MfiContext {
 		return this.matchFile;
 	}
 
-	public int getRecordsSize() {
-		return this.records.size();
-	}
+//	public int getRecordsSize() {
+//		return this.records.size();
+//	}
 
 	public Configuration getConfig() {
 		return this.configuration;
 	}
 
-	public Map<Integer, Record> getRecords() {
-		return this.records;
-	}
+//	public Map<Integer, Record> getRecords() {
+//		return this.records;
+//	}
 
 	public boolean isInPerformanceMode() {
 		return this.inPerformanceMode;

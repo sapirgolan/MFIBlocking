@@ -1,17 +1,17 @@
 package fimEntityResolution;
 
-import java.util.BitSet;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.enerj.core.SparseBitSet;
-import org.enerj.core.SparseBitSet.Iterator;
-
 import fimEntityResolution.interfaces.IFRecord;
 
 public class Record implements IFRecord{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int id;
 	private Map<Integer,Integer> itemToFrequency = new HashMap<Integer, Integer>();
 	private String recordStr = null;

@@ -130,7 +130,7 @@ public class SparkBlocksReader {
 
 			// 3.2 ClusterJaccard score
 			List<Integer> currentItemSet = candidateBlock.items;
-			double maxClusterScore = StringSimTools.MaxScore(candidateBlock.supportSize, currentItemSet, Utilities.minRecordLength);
+			double maxClusterScore = StringSimTools.MaxScore(candidateBlock.supportSize, currentItemSet, RecordSet.minRecordLength);
 			if (maxClusterScore < 0.1 * scoreThreshold) {
 				//scorePruned++;
 				return new Tuple2<CandidateBlock, Double>(candidateBlock, -200.0);

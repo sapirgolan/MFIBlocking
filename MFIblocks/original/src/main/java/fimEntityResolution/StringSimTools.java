@@ -288,19 +288,19 @@ public class StringSimTools {
 	
 	private static double RSJWeight(int wordId){
 		double n_t=(double)Utilities.globalItemsMap.get(wordId).getSupportSize();
-		double N = (double)Utilities.globalRecords.size();
+		double N = (double)RecordSet.size;
 		return ((N - n_t + 0.5)/n_t+0.5);
 	}
 	
 	private static double IDF(int wordId){
-		return ((double)Utilities.globalRecords.size()/
+		return ((double)RecordSet.size/
 					(double)Utilities.globalItemsMap.get(wordId).getSupportSize());
 	}
 	
 	private static double log2IDF(int wordId){
 		double retVal = Utilities.globalItemsMap.get(wordId).getLog2IDF();
 		if(retVal <=0){
-			retVal = ((double)Utilities.globalRecords.size()/
+			retVal = ((double)RecordSet.size/
 					(double)Utilities.globalItemsMap.get(wordId).getSupportSize());
 			return logBase2(retVal);
 		}

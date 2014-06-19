@@ -67,94 +67,15 @@ import fimEntityResolution.pools.LimitedPool;
 public class Utilities {
 
 	public static boolean DEBUG = false;
-	public static int DB_SIZE;
 	public static String NEW_LINE = System.getProperty("line.separator");
 	public static Map<Integer, FrequentItem> globalItemsMap;
-	public static Map<Integer, Record> globalRecords;
 	public static boolean WRITE_ALL_ERRORS = false;
-	//JS:changed to public
-	//private static int minRecordLength = Integer.MAX_VALUE;
-	public static int minRecordLength = Integer.MAX_VALUE;
 	public static GraphDatabaseService recordDB;
 	private static final String RECORD_DB_PATH = "target/records-db";
 	private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\}";
 	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
 
-	public static Map<Integer, Record> readRecords(MfiContext context) {
-
-		String numericRecordsFile = context.getRecordsFile();
-		String origRecordsFile = context.getOriginalFile();
-		String srcFile = context.getRecordsFile();
-		Map<Integer, Record> outputRecords = new HashMap<Integer, Record>();
-		try {
-			BufferedReader recordsFileReader = new BufferedReader(
-					new FileReader(new File(numericRecordsFile)));
-			BufferedReader origRecordsFileReader = new BufferedReader(
-					new FileReader(new File(origRecordsFile)));
-			BufferedReader srcFileReader = null;
-			if (srcFile != null && srcFile.length() > 0) {
-				srcFileReader = new BufferedReader(new FileReader(new File(
-						srcFile)));
-			}
-			System.out.println("readRecords: srcFile = " + srcFile);
-			/*
-			 * BufferedReader origRecordsFileReader = new BufferedReader (new
-			 * InputStreamReader(new FileInputStream(origRecordsFile),
-			 * "UTF16"));
-			 */
-
-			String numericLine = "";
-			String recordLine = "";
-			Pattern ws = Pattern.compile("[\\s]+");
-			int recordIndex = 1;
-			while (numericLine != null) {
-				try {
-					numericLine = recordsFileReader.readLine();
-					if (numericLine == null) {
-						break;
-					}
-					numericLine = numericLine.trim();
-					recordLine = origRecordsFileReader.readLine().trim();
-					String src = null;
-					if (srcFileReader != null) {
-						src = srcFileReader.readLine().trim();
-					}
-					Record r = new Record(recordIndex, recordLine);
-					r.setSrc(src); // in the worst case this is null
-					String[] words = ws.split(numericLine);
-					if (numericLine.length() > 0) { // very special case when
-													// there is an empty line
-						for (String word : words) {
-							int item = Integer.parseInt(word);
-							r.addItem(item);
-						}
-					}
-					minRecordLength = (r.getSize() < minRecordLength) ? r
-							.getSize() : minRecordLength;
-					outputRecords.put(r.getId(), r);
-					recordIndex++;
-				} catch (Exception e) {
-					System.out.println("Exception while reading line "
-							+ recordIndex + ":" + numericLine);
-					System.out.println(e);
-					break;
-				}
-			}
-			recordsFileReader.close();
-			System.out.println("Num of records read: " + outputRecords.size());
-			DB_SIZE = outputRecords.size();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		globalRecords = outputRecords;
-		System.out.println("globalRecords.size() " + globalRecords.size());
-		return globalRecords;
-
-	}
+	
 
 	private static void clearRecordDb() {
 		try {
@@ -235,8 +156,8 @@ public class Utilities {
 							r.addItem(item);
 						}
 					}
-					minRecordLength = (r.getSize() < minRecordLength) ? r
-							.getSize() : minRecordLength;
+					RecordSet.minRecordLength = (r.getSize() < RecordSet.minRecordLength) ? r
+							.getSize() : RecordSet.minRecordLength;
 					recordIndex++;
 				} catch (Exception e) {
 					System.out.println("Exception while reading line "
@@ -249,7 +170,7 @@ public class Utilities {
 			recordsFileReader.close();
 			System.out.println("Num of records read: " + (recordIndex - 1));
 			tx.success();
-			DB_SIZE = recordIndex - 1;
+			RecordSet.DB_SIZE = recordIndex - 1;
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -524,13 +445,13 @@ public class Utilities {
 					}
 					List<Integer> currentItemSet = parsedFrequentItems.items;
 					double maxClusterScore = StringSimTools.MaxScore(
-							parsedFrequentItems.supportSize, currentItemSet, minRecordLength);
+							parsedFrequentItems.supportSize, currentItemSet, RecordSet.minRecordLength);
 					if (maxClusterScore < 0.1 * Utilities.scoreThreshold) {
 						scorePruned++;
 						continue;
 					}
 					FIRunnable FIR = FIRunnablePool.getInstance().getRunnable(
-							currentItemSet, minSup, itemsetContext.getMfiContext().getRecords(), NG_PARAM, coverageIndex, candidatePairs);
+							currentItemSet, minSup, NG_PARAM, coverageIndex, candidatePairs);
 					executorService.execute(FIR);
 					numOfLines++;
 					if (numOfLines % 100000 == 0) {
@@ -695,7 +616,7 @@ public class Utilities {
 					}
 					List<Integer> currIS = pfi.items;
 					double maxClusterScore = StringSimTools.MaxScore(
-							pfi.supportSize, currIS, minRecordLength);
+							pfi.supportSize, currIS, RecordSet.minRecordLength);
 					if (maxClusterScore < 0.1 * Utilities.scoreThreshold) {
 						scorePruned++;
 						continue;
@@ -847,7 +768,7 @@ public class Utilities {
 
 		while (It.hasNext()) {
 			int recordId = new Long(It.next()).intValue();
-			retVal.add(Utilities.globalRecords.get(recordId));
+			retVal.add(RecordSet.values.get(recordId));
 		}
 		return retVal;
 
@@ -857,7 +778,7 @@ public class Utilities {
 		List<Record> retVal = new ArrayList<Record>(support.cardinality());
 		for (int i = support.nextSetBit(0); i >= 0; i = support
 				.nextSetBit(i + 1)) {
-			retVal.add(Utilities.globalRecords.get(i));
+			retVal.add(RecordSet.values.get(i));
 		}
 
 		return retVal;
@@ -868,7 +789,7 @@ public class Utilities {
 		IntIterator iterator = support.intIterator();
 		while (iterator.hasNext()) {
 			int index = iterator.next();
-			retVal.add(Utilities.globalRecords.get(index));
+			retVal.add(RecordSet.values.get(index));
 		}
 		if (support.cardinality() != retVal.size()) {
 			System.out
@@ -1092,10 +1013,8 @@ public class Utilities {
 						System.out.println(printRecordCluster(clusterPair,
 								records));
 						maxScoreForFP = Math.max(maxScoreForFP, StringSimTools
-								.softTFIDF(Utilities.globalRecords
-										.get(clusterPair.r1),
-										Utilities.globalRecords
-												.get(clusterPair.r2)));
+								.softTFIDF(RecordSet.values.get(clusterPair.r1),
+										RecordSet.values.get(clusterPair.r2)));
 					}
 					/*
 					 * System.out.println("inside FP cluster: " +
@@ -1111,16 +1030,16 @@ public class Utilities {
 				FN++;
 				if (WRITE_ALL_ERRORS) {
 					System.out.println("missed cluster: ");
-					if (Utilities.globalRecords.get(truePair.r1) == null
-							|| Utilities.globalRecords.get(truePair.r2) == null) {
+					if (RecordSet.values.get(truePair.r1) == null
+							|| RecordSet.values.get(truePair.r2) == null) {
 						System.out.println("Record " + truePair.r1 + " or "
 								+ truePair.r2 + " doesn;t exist");
 					}
 					System.out.println(printRecordCluster(truePair, records));
 				}
 				minScoreForFN = Math.min(minScoreForFN, StringSimTools
-						.softTFIDF(Utilities.globalRecords.get(truePair.r1),
-								Utilities.globalRecords.get(truePair.r2)));
+						.softTFIDF(RecordSet.values.get(truePair.r1),
+								RecordSet.values.get(truePair.r2)));
 			} else {
 				TN++;
 			}

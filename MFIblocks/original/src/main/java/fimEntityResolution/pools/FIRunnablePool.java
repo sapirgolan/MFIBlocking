@@ -30,21 +30,21 @@ public class FIRunnablePool {
 	}
 	
 	//assumption is all bms are the same size
-	public FIRunnable getRunnable(List<Integer> currIS,int minSup, Map<Integer,Record> records, 
+	public FIRunnable getRunnable(List<Integer> currIS,int minSup, 
 			double NG_PARAM, Map<Integer, BitMatrix> coverageIndex, CandidatePairs CPs){	
 		synchronized(this){
 			if(runnables.size() > 0){
 				FIRunnable toReturn = runnables.remove();
-				toReturn.setParams(currIS, minSup, records, NG_PARAM,coverageIndex,CPs);
+				toReturn.setParams(currIS, minSup, NG_PARAM,coverageIndex,CPs);
 				return toReturn;
 			}
 			created++;			
-			return new FIRunnable(currIS, minSup, records, NG_PARAM,coverageIndex, CPs);
+			return new FIRunnable(currIS, minSup, NG_PARAM,coverageIndex, CPs);
 		}		
 	}
 	
 	public void returnRunnable(FIRunnable toReturn){	
-		toReturn.setParams(null, 0, null, 0,null,null);		
+		toReturn.setParams(null, 0, 0,null,null);		
 		synchronized(this){
 			runnables.add(toReturn);
 		}

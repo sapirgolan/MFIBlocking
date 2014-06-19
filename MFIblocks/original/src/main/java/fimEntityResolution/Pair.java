@@ -30,7 +30,7 @@ public class Pair {
 	
 	public double getScore(){
 		if(score < 0){
-			score = StringSimTools.softTFIDF(Utilities.globalRecords.get(r1), Utilities.globalRecords.get(r2));
+			score = StringSimTools.softTFIDF(RecordSet.values.get(r1), RecordSet.values.get(r2));
 		}
 		return score;
 	}
@@ -45,16 +45,16 @@ public class Pair {
 	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		sb.append(Utilities.globalRecords.get(r1).toString()).append(Utilities.NEW_LINE).
-				append(Utilities.globalRecords.get(r2).toString()).append(Utilities.NEW_LINE);
+		sb.append(RecordSet.values.get(r1).toString()).append(Utilities.NEW_LINE).
+				append(RecordSet.values.get(r2).toString()).append(Utilities.NEW_LINE);
 		sb.append("with score: " + getScore());
 		return sb.toString();
 		
 	}
 	
 	public boolean sameSource(){
-		String src1 = Utilities.globalRecords.get(r1).getSrc();
-		String src2 = Utilities.globalRecords.get(r2).getSrc();
+		String src1 = RecordSet.values.get(r1).getSrc();
+		String src2 = RecordSet.values.get(r2).getSrc();
 		if(src1 == null || src2 == null){ //if null then assume different sources		
 			return false;
 		}
@@ -63,8 +63,8 @@ public class Pair {
 	
 	public String simpleToString(){
 		StringBuilder sb = new StringBuilder();
-		sb.append(Utilities.globalRecords.get(r1).getRecordStr()).append(Utilities.NEW_LINE)
-		.append(Utilities.globalRecords.get(r2).getRecordStr()).append(Utilities.NEW_LINE);
+		sb.append(RecordSet.values.get(r1).getRecordStr()).append(Utilities.NEW_LINE)
+		.append(RecordSet.values.get(r2).getRecordStr()).append(Utilities.NEW_LINE);
 		return sb.toString();
 		
 	}

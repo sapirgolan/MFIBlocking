@@ -11,7 +11,7 @@ import com.javamex.classmexer.MemoryUtil;
 import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
 
 import fimEntityResolution.BitMatrix;
-import fimEntityResolution.Utilities;
+import fimEntityResolution.RecordSet;
 import fimEntityResolution.interfaces.SetPairIF;
 
 /**
@@ -146,7 +146,7 @@ public class CandidatePairs implements SetPairIF{
 		System.out.println("DEBUG: total memory used by CandidatePairs: " +	memoryUsage() + " GB");
 		
 		removeBelowThresh();
-		BitMatrix bm = new BitMatrix(Utilities.DB_SIZE);
+		BitMatrix bm = new BitMatrix(RecordSet.DB_SIZE);
 		for (Entry<Integer, RecordMatches> entry: allMatches.entrySet()) {
 			for(CandidateMatch cm: entry.getValue().getCandidateMatches()){
 				bm.setPair(entry.getKey(), cm.getRecordId());

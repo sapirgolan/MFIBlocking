@@ -19,21 +19,17 @@ public class FIRunnable implements Runnable, Clearer {
 	private Map<Integer, BitMatrix> coverageIndex;
 	private CandidatePairs candidatePairs;
 
-	public FIRunnable(List<Integer> currentItemSet, int minSup,
-			Map<Integer, Record> records, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs candidatePairs) {
+	public FIRunnable(List<Integer> currentItemSet, int minSup, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs candidatePairs) {
 		this.currentItemSet = currentItemSet;
 		this.minSup = minSup;
-		this.records = records;
 		this.NG_PARAM = NG_PARAM;
 		this.coverageIndex = coverageIndex;
 		this.candidatePairs = candidatePairs;
 	}
 
-	public void setParams(List<Integer> currIS, int minSup,
-			Map<Integer, Record> records, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs candidatePairs) {
+	public void setParams(List<Integer> currIS, int minSup, double NG_PARAM,Map<Integer, BitMatrix> coverageIndex, CandidatePairs candidatePairs) {
 		this.currentItemSet = currIS;
 		this.minSup = minSup;
-		this.records = records;
 		this.NG_PARAM = NG_PARAM;
 		this.coverageIndex = coverageIndex;
 		this.candidatePairs = candidatePairs;
@@ -117,7 +113,7 @@ public class FIRunnable implements Runnable, Clearer {
 
 	@Override
 	public void clearAll() {
-		this.setParams(null, 0, null, 0, null,null);
+		this.setParams(null, 0, 0, null,null);
 	}
 	
 	private static int cellForCluster(final double score) {

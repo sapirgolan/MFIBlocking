@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 
+import fimEntityResolution.RecordSet;
 import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.BitSetIF;
 import fimEntityResolution.interfaces.IFRecord;
@@ -79,7 +80,7 @@ public class SingleBitBS implements BitSetIF{
 
 	@Override
 	public List<IFRecord> getRecords() {
-		IFRecord rec = Utilities.globalRecords.get(index);
+		IFRecord rec = RecordSet.values.get(index);
 		return Collections.singletonList(rec);
 	}
 

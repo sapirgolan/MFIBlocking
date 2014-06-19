@@ -392,7 +392,7 @@ public class Utilities {
 		
 		System.out.println("reading FIs");
 
-		Utilities.scoreThreshold = scoreThreshold;
+		Utilities.scoreThreshold = itemsetContext.getMinBlockingThreshold();
 		// reset all parameters
 		nonFIs.set(0);
 		numOfFIs.set(0);

@@ -171,9 +171,9 @@ public class BottomUp {
 		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
-		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
+		//20140619 - SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
 		
-		IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
+		//20140619 - IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
 		for(double neiborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neiborhoodGrow;
 		
@@ -198,7 +198,8 @@ public class BottomUp {
 				StatisticMeasuremnts results = experimentResult.calculate();
 				
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+				//20140619 - long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+				long timeOfComparison=0;
 				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
 				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
 				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
@@ -352,7 +353,7 @@ public class BottomUp {
 				" which are: " + 100*(coveredRecords.cardinality()/RecordSet.size) + "%");
 		int firstDbSize = context.getFirstDbSize();
 		if (firstDbSize>0) {
-			allResults=removePairsSameSet(allResults);
+			allResults=removePairsSameSet(allResults,firstDbSize);
 		}
 		
 		return allResults;

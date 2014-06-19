@@ -35,7 +35,10 @@ public class ExperimentResult {
 		long duplicatesFound = truePositive;
 		double precision = (double)truePositive/(truePositive+falsePositive);
 		double recall = (double)truePositive/(truePositive+falseNegative);
-		double fMeasure = (double)(2*precision*recall)/(precision+recall);
+		double fMeasure; 
+		if (precision!=0 && recall!=0) 
+			fMeasure=(double)(2*precision*recall)/(precision+recall);
+		else fMeasure=0.0;
 		double totalComparisonsAvailable = ((numOfRecords * (numOfRecords - 1))*0.5);	
 		double reductionRatio = Math.max(0.0, (1.0-((comparisonsMade)/totalComparisonsAvailable)));		
 		

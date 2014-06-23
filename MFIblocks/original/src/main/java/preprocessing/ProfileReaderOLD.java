@@ -26,7 +26,7 @@ import DataStructures.Attribute;
 import DataStructures.EntityProfile;
 import DataStructures.IdDuplicates;
 
-public class ProfileReaderDBP {
+public class ProfileReaderOLD {
 
 	private static Lexicon lexicon;
 	private static String stopWordsFile;
@@ -37,12 +37,12 @@ public class ProfileReaderDBP {
 	public static Map<String, Integer> map;
 	public static int[] denseCounter;
 	public static Set<ComparableColumnsDensity> sortedDensity;
-	//JS :CONSTs:
+	//Constants:
 	public static final String COMMA=",";
 	public static final String DEFAULT_COLUMN_WIEGHT="0.1"; //for DS_Weights file
 	public static final String PREFIX_LENGTH="30";   //for DS_Weights file
 	public static int COLUMNS=5;
-	public static boolean IS_DBPedia=true;
+	public static boolean IS_DBPedia;
 	public static String MOVIES_DS_FILE=null; //"DS_weights_movies.properties";
 	public static DBSize dbSize;
 	//BufferWriters
@@ -104,6 +104,8 @@ public class ProfileReaderDBP {
 		String recordOutFilePath = args[6];
 		int n_gramsParam = Integer.parseInt(args[7]);	
 		double idfThreshParam = Double.parseDouble(args[8]);
+		//DatasetType dataset=new DatasetType(args[9]);
+		//if (dataset.getName().equals("DBPEDIA")) IS_DBPedia=true;
 		String sourceMapFilePath = (args.length > 9 ? args[9] : null);
 		start = System.currentTimeMillis();
 		//loading data
@@ -116,23 +118,17 @@ public class ProfileReaderDBP {
 			dbSize.setSize(i, entityProfiles[i].size());
 			System.out.println("File "+(i+1)+" loaded. Size: " +dbSize.getSize(i));
 		}
-		
 		System.out.println("Processing file with " +dbSize.getTotalSize()  + " records");
 		System.out.println("Time to load profiles "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 		groundTruth=loadGroundTruth(groundTruthOutFilePath);
 		System.out.println("Ground truth file loaded.");
-//		extractMatchingTuples(1000,true);
-//		System.out.println("DBSize was roughly reduced to :" + 1000 + " tuples");
-//		dbSize.setSize(0, entityProfiles[0].size());
-//		dbSize.setSize(1, entityProfiles[1].size());
-
 		start = System.currentTimeMillis();
 		//1. extract names from attributes list AND 
 		attributeNames = new TreeSet<String>();
 		long attributeCounter=0;
-		for (int i=0;i<entityProfiles.length;i++){
-			for(int j=0;j<entityProfiles[i].size();j++){
-				HashSet<Attribute> attributes = entityProfiles[i].get(j).getAttributes();
+		for (ArrayList<EntityProfile> profiles:entityProfiles){
+			for (EntityProfile entityProfile : profiles){
+				HashSet<Attribute> attributes = entityProfile.getAttributes();
 				for (Attribute attribute : attributes) {
 					attributeNames.add( attribute.getName() );
 					attributeCounter++;
@@ -147,6 +143,7 @@ public class ProfileReaderDBP {
 		System.out.println("Time to extract attributess "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 		//2. build the map for numeric column indexing
 		map = buildMapIndex(attributeNames);
+		
 		wordProcessor = new WordProcessor(new File(stopWordsFile),n_gramsParam,n_gramsParam);
 		if (IS_DBPedia){
 			//3. choose dense columns only
@@ -160,13 +157,13 @@ public class ProfileReaderDBP {
 					maximalAttributeNumber=Math.max(maximalAttributeNumber, entityProfile.getAttributes().size());
 					for (Attribute attribute : attributes) {
 						if (attribute.getValue()!=null && getCleanString(attribute.getValue())!=null) 
-							denseCounter[map.get(attribute.getName())]++;							
+							denseCounter[map.get(attribute.getName())]++;
+							
 					}
 				}
 			}
-			for (int i=0; i<attributeNames.size();i++){ 
-				sortedDensity.add(new ComparableColumnsDensity(i, denseCounter[i])); 
-				
+			for (int i=0; i<attributeNames.size()-1;i++){ //JS: 25052014
+				sortedDensity.add(new ComparableColumnsDensity(i, denseCounter[i+1])); //JS: 25052014
 			}
 			System.out.println("Time to calculate density: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			System.out.println("Maximum number of attributes in profile: "+maximalAttributeNumber);
@@ -175,6 +172,7 @@ public class ProfileReaderDBP {
 		if (MOVIES_DS_FILE==null){
 			//4. create DS_weights.properties file
 			start = System.currentTimeMillis();
+			
 			File DS_weightsFile= createDS_weightsFile();
 			writeMapToDS_weightsFile(DS_weightsFile);
 			System.out.println("Time to create DS_weights.properties file: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
@@ -194,20 +192,32 @@ public class ProfileReaderDBP {
 		if(sourceMapFilePath != null && sourceMapFilePath.length() > 0){
 			sourceWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sourceMapFilePath)));
 		}
-		
 		try {
 			createMatchingFile(inputFiles.length);
 			System.out.println("MatchingFile was created");
 			groundTruth=null; //JS: not used anymore 20140506
 			removeTooFrequentItems(dbSize.getTotalSize(),idfThreshParam );
-			System.out.println("Frequent items were removed!");			
+			System.out.println("Frequent items were removed!");
+			if (IS_DBPedia){
+				//reloading data - JS: 20140509
+				start = System.currentTimeMillis();
+				entityProfiles=new ArrayList[inputFiles.length];
+				for (int i=0;i<inputFiles.length;i++){
+					entityProfiles[i] = loadEntityProfile(inputFiles[i]);
+					System.out.println("File "+(i+1)+" reloaded.");
+				}
+				System.out.println("Profiles were reloaded.");
+				System.out.println("Time to reload profiles: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+			}
+			
 			int recordId = 1;
-			for (int i=0;i<entityProfiles.length;i++){
-				for (int j=0;j<entityProfiles[i].size();j++){
+			for (ArrayList<EntityProfile> profiles : entityProfiles){
+				for (EntityProfile entityProfile : profiles){
+					
 					StringBuilder cleanStringBuilder = new StringBuilder();			
 					StringBuilder numericStringBuilder = new StringBuilder();
 					
-					for (Attribute attribute : entityProfiles[i].get(j).getAttributes()){
+					for (Attribute attribute : entityProfile.getAttributes()){
 						String toWrite = getCleanString(attribute.getValue());
 						if(lexicon.getPrefixLengthForColumn(map.get(attribute.getName())) > 0){						
 							toWrite = toWrite.substring(0, 
@@ -223,12 +233,16 @@ public class ProfileReaderDBP {
 						}
 						attribute=null;
 					}
+
 					String numericString = numericStringBuilder.toString().trim();
 					numericOutputWriter.write(numericString.trim());
 					numericOutputWriter.newLine();
 					stringOutputWriter.write(cleanStringBuilder.toString().trim());
-					stringOutputWriter.newLine();					
+					stringOutputWriter.newLine();
+					
+					
 					recordId++;
+					entityProfile=null;
 				}
 			}
 
@@ -248,32 +262,6 @@ public class ProfileReaderDBP {
 		}
 		System.out.println("Total time to convert files: " + (System.currentTimeMillis()-globalStart)/1000.0 + " seconds");
 		
-	}
-	
-	//JS: use to reduce dbpedia file to required limit only from ground truth
-	private static void extractMatchingTuples(int limit,boolean createGroundTruth) {
-		int count=0;
-		HashSet<IdDuplicates> newGroundTruth=new HashSet<>();
-		ArrayList<EntityProfile> extractedEntityProfiles = new ArrayList<>() ;
-		for (IdDuplicates pair : groundTruth){
-			int id1=pair.getEntityId1();
-			int id2=pair.getEntityId2();
-			if (entityProfiles[0].size() > id1 && entityProfiles[1].size() > id2) {
-				extractedEntityProfiles.add(entityProfiles[0].get(id1));
-				extractedEntityProfiles.add(entityProfiles[1].get(id2));
-				count+=2;
-				newGroundTruth.add(new IdDuplicates(count-1, count));
-			}
-			else {
-				System.out.println("Index of dublicates is out of range: id1=" + id1+", id2="+id2);
-			}
-			if (count >= limit)
-				break;
-		}
-		entityProfiles[1]=extractedEntityProfiles;
-		entityProfiles[0]=new ArrayList<>();
-		if (createGroundTruth) 
-			groundTruth=newGroundTruth;
 	}
 
 	private static File createDS_weightsFile() {
@@ -324,10 +312,9 @@ public class ProfileReaderDBP {
 	private static void removeTooFrequentItems( double DBSize, double IDFThresh){
 		int recordId = 1;
 		
-		for (int i=0;i<entityProfiles.length;i++){
-			for (int j=0;j<entityProfiles[i].size();j++){
-				
-				for (Attribute attribute : entityProfiles[i].get(j).getAttributes()){
+		for (ArrayList<EntityProfile> profiles :entityProfiles){
+			for (EntityProfile entityProfile : profiles){
+				for (Attribute attribute : entityProfile.getAttributes()){
 					try{
 						if(lexicon.getColumnWeight(map.get(attribute.getName())) <= 0){
 							continue;
@@ -344,10 +331,14 @@ public class ProfileReaderDBP {
 					}
 					//uses functions that in the end call to Lexicon.addWord that updates lexicon
 					getNGramIdString(recordId, toWrite,map.get(attribute.getName()), false);
-					//if (IS_DBPedia) attribute=null;  //JS: 20140509
+					if (IS_DBPedia) attribute=null;  //JS: 20140509
+					
+					//System.out.println("=============="+attribute.toString());
 				}
 				recordId++;
-				//if (IS_DBPedia)  entityProfiles[i].add(j, null); // JS: 20140509
+				if (IS_DBPedia) entityProfile=null; // JS: 20140509
+				
+				//System.out.println("=============="+entityProfile.toString());
 				
 			}
 			System.out.println("removeTooFrequentItems: "+recordId+" records done.");
@@ -364,6 +355,7 @@ public class ProfileReaderDBP {
 	
 	private static String getNGramIdString(int recordId, String value, int propertyId, boolean removedFrequent){
 		List<Integer> NGramsIds = new ArrayList<Integer>();
+		//String[] values = value.split("\\s+");
 		String[] values = value.split("[+\\-*/\\^ .,?!]+");
 		for(int i=0; i < values.length ;i++){
 			if (values[i]==null) continue; //JS 20140506
@@ -438,6 +430,7 @@ public class ProfileReaderDBP {
 					bufferedWriter.newLine();
 					counter++;
 				}
+				
 			}
 			try {
 				bufferedWriter.close();

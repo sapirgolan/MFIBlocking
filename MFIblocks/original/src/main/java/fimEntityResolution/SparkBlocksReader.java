@@ -89,7 +89,7 @@ public class SparkBlocksReader {
 	/**
 	 * TrueBlocks extends Function<Tuple2<CandidateBlock, Double>, Boolean>
 	 * for filtering blocks that holds our 3 conditions.
-	 * -100.0: tooLarge in original
+	 * -100.0: tooLarge in original	
 	 * -200.0: scorePruned
 	 * -300.0: nonFIs (support.getCardinality() <  minSup) 
 	 * -400.0: not classified

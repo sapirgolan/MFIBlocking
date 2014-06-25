@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,9 +76,19 @@ public class SearchEngine {
 		String line = bufferedReader.readLine();
 		int recordIndex = 1;
 		while (line != null) {
-			addDoc(indexWriter, Integer.toString(recordIndex), line);
-			recordIndex++;
-			line = bufferedReader.readLine();
+			if ( isTermSizeValid(line) ) {
+				addDoc(indexWriter, Integer.toString(recordIndex), line);
+				recordIndex++;
+				line = bufferedReader.readLine();
+			}
+		}
+	}
+
+	private boolean isTermSizeValid(String line) {
+		try {
+			return (line.getBytes("UTF-8").length < IndexWriter.MAX_TERM_LENGTH);
+		} catch (UnsupportedEncodingException e) {
+			return false;
 		}
 	}
 

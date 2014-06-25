@@ -154,5 +154,12 @@ public class SearchEngineTest {
 		Assert.assertTrue("Obtained attributes for recordId that was not indexed", recordAttributes.isEmpty());
 	}
 	
+	@Test
+	public void testIsTermSizeValid_shortTerm() throws Exception {
+		Boolean isTermSizeValid = Whitebox.<Boolean>invokeMethod(engine, "isTermSizeValid", "This is a short Term");
+		Assert.assertTrue("Short term was classified as long term", isTermSizeValid);
+		
+	}
+	
 
 }

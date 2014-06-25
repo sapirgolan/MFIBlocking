@@ -20,7 +20,6 @@ import lucene.search.SearchEngine;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
-
 import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
 import candidateMatches.RecordMatches;
@@ -171,9 +170,9 @@ public class BottomUp {
 		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
-		//20140619 - SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
+		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
 		
-		//20140619 - IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
+		IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
 		for(double neiborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neiborhoodGrow;
 		
@@ -198,8 +197,7 @@ public class BottomUp {
 				StatisticMeasuremnts results = experimentResult.calculate();
 				
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				//20140619 - long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
-				long timeOfComparison=0;
+				long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
 				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
 				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
 				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);

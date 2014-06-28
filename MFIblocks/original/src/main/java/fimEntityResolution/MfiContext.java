@@ -1,7 +1,8 @@
 package fimEntityResolution;
 
 import java.util.Arrays;
-import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import fimEntityResolution.BottomUp.Alg;
 import fimEntityResolution.BottomUp.Configuration;
@@ -152,7 +153,9 @@ public class MfiContext {
 
 	public void setFirstDbSize(String[] args) {
 		if(args.length > 9 && args[9] != null){
-			this.firstDbSize = Integer.parseInt(args[9]);
+			if (StringUtils.isNumeric(args[9]) ) {
+				this.firstDbSize = Integer.parseInt(args[9]);
+			}
 		}
 	}
 

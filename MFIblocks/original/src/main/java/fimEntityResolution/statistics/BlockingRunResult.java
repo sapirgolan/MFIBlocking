@@ -23,7 +23,11 @@ public class BlockingRunResult {
 	}
 	
 	private double format(double number){
-		return Double.valueOf(decimalFormat.format(number));
+		if (Double.isNaN(number)) {
+			return 0;
+		} else {
+			return Double.valueOf(decimalFormat.format(number));
+		}
 	}
 	
 	public String[] getCoulmnsName() {

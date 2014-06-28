@@ -394,28 +394,6 @@ public class BottomUp {
 		return updatedPairs;
 	}
 
-	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs) {
-		System.out.println("Excluding pairs if records from different sets..");
-		CandidatePairs updatedPairs=new CandidatePairs();
-		long start=System.currentTimeMillis();
-		//Set<Set<Integer>> actualPairs=new HashSet<>();
-		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
-			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
-				if ( 	(entry.getKey()%2==0 && cm.getRecordId()%2==0) ||
-						(entry.getKey()%2!=0 && cm.getRecordId()%2!=0)) 
-					continue;
-				else 
-					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
-				//Set<Integer> temp=new HashSet<Integer>();
-				//temp.add(cm.getRecordId());
-				//temp.add(entry.getKey());
-				//actualPairs.add(temp);
-			}
-		}
-		System.out.println("Time exclude pairs : " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-		return updatedPairs;
-	}
-
 	private static void updateCoveredRecords(BitSet coveredRecords, BitSet coveredRows){
 		coveredRecords.or(coveredRows);
 	}

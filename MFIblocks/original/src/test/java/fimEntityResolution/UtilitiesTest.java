@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 
-@PrepareForTest(System.class)
+@PrepareForTest({System.class, Utilities.class})
 public class UtilitiesTest {
 	
 	@Rule
@@ -37,6 +37,13 @@ public class UtilitiesTest {
 		File resource = new File(unixMFICmdLine.substring(0, commandParameterInsex).trim());
 		Assert.assertTrue(resource.exists());
 		Assert.assertTrue(resource.canExecute());
+	}
+	
+	@Test
+	public void testConvertToSeconds() {
+		Assert.assertEquals("Conversion to 1 second is not right" , 1, Utilities.convertToSeconds(1000), 0);
+		Assert.assertEquals("Conversion to 1.5 second is not right" , 1.5, Utilities.convertToSeconds(1500), 0);
+		Assert.assertEquals("Conversion to 31.52 second is not right" , 31.52, Utilities.convertToSeconds(31520), 0);
 	}
 
 }

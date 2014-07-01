@@ -17,6 +17,7 @@ public class BlockingRunResult {
 	private double totalDuplicates;
 	private double comparisonsMade;
 	private final DecimalFormat decimalFormat = new DecimalFormat("#.####");
+	private double timeOfERComparison;
 
 	public double getTimeToRunInSec() {
 		return timeToRunInSec;
@@ -34,13 +35,13 @@ public class BlockingRunResult {
 		return new String[] {"MaxNG", "minBlockingThresh", "usedThresh", 
 			"Recall (PC)", "Precision (PQ)", "F-measure", "RR", 
 			"Duplicates found", "#Duplicates in dataset", "Comparisons made",
-			"time to run"};
+			"time to run", "ER calcilate Time"};
 	}
 	
 	public Object[] getValues() {
 		return new Object[] {ngLimit, minBlockingThreshold, format(actualUsedThreshold),
 				format(recall), format(precision), format(f_measure), format(reductionRatio),
-				duplicatesFound, totalDuplicates, comparisonsMade,	timeToRunInSec};
+				duplicatesFound, totalDuplicates, comparisonsMade, timeToRunInSec, timeOfERComparison};
 	}	
 	
 	public double[] asArray(){
@@ -60,7 +61,8 @@ public class BlockingRunResult {
 		this.ngLimit = resultContext.getNgLimit();
 		this.minBlockingThreshold = resultContext.getMinBlockingThreshold();
 		this.actualUsedThreshold = resultContext.getLastUsedBlockingThreshold();
-		this.timeToRunInSec = resultContext.getExecutionTime();	
+		this.timeToRunInSec = resultContext.getExecutionTime();
+		this.timeOfERComparison = resultContext.getTimeOfERComparison();
 		this.recall = resultContext.getStatisticMeasuremnts().getRecall();
 		this.precision = resultContext.getStatisticMeasuremnts().getPrecision();
 		this.f_measure = resultContext.getStatisticMeasuremnts().getFMeasure();

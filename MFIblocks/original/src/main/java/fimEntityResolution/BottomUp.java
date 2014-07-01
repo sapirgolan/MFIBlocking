@@ -197,9 +197,10 @@ public class BottomUp {
 				StatisticMeasuremnts results = experimentResult.calculate();
 				
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
-				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
-				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
+				long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration);
+				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, 
+						executionTime, Utilities.convertToSeconds(timeOfERComparison));
 				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
 				blockingRunResults.add(blockingRR);
 				
@@ -220,14 +221,12 @@ public class BottomUp {
 	}
 	
 	private static double calcExecutionTime(long start,
-			long totalMaxRecallCalculationDuration, long writeBlocksDuration,
-			long timeOfComparison) {
+			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
 		long totalRunTime = System.currentTimeMillis() - start;
 		totalRunTime = reduceIreleventTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
-		double totalRunTimeSeconds = (double)(totalRunTime/1000.0);
+		double totalRunTimeSeconds = Utilities.convertToSeconds(totalRunTime); 
 		return totalRunTimeSeconds;
 	}
-
 
 	private static long reduceIreleventTimes(long totalRunTime,
 			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {

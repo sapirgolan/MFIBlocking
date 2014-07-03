@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import lucene.search.SearchEngine;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -58,7 +57,7 @@ public class BottomUp {
 		CFI,
 		MFI
 	}
-	public enum Configuration{
+	public enum MFISetsCheckConfiguration{
 		SPARK,DEFAULT
 	}
 	
@@ -94,11 +93,11 @@ public class BottomUp {
 		int numOfrecords = RecordSet.DB_SIZE;
 		System.out.println("After reading records numOfrecords=" + numOfrecords);
 		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
-		System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(RecordSet.values.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+		//System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(RecordSet.values.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 		start = System.currentTimeMillis();
 		Utilities.parseLexiconFile(context.getLexiconFile());
 		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
-		System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+		//System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
 		start = System.currentTimeMillis();
 		mfiBlocksCore();
@@ -106,8 +105,8 @@ public class BottomUp {
 	}
 
 
-	private static void createSparkContext(Configuration config) {
-		if (config.equals(Configuration.SPARK)) {
+	private static void createSparkContext(MFISetsCheckConfiguration config) {
+		if (config.equals(MFISetsCheckConfiguration.SPARK)) {
 			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 			System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
 			System.setProperty("spark.executor.memory", "5g");
@@ -172,7 +171,6 @@ public class BottomUp {
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
 		//20140619 - SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
-		
 		//20140619 - IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
 		for(double neiborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neiborhoodGrow;
@@ -192,13 +190,14 @@ public class BottomUp {
 				
 				actionStart = System.currentTimeMillis();
 				TrueClusters trueClusters = new TrueClusters(RecordSet.DB_SIZE, context.getMatchFile());
-				System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+				//System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
 				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
 				StatisticMeasuremnts results = experimentResult.calculate();
 				
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				//20140619 - long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+				
+				//20140619 -long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
 				long timeOfComparison=0;
 				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
 				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
@@ -302,7 +301,7 @@ public class BottomUp {
 			//TODO: check content of file
 			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords, minimumSupports[i]);	
 			System.out.println("Time to createRecordFileFromRecords" +Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-				
+			
 			start = System.currentTimeMillis();
 			File mfiFile = Utilities.RunMFIAlg(minimumSupports[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
 			System.out.println("Time to run MFI with minsup="+minimumSupports[i] +
@@ -312,7 +311,7 @@ public class BottomUp {
 			start = System.currentTimeMillis();
 			FrequentItemsetContext itemsetContext = createFrequentItemsetContext( mfiFile.getAbsolutePath(), minBlockingThreshold, minimumSupports[i], context);
 			CandidatePairs candidatePairs = null;
-			if (Configuration.SPARK.equals(context.getConfig())) {
+			if (MFISetsCheckConfiguration.SPARK.equals(context.getConfig())) {
 				candidatePairs = SparkBlocksReader.readFIs(itemsetContext);
 			} else {
 				candidatePairs = Utilities.readFIs(itemsetContext);
@@ -338,8 +337,8 @@ public class BottomUp {
 					minimumSupports[i] +  " is " + coveredRecords.cardinality() + " out of " + RecordSet.size);
 			
 			System.out.println("memory statuses:");
-			System.out.println("DEBUG: Size of coveredRecords: " + MemoryUtil.deepMemoryUsageOf(coveredRecords,VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-			System.out.println("DEBUG: Size of allResults: " + allResults.memoryUsage() + " GB");
+			//System.out.println("DEBUG: Size of coveredRecords: " + MemoryUtil.deepMemoryUsageOf(coveredRecords,VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
+			//System.out.println("DEBUG: Size of allResults: " + allResults.memoryUsage() + " GB");
 			
 				
 		}

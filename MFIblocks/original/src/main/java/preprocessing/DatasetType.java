@@ -3,13 +3,9 @@ package preprocessing;
 public class DatasetType {
 	
 	private String name;
-	private final String CORA = "CORA";
-	private final String CENSUS = "CENSUS";
-	private final String CDDB = "CDDB";
-	private final String MOVIES = "MOVIES";
-	private final String RESTS = "RESTS";
-	private final String DBPEDIA = "DBPedia";
-	private final String[] types = {CORA,CENSUS,CDDB,MOVIES,RESTS,DBPEDIA};
+	
+	
+	private final String[] types = DatasetName.names;
 	
 	
 	public DatasetType (String input){
@@ -21,4 +17,6 @@ public class DatasetType {
 	public String getName(){
 		return name;
 	}
+	
+	
 }

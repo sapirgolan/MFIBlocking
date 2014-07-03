@@ -143,7 +143,7 @@ public class CandidatePairs implements SetPairIF{
 	 */
 	public BitMatrix exportToBitMatrix(){
 		long start = System.currentTimeMillis();
-		System.out.println("DEBUG: total memory used by CandidatePairs: " +	memoryUsage() + " GB");
+		//System.out.println("DEBUG: total memory used by CandidatePairs: " +	memoryUsage() + " GB");
 		
 		removeBelowThresh();
 		BitMatrix bm = new BitMatrix(RecordSet.DB_SIZE);

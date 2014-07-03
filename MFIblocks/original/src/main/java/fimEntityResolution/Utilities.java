@@ -467,18 +467,18 @@ public class Utilities {
 								+ GDS_NG.getMem().getTotal());
 
 						System.out.println("memory statuses");
-						System.out.println("DEBUG: size of coverageIndex "
-								+ MemoryUtil.deepMemoryUsageOfAll(coverageIndex
-										.values(), VisibilityFilter.ALL)
-								/ Math.pow(2, 30) + " GB");
-						System.out.println("DEBUG: size of BitMatrixPool "
-								+ MemoryUtil.deepMemoryUsageOf(BitMatrixPool
-										.getInstance(), VisibilityFilter.ALL)
-								/ Math.pow(2, 30) + " GB");
-						System.out.println("DEBUG: size of FIRunnablePool "
-								+ MemoryUtil.deepMemoryUsageOf(FIRunnablePool
-										.getInstance(), VisibilityFilter.ALL)
-								/ Math.pow(2, 30) + " GB");
+//						System.out.println("DEBUG: size of coverageIndex "
+//								+ MemoryUtil.deepMemoryUsageOfAll(coverageIndex
+//										.values(), VisibilityFilter.ALL)
+//								/ Math.pow(2, 30) + " GB");
+//						System.out.println("DEBUG: size of BitMatrixPool "
+//								+ MemoryUtil.deepMemoryUsageOf(BitMatrixPool
+//										.getInstance(), VisibilityFilter.ALL)
+//								/ Math.pow(2, 30) + " GB");
+//						System.out.println("DEBUG: size of FIRunnablePool "
+//								+ MemoryUtil.deepMemoryUsageOf(FIRunnablePool
+//										.getInstance(), VisibilityFilter.ALL)
+//								/ Math.pow(2, 30) + " GB");
 						System.gc();
 					}
 				} catch (Exception e) {

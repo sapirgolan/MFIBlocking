@@ -4,19 +4,19 @@ import java.util.Arrays;
 import java.util.Map;
 
 import fimEntityResolution.BottomUp.Alg;
-import fimEntityResolution.BottomUp.Configuration;
+import fimEntityResolution.BottomUp.MFISetsCheckConfiguration;
 
 public class MfiContext {
 	
 	public MfiContext() {
 		this.firstDbSize = 0;
-		this.configuration = Configuration.DEFAULT;
+		this.configuration = MFISetsCheckConfiguration.DEFAULT;
 	}
 
 	private double[] minBlockingThresholds;
 	private int[] minSup;
 	private double[] neighborhoodGrowth;
-	private Configuration configuration;
+	private MFISetsCheckConfiguration configuration;
 	private String matchFile;
 	private Alg alg;
 	private String lexiconFile;
@@ -138,7 +138,7 @@ public class MfiContext {
 //		return this.records.size();
 //	}
 
-	public Configuration getConfig() {
+	public MFISetsCheckConfiguration getConfig() {
 		return this.configuration;
 	}
 
@@ -162,9 +162,9 @@ public class MfiContext {
 
 	public void setConfiguration(String configuration) {
 		try {
-			this.configuration = Configuration.valueOf(configuration);
+			this.configuration = MFISetsCheckConfiguration.valueOf(configuration);
 		} catch (Exception e) {
-			System.err.println(String.format("Failed to read value of configuration, will use %s instead", Configuration.DEFAULT.toString()));
+			System.err.println(String.format("Failed to read value of configuration, will use %s instead", MFISetsCheckConfiguration.DEFAULT.toString()));
 		}
 		
 	}

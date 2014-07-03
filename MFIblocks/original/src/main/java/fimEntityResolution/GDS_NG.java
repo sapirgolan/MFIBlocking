@@ -237,9 +237,9 @@ public class GDS_NG implements SetPairIF{
 		 * 3. The matrix has at least 10000 set bits (otherwise there is no point in writing it)
 		 */
 		if (tempStorageMatrix.numOfSet() > NUM_SET_THRESH &&  maxNG < NGLimit && percentegeOfFreeMem() < FREE_MEM_THRESH) {
-			System.out.println("DEBUG: getActualFree(): " + getMem().getActualFree() + " MB");			
-			System.out.println("DEBUG: memAn.getActualUsed(): " + getMem().getActualUsed() + " MB");
-			System.out.println("DEBUG: perfreeMem: " + percentegeOfFreeMem());
+			//System.out.println("DEBUG: getActualFree(): " + getMem().getActualFree() + " MB");			
+			//System.out.println("DEBUG: memAn.getActualUsed(): " + getMem().getActualUsed() + " MB");
+			//System.out.println("DEBUG: perfreeMem: " + percentegeOfFreeMem());
 			//first time writing to DB
 			writeToDB(tempStorageMatrix);
 			tempStorageMatrix= null;

@@ -1064,5 +1064,9 @@ public class Utilities {
 				+ minScoreForFN);
 		return retval;
 	}
+	
+	public static double convertToSeconds(long miliseconds) {
+		return ((double)miliseconds)/1000;
+	}
 
 }

@@ -200,5 +200,11 @@
 		<artifactId>spark-core_2.10</artifactId>
 		<version>1.0.0</version>
 	</dependency>
+	<!-- Mohout - distributed fpgrowth 
+	<dependency>
+    	<groupId>org.apache.mahout</groupId>
+    	<artifactId>mahout-core</artifactId>
+    	<version>0.9</version>
+	</dependency>-->
   </dependencies>
 </project>

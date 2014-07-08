@@ -74,7 +74,24 @@ public class ProfileReader {
 			long start = System.currentTimeMillis();
 			reduceProfiles(filePaths);
 			System.out.println("Profiles were reduced to required limit relative to their sizes in "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+			start = System.currentTimeMillis();
+			reduceGroundTruth();
+			System.out.println("Ground truth was reduced relative to dataset in "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+			
 		}	
+	}
+
+	private static void reduceGroundTruth() {
+		HashSet<IdDuplicates> newGroundTruth=new HashSet<IdDuplicates>();
+		for (IdDuplicates pair : groundTruth){
+			if (pair.getEntityId1() < dbSize.getSize(0) && pair.getEntityId2() < dbSize.getSize(1)){
+				newGroundTruth.add(new IdDuplicates(pair.getEntityId1(), pair.getEntityId2()));
+			}
+		}
+		System.out.println("original="+groundTruth.size());
+		System.out.println("new="+newGroundTruth.size());
+		groundTruth=newGroundTruth;
+		
 	}
 
 	public static void reduceProfiles(String[] filePaths){
@@ -142,15 +159,16 @@ public class ProfileReader {
 		entityProfiles=new ArrayList[inputFiles.length];
 		dbSize=new DBSize(inputFiles.length);
 		if (args.length>10) dbSize.setLimit(Integer.parseInt(args[10]));
+		groundTruth=loadGroundTruth(groundTruthOutFilePath);
+		System.out.println("Ground truth file loaded.");
 		loadEntityProfileSets(inputFiles);
 		System.out.println("Processing file with " +dbSize.getTotalSize()  + " records");
 		System.out.println("Time to load profiles "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
-		groundTruth=loadGroundTruth(groundTruthOutFilePath);
-		System.out.println("Ground truth file loaded.");
+		
 		//================testing DBPEDIA 20140701====START=========
-		//		extractMatchingTuples(1000,true);
-		//		System.out.println("DBSize was roughly reduced to :" + 1000 + " tuples");
-		//		dbSize.setSize(0, entityProfiles[0].size());
+//				extractMatchingTuples(1000,true);
+//				System.out.println("DBSize was roughly reduced to :" + 1000 + " tuples");
+//				dbSize.setSize(0, entityProfiles[0].size());
 		//dbSize.setSize(1, entityProfiles[1].size());
 		//================testing DBPEDIA 20140701=====END==========
 		start = System.currentTimeMillis();

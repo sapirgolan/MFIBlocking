@@ -19,7 +19,6 @@ import lucene.search.SearchEngine;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
-
 import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
 import candidateMatches.RecordMatches;
@@ -170,8 +169,8 @@ public class BottomUp {
 		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
-		//20140619 - SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
-		//20140619 - IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
+		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
+		IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
 		for(double neiborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neiborhoodGrow;
 		
@@ -194,13 +193,11 @@ public class BottomUp {
 				
 				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
 				StatisticMeasuremnts results = experimentResult.calculate();
-				
 				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				
-				//20140619 -long timeOfComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
-				long timeOfComparison=0;
-				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration, timeOfComparison);
-				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, executionTime);
+				long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration);
+				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, 
+						executionTime, Utilities.convertToSeconds(timeOfERComparison));
 				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
 				blockingRunResults.add(blockingRR);
 				
@@ -221,14 +218,12 @@ public class BottomUp {
 	}
 	
 	private static double calcExecutionTime(long start,
-			long totalMaxRecallCalculationDuration, long writeBlocksDuration,
-			long timeOfComparison) {
+			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
 		long totalRunTime = System.currentTimeMillis() - start;
 		totalRunTime = reduceIreleventTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
-		double totalRunTimeSeconds = (double)(totalRunTime/1000.0);
+		double totalRunTimeSeconds = Utilities.convertToSeconds(totalRunTime); 
 		return totalRunTimeSeconds;
 	}
-
 
 	private static long reduceIreleventTimes(long totalRunTime,
 			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
@@ -382,28 +377,6 @@ public class BottomUp {
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
 				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()<firstDbSize) ||
 						(entry.getKey()<firstDbSize && cm.getRecordId()>firstDbSize)) 
-					continue;
-				else 
-					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
-				//Set<Integer> temp=new HashSet<Integer>();
-				//temp.add(cm.getRecordId());
-				//temp.add(entry.getKey());
-				//actualPairs.add(temp);
-			}
-		}
-		System.out.println("Time exclude pairs : " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-		return updatedPairs;
-	}
-
-	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs) {
-		System.out.println("Excluding pairs if records from different sets..");
-		CandidatePairs updatedPairs=new CandidatePairs();
-		long start=System.currentTimeMillis();
-		//Set<Set<Integer>> actualPairs=new HashSet<>();
-		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
-			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
-				if ( 	(entry.getKey()%2==0 && cm.getRecordId()%2==0) ||
-						(entry.getKey()%2!=0 && cm.getRecordId()%2!=0)) 
 					continue;
 				else 
 					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());

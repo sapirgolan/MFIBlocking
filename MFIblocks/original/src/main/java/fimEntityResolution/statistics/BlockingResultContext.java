@@ -7,16 +7,18 @@ public class BlockingResultContext {
 	private double lastUsedBlockingThreshold;
 	private double ngLimit;
 	private double executionTime;
+	private double timeOfERComparison;
 
 	public BlockingResultContext(StatisticMeasuremnts results,
 			double minBlockingThreshold, double lastUsedBlockingThreshold,
-			double nG_LIMIT, double executionTime) {
+			double nG_LIMIT, double executionTime, double timeOfERComparison) {
 		
 		this.statisticMeasuremnts = results;
 		this.minBlockingThreshold = minBlockingThreshold;
 		this.lastUsedBlockingThreshold = lastUsedBlockingThreshold;
 		this.ngLimit = nG_LIMIT;
 		this.executionTime = executionTime;
+		this.timeOfERComparison = timeOfERComparison;
 	}
 
 	/**
@@ -52,6 +54,10 @@ public class BlockingResultContext {
 	 */
 	public final double getExecutionTime() {
 		return executionTime;
+	}
+
+	public double getTimeOfERComparison() {
+		return timeOfERComparison;
 	}
 
 }

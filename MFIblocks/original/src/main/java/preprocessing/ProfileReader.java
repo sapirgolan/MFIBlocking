@@ -43,6 +43,7 @@ public class ProfileReader {
 	public static final String PREFIX_LENGTH="30";   //for DS_Weights file
 	public static int COLUMNS=5;
 	public static String MOVIES_DS_FILE="DS_weights_movies.properties";
+	public static String CDDB_DS_FILE="DS_weights_CDDB.properties";
 	public static DBSize dbSize;
 	private static DatasetType dataset;
 	//BufferWriters
@@ -228,8 +229,11 @@ public class ProfileReader {
 			DS_weightsFile=null;
 
 		}
-		else {
+		else if (dataset.getName().equalsIgnoreCase("MOVIES")){
 			lexicon = new Lexicon(new File (MOVIES_DS_FILE));
+		}
+		else if (dataset.getName().equalsIgnoreCase("CDDB")){
+			lexicon = new Lexicon(new File (CDDB_DS_FILE));
 		}
 
 		numericOutputWriter = new BufferedWriter(new FileWriter(new File(numericOutFilePath)));

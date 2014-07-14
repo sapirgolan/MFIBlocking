@@ -106,7 +106,7 @@ public class ProfileReader {
 		}
 		for (int i=0;i<filePaths.length;i++){
 			dbSize.setSize(i, entityProfiles[i].size());
-			//System.out.println("DEBUG: Size of file "+i+ " is "+dbSize.getSize(i));
+			System.out.println("DEBUG: Size of file "+i+ " is "+dbSize.getSize(i));
 		}
 	}
 
@@ -133,7 +133,7 @@ public class ProfileReader {
 	 * 7. output records file path
 	 * 8. n-grams parameter {3,4,5,..}
 	 * 9. pruning threshold parameter
-	 * 10. [source map file path]
+	 * 10. [limit for data-set size]
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException{
@@ -368,8 +368,8 @@ public class ProfileReader {
 			long linesNumPrefix=entityProfiles[0].size();
 			for (IdDuplicates groundPair:groundTruth){
 				StringBuilder sb = new StringBuilder();
-				sb.append(groundPair.getEntityId1()).append(" ");
-				sb.append(groundPair.getEntityId2()+linesNumPrefix).append(" ");
+				sb.append(groundPair.getEntityId1()+1).append(" ");
+				sb.append(groundPair.getEntityId2()+1+linesNumPrefix).append(" ");
 				matchWriter.write(sb.toString());
 				matchWriter.newLine();
 			}
@@ -377,8 +377,9 @@ public class ProfileReader {
 		else{
 			for (IdDuplicates groundPair:groundTruth){
 				StringBuilder sb = new StringBuilder();
-				sb.append(groundPair.getEntityId1()).append(" ");
-				sb.append(groundPair.getEntityId2()).append(" ");
+				//20140713 adding 1 to match index (records start from 1 and index from 0)
+				sb.append(groundPair.getEntityId1()+1).append(" ");
+				sb.append(groundPair.getEntityId2()+1).append(" ");
 				matchWriter.write(sb.toString());
 				matchWriter.newLine();
 			}

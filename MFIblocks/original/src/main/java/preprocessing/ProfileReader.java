@@ -39,8 +39,8 @@ public class ProfileReader {
 	public static Set<ComparableColumnsDensity> sortedDensity;
 	//Constants:
 	public static final String COMMA=",";
-	public static final String DEFAULT_COLUMN_WIEGHT="0.1"; //for DS_Weights file
-	public static final String PREFIX_LENGTH="30";   //for DS_Weights file
+	public static final String DEFAULT_COLUMN_WIEGHT="0.9"; //for DS_Weights file
+	public static final String PREFIX_LENGTH="100";   //for DS_Weights file
 	public static int COLUMNS=5;
 	public static String MOVIES_DS_FILE="DS_weights_movies.properties";
 	public static String CDDB_DS_FILE="DS_weights_CDDB.properties";
@@ -133,17 +133,16 @@ public class ProfileReader {
 	 * 7. output records file path
 	 * 8. n-grams parameter {3,4,5,..}
 	 * 9. pruning threshold parameter
-	 * 10. [limit for data-set size]
+	 * 10. dataset type
+	 * 11. [limit for data-set size]
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException{
-		Runtime runtime = Runtime.getRuntime();
-		runtime.gc();
+		Runtime.getRuntime().gc();
 		long globalStart = System.currentTimeMillis();
-		long start = System.currentTimeMillis();
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		Date date = new Date();
-		System.out.println("Started on : " + dateFormat.format(date));	
+		System.out.println("Started on : " + dateFormat.format(new Date()));	
+		
 		//reading inputs:
 		String[] inputFiles = args[0].split(COMMA);
 		String numericOutFilePath = args[1];
@@ -154,17 +153,20 @@ public class ProfileReader {
 		String recordOutFilePath = args[6];
 		int n_gramsParam = Integer.parseInt(args[7]);	
 		double idfThreshParam = Double.parseDouble(args[8]);
-		dataset=new DatasetType(args[9]);
-		start = System.currentTimeMillis();
+		dataset = new DatasetType(args[9]);
+		long start = System.currentTimeMillis();
+
 		//loading data
-		entityProfiles=new ArrayList[inputFiles.length];
-		dbSize=new DBSize(inputFiles.length);
-		if (args.length>10) dbSize.setLimit(Integer.parseInt(args[10]));
-		groundTruth=loadGroundTruth(groundTruthOutFilePath);
+		entityProfiles = new ArrayList[inputFiles.length];
+		dbSize = new DBSize(inputFiles.length);
+		if (args.length>10) {
+			dbSize.setLimit(Integer.parseInt(args[10]));
+		}
+		groundTruth = loadGroundTruth(groundTruthOutFilePath);
 		System.out.println("Ground truth file loaded.");
 		loadEntityProfileSets(inputFiles);
-		System.out.println("Processing file with " +dbSize.getTotalSize()  + " records");
-		System.out.println("Time to load profiles "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+		System.out.println("Processing file with " + dbSize.getTotalSize() + " records");
+		System.out.println("Time to load profiles "+ (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		
 		//================testing DBPEDIA 20140701====START=========
 //				extractMatchingTuples(1000,true);
@@ -172,12 +174,13 @@ public class ProfileReader {
 //				dbSize.setSize(0, entityProfiles[0].size());
 		//dbSize.setSize(1, entityProfiles[1].size());
 		//================testing DBPEDIA 20140701=====END==========
+		
 		start = System.currentTimeMillis();
 		//1. extract names from attributes list AND 
 		attributeNames = new TreeSet<String>();
 		long attributeCounter=0;
-		for (int i=0;i<entityProfiles.length;i++){
-			for(int j=0;j<entityProfiles[i].size();j++){
+		for (int i=0 ; i<entityProfiles.length ; i++){
+			for(int j=0 ; j<entityProfiles[i].size() ; j++){
 				HashSet<Attribute> attributes = entityProfiles[i].get(j).getAttributes();
 				for (Attribute attribute : attributes) {
 					attributeNames.add( attribute.getName() );
@@ -185,15 +188,20 @@ public class ProfileReader {
 				}
 			}
 		}
+		
+		//special case for datasets
 		if (dataset.getName().equalsIgnoreCase("DBPEDIA")){
 			System.out.println("Number of columns is set to "+COLUMNS+" .");
 		}
 
-		System.out.println("Attribute names were extracted. Total: "+attributeCounter+" attributes");
-		System.out.println("Time to extract attributess "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
+		System.out.println("Attribute names were extracted. Total: " + attributeCounter + " attributes");
+		System.out.println("Time to extract attributess " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
+		
 		//2. build the map for numeric column indexing
 		map = buildMapIndex(attributeNames);
 		wordProcessor = new WordProcessor(new File(stopWordsFile),n_gramsParam,n_gramsParam);
+		
+		//Special case for DBPEDIA dataset
 		if (dataset.getName().equalsIgnoreCase("DBPEDIA")){
 			//3. choose dense columns only
 			start = System.currentTimeMillis();
@@ -218,20 +226,23 @@ public class ProfileReader {
 			System.out.println("Maximum number of attributes in profile: "+maximalAttributeNumber);
 		}
 
+		//special case if dataset is NOT MOVIES 
 		if (!dataset.getName().equalsIgnoreCase("MOVIES")){
 			//4. create DS_weights.properties file
 			start = System.currentTimeMillis();
-			File DS_weightsFile= createDS_weightsFile();
+			File DS_weightsFile = createDS_weightsFile();
 			writeMapToDS_weightsFile(DS_weightsFile);
 			System.out.println("Time to create DS_weights.properties file: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			//5. construct lexicon object
 			lexicon = new Lexicon(DS_weightsFile);
-			DS_weightsFile=null;
+			DS_weightsFile = null;
 
 		}
+		//special case for movies
 		else if (dataset.getName().equalsIgnoreCase("MOVIES")){
 			lexicon = new Lexicon(new File (MOVIES_DS_FILE));
 		}
+		//special case for CDDB
 		else if (dataset.getName().equalsIgnoreCase("CDDB")){
 			lexicon = new Lexicon(new File (CDDB_DS_FILE));
 		}

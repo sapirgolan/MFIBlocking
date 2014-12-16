@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import au.com.bytecode.opencsv.CSVReader;
 
 public class csvFile {
@@ -25,7 +24,7 @@ public class csvFile {
 	private static BufferedWriter numericOutputWriter;
 	private static BufferedWriter stringOutputWriter;
 	private static BufferedWriter matchWriter;	
-	private static Lexicon lexicon;
+	private static LexiconOriginal lexicon;
 	private static String swFile;
 	private static WordProcessor wordProcessor;	
 	public static int DB_Size;
@@ -37,7 +36,7 @@ public class csvFile {
 		String matchFile = args[2];
 		String paramsFile = args[3];
 		swFile = args[4];
-		String lexiconOutFile = args[5];
+		String LexiconOriginalOutFile = args[5];
 		String recordOutFile = args[6];
 		int NGramSize = Integer.parseInt(args[7]);		
 		double DBSize = Double.parseDouble(args[8]);
@@ -45,8 +44,8 @@ public class csvFile {
 		double IDFThresh = Double.parseDouble(args[9]);
 		String sourceMapFile = (args.length > 10 ? args[10] : null);
 		System.out.println("Processing file with " + DBSize + " records");
-		
-		lexicon = new Lexicon(new File(paramsFile));
+		System.out.println(new File(paramsFile).getAbsolutePath().toString());
+		lexicon = new LexiconOriginal(new File(paramsFile));
 		wordProcessor = new WordProcessor(new File(swFile),NGramSize,NGramSize);
 		
 		try {
@@ -143,7 +142,7 @@ public class csvFile {
 	        numericOutputWriter.close();
 	        stringOutputWriter.close();
 	        matchWriter.close();	        
-	        lexicon.exportToPropFile(lexiconOutFile);
+	        lexicon.exportToPropFile(LexiconOriginalOutFile);
 	        System.out.println("total number of pairs in match file: " + numOfpairs);
 	        if(sourceWriter != null){
 	        	sourceWriter.close();
@@ -158,7 +157,7 @@ public class csvFile {
 		}	
 	}
 	
-	private static void removeTooFrequentItems(Lexicon lexicon, CSVReader reader, double DBSize, double IDFThresh){
+	private static void removeTooFrequentItems(LexiconOriginal lexiconOriginal, CSVReader reader, double DBSize, double IDFThresh){
 		String[] currLine = null;
 		int recordId = 1;
 		boolean first = true;
@@ -178,13 +177,13 @@ public class csvFile {
 					if(i == clusterAttIndex|| i == sourceAttIndex){
 						continue; // do not want to write this as part of the file
 					}					
-					if(lexicon.getColumnWeight(i) <= 0){
+					if(lexiconOriginal.getColumnWeight(i) <= 0){
 						continue;
 					}
 					String toWrite = getCleanString(parts[i]);	
-					if(lexicon.getPrefixLengthForColumn(i) > 0){						
+					if(lexiconOriginal.getPrefixLengthForColumn(i) > 0){						
 						toWrite = toWrite.substring(0, 
-								Math.min(lexicon.getPrefixLengthForColumn(i),toWrite.length()));						
+								Math.min(lexiconOriginal.getPrefixLengthForColumn(i),toWrite.length()));						
 					}		
 					getNGramIdString(recordId, toWrite,i, false);				
 						
@@ -205,7 +204,7 @@ public class csvFile {
 		}
 	
 		//now remove high frequency items
-		lexicon.removeFrequentItems(DBSize, IDFThresh);
+		lexiconOriginal.removeFrequentItems(DBSize, IDFThresh);
 		
 	}
 	

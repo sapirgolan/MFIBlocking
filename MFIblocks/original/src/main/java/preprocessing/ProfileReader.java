@@ -39,9 +39,9 @@ public class ProfileReader {
 	public static Set<ComparableColumnsDensity> sortedDensity;
 	//Constants:
 	public static final String COMMA=",";
-	public static final String DEFAULT_COLUMN_WIEGHT="0.1"; //for DS_Weights file
+	public static final String DEFAULT_COLUMN_WIEGHT="0.9"; //for DS_Weights file
 	public static final String PREFIX_LENGTH="30";   //for DS_Weights file
-	public static int COLUMNS=5;
+	public static int COLUMNS=10;
 	public static String MOVIES_DS_FILE="DS_weights_movies.properties";
 	public static String CDDB_DS_FILE="DS_weights_CDDB.properties";
 	public static DBSize dbSize;
@@ -133,7 +133,7 @@ public class ProfileReader {
 	 * 7. output records file path
 	 * 8. n-grams parameter {3,4,5,..}
 	 * 9. pruning threshold parameter
-	 * 10. [limit for data-set size]
+	 * 10. dataset type as appears in DatasetName.java
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException{
@@ -217,11 +217,17 @@ public class ProfileReader {
 			System.out.println("Time to calculate density: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			System.out.println("Maximum number of attributes in profile: "+maximalAttributeNumber);
 		}
-
-		if (!dataset.getName().equalsIgnoreCase("MOVIES")){
+		if (dataset.getName().equalsIgnoreCase("MOVIES")){
+			lexicon = new Lexicon(new File (MOVIES_DS_FILE));
+		}
+		else if (dataset.getName().equalsIgnoreCase("CDDB")){
+			lexicon = new Lexicon(new File (CDDB_DS_FILE));
+		}
+		else {
 			//4. create DS_weights.properties file
 			start = System.currentTimeMillis();
 			File DS_weightsFile= createDS_weightsFile();
+			System.out.println(DS_weightsFile.getAbsolutePath().toString());
 			writeMapToDS_weightsFile(DS_weightsFile);
 			System.out.println("Time to create DS_weights.properties file: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			//5. construct lexicon object
@@ -229,12 +235,7 @@ public class ProfileReader {
 			DS_weightsFile=null;
 
 		}
-		else if (dataset.getName().equalsIgnoreCase("MOVIES")){
-			lexicon = new Lexicon(new File (MOVIES_DS_FILE));
-		}
-		else if (dataset.getName().equalsIgnoreCase("CDDB")){
-			lexicon = new Lexicon(new File (CDDB_DS_FILE));
-		}
+		
 
 		numericOutputWriter = new BufferedWriter(new FileWriter(new File(numericOutFilePath)));
 		matchWriter = new BufferedWriter( new FileWriter(new File(matchOutFilePath)));
@@ -260,6 +261,7 @@ public class ProfileReader {
 						if(lexicon.getColumnWeight(map.get(attribute.getName())) > 0){
 							cleanStringBuilder.append(toWrite).append(" ");
 						}
+						//else System.out.println("DEBUG: value " + toWrite +" is from attribute "+ attribute.getName()+ " and it's weight is 0");
 
 						String ngramIdString = getNGramIdString(recordId, toWrite,map.get(attribute.getName()), true);
 						if(ngramIdString.trim().length() > 0){

@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 import fimEntityResolution.FrequentItem;
 import fimEntityResolution.bitsets.SBS_BitSet_Factory;
 
-public class Lexicon {
+public class LexiconOriginal {
 
 	private Map<Integer,AttributeItems> attIdToItems = new HashMap<Integer,AttributeItems>();	
 	private Map<Integer,Double> attIdToWeights = new HashMap<Integer, Double>();
@@ -31,7 +31,7 @@ public class Lexicon {
 	private int numOfWords = 0;
 	private int minWordSize = Integer.MAX_VALUE;
 	private int maxWordSize = 0;
-	public Lexicon(File weightsPropertiesFile){
+	public LexiconOriginal(File weightsPropertiesFile){
 		FileReader fr;
 		try {
 			fr = new FileReader(weightsPropertiesFile);
@@ -81,7 +81,7 @@ public class Lexicon {
 	
 	private final static String DEFAULT_WEIGHTS = "0.99999";
 	private final static String SEP = ",";
-	public Lexicon(String weightsProperty){
+	public LexiconOriginal(String weightsProperty){
 		if(weightsProperty == null || weightsProperty.length() == 0){
 			weightsProperty=DEFAULT_WEIGHTS;
 		}
@@ -121,7 +121,7 @@ public class Lexicon {
 			int wordId = currItemId++;
 			wordsToIds.put(word, wordId);
 			//wordItem = new SparseFrequentItem(wordId, word,attIdToWeights.get(attId));
-			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*ProfileReader.dbSize.getTotalSize()));
+			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*csvFile.DB_Size));
 		}
 		wordItem.addSupport(recordId);
 		attFIs.getItems().put(wordItem.getId(), wordItem);

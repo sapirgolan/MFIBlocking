@@ -16,7 +16,6 @@
   
    <modules>
     <module>original</module>
-    <module>SparkMohout</module>
   </modules>
   
   <build>

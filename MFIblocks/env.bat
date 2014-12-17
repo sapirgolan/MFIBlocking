@@ -9,6 +9,12 @@ IF EXIST C:\worksapce\Apache-maven-3.1.1 (
 @set M2_HOME=C:\worksapce\Apache-maven-3.1.1
 goto addMvnToPath
 )
+@echo off
+IF EXIST C:\Apache-maven-3.2.3 (
+@echo Apache-maven-3.2.3 exists under C drive.
+@set M2_HOME=C:\Apache-maven-3.2.3
+goto addMvnToPath
+) 
 
 echo.
 echo ERROR: Apache-maven not found in your environment.

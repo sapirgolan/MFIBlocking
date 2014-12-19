@@ -369,14 +369,14 @@ public class BottomUp {
 	}
 	
 	private static CandidatePairs removePairsSameSet(CandidatePairs actualCPs, int firstDbSize) {
-		System.out.println("Excluding pairs if records from different sets..");
+		System.out.println("Excluding pairs if records from the same set..");
 		CandidatePairs updatedPairs=new CandidatePairs();
 		long start=System.currentTimeMillis();
 		//Set<Set<Integer>> actualPairs=new HashSet<>();
 		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
-				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()<firstDbSize) ||
-						(entry.getKey()<firstDbSize && cm.getRecordId()>firstDbSize)) 
+				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()>firstDbSize) ||
+						(entry.getKey()<firstDbSize && cm.getRecordId()<firstDbSize)) 
 					continue;
 				else 
 					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());

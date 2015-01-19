@@ -16,16 +16,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import lucene.search.SearchEngine;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
 import candidateMatches.RecordMatches;
-
-import com.javamex.classmexer.MemoryUtil;
-import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
-
 import dnl.utils.text.table.TextTable;
 import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
@@ -188,7 +185,8 @@ public class BottomUp {
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
-				TrueClusters trueClusters = new TrueClusters(RecordSet.DB_SIZE, context.getMatchFile());
+				TrueClusters trueClusters = new TrueClusters();
+				trueClusters.findClustersAssingments(context.getMatchFile());
 				//System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
 				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);

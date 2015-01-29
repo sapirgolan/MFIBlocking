@@ -264,7 +264,8 @@ public class LexiconCSV {
 				propVal.setLength(0); //clear the stringBuilder		
 				propVal.append(fi.getItem()).append(",").
 						append(Double.toString(fi.getWeight())).append(",").
-							append(fi.getSupportString()).append(fi.getColumnsString());
+							append(fi.getSupportString()).append(",").
+							append(fi.getColumnsString());
 				
 				props.put(Integer.toString(fi.getId()), propVal.toString());
 				//props.put(Integer.toString(fi.get()), propVal.toString());

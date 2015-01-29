@@ -74,6 +74,8 @@ public class BottomUp {
 		6. The set of min supports to use.
 		7. Must be set to MFI
 		8. The set of p parameters to use as the Neighberhood Growth constraints.
+		9. Blocks output format [S,Path], [B], [N] (S-statistics+blocks with a path of original CSV, B-only blocks, N-no print)
+		10.Size of the first dataset (optional, only for 2 and more dataset files)
 	 */
 	public static void main(String[] args){
 		context = readArguments(args);
@@ -149,6 +151,7 @@ public class BottomUp {
 		context.setNGs(args[8]);
 		context.setFirstDbSize(args);
 		context.setPerformanceFlag(args);
+		context.setPrintFormat(args[9]);
 		return context;
 	}
 
@@ -184,7 +187,7 @@ public class BottomUp {
 				//obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
 				long actionStart = System.currentTimeMillis();
-				writeCandidatePairs(algorithmObtainedPairs);
+				writeCandidatePairs(algorithmObtainedPairs,context);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
@@ -242,11 +245,20 @@ public class BottomUp {
 	 * the method write the blocking output to a file for later usage
 	 * @param cps
 	 */
-	private static void writeCandidatePairs(CandidatePairs cps) {
+	private static void writeCandidatePairs(CandidatePairs cps, MfiContext context) {
 		ResultWriter resultWriter = new ResultWriter();
 		File outputFile = resultWriter.createOutputFile();
 		try {
-			resultWriter.writeBlocks(outputFile, cps);
+			if (context.getPrntFormat().equalsIgnoreCase("S")){
+				resultWriter.writeBlocksStatistics(outputFile, cps, context);
+			}
+			else if (context.getPrntFormat().equalsIgnoreCase("B")){
+				resultWriter.writeBlocksIDs(outputFile, cps);
+			}
+			else {
+				System.out.println("No blocks were printed (format 'N')");
+			}
+			
 		} catch (IOException e) {
 			System.err.println("***Failed to write blocks***");
 			e.printStackTrace();
@@ -378,6 +390,8 @@ public class BottomUp {
 				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()>firstDbSize) ||
 						(entry.getKey()<firstDbSize && cm.getRecordId()<firstDbSize)) 
 					continue;
+//				if  (entry.getKey()>firstDbSize || cm.getRecordId()>firstDbSize) //for CDDB experiemtns (also add 500 to the command inputs)
+//					continue;
 				else 
 					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
 				//Set<Integer> temp=new HashSet<Integer>();

@@ -29,7 +29,7 @@ public class CDs {
 	private static BufferedWriter numericOutputWriter;
 	private static BufferedWriter stringOutputWriter;
 	private static BufferedWriter matchWriter;	
-	private static Lexicon lexicon;
+	private static LexiconProfiles lexicon;
 	private static String swFile;
 	private static WordProcessor wordProcessor;
 
@@ -44,7 +44,7 @@ public class CDs {
 		String discOutFile = args[6];
 		String inputMatchFile = args[7];
 		
-		lexicon = new Lexicon(paramsFile);
+		lexicon = new LexiconProfiles(paramsFile);
 		wordProcessor = new WordProcessor(new File(swFile));
 
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();

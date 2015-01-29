@@ -26,6 +26,9 @@ public class MfiContext {
 	//private Map<Integer, Record> records;
 	private boolean inPerformanceMode;
 	private int firstDbSize;
+	private String printFormat;
+	private String originalRecordsPath;
+	
 
 	public void setMatchFile(String matchFile) {
 		this.matchFile = matchFile;
@@ -152,9 +155,9 @@ public class MfiContext {
 	}
 
 	public void setFirstDbSize(String[] args) {
-		if(args.length > 9 && args[9] != null){
-			if (StringUtils.isNumeric(args[9]) ) {
-				this.firstDbSize = Integer.parseInt(args[9]);
+		if(args.length > 10 && args[10] != null){
+			if (StringUtils.isNumeric(args[10]) ) {
+				this.firstDbSize = Integer.parseInt(args[10]);
 			}
 		}
 	}
@@ -170,6 +173,27 @@ public class MfiContext {
 			System.err.println(String.format("Failed to read value of configuration, will use %s instead", MFISetsCheckConfiguration.DEFAULT.toString()));
 		}
 		
+	}
+
+	public void setPrintFormat(String string) {
+		String[] input = string.trim().split(",");
+		if (input[0]==null || input[1]==null){
+			System.err.println("The chosen format for block printing is unsupported.");
+		}
+		else {
+			if (input[0].equalsIgnoreCase("B") || input[0].equalsIgnoreCase("N") || input[0].equalsIgnoreCase("S"))
+				printFormat=string;
+			else 
+				System.err.println("The chosen format for block printing is unsupported.");
+			originalRecordsPath=input[1];
+		}
+	}
+
+	public String getPrntFormat() {
+		return printFormat;
+	}
+	public String getOriginalRecordsPath() {
+		return originalRecordsPath;
 	}
 
 }

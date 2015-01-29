@@ -32,7 +32,7 @@ public class ResultWriter {
 		return file;
 	}
 	
-	public void writeBlocks(File file, CandidatePairs cps) throws IOException {
+	public void writeBlocksIDs(File file, CandidatePairs cps) throws IOException {
 		FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 		ConcurrentHashMap<Integer,RecordMatches> allMatches = cps.getAllMatches();
@@ -53,6 +53,43 @@ public class ResultWriter {
 			stringBuilder.append(" - " + keySet.toString());
 			bufferedWriter.write(stringBuilder.toString());
 			bufferedWriter.newLine();
+		}
+		bufferedWriter.close();
+	}
+	
+	public void writeBlocksStatistics(File file, CandidatePairs cps, MfiContext context) throws IOException {
+		FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+		ConcurrentHashMap<Integer,RecordMatches> allMatches = cps.getAllMatches();
+		if (allMatches == null) {
+			bufferedWriter.close();
+			return;
+		}
+		Iterator<Entry<Integer, RecordMatches>> iterator = allMatches.entrySet().iterator();
+		while (iterator.hasNext()) {
+			StringBuilder stringBuilder = new StringBuilder();
+			Map.Entry<Integer, RecordMatches> entry = (Map.Entry<Integer, RecordMatches>) iterator.next();
+			if (entry.getValue() == null || entry.getValue().size() == 0) {
+				continue;
+			}
+			//adds ID of current record
+			stringBuilder.append(entry.getKey());
+			stringBuilder.append(" ");
+			stringBuilder.append("size=");
+			stringBuilder.append(entry.getValue().size());
+			bufferedWriter.write(stringBuilder.toString());
+			bufferedWriter.newLine();
+			RecordSet.loadOriginalRecordsFromCSV(context.getOriginalRecordsPath());
+			for (Integer id : entry.getValue().getCandidateSet().keySet()){
+				stringBuilder = new StringBuilder();
+				stringBuilder.append(RecordSet.originalRecords[id-1]);
+				bufferedWriter.write(stringBuilder.toString());
+				bufferedWriter.newLine();
+			}
+			//Set<Integer> keySet = entry.getValue().getCandidateSet().keySet();
+			//stringBuilder.append(" - " + keySet.toString());
+			//bufferedWriter.write(stringBuilder.toString());
+			//bufferedWriter.newLine();
 		}
 		bufferedWriter.close();
 	}

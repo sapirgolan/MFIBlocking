@@ -28,7 +28,7 @@ import DataStructures.IdDuplicates;
 
 public class ProfileReaderOLD {
 
-	private static Lexicon lexicon;
+	private static LexiconProfiles lexicon;
 	private static String stopWordsFile;
 	private static WordProcessor wordProcessor;	
 	public static HashSet<IdDuplicates> groundTruth;
@@ -177,12 +177,12 @@ public class ProfileReaderOLD {
 			writeMapToDS_weightsFile(DS_weightsFile);
 			System.out.println("Time to create DS_weights.properties file: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			//5. construct lexicon object
-			lexicon = new Lexicon(DS_weightsFile);
+			lexicon = new LexiconProfiles(DS_weightsFile);
 			DS_weightsFile=null;
 		
 		}
 		else {
-			lexicon = new Lexicon(new File (MOVIES_DS_FILE));
+			lexicon = new LexiconProfiles(new File (MOVIES_DS_FILE));
 		}
 		
 		numericOutputWriter = new BufferedWriter(new FileWriter(new File(numericOutFilePath)));

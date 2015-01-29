@@ -23,7 +23,7 @@ public class Cora {
 	private static BufferedWriter stringOutputWriter;
 	private static BufferedWriter matchWriter;
 	private static Set<String> distinctRecords;
-	private static Lexicon lexicon;
+	private static LexiconProfiles lexicon;
 	private static String swFile;
 	private static WordProcessor wordProcessor;
 	
@@ -39,7 +39,7 @@ public class Cora {
 		String publicationsOutFile = args[6];
 		 
 		
-		lexicon = new Lexicon(paramsFile);
+		lexicon = new LexiconProfiles(paramsFile);
 		wordProcessor = new WordProcessor(new File(swFile));
 		
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();

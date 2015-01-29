@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 import fimEntityResolution.FrequentItem;
 import fimEntityResolution.bitsets.SBS_BitSet_Factory;
 
-public class LexiconOriginal {
+public class LexiconCSV {
 
 	private Map<Integer,AttributeItems> attIdToItems = new HashMap<Integer,AttributeItems>();	
 	private Map<Integer,Double> attIdToWeights = new HashMap<Integer, Double>();
@@ -31,7 +31,7 @@ public class LexiconOriginal {
 	private int numOfWords = 0;
 	private int minWordSize = Integer.MAX_VALUE;
 	private int maxWordSize = 0;
-	public LexiconOriginal(File weightsPropertiesFile){
+	public LexiconCSV(File weightsPropertiesFile){
 		FileReader fr;
 		try {
 			fr = new FileReader(weightsPropertiesFile);
@@ -81,7 +81,7 @@ public class LexiconOriginal {
 	
 	private final static String DEFAULT_WEIGHTS = "0.99999";
 	private final static String SEP = ",";
-	public LexiconOriginal(String weightsProperty){
+	public LexiconCSV(String weightsProperty){
 		if(weightsProperty == null || weightsProperty.length() == 0){
 			weightsProperty=DEFAULT_WEIGHTS;
 		}
@@ -123,6 +123,7 @@ public class LexiconOriginal {
 			//wordItem = new SparseFrequentItem(wordId, word,attIdToWeights.get(attId));
 			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*csvFile.DB_Size));
 		}
+		wordItem.addColumn(columnIndex);
 		wordItem.addSupport(recordId);
 		attFIs.getItems().put(wordItem.getId(), wordItem);
 		attIdToItems.put(attId, attFIs);
@@ -263,8 +264,10 @@ public class LexiconOriginal {
 				propVal.setLength(0); //clear the stringBuilder		
 				propVal.append(fi.getItem()).append(",").
 						append(Double.toString(fi.getWeight())).append(",").
-							append(fi.getSupportString());
+							append(fi.getSupportString()).append(fi.getColumnsString());
+				
 				props.put(Integer.toString(fi.getId()), propVal.toString());
+				//props.put(Integer.toString(fi.get()), propVal.toString());
 			}
 		}
 		return props;

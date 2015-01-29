@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.ngram.NGramTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -49,6 +51,7 @@ public class WordProcessor {
 					retVal.add(term.trim().toLowerCase());
 				}
 			}
+			
 			ts_shortWords.end();
 			ts_shortWords.close();
 			//JS: TokenStream protocol requirement: 1. define, 2. reset, 3. increment, 4.end, 5. close  20140515

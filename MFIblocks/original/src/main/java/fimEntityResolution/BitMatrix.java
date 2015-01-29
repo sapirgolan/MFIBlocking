@@ -165,7 +165,8 @@ public class BitMatrix implements Clearer,SetPairIF{
 		bm2.setIndex(2,4);
 		bm2.setIndex(3,2);
 		bm2.setIndex(3,4);
-		
+		bm2.setIndex(3,4);
+		bm2.setIndex(2,4);
 		Iterator It = bm2.getSBS().getIterator();
 		int[] pair = new int[2];
 		while(It.hasNext()){

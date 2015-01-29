@@ -5,12 +5,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import scala.collection.mutable.StringBuilder;
+
+import au.com.bytecode.opencsv.CSVReader;
+
 public class RecordSet {
 	public static Map<Integer, Record> values;
+	public static String[] originalRecords;
 	public static int size;
 	public static int minRecordLength = Integer.MAX_VALUE;
 	public static int DB_SIZE;
@@ -20,7 +27,37 @@ public class RecordSet {
 		size=values.size();
 		
 	}
-	
+	public static void loadOriginalRecordsFromCSV(String filename) throws IOException{
+		originalRecords=new String[DB_SIZE];
+		CSVReader cvsReader = null; 
+		
+		
+		cvsReader = new CSVReader(new FileReader(
+					new File(filename)));
+		
+		String[] currLine = null;
+		int recordId = 1;
+		boolean first = true;
+		String[] attNames= null;
+		while ((currLine = cvsReader.readNext()) != null) {				
+			if(first){
+				attNames = currLine;	
+				first = false;
+				continue;
+			}
+			String[] parts=currLine;
+			
+			
+			StringBuilder sb=new StringBuilder();
+			
+			for(int i=0 ; i < parts.length ; i++){	
+				sb.append(parts[i]);
+				sb.append(",");
+			}
+			originalRecords[recordId-1] = sb.toString();
+			recordId++;
+		}
+	}
 	public static void readRecords(MfiContext context) {
 
 		String numericRecordsFile = context.getRecordsFile();

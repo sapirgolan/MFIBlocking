@@ -77,7 +77,7 @@ public class FIRunnableDB implements Runnable, Clearer {
 								NG_PARAM * minSup);
 						Utilities.numOfGDs.incrementAndGet();
 					}
-					support.markPairs(gds,currClusterScore);						
+					support.markPairs(gds,currClusterScore,currIS);						
 					/*
 					 * NG constraint compromised: this means that a
 					 * cluster of score currClusterScore caused the

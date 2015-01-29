@@ -491,6 +491,7 @@ public class BottomUp {
 	
 	private static void updateCandidatePairs(CandidatePairs allResults, final CandidatePairs coveragePairs){	
 		allResults.addAll(coveragePairs);
+		
 	}
 	
 	public static void comparePairSets(Set<Pair> prev, Set<Pair> next){

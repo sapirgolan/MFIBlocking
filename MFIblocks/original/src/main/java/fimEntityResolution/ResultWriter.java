@@ -6,15 +6,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
+import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
 import candidateMatches.RecordMatches;
+import fimEntityResolution.interfaces.IFRecord;
 
 /**
  * This class will write the results of MFIBlocks to an file
@@ -65,31 +69,46 @@ public class ResultWriter {
 			bufferedWriter.close();
 			return;
 		}
+		
+		
 		Iterator<Entry<Integer, RecordMatches>> iterator = allMatches.entrySet().iterator();
 		while (iterator.hasNext()) {
+			
+			
+			
 			StringBuilder stringBuilder = new StringBuilder();
 			Map.Entry<Integer, RecordMatches> entry = (Map.Entry<Integer, RecordMatches>) iterator.next();
+			
 			if (entry.getValue() == null || entry.getValue().size() == 0) {
 				continue;
 			}
+			List<Integer> columnsForBlock = new ArrayList<Integer>();
+			columnsForBlock.addAll(cps.getColumnsSupport(entry.getKey()));
+
 			//adds ID of current record
 			stringBuilder.append(entry.getKey());
-			stringBuilder.append(" ");
+			stringBuilder.append(", ");
 			stringBuilder.append("size=");
-			stringBuilder.append(entry.getValue().size());
+			stringBuilder.append(entry.getValue().size()+1); //add itself
+			stringBuilder.append(", ");
+			stringBuilder.append("attributes: ");
+			Collections.sort(columnsForBlock);
+			stringBuilder.append(columnsForBlock.toString());
 			bufferedWriter.write(stringBuilder.toString());
 			bufferedWriter.newLine();
 			RecordSet.loadOriginalRecordsFromCSV(context.getOriginalRecordsPath());
 			for (Integer id : entry.getValue().getCandidateSet().keySet()){
+				
 				stringBuilder = new StringBuilder();
 				stringBuilder.append(RecordSet.originalRecords[id-1]);
 				bufferedWriter.write(stringBuilder.toString());
 				bufferedWriter.newLine();
 			}
-			//Set<Integer> keySet = entry.getValue().getCandidateSet().keySet();
-			//stringBuilder.append(" - " + keySet.toString());
-			//bufferedWriter.write(stringBuilder.toString());
-			//bufferedWriter.newLine();
+			//ad the record itself
+			stringBuilder = new StringBuilder();
+			stringBuilder.append(RecordSet.originalRecords[entry.getKey()-1]);
+			bufferedWriter.write(stringBuilder.toString());
+			bufferedWriter.newLine();
 		}
 		bufferedWriter.close();
 	}

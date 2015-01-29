@@ -182,7 +182,7 @@ public class MfiContext {
 		}
 		else {
 			if (input[0].equalsIgnoreCase("B") || input[0].equalsIgnoreCase("N") || input[0].equalsIgnoreCase("S"))
-				printFormat=string;
+				printFormat=input[0];
 			else 
 				System.err.println("The chosen format for block printing is unsupported.");
 			originalRecordsPath=input[1];

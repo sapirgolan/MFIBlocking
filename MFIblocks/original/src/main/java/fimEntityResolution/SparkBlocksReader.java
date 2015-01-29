@@ -151,7 +151,7 @@ public class SparkBlocksReader {
 			Utilities.clusterScores[cellForCluster(currClusterScore)].incrementAndGet();
 			if (currClusterScore > scoreThreshold) {
 				//SparkBlocksReader.numOfFIs.incrementAndGet();
-				support.markPairs(candidatePairs,currClusterScore);
+				support.markPairs(candidatePairs,currClusterScore,candidateBlock.items);
 				return new Tuple2<CandidateBlock, Double>(candidateBlock, currClusterScore);
 			}
 			//JS:Non of conditions passed and wasn't classified.

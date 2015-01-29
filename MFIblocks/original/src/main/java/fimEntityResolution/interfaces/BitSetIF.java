@@ -14,7 +14,8 @@ public interface BitSetIF extends Clearer{
 	public BitSetIF or(final BitSetIF other) throws NotSupportedException;
 	public boolean get(int recordId) throws NotSupportedException;
 	public List<IFRecord> getRecords();
-	public int markPairs(SetPairIF spf, double score);
+	public List<Integer> getColumns();
+	public int markPairs(SetPairIF spf, double score, List<Integer> items);
 	/**
 	 * Will set the current set bits into the other IF
 	 * @param other

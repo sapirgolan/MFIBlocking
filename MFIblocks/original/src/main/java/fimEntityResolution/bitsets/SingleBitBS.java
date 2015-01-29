@@ -84,7 +84,6 @@ public class SingleBitBS implements BitSetIF{
 		return Collections.singletonList(rec);
 	}
 
-	@Override
 	public int markPairs(SetPairIF spf, double score) {
 		return 0;//does nothing
 	}
@@ -94,6 +93,16 @@ public class SingleBitBS implements BitSetIF{
 		if(set){
 			other.set(index);
 		}
+	}
+
+	@Override
+	public List<Integer> getColumns() {
+		return Collections.singletonList(index);
+	}
+
+	@Override
+	public int markPairs(SetPairIF spf, double score, List<Integer> items) {
+		return 0;//does nothing
 	}
 
 }

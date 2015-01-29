@@ -4,6 +4,7 @@ package fimEntityResolution;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.enerj.core.SparseBitSet;
@@ -231,6 +232,12 @@ public class BitMatrix implements Clearer,SetPairIF{
 			this.bs.set(nextSetBit);
 		}		
 		return this;		
+	}
+
+	@Override
+	public void setColumnsSupport(List<Integer> items, int recordID1,int recordID2) {
+		
+		
 	}
 
 	

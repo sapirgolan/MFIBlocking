@@ -72,7 +72,7 @@ public class Utilities {
 	public static boolean WRITE_ALL_ERRORS = false;
 	public static GraphDatabaseService recordDB;
 	private static final String RECORD_DB_PATH = "target/records-db";
-	private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\}";
+	private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\},\\{(.+)\\}";
 	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
 
 	
@@ -209,6 +209,8 @@ public class Utilities {
 				String weightsStr = fiMatcher.group(2);
 				String supportAsString = fiMatcher.group(3);
 				String[] supportStrings = supportAsString.split(", ");
+				String columnsAsString = fiMatcher.group(4);	//20150129
+				String[] columnsStrings = columnsAsString.split(", "); //20150129
 				FrequentItem item;
 				if (supportStrings.length > 1) {
 					item = new FrequentItem(Integer.parseInt(itemId), wordVal,
@@ -225,8 +227,12 @@ public class Utilities {
 									.getInstance());
 				}
 				int[] support = getSortedSupportArr(supportStrings);
+				int[] columns = getSortedSupportArr(columnsStrings);//20150129
 				for (int trans : support) {
 					item.addSupport(trans);
+				}
+				for (int trans : columns) {	//20150129
+					item.addColumn(trans);	//20150129
 				}
 				if (item.getSupportSize() < support.length) {
 					System.out.println("support size should be "

@@ -15,11 +15,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import candidateMatches.RecordMatches;
+
 import fimEntityResolution.FrequentItem;
 import fimEntityResolution.bitsets.SBS_BitSet_Factory;
 
 public class LexiconCSV {
 
+	//private Map<FrequentItem,Integer> wordsToColumns = new HashMap<FrequentItem,Integer>();	
 	private Map<Integer,AttributeItems> attIdToItems = new HashMap<Integer,AttributeItems>();	
 	private Map<Integer,Double> attIdToWeights = new HashMap<Integer, Double>();
 	private Map<Integer,Integer> columnIndexToId = new HashMap<Integer, Integer>();
@@ -94,6 +97,11 @@ public class LexiconCSV {
 	
 	
 	public int addWord(int columnIndex, int recordId, String word){
+		//FrequentItem wordItem = new F
+//		if (wordsToColumns.containsKey(new word)){
+//			return 
+//		}
+		
 		int attId = getAttId(columnIndex);
 		AttributeItems attFIs = null;
 		//do not want to waste time on this word, or have it participate in the algorithm
@@ -106,6 +114,7 @@ public class LexiconCSV {
 		}
 		else{
 			attFIs = new AttributeItems();
+			//attIdToItems.put(attId, attFIs); //20150129
 		}
 		FrequentItem wordItem = null;
 		word = word.trim().toLowerCase();
@@ -113,6 +122,7 @@ public class LexiconCSV {
 		if(wordsToIds.containsKey(word)){
 			int wordId = wordsToIds.get(word);
 			wordItem = attFIs.getItems().get(wordId);
+			
 			if(wordItem == null){
 				System.out.println("word " + word + " was in wordsToIds but doesnt have a frequentitem object as expected");
 			}
@@ -123,6 +133,7 @@ public class LexiconCSV {
 			//wordItem = new SparseFrequentItem(wordId, word,attIdToWeights.get(attId));
 			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*csvFile.DB_Size));
 		}
+		
 		wordItem.addColumn(columnIndex);
 		wordItem.addSupport(recordId);
 		attFIs.getItems().put(wordItem.getId(), wordItem);
@@ -268,7 +279,6 @@ public class LexiconCSV {
 							append(fi.getColumnsString());
 				
 				props.put(Integer.toString(fi.getId()), propVal.toString());
-				//props.put(Integer.toString(fi.get()), propVal.toString());
 			}
 		}
 		return props;
@@ -290,6 +300,10 @@ public class LexiconCSV {
 		public AttributeItems(){
 			attItems = new HashMap<Integer, FrequentItem>();	
 			wordToId = new HashMap<String, Integer>();			
+//			for (Entry<Integer,FrequentItem> entry: attItems.entrySet()){
+//				if (!wordToId.containsKey(entry.getValue().getItem())) 
+//					wordToId.put(entry.getValue().getItem(),entry.getKey());
+//			}
 		}		
 		
 		public Map<Integer,FrequentItem> getItems(){

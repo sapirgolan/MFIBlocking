@@ -121,7 +121,6 @@ public class SBS_BitSet implements BitSetIF{
 		return retVal;
 	}
 
-	@Override
 	public synchronized int markPairs(SetPairIF spf, double score) {
 		int cnt = 0;
 		for(long i=getNextSetBitIndex(0); i >= 0; i=getNextSetBitIndex(i+1)) {
@@ -196,6 +195,33 @@ public class SBS_BitSet implements BitSetIF{
 			other.set((int) i);
 		}
 		
+	}
+
+
+	@Override
+	public List<Integer> getColumns() {
+		List<Integer> retVal = new ArrayList<Integer>(this.getCardinality());
+		for(long i=getNextSetBitIndex(0); i >= 0; i=getNextSetBitIndex(i+1)) {
+			retVal.add((int)i);
+		}
+		if(retVal.size() == 0){
+			System.out.println("inside getRecords: cardinality: " + this.getCardinality() + " retVal.size(): " + retVal.size());
+		}
+		return retVal;
+	}
+
+
+	@Override
+	public int markPairs(SetPairIF spf, double score, List<Integer> items) {
+		int cnt = 0;
+		for(long i=getNextSetBitIndex(0); i >= 0; i=getNextSetBitIndex(i+1)) {
+			for(long j=getNextSetBitIndex(i+1); j >= 0 ; j=getNextSetBitIndex(j+1)) {
+				spf.setPair((int)i, (int)j,score);			
+				spf.setColumnsSupport(items,(int)i,(int)i);
+				cnt++;
+			}
+		}
+		return cnt;
 	}
 	
 }

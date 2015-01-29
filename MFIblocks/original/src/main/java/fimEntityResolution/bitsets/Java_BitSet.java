@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 
+import com.googlecode.javaewah.IntIterator;
+
 
 import fimEntityResolution.RecordSet;
 import fimEntityResolution.Utilities;
@@ -76,7 +78,6 @@ public class Java_BitSet implements BitSetIF{
 			
 	}
 	
-	@Override
 	public int markPairs(SetPairIF spf, double score) {		
 		int cnt =0;
 		for(int i=bs.nextSetBit(0); i>=0; i=bs.nextSetBit(i+1)) {
@@ -94,6 +95,28 @@ public class Java_BitSet implements BitSetIF{
 			other.set(i);
 		}
 		
+	}
+
+	@Override
+	public List<Integer> getColumns() {
+		List<Integer> retVal = new ArrayList<Integer>(bs.cardinality());
+		for(int i=bs.nextSetBit(1); i>=0; i=bs.nextSetBit(i+1)){
+			retVal.add(i);
+		}
+		return retVal;
+	}
+
+	@Override
+	public int markPairs(SetPairIF spf, double score, List<Integer> items) {
+		int cnt =0;
+		for(int i=bs.nextSetBit(0); i>=0; i=bs.nextSetBit(i+1)) {
+			for(int j=bs.nextSetBit(i+1); j>=0; j=bs.nextSetBit(j+1)) {
+				spf.setPair(i, j,score);
+				spf.setColumnsSupport(items,i,j);
+				cnt++;
+			}			
+		}
+		return cnt;
 	}
 
 }

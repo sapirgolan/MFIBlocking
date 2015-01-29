@@ -3,6 +3,7 @@ package fimEntityResolution;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.enerj.core.SparseBitSet.Iterator;
@@ -330,6 +331,12 @@ public class GDS_NG implements SetPairIF{
 			}
 		}
 		return FN;
+	}
+
+	@Override
+	public void setColumnsSupport(List<Integer> items, int recordID,int recordID1) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -1,6 +1,5 @@
 package fimEntityResolution.interfaces;
 
-import org.apache.spark.SerializableWritable;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;

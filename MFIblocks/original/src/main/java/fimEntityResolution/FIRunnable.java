@@ -60,7 +60,7 @@ public class FIRunnable implements Runnable, Clearer {
 
 			if (currClusterScore > Utilities.scoreThreshold) {
 				Utilities.numOfFIs.incrementAndGet();
-				support.markPairs(candidatePairs,currClusterScore);
+				support.markPairs(candidatePairs,currClusterScore,currentItemSet);
 				
 			/*	int clusterCell = cellForCluster(currClusterScore);
 				synchronized (FIRunnable.class) {

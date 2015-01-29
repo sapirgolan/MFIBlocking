@@ -95,12 +95,13 @@ public class EWAH_BitSet implements BitSetIF{
 		return retVal;
 	}
 	@Override
-	public int markPairs(SetPairIF spf, double score) {		
+	public int markPairs(SetPairIF spf, double score, List<Integer> items) {		
 		int cnt =0;
 		List<Integer> positions = comBS.getPositions();		
 		for(int i=0 ; i < positions.size() ; i++){
 			for(int j=i+1 ; j < positions.size() ; j++){
 				spf.setPair(positions.get(i), positions.get(j),score);	
+				spf.setColumnsSupport(items,positions.get(i),positions.get(j));
 				cnt++;
 			}
 		}
@@ -113,6 +114,16 @@ public class EWAH_BitSet implements BitSetIF{
 			other.set(positions.get(i));
 		}
 		
+	}
+	@Override
+	public List<Integer> getColumns() {
+		List<Integer> retVal = new ArrayList<Integer>(comBS.cardinality());
+		IntIterator iterator = comBS.intIterator();
+		while(iterator.hasNext()){
+			//int index = iterator.next();
+			retVal.add(iterator.next());
+		}		
+		return retVal;
 	}
 
 }

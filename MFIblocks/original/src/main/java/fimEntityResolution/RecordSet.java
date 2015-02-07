@@ -17,18 +17,22 @@ import au.com.bytecode.opencsv.CSVReader;
 
 public class RecordSet {
 	public static Map<Integer, Record> values;
-	public static String[] originalRecords;
+	public static String[][] originalRecords;
+	public static String[] columnNames;
 	public static int size;
 	public static int minRecordLength = Integer.MAX_VALUE;
 	public static int DB_SIZE;
+	public static int SCHEMA_SIZE;
+	
 	
 	public static void setRecords(Map<Integer, Record> records){
 		values=records;
 		size=values.size();
 		
 	}
+	
 	public static void loadOriginalRecordsFromCSV(String filename) throws IOException{
-		originalRecords=new String[DB_SIZE];
+		originalRecords=new String[DB_SIZE][SCHEMA_SIZE];
 		CSVReader cvsReader = null; 
 		
 		
@@ -45,18 +49,20 @@ public class RecordSet {
 				first = false;
 				continue;
 			}
+			SCHEMA_SIZE=attNames.length;
 			String[] parts=currLine;
+			originalRecords[recordId-1]=currLine;
 			
+			//StringBuilder sb=new StringBuilder();
 			
-			StringBuilder sb=new StringBuilder();
-			
-			for(int i=0 ; i < parts.length ; i++){	
-				sb.append(parts[i]);
-				sb.append(",");
-			}
-			originalRecords[recordId-1] = sb.toString();
+			//for(int i=0 ; i < parts.length ; i++){	
+			//	sb.append(parts[i]);
+			//	sb.append(",");
+			//}
+			//originalRecords[recordId-1] = sb.toString();
 			recordId++;
 		}
+		columnNames=attNames;
 	}
 	public static void readRecords(MfiContext context) {
 

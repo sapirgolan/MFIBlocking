@@ -1,18 +1,16 @@
 package candidateMatches;
 
+import fimEntityResolution.BitMatrix;
+import fimEntityResolution.RecordSet;
+import fimEntityResolution.interfaces.SetPairIF;
+import org.apache.log4j.Logger;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.javamex.classmexer.MemoryUtil;
-import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
-
-import fimEntityResolution.BitMatrix;
-import fimEntityResolution.RecordSet;
-import fimEntityResolution.interfaces.SetPairIF;
 
 /**
  * {@link #allMatches} is a {@link ConcurrentHashMap} with key representing record ID and value is {@link RecordMatches} which is all records that highest
@@ -26,8 +24,11 @@ public class CandidatePairs implements SetPairIF{
 	private int maxMatches;
 	private double minThresh = 0.0;
 	private boolean limited = true;
-	
-	public CandidatePairs(int maxMatches){
+
+    static final Logger logger = Logger.getLogger(CandidatePairs.class);
+
+
+    public CandidatePairs(int maxMatches){
 		allMatches = new ConcurrentHashMap<Integer, RecordMatches>();
 		this.maxMatches = maxMatches;
 		limited = true;
@@ -52,22 +53,25 @@ public class CandidatePairs implements SetPairIF{
 	}
 	
 	public void addAll(final CandidatePairs other){
-		for (Entry<Integer,RecordMatches> entry: other.allMatches.entrySet()) {
-			if(!allMatches.containsKey(entry.getKey())){
-				allMatches.put(entry.getKey(), entry.getValue());
-			}
-			else{
-				RecordMatches currRM = allMatches.get(entry.getKey());
-				RecordMatches otherRM = entry.getValue();
-				for (CandidateMatch cm : otherRM.getCandidateMatches()) {
-					currRM.addCandidate(cm.getRecordId(), cm.getScore());
-				}
-			}
-			
-		}
-	}
-	
-	/**
+        for (Entry<Integer, RecordMatches> entry : other.allMatches.entrySet()) {
+
+            Integer recordId = entry.getKey();
+            RecordMatches recordMatches = entry.getValue();
+            if ( !recordHasAnyMatch(recordId) ) {
+                // This is the first time we handle the possible matches of entry.getKey()
+                allMatches.put(recordId, recordMatches);
+            } else {
+                // Add more possible matches for entry.getKey()
+                RecordMatches currRM = allMatches.get(recordId);
+                RecordMatches otherRM = recordMatches;
+                for (CandidateMatch cm : otherRM.getCandidateMatches()) {
+                    currRM.addCandidate(cm.getRecordId(), cm.getScore());
+                }
+            }
+        }
+    }
+
+    /**
 	 * Tries to create a pair of records with IDs <b>i</b> and <b>j</b>.<br>
 	 * It tries to add to the block of record <b>i</b> record <b>j</b> and to the block of record <b>j</b> record <b>i</b><br>
 	 * If record with ID <b>i</b> already has a record with id <b>j</b> than does nothing.<br>
@@ -101,28 +105,33 @@ public class CandidatePairs implements SetPairIF{
 	}
 
 	private synchronized RecordMatches getRecordMatch(int index){
-		RecordMatches retVal = null;
-		if(allMatches.containsKey(index)){
+		RecordMatches retVal;
+		if(recordHasAnyMatch(index)){
 			retVal = allMatches.get(index);
-		}
-		else{
-			if(limited){
-				retVal = new RecordMatches(maxMatches);
-			}
-			else{
-				retVal = new RecordMatches();
-			}
-			allMatches.put(index, retVal);
+		} else {
+            retVal = createNewRecordMatch(index);
 		}			
 		return retVal;
 	}
-	
-	public double getMinThresh(){
+
+    private RecordMatches createNewRecordMatch(int index) {
+        RecordMatches retVal;
+        if(limited){
+            retVal = new RecordMatches(maxMatches);
+        } else{
+            retVal = new RecordMatches();
+        }
+        allMatches.put(index, retVal);
+        return retVal;
+    }
+
+    public double getMinThresh(){
 		return minThresh;
 	}
 	
 	private void removeBelowThresh(){
 		long start = System.currentTimeMillis();
+        logger.debug("about to a record. minThresh:" + minThresh +" maxMatches: " + maxMatches);
 		System.out.println("DEBUG: about to removeBelowThresh, minThresh: " + minThresh);
 		System.out.println("DEBUG: about to removeBelowThresh, maxMatches: " + maxMatches);
 		for (RecordMatches matches : allMatches.values()) {
@@ -134,17 +143,13 @@ public class CandidatePairs implements SetPairIF{
 		System.gc();
 	}
 	
-	public double memoryUsage(){
-		return (MemoryUtil.deepMemoryUsageOfAll(allMatches.values(), VisibilityFilter.ALL)/Math.pow(2, 30));
-	}
 	/***
 	 * Removes pairs that didn't pass the threshold (min_th) and export to BitMatrix (Jonathan Svirsky)
 	 * @return BitMatrix object
 	 */
 	public BitMatrix exportToBitMatrix(){
 		long start = System.currentTimeMillis();
-		//System.out.println("DEBUG: total memory used by CandidatePairs: " +	memoryUsage() + " GB");
-		
+
 		removeBelowThresh();
 		BitMatrix bm = new BitMatrix(RecordSet.DB_SIZE);
 		for (Entry<Integer, RecordMatches> entry: allMatches.entrySet()) {
@@ -153,7 +158,6 @@ public class CandidatePairs implements SetPairIF{
 			}
 		}
 		System.out.println("DEBUG: time to exportToBM: " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
-		
 		return bm;
 	}
 	
@@ -167,58 +171,62 @@ public class CandidatePairs implements SetPairIF{
 	public boolean isPairSet(int sourceRecordId, int comparedRecordId){
 		boolean retVal = false;
 		//if has any matches for sourceRecordId
-		if( allMatches.containsKey(sourceRecordId) ){
+		if(recordHasAnyMatch(sourceRecordId)){
 			RecordMatches recordMatches = allMatches.get(sourceRecordId);
 			retVal = recordMatches.isMatched(comparedRecordId);
 		}
 		if(!retVal){
-			if(allMatches.containsKey(comparedRecordId)){
+			if(recordHasAnyMatch(comparedRecordId)){
 				RecordMatches recordMatches = allMatches.get(comparedRecordId);
-				retVal = retVal || recordMatches.isMatched(sourceRecordId);
+				retVal = recordMatches.isMatched(sourceRecordId);
 			}
 		}
 		return retVal;
 	}
-	//TODO: CHECK IT
+
+    private boolean recordHasAnyMatch(int sourceRecordId) {
+        return allMatches.containsKey(sourceRecordId);
+    }
+
+    //TODO: CHECK IT
 	//TP+ FP - 1 in both the Ground Truth and in the result
 	public long[] calcTrueAndFalsePositives(CandidatePairs actualCPs) throws NullPointerException{
-		long TP = 0;
-		long FP = 0;
-		long FN = 0;
-	
-		Set<Set<Integer>> truePairs=new HashSet<>();
-		Set<Set<Integer>> actualPairs=new HashSet<>();
-		for (Entry<Integer,RecordMatches> entry: actualCPs.allMatches.entrySet()) { //run over all records
-			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
-				Set<Integer> temp=new HashSet<Integer>();
-				temp.add(cm.getRecordId());
-				temp.add(entry.getKey());
-				actualPairs.add(temp);
-			}
-		}
-		for (Entry<Integer,RecordMatches> entry: this.allMatches.entrySet()) { //run over all records
-			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
-				//count++;
-				Set<Integer> temp=new HashSet<Integer>();
-				temp.add(cm.getRecordId());
-				temp.add(entry.getKey());
-				truePairs.add(temp);
-			}
-		}
-		
-		Set<Set<Integer>> tempTruePairs=new HashSet<>();
-		tempTruePairs.addAll(truePairs);
-		tempTruePairs.removeAll(actualPairs);
-		FN=tempTruePairs.size();
-		//intersection between truePairs and actualPairs
-		truePairs.retainAll(actualPairs);
-		TP=truePairs.size();
-		//remove intersection from actualPairs
-		actualPairs.removeAll(truePairs);
-		FP=actualPairs.size();
-		return new long[]{TP,FP, FN};	
-		
-	}
+        long TP = 0;
+        long FP = 0;
+        long FN = 0;
+
+        Set<Set<Integer>> truePairs = new HashSet<>();
+        Set<Set<Integer>> actualPairs = new HashSet<>();
+        for (Entry<Integer, RecordMatches> entry : actualCPs.allMatches.entrySet()) { //run over all records
+            for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
+                Set<Integer> temp = new HashSet<Integer>();
+                temp.add(cm.getRecordId());
+                temp.add(entry.getKey());
+                actualPairs.add(temp);
+            }
+        }
+        for (Entry<Integer, RecordMatches> entry : this.allMatches.entrySet()) { //run over all records
+            for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
+                //count++;
+                Set<Integer> temp = new HashSet<Integer>();
+                temp.add(cm.getRecordId());
+                temp.add(entry.getKey());
+                truePairs.add(temp);
+            }
+        }
+
+        Set<Set<Integer>> tempTruePairs = new HashSet<>();
+        tempTruePairs.addAll(truePairs);
+        tempTruePairs.removeAll(actualPairs);
+        FN = tempTruePairs.size();
+        //intersection between truePairs and actualPairs
+        truePairs.retainAll(actualPairs);
+        TP = truePairs.size();
+        //remove intersection from actualPairs
+        actualPairs.removeAll(truePairs);
+        FP = actualPairs.size();
+        return new long[]{TP, FP, FN};
+    }
 	
 	public static double FalseNegatives(CandidatePairs trueCPs, CandidatePairs actualCPs){		
 		long FN = 0;
@@ -236,7 +244,6 @@ public class CandidatePairs implements SetPairIF{
 		return FN;	
 	
 	}
-	
 	
 	public static void main(String[] args){
 		CandidatePairs cps = new CandidatePairs(10);
@@ -273,6 +280,5 @@ public class CandidatePairs implements SetPairIF{
 		cps.isPairSet(1,7);
 		cps.isPairSet(4,2);
 		cps.isPairSet(4,8);
-		
 	}
 }

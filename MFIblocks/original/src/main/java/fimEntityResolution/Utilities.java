@@ -467,18 +467,6 @@ public class Utilities {
 								+ GDS_NG.getMem().getTotal());
 
 						System.out.println("memory statuses");
-//						System.out.println("DEBUG: size of coverageIndex "
-//								+ MemoryUtil.deepMemoryUsageOfAll(coverageIndex
-//										.values(), VisibilityFilter.ALL)
-//								/ Math.pow(2, 30) + " GB");
-//						System.out.println("DEBUG: size of BitMatrixPool "
-//								+ MemoryUtil.deepMemoryUsageOf(BitMatrixPool
-//										.getInstance(), VisibilityFilter.ALL)
-//								/ Math.pow(2, 30) + " GB");
-//						System.out.println("DEBUG: size of FIRunnablePool "
-//								+ MemoryUtil.deepMemoryUsageOf(FIRunnablePool
-//										.getInstance(), VisibilityFilter.ALL)
-//								/ Math.pow(2, 30) + " GB");
 						System.gc();
 					}
 				} catch (Exception e) {
@@ -706,19 +694,6 @@ public class Utilities {
 		}
 		exec = null;
 		System.gc();
-		/*
-		 * for(int i = 0 ; i <= coverageIndex.size() ; i++){ BitMatrix bm =
-		 * coverageIndex.get(i); if(bm != null){
-		 * System.out.println("coverageIndex.get(" + i + ").getNumBitsSet=" +
-		 * bm.getSBS().getNumBitsSet()); System.out.println("coverageIndex.get("
-		 * + i + ").getCoveredRows().cardinality()=" +
-		 * bm.getCoveredRows().cardinality());
-		 * System.out.println("coverageIndex.get(" + i + ").getMaxNG()=" +
-		 * bm.getMaxNG()); } else{ System.out.println("coverageIndex.get(" + i +
-		 * ")==null"); }
-		 * 
-		 * }
-		 */
 		return coverageIndexDB;
 	}
 
@@ -832,9 +807,7 @@ public class Utilities {
 	private static AtomicLong time_in_supp_calc = new AtomicLong(0);
 
 
-	private static BitSetFactory bsf = Java_BitSet_Factory.getInstance();
-	private static LimitedPool limitedPool = LimitedPool.getInstance(bsf);
-	/***
+    /***
 	 * Returns set of tuples as BitSetIF object (Jonathan Svirsky)
 	 * @param items - q-grams ids returned by FP-growth (Jonathan Svirsky)
 	 * @return
@@ -951,15 +924,9 @@ public class Utilities {
 	 * 
 	 * @param group
 	 *            - from which to generate pairs
-	 * @param threshold
-	 *            - below which the pairs are no considered
-	 * @param records
-	 *            - dataset records
-	 * @param itemsMap
 	 * @return
 	 */
-	public static Set<Pair> getPairs(Collection<Record> group,
-			Map<Integer, Record> records) {
+	public static Set<Pair> getPairs(Collection<Record> group) {
 		Set<Pair> pairs = new HashSet<Pair>();
 		List<Record> temp = new ArrayList<Record>(group.size());
 		temp.addAll(group);
@@ -991,9 +958,8 @@ public class Utilities {
 	}
 
 	public static double[] evaluateResolution(Set<Pair> trueDupPairs,
-			Map<Integer, Set<Pair>> actualDupPairs, String experimentTitle,
-			Map<Integer, Cluster> clusters, Map<Integer, Record> records,
-			Map<Integer, FrequentItem> itemsMap) {
+                                              Map<Integer, Set<Pair>> actualDupPairs, String experimentTitle,
+                                              Map<Integer, Record> records) {
 		System.out.println(experimentTitle);
 		float TP = 0, TN = 0, FN = 0, FP = 0;
 		System.out.println("False Positives:");
@@ -1016,10 +982,6 @@ public class Utilities {
 								.softTFIDF(RecordSet.values.get(clusterPair.r1),
 										RecordSet.values.get(clusterPair.r2)));
 					}
-					/*
-					 * System.out.println("inside FP cluster: " +
-					 * clusters.get(currClusterEntry.getKey()).toString());
-					 */
 				}
 			}
 			actualPairs.addAll(clusterPairs);

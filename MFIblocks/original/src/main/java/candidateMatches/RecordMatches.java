@@ -4,6 +4,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This class is responsible to store the Top K match candidates for a record.
+ * The candidates are stored in candidateSet. <br>
+ * The default threshold is 0 and it increases once the candidateSet has reached is Max size that is defined by maxSize
+ *
+ */
 public class RecordMatches {
 
 	private ConcurrentHashMap<Integer,CandidateMatch> candidateSet;
@@ -41,41 +47,58 @@ public class RecordMatches {
 	public synchronized boolean addCandidate(int recordId, double score){
 		boolean added = true;
 		//if candidate exists
-		if(candidateSet.containsKey(recordId)){		
+		if(isRecordExistsAsPotentialMatch(recordId)){
 			added = false;
-			CandidateMatch exisitingCandidate = candidateSet.get(recordId);
+			CandidateMatch existingCandidate = candidateSet.get(recordId);
 			// update score only if larger - can happen if both records exists in several clusters
 			// and in one of them, the cluster's score is greater.
 			// (the resemblance score of two records is the cluster score)
-			if(exisitingCandidate.getScore() < score){ 
-				exisitingCandidate.setScore(score);
-				limitedMinHeap.increaseKey(exisitingCandidate.getHeapPos());				
+			if(existingCandidate.getScore() < score){
+                increaseCandidateScore(score, existingCandidate);
 			}
 		}
 		else{
 			// If heap is at the max size and the resemblance score of given candidate is smaller
 			// than the minimum resemblance score in the heap, candidate will not be added
-			if(limitedMinHeap.size() >= maxSize && score <= minThresh){ 
-				return added;
-			}
-			CandidateMatch newCandidate = new CandidateMatch(recordId, score);
-			if(limitedMinHeap.size() >= maxSize){ //means that score > minScore()
-				//first delete former minimum from the hashSet
-				int minId = minRecId();
-				candidateSet.remove(minId);
-			}							
-			limitedMinHeap.insert(newCandidate);			
+			if(isHeapFull() ){
+                // new candidate score is smaller than current smallest candidate
+                if (score <= minThresh) {
+                    return added;
+                } else {
+                    removeLowestSimMatch();
+                }
+            }
+            CandidateMatch newCandidate = new CandidateMatch(recordId, score);
+            limitedMinHeap.insert(newCandidate);
 			candidateSet.put(recordId, newCandidate);			
 		}
-		if(limitedMinHeap.size() >= maxSize){
+		if(isHeapFull()){
 			minThresh = minScore();
 		}
 		return added;
 	}
 
-	public synchronized void removeMin(){
-		CandidateMatch removed = (CandidateMatch) limitedMinHeap.pop();
-		candidateSet.remove(removed.getRecordId());
+    private void removeLowestSimMatch() {
+        int minId = minRecId();
+        candidateSet.remove(minId);
+    }
+
+    private void increaseCandidateScore(double score, CandidateMatch existingCandidate) {
+        existingCandidate.setScore(score);
+        limitedMinHeap.increaseKey(existingCandidate.getHeapPos());
+    }
+
+    private boolean isRecordExistsAsPotentialMatch(int recordId) {
+        return candidateSet.containsKey(recordId);
+    }
+
+    private boolean isHeapFull() {
+        return limitedMinHeap.size() >= maxSize;
+    }
+
+    public synchronized void removeMin(){
+		CandidateMatch removedMatched = (CandidateMatch) limitedMinHeap.pop();
+		candidateSet.remove(removedMatched.getRecordId());
 	}
 	
 	public double getMinThresh(){
@@ -114,37 +137,7 @@ public class RecordMatches {
 	}
 	
 	public boolean isMatched(int recId){
-		return candidateSet.containsKey(recId);
+		return isRecordExistsAsPotentialMatch(recId);
 	}
 	
-	public static void main(String[] args){
-		RecordMatches rm = new RecordMatches(5);
-		rm.addCandidate(1, 0.2);
-		System.out.println(rm.toString());		
-		rm.addCandidate(5, 0.56);
-		System.out.println(rm.toString());		
-		rm.addCandidate(5, 0.78);
-		System.out.println(rm.toString());		
-		rm.addCandidate(8, 0.9);
-		System.out.println(rm.toString());		
-		rm.addCandidate(10, 0.1);
-		System.out.println(rm.toString());		
-		rm.addCandidate(11, 0.15);
-		System.out.println(rm.toString());		
-		rm.addCandidate(13, 0.44);
-		System.out.println(rm.toString());
-		System.out.println();
-		rm.addCandidate(17, 0.05);
-		System.out.println(rm.toString());
-		rm.addCandidate(17, 0.1);
-		System.out.println(rm.toString());
-		rm.addCandidate(8, 0.67);
-		System.out.println(rm.toString());
-		rm.addCandidate(1, 0.4);
-		System.out.println(rm.toString());
-		rm.addCandidate(1, 0.7);
-		rm.addCandidate(17, 33);
-		System.out.println(rm.toString());
-		
-	}
 }

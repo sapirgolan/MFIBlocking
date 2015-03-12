@@ -24,7 +24,13 @@ public class MinHeap{
 	final private Comparator<PositionUpdater> comparator;
 
 	protected class Node {
-		public PositionUpdater element;
+
+        public Node(PositionUpdater element, int position) {
+            this.element = element;
+            this.position = position;
+        }
+
+        public PositionUpdater element;
 		public int position;
 	}
 
@@ -42,9 +48,6 @@ public class MinHeap{
 
 		// Comparator
 		this.comparator = comparator;
-
-		// initialy clear
-		// for (int i=0;i<maxSize;i++) heap[i] = null;
 	}
 
 	public MinHeap(Comparator<PositionUpdater> comparator) {
@@ -61,14 +64,11 @@ public class MinHeap{
 	 * Insert element into the heap. O(lg n) where n is the number of
 	 * elements/nodes in the heap
 	 * 
-	 * @param element
-	 *            new element to be inserted
+	 * @param element new element to be inserted
 	 */
 	public void insert(final PositionUpdater element) {
 		size++;
-		Node node = new Node();
-		node.element = element;
-		node.position = size;
+		Node node = new Node(element, size);
 		node.element.setHeapPos(size);
 		heap.add(node.position, node);		
 		decreaseKey(node);
@@ -110,12 +110,6 @@ public class MinHeap{
 		return returnNode;
 	}
 
-	// private final void reinsert( final Node n ) {
-	// if ( !decreaseKey(n) ) {
-	// minHeapify(n);
-	// }
-	// }
-
 	public final int size() {
 		return size;
 	}
@@ -123,8 +117,6 @@ public class MinHeap{
 	public final void decreaseKey(final Node node) {
 		int index = node.position;
 		
-		// while ( index>0 && (heap[parent(index)]).compareTo( heap[index]) >= 0
-		// ) {
 		while (index > 1
 				&& comparator.compare(heap.get(parent(index)).element, heap
 						.get(index).element) >= 0) {
@@ -144,7 +136,6 @@ public class MinHeap{
 		int left = left(index);
 		int right = right(index);
 
-		// if (left<size && (heap[left]).compareTo(heap[index]) <= 0 )
 		if (left <= size
 				&& comparator.compare(heap.get(left).element,
 						heap.get(index).element) <= 0)
@@ -152,7 +143,6 @@ public class MinHeap{
 		else
 			smallest = index;
 
-		// if (right<size && (heap[right]).compareTo(heap[smallest]) <=0 )
 		if (right <= size
 				&& comparator.compare(heap.get(right).element, heap
 						.get(smallest).element) <= 0)
@@ -174,10 +164,6 @@ public class MinHeap{
 
 		heap.set(index, temp2);
 		heap.set(index2, temp);
-
-		// Update posistion in Node
-		// heap.get(index).position=index;
-		// heap.get(index2).position=index2;
 	}
 
 	private final int parent(final int i) {

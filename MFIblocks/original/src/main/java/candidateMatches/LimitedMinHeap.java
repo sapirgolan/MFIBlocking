@@ -23,10 +23,9 @@ public class LimitedMinHeap<T> extends MinHeap{
 			super.insert(element);
 			return;
 		}
-		Node node = new Node();
-		node.element = element;
+        //element will replace the root - i.e, the minimum
+		Node node = new Node(element, 1);
 		element.setHeapPos(1);
-		node.position = 1; //replaces the root - i.e, the minimum
 		heap.set(1, node);
 		minHeapify(node);
 		

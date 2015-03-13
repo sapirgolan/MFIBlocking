@@ -1,26 +1,5 @@
 package fimEntityResolution;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import lucene.search.SearchEngine;
-
-import org.apache.log4j.Logger;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-
 import candidateMatches.CandidateMatch;
 import candidateMatches.CandidatePairs;
 import candidateMatches.RecordMatches;
@@ -28,11 +7,18 @@ import dnl.utils.text.table.TextTable;
 import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
 import fimEntityResolution.entityResulution.IComparison;
-import fimEntityResolution.statistics.BlockingResultContext;
-import fimEntityResolution.statistics.BlockingResultsSummary;
-import fimEntityResolution.statistics.BlockingRunResult;
-import fimEntityResolution.statistics.ExperimentResult;
-import fimEntityResolution.statistics.StatisticMeasuremnts;
+import fimEntityResolution.statistics.*;
+import lucene.search.SearchEngine;
+import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class BottomUp {
 	
@@ -152,7 +138,7 @@ public class BottomUp {
 	 * Core of the MFIBlocks algorithm
 	 */
 	public static void mfiBlocksCore() {
-		
+
 		int recordsSize = RecordSet.size;
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
 		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
@@ -162,7 +148,7 @@ public class BottomUp {
 		IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
 		for(double neighborhoodGrow: neighborhoodGrowth){
 			NG_LIMIT = neighborhoodGrow;
-		
+
 			double[] minBlockingThresholds = context.getMinBlockingThresholds();
 			for (double minBlockingThreshold : minBlockingThresholds) { // test for each minimum blocking threshold
 				coveredRecords = new BitSet(recordsSize+1);
@@ -170,12 +156,12 @@ public class BottomUp {
                 logger.info("running iterative " + context.getAlgName() + "s with minimum blocking threshold " + minBlockingThreshold +
                         " and NGLimit: " + NG_LIMIT);
 				System.out.println("running iterative " + context.getAlgName() + "s with minimum blocking threshold " + minBlockingThreshold +
-						" and NGLimit: " + NG_LIMIT);			
+						" and NGLimit: " + NG_LIMIT);
 				long start = System.currentTimeMillis();
 				//obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
-				long actionStart = System.currentTimeMillis();
-				writeCandidatePairs(algorithmObtainedPairs);
+                long actionStart = System.currentTimeMillis();
+                writeCandidatePairs(algorithmObtainedPairs);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();

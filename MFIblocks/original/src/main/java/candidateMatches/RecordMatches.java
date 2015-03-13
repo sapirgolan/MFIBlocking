@@ -33,11 +33,7 @@ public class RecordMatches {
 	public int size(){
 		return candidateSet.size();
 	}
-	
-	public final Set<Integer> getMatchedRecordsIds() {
-		return candidateSet.keySet();
-	}
-	
+
 	/**
 	 * 
 	 * @param recordId

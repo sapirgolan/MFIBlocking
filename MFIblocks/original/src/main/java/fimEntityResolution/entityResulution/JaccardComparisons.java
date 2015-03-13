@@ -34,7 +34,7 @@ public class JaccardComparisons implements IComparison{
 			Entry<Integer, RecordMatches> entry = iterator.next();
 			
 			List<String> blockSeedAttributes = engine.getRecordAttributes(entry.getKey().toString());
-			final Set<Integer> matchedRecordsIds = entry.getValue().getMatchedRecordsIds();
+			final Set<Integer> matchedRecordsIds = entry.getValue().getMatchedIds();
 			for (Integer recordId : matchedRecordsIds) {
 				if (!didComparisonOccur(recordId, entry.getKey())) {
 					List<String> recordAttributes = engine.getRecordAttributes(recordId.toString());

@@ -177,7 +177,7 @@ public class MfiContext {
 
 	public void setPrintFormat(String string) {
 		String[] input = string.trim().split(",");
-		if (input[0]==null || input[1]==null){
+		if (input[0]==null){
 			System.err.println("The chosen format for block printing is unsupported.");
 		}
 		else {
@@ -185,7 +185,9 @@ public class MfiContext {
 				printFormat=input[0];
 			else 
 				System.err.println("The chosen format for block printing is unsupported.");
+			if (input.length>1){
 			originalRecordsPath=input[1];
+			}
 		}
 	}
 

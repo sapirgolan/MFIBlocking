@@ -93,7 +93,7 @@ public class BottomUp {
 		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		//System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(RecordSet.values.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 		start = System.currentTimeMillis();
-		Utilities.parseLexiconFile(context.getLexiconFile());
+		Utilities.parseLexiconFile(context.getLexiconFile(),context.getPrntFormat());
 		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		//System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
@@ -105,9 +105,10 @@ public class BottomUp {
 
 	private static void createSparkContext(MFISetsCheckConfiguration config) {
 		if (config.equals(MFISetsCheckConfiguration.SPARK)) {
-			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-			System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
-			System.setProperty("spark.executor.memory", "5g");
+			//System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+			//System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
+			System.setProperty("spark.executor.memory", "2g");
+			System.setProperty("hadoop.home.dir", "C:\\workspace\\winutils\\");
 			//System.getProperty("spark.akka.askTimeout","50000");
 			Runtime runtime = Runtime.getRuntime();
 			runtime.gc();
@@ -309,6 +310,7 @@ public class BottomUp {
 			
 			start = System.currentTimeMillis();
 			File mfiFile = Utilities.RunMFIAlg(minimumSupports[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
+			//File mfiFile = Utilities.RunPFPGrowth(minimumSupports[i], RecordSet.size-coveredRecords.cardinality(),uncoveredRecordsFile.getAbsolutePath(), mfiDir);
 			System.out.println("Time to run MFI with minsup="+minimumSupports[i] +
 					" on table of size " + (RecordSet.size-coveredRecords.cardinality()) + 
 					" is " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));

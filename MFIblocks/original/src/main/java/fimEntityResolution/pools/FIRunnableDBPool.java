@@ -1,12 +1,12 @@
 package fimEntityResolution.pools;
 
+import fimEntityResolution.FIRunnableDB;
+import fimEntityResolution.GDS_NG;
+import il.ac.technion.ie.model.Record;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import fimEntityResolution.FIRunnableDB;
-import fimEntityResolution.GDS_NG;
-import fimEntityResolution.Record;
 
 public class FIRunnableDBPool {
 
@@ -29,7 +29,7 @@ public class FIRunnableDBPool {
 	}
 	
 	//assumption is all bms are the same size
-	public FIRunnableDB getRunnable(List<Integer> currIS,int minSup, Map<Integer,Record> records, double NG_PARAM, 
+	public FIRunnableDB getRunnable(List<Integer> currIS,int minSup, Map<Integer,Record> records, double NG_PARAM,
 			int expectedSupportSize,Map<Integer, GDS_NG> coverageIndexDB){	
 		synchronized(this){
 			if(runnables.size() > 0){

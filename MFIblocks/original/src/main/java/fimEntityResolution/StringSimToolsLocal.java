@@ -1,18 +1,13 @@
 package fimEntityResolution;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.model.Record;
+import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
+
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
-
-import fimEntityResolution.interfaces.IFRecord;
-
-import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 /***
  * Copied from StringSimTools but with some modifications - reads algorithm`s input files locally.
  * @author Jonathan Svirsky

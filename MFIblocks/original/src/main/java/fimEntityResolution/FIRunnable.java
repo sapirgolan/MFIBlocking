@@ -1,14 +1,15 @@
 package fimEntityResolution;
 
+import fimEntityResolution.interfaces.BitSetIF;
+import fimEntityResolution.pools.FIRunnablePool;
+import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.data.structure.Clearer;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.Record;
+
 import java.util.List;
 import java.util.Map;
-
-import candidateMatches.CandidatePairs;
-
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.Clearer;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.pools.FIRunnablePool;
 
 public class FIRunnable implements Runnable, Clearer {
 
@@ -47,7 +48,7 @@ public class FIRunnable implements Runnable, Clearer {
 				return; // must be the case that the item appears minSup times
 						// but in a number of records < minsup
 			}			
-			List<IFRecord> FISupportRecords = support.getRecords();				
+			List<IFRecord> FISupportRecords = support.getRecords();
 								
 			long start = System.currentTimeMillis();
 			

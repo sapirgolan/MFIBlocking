@@ -1,5 +1,7 @@
 package fimEntityResolution.interfaces;
 
+import il.ac.technion.ie.data.structure.Clearer;
+
 import java.io.Serializable;
 
 

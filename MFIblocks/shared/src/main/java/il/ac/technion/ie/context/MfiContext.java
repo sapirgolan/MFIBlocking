@@ -1,11 +1,12 @@
-package fimEntityResolution;
+package il.ac.technion.ie.context;
+
+
+import il.ac.technion.ie.types.Alg;
+import il.ac.technion.ie.types.MFISetsCheckConfiguration;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.StringUtils;
-
-import fimEntityResolution.BottomUp.Alg;
-import fimEntityResolution.BottomUp.MFISetsCheckConfiguration;
 
 public class MfiContext {
 	

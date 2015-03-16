@@ -1,6 +1,5 @@
-package fimEntityResolution.interfaces;
+package il.ac.technion.ie.model;
 
-import org.apache.spark.SerializableWritable;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;

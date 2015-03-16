@@ -1,5 +1,9 @@
 package fimEntityResolution;
 
+
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.RecordMatches;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -12,9 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
 
 /**
  * This class will write the results of MFIBlocks to an file

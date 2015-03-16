@@ -1,7 +1,7 @@
 package il.ac.technion.ie.service;
 
-import candidateMatches.CandidatePairs;
-import fimEntityResolution.exception.NotImplementedYetException;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.logic.BlockLogic;
 import il.ac.technion.ie.logic.iBlockLogic;
 import org.apache.log4j.Logger;

@@ -1,10 +1,11 @@
 package fimEntityResolution;
 
 
-import java.io.Serializable;
-
 import fimEntityResolution.interfaces.BitSetFactory;
 import fimEntityResolution.interfaces.BitSetIF;
+import il.ac.technion.ie.model.RecordSet;
+
+import java.io.Serializable;
 
 
 public class FrequentItem implements Comparable<FrequentItem>,Serializable{
@@ -93,7 +94,7 @@ public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 	}
 	
 	public void setIDFWeight(){
-		log2IDF = ((double)RecordSet.DB_SIZE/getSupportSize());
+		log2IDF = ((double) RecordSet.DB_SIZE/getSupportSize());
 		log2IDF = StringSimTools.logBase2(log2IDF);
 	}
 	

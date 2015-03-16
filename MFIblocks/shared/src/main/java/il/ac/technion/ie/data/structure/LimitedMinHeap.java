@@ -1,4 +1,6 @@
-package candidateMatches;
+package il.ac.technion.ie.data.structure;
+
+import il.ac.technion.ie.model.PositionUpdater;
 
 import java.util.Comparator;
 

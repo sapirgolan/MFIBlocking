@@ -1,7 +1,7 @@
 package fimEntityResolution.statistics;
 
-import candidateMatches.CandidatePairs;
 import fimEntityResolution.TrueClusters;
+import il.ac.technion.ie.model.CandidatePairs;
 
 /**
  * Calculate output measurements: F-measure, Precision (PQ), Recall (PC) and others... 

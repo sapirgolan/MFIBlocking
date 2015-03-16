@@ -1,7 +1,7 @@
 package il.ac.technion.ie.logic;
 
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.RecordMatches;
 import il.ac.technion.ie.model.NeighborsVector;
 import il.ac.technion.ie.model.NeighborsVectorsCompare;
 import org.apache.log4j.Logger;
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BlockLogic implements iBlockLogic{
 
     private iFindBlockAlgorithm algorithm;
-    	static final Logger logger = Logger.getLogger(BlockLogic.class);
+    static final Logger logger = Logger.getLogger(BlockLogic.class);
 
 
     public BlockLogic() {

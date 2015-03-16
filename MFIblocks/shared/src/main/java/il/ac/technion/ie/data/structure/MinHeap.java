@@ -1,4 +1,4 @@
-package candidateMatches;
+package il.ac.technion.ie.data.structure;
 
 /**
  * Copyright (c) 2008-2010  Morten Silcowitz.
@@ -9,8 +9,12 @@ package candidateMatches;
  * at http://www.gnu.org/copyleft/gpl.html. 
  */
 //package jinngine.util;
-import java.util.*;
-import candidateMatches.PositionUpdater;
+import il.ac.technion.ie.model.PositionUpdater;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Minimum heap implementation. See [Cormen et al 1999] for formal theory.

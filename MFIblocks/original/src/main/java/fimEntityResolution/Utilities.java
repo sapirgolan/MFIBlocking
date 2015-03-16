@@ -1,38 +1,20 @@
 package fimEntityResolution;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.transaction.NotSupportedException;
-
+import com.googlecode.javaewah.EWAHCompressedBitmap;
+import com.googlecode.javaewah.IntIterator;
+import fimEntityResolution.bitsets.EWAH_BitSet;
+import fimEntityResolution.bitsets.EWAH_BitSet_Factory;
+import fimEntityResolution.bitsets.SingleBSFactory;
+import fimEntityResolution.interfaces.BitSetIF;
+import fimEntityResolution.pools.BitMatrixPool;
+import fimEntityResolution.pools.FIRunnableDBPool;
+import fimEntityResolution.pools.FIRunnablePool;
+import fimEntityResolution.pools.GDSPool;
+import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.model.RecordSet;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -44,25 +26,19 @@ import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.util.FileUtils;
 
-import candidateMatches.CandidatePairs;
-
-import com.googlecode.javaewah.EWAHCompressedBitmap;
-import com.googlecode.javaewah.IntIterator;
-import com.javamex.classmexer.MemoryUtil;
-import com.javamex.classmexer.MemoryUtil.VisibilityFilter;
-
-import fimEntityResolution.bitsets.EWAH_BitSet;
-import fimEntityResolution.bitsets.EWAH_BitSet_Factory;
-import fimEntityResolution.bitsets.Java_BitSet_Factory;
-import fimEntityResolution.bitsets.SingleBSFactory;
-import fimEntityResolution.interfaces.BitSetFactory;
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.pools.BitMatrixPool;
-import fimEntityResolution.pools.FIRunnableDBPool;
-import fimEntityResolution.pools.FIRunnablePool;
-import fimEntityResolution.pools.GDSPool;
-import fimEntityResolution.pools.LimitedPool;
+import javax.transaction.NotSupportedException;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utilities {
 

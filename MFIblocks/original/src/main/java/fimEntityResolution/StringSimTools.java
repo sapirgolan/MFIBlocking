@@ -1,18 +1,13 @@
 package fimEntityResolution;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.model.RecordSet;
+import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
+
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
-
-import fimEntityResolution.interfaces.IFRecord;
-
-import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 public class StringSimTools {
 
 	private final static JaroWinkler jwMetric = new JaroWinkler();
@@ -300,7 +295,7 @@ public class StringSimTools {
 	private static double log2IDF(int wordId){
 		double retVal = Utilities.globalItemsMap.get(wordId).getLog2IDF();
 		if(retVal <=0){
-			retVal = ((double)RecordSet.size/
+			retVal = ((double) RecordSet.size/
 					(double)Utilities.globalItemsMap.get(wordId).getSupportSize());
 			return logBase2(retVal);
 		}

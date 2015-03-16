@@ -1,4 +1,6 @@
-package fimEntityResolution;
+package il.ac.technion.ie.model;
+
+import il.ac.technion.ie.context.MfiContext;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,10 +18,9 @@ public class RecordSet {
 	public static int DB_SIZE;
 	
 	public static void setRecords(Map<Integer, Record> records){
-		values=records;
-		size=values.size();
-		
-	}
+        values = records;
+        size = values.size();
+    }
 	
 	public static void readRecords(MfiContext context) {
 

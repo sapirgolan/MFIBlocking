@@ -1,12 +1,11 @@
-package fimEntityResolution;
+package il.ac.technion.ie.model;
 
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import fimEntityResolution.interfaces.IFRecord;
 
-public class Record implements IFRecord{
+public class Record implements IFRecord {
 
 	/**
 	 * 

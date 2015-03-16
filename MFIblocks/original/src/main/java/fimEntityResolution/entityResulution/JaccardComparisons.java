@@ -1,16 +1,12 @@
 package fimEntityResolution.entityResulution;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import lucene.search.SearchEngine;
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
 import fimEntityResolution.comparison.ProfileComparison;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.RecordMatches;
+import lucene.search.SearchEngine;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class JaccardComparisons implements IComparison{
 

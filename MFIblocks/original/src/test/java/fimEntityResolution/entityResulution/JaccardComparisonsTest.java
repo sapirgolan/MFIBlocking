@@ -1,11 +1,7 @@
 package fimEntityResolution.entityResulution;
 
-import static org.mockito.Matchers.eq;
-
-import java.util.Arrays;
-
+import il.ac.technion.ie.model.CandidatePairs;
 import lucene.search.SearchEngine;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,7 +9,10 @@ import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 
-import candidateMatches.CandidatePairs;
+import java.util.Arrays;
+
+import static org.mockito.Matchers.eq;
+
 
 public class JaccardComparisonsTest {
 

@@ -1,8 +1,9 @@
 package fimEntityResolution.pools;
 
+import il.ac.technion.ie.data.structure.BitMatrix;
+
 import java.util.LinkedList;
 
-import fimEntityResolution.BitMatrix;
 
 public class BitMatrixPool {
 

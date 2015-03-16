@@ -1,8 +1,7 @@
-package candidateMatches;
+package il.ac.technion.ie.model;
 
-import fimEntityResolution.BitMatrix;
-import fimEntityResolution.RecordSet;
-import fimEntityResolution.interfaces.SetPairIF;
+import il.ac.technion.ie.data.structure.SetPairIF;
+import il.ac.technion.ie.data.structure.BitMatrix;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
@@ -17,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * similarity to current record ID
  *
  */
-public class CandidatePairs implements SetPairIF{
+public class CandidatePairs implements SetPairIF {
 
 	private static final long serialVersionUID = -3723310157735251353L;
 	private ConcurrentHashMap<Integer,RecordMatches> allMatches;

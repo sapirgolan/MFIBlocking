@@ -1,4 +1,4 @@
-package fimEntityResolution.exception;
+package il.ac.technion.ie.exception;
 
 /**
  * Created by I062070 on 16/03/2015.

@@ -1,24 +1,24 @@
 package fimEntityResolution;
 
+import fimEntityResolution.bitsets.EWAH_BitSet;
+import fimEntityResolution.interfaces.BitSetIF;
+import fimEntityResolution.pools.BitMatrixPool;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.model.RecordSet;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFunction;
+import scala.Tuple2;
+
+import javax.transaction.NotSupportedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.transaction.NotSupportedException;
-
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.PairFunction;
-
-import scala.Tuple2;
-import candidateMatches.CandidatePairs;
-import fimEntityResolution.bitsets.EWAH_BitSet;
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.pools.BitMatrixPool;
 /***
  * Reads frequent item-sets created by fpgrow and marks candidate blocks according to 3 parameters:
  * support condition, ClusterJaccard score, sparse neighborhood condition.
@@ -39,12 +39,7 @@ public class SparkBlocksReader {
 	
 	/**
 	 * Replaces Utilities.readFIs, uses SPARK.
-	 * @param frequentItemsetFile
-	 * @param globalItemsMap
-	 * @param scoreThreshold
-	 * @param records
-	 * @param minSup
-	 * @param NG_PARAM
+	 * @param itemsetContext
 	 * @return CandidatePairs object
 	 */
 	public static CandidatePairs readFIs(FrequentItemsetContext itemsetContext){

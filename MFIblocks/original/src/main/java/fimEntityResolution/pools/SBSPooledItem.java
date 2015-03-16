@@ -1,10 +1,10 @@
 package fimEntityResolution.pools;
 
+import il.ac.technion.ie.data.structure.Clearer;
 import org.enerj.core.SparseBitSet;
 
-import fimEntityResolution.interfaces.Clearer;
 
-public class SBSPooledItem implements Clearer{
+public class SBSPooledItem implements Clearer {
 	private SparseBitSet sbs;
 	public SBSPooledItem(){
 		sbs = new SparseBitSet();

@@ -1,5 +1,7 @@
 package fimEntityResolution;
 
+import il.ac.technion.ie.model.RecordSet;
+
 public class Pair {
 
 	public int r1;

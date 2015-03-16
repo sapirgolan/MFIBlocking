@@ -1,4 +1,6 @@
-package candidateMatches;
+package il.ac.technion.ie.model;
+import il.ac.technion.ie.data.structure.LimitedMinHeap;
+
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;

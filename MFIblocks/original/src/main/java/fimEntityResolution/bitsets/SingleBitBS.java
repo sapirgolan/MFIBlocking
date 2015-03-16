@@ -1,15 +1,13 @@
 package fimEntityResolution.bitsets;
 
-import java.util.Collections;
-import java.util.List;
+import fimEntityResolution.interfaces.BitSetIF;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.data.structure.SetPairIF;
 
 import javax.transaction.NotSupportedException;
-
-import fimEntityResolution.RecordSet;
-import fimEntityResolution.Utilities;
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.interfaces.SetPairIF;
+import java.util.Collections;
+import java.util.List;
 
 public class SingleBitBS implements BitSetIF{
 	/**

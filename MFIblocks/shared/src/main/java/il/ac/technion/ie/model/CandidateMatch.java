@@ -1,4 +1,4 @@
-package candidateMatches;
+package il.ac.technion.ie.model;
 
 
 /**
@@ -6,7 +6,7 @@ package candidateMatches;
  * @author Tal
  *
  */
-public class CandidateMatch implements PositionUpdater{
+public class CandidateMatch implements PositionUpdater {
 
 	private final int recordId;
 	private double score;

@@ -1,4 +1,4 @@
-package candidateMatches;
+package il.ac.technion.ie.model;
 
 import java.util.Comparator;
 

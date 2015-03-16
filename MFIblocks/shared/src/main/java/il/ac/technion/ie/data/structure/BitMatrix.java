@@ -1,18 +1,16 @@
-package fimEntityResolution;
+package il.ac.technion.ie.data.structure;
 
+
+import org.enerj.core.SparseBitSet;
+import org.enerj.core.SparseBitSet.Iterator;
 
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.enerj.core.SparseBitSet;
-import org.enerj.core.SparseBitSet.Iterator;
-
-import fimEntityResolution.interfaces.Clearer;
-import fimEntityResolution.interfaces.SetPairIF;
 /** should be made parallalizable**/
-public class BitMatrix implements Clearer,SetPairIF{
+public class BitMatrix implements Clearer,SetPairIF {
 	
 	private  SparseBitSet bs;
 	private long n, m;
@@ -183,7 +181,7 @@ public class BitMatrix implements Clearer,SetPairIF{
 	}
 	
 	public static SparseBitSet and(SparseBitSet bs1, SparseBitSet bs2){		
-		Iterator It =bs1.getIterator();	
+		Iterator It =bs1.getIterator();
 		while(It.hasNext()){
 			long index = It.next();
 			if(!bs2.get(index)){

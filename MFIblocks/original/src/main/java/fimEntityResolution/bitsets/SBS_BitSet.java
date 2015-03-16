@@ -1,21 +1,18 @@
 package fimEntityResolution.bitsets;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import javax.transaction.NotSupportedException;
-
+import fimEntityResolution.interfaces.BitSetIF;
+import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.data.structure.SetPairIF;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
 
-import fimEntityResolution.BitMatrix;
-import fimEntityResolution.RecordSet;
-import fimEntityResolution.Utilities;
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.interfaces.SetPairIF;
+import javax.transaction.NotSupportedException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class SBS_BitSet implements BitSetIF{	 
 	/**
@@ -31,7 +28,7 @@ public class SBS_BitSet implements BitSetIF{
 	
 	
 	public SBS_BitSet(){
-		int size = SizeForSBSImp(RecordSet.DB_SIZE);		
+		int size = SizeForSBSImp(RecordSet.DB_SIZE);
 		sbs = new SparseBitSet(size);
 		cardinality = 0;
 	}

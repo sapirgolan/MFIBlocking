@@ -1,11 +1,15 @@
 package fimEntityResolution.interfaces;
 
-import java.util.List;
+
+import il.ac.technion.ie.data.structure.Clearer;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.data.structure.SetPairIF;
 
 import javax.transaction.NotSupportedException;
+import java.util.List;
 
 
-public interface BitSetIF extends Clearer{
+public interface BitSetIF extends Clearer {
 
 	public void set(int recordId);
 	public int getCardinality();

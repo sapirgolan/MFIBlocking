@@ -1,14 +1,14 @@
 package fimEntityResolution;
 
-import java.util.List;
-import java.util.Map;
-
 import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.Clearer;
-import fimEntityResolution.interfaces.IFRecord;
 import fimEntityResolution.pools.FIRunnableDBPool;
 import fimEntityResolution.pools.GDSPool;
+import il.ac.technion.ie.data.structure.Clearer;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.Record;
 
+import java.util.List;
+import java.util.Map;
 
 
 public class FIRunnableDB implements Runnable, Clearer {

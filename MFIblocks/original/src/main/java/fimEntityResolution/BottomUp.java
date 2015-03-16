@@ -1,13 +1,15 @@
 package fimEntityResolution;
 
-import candidateMatches.CandidateMatch;
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
 import dnl.utils.text.table.TextTable;
 import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
 import fimEntityResolution.entityResulution.IComparison;
 import fimEntityResolution.statistics.*;
+import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.types.Alg;
+import il.ac.technion.ie.types.MFISetsCheckConfiguration;
 import lucene.search.SearchEngine;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -36,17 +38,7 @@ public class BottomUp {
 
     static final Logger logger = Logger.getLogger(BottomUp.class);
 
-
-    public enum Alg{
-		CFI,
-		MFI
-	}
-
-	public enum MFISetsCheckConfiguration{
-		SPARK,DEFAULT
-	}
-
-	/**
+    /**
 	 * The Main of the MFIBlocking Algorithm
 	 * @param args
 	 * The parameters are as follows:
@@ -408,7 +400,7 @@ public class BottomUp {
 			writer = new BufferedWriter(new FileWriter(outputFle));
 			
 			for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1)){
-				Record currRecord = RecordSet.values.get(i);				
+				Record currRecord = RecordSet.values.get(i);
 				String toWrite = currRecord.getNumericline(appItems.keySet());
 				writer.write(toWrite);
 				writer.newLine();

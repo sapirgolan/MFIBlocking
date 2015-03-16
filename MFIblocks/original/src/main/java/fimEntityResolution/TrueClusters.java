@@ -1,15 +1,14 @@
 package fimEntityResolution;
 
+import il.ac.technion.ie.model.CandidatePairs;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import candidateMatches.CandidatePairs;
-
-import org.apache.log4j.Logger;
 
 
 public class TrueClusters {

@@ -1,13 +1,11 @@
 package fimEntityResolution;
 
 import com.esotericsoftware.kryo.Kryo;
-
 import fimEntityResolution.bitsets.EWAH_BitSet_Factory;
-import fimEntityResolution.interfaces.Clearer;
 import fimEntityResolution.interfaces.ClearerFactory;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.interfaces.SetPairIF;
-
+import il.ac.technion.ie.data.structure.Clearer;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.data.structure.SetPairIF;
 import org.apache.spark.serializer.KryoRegistrator;
 /***
  * In order to use Kryo serialization we have to register our classes. (Spark tuning)

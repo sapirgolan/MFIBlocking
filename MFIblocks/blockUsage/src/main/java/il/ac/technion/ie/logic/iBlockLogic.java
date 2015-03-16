@@ -1,6 +1,7 @@
 package il.ac.technion.ie.logic;
 
-import candidateMatches.CandidatePairs;
+
+import il.ac.technion.ie.model.CandidatePairs;
 
 import java.util.List;
 

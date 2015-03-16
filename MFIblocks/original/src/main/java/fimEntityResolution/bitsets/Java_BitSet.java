@@ -1,17 +1,14 @@
 package fimEntityResolution.bitsets;
 
+import fimEntityResolution.interfaces.BitSetIF;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.data.structure.SetPairIF;
+
+import javax.transaction.NotSupportedException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-
-import javax.transaction.NotSupportedException;
-
-
-import fimEntityResolution.RecordSet;
-import fimEntityResolution.Utilities;
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.interfaces.SetPairIF;
 
 public class Java_BitSet implements BitSetIF{
 
@@ -77,7 +74,7 @@ public class Java_BitSet implements BitSetIF{
 	}
 	
 	@Override
-	public int markPairs(SetPairIF spf, double score) {		
+	public int markPairs(SetPairIF spf, double score) {
 		int cnt =0;
 		for(int i=bs.nextSetBit(0); i>=0; i=bs.nextSetBit(i+1)) {
 			for(int j=bs.nextSetBit(i+1); j>=0; j=bs.nextSetBit(j+1)) {

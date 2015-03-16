@@ -1,22 +1,16 @@
 package fimEntityResolution.bitsets;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.transaction.NotSupportedException;
-
-import org.apache.commons.lang.NotImplementedException;
-
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.IntIterator;
-
-import fimEntityResolution.RecordSet;
-import fimEntityResolution.Utilities;
 import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.interfaces.SetPairIF;
-//import javaewah.EWAHCompressedBitmap;
-//import javaewah.IntIterator;
+import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.data.structure.SetPairIF;
+import org.apache.commons.lang.NotImplementedException;
+
+import javax.transaction.NotSupportedException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EWAH_BitSet implements BitSetIF{
 
@@ -95,7 +89,7 @@ public class EWAH_BitSet implements BitSetIF{
 		return retVal;
 	}
 	@Override
-	public int markPairs(SetPairIF spf, double score) {		
+	public int markPairs(SetPairIF spf, double score) {
 		int cnt =0;
 		List<Integer> positions = comBS.getPositions();		
 		for(int i=0 ; i < positions.size() ; i++){

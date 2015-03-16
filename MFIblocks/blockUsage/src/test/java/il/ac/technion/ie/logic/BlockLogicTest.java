@@ -1,7 +1,7 @@
 package il.ac.technion.ie.logic;
 
-import candidateMatches.RecordMatches;
 import com.google.common.collect.Sets;
+import il.ac.technion.ie.model.RecordMatches;
 import il.ac.technion.ie.model.NeighborsVector;
 import org.hamcrest.Matchers;
 import org.junit.After;

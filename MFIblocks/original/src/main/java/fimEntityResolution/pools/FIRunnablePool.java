@@ -1,14 +1,12 @@
 package fimEntityResolution.pools;
 
+import fimEntityResolution.FIRunnable;
+import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.model.CandidatePairs;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import candidateMatches.CandidatePairs;
-
-import fimEntityResolution.BitMatrix;
-import fimEntityResolution.FIRunnable;
-import fimEntityResolution.Record;
 
 public class FIRunnablePool {
 
@@ -31,7 +29,7 @@ public class FIRunnablePool {
 	
 	//assumption is all bms are the same size
 	public FIRunnable getRunnable(List<Integer> currIS,int minSup, 
-			double NG_PARAM, Map<Integer, BitMatrix> coverageIndex, CandidatePairs CPs){	
+			double NG_PARAM, Map<Integer, BitMatrix> coverageIndex, CandidatePairs CPs){
 		synchronized(this){
 			if(runnables.size() > 0){
 				FIRunnable toReturn = runnables.remove();

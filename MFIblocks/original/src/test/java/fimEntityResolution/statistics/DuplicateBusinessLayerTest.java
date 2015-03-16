@@ -1,14 +1,14 @@
 package fimEntityResolution.statistics;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
+import il.ac.technion.ie.model.CandidatePairs;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import candidateMatches.CandidatePairs;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 
 public class DuplicateBusinessLayerTest {
 

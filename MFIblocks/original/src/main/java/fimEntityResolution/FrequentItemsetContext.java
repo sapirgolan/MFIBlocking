@@ -1,5 +1,7 @@
 package fimEntityResolution;
 
+import il.ac.technion.ie.context.MfiContext;
+
 import java.util.Map;
 
 public class FrequentItemsetContext {

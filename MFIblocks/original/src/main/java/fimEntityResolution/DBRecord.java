@@ -1,14 +1,15 @@
 package fimEntityResolution;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
+import il.ac.technion.ie.model.IFRecord;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
 
-import fimEntityResolution.interfaces.IFRecord;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 
 
 /**

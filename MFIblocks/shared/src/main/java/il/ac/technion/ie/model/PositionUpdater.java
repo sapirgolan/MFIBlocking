@@ -1,4 +1,4 @@
-package candidateMatches;
+package il.ac.technion.ie.model;
 
 public interface PositionUpdater {
 

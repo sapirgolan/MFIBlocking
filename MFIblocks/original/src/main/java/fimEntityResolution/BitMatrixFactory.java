@@ -1,7 +1,9 @@
 package fimEntityResolution;
 
-import fimEntityResolution.interfaces.Clearer;
 import fimEntityResolution.interfaces.ClearerFactory;
+import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.data.structure.Clearer;
+import il.ac.technion.ie.model.RecordSet;
 
 public class BitMatrixFactory implements ClearerFactory{
 
@@ -22,8 +24,9 @@ public class BitMatrixFactory implements ClearerFactory{
 	
 	@Override
 	public Clearer createInstance() {
-		return new BitMatrix(RecordSet.DB_SIZE);
-	}
+        Clearer clearer = new BitMatrix(RecordSet.DB_SIZE);
+        return clearer;
+    }
 
 	
 }

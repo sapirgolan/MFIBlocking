@@ -1,9 +1,6 @@
 package il.ac.technion.ie.logic;
 
-import il.ac.technion.ie.model.CandidatePairs;
-import il.ac.technion.ie.model.RecordMatches;
-import il.ac.technion.ie.model.NeighborsVector;
-import il.ac.technion.ie.model.NeighborsVectorsCompare;
+import il.ac.technion.ie.model.*;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -25,7 +22,7 @@ public class BlockLogic implements iBlockLogic{
     }
 
     @Override
-    public List<List<Integer>> findBlocks(CandidatePairs candidatePairs) {
+    public List<Block> findBlocks(CandidatePairs candidatePairs) {
         ConcurrentHashMap<Integer, RecordMatches> matches = candidatePairs.getAllMatches();
         Set<Integer> recordsIds = matches.keySet();
 

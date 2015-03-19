@@ -1,5 +1,6 @@
 package il.ac.technion.ie.logic;
 
+import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.NeighborsVector;
 import org.apache.log4j.Logger;
 
@@ -24,10 +25,10 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
     }
 
     @Override
-    public <E extends NeighborsVector> List<List<Integer>> findBlocks(List<E> matches) {
+    public <E extends NeighborsVector> List<Block> findBlocks(List<E> matches) {
         int largestBlockCreated = 0;
         ArrayList<Integer> itemsSeen = new ArrayList<>();
-        List<List<Integer>> result = new ArrayList<>();
+        List<Block> result = new ArrayList<>();
         for (E match : matches) {
             if (isSingleOrDoubleBlock(match)) {
                 logger.debug("input block is of size <=2, " + match.toString());
@@ -53,14 +54,15 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
      *
      * @param itemsSeen - List of items that their row vectors has already processed
      * @param result - list of block to be returned by algorithm
-     * @param match - current {@link NeighborsVector}
-     * @param neighbors - List of all records that share some block with current {@link NeighborsVector}
+     * @param match - current {@link il.ac.technion.ie.model.NeighborsVector}
+     * @param neighbors - List of all records that share some block with current {@link il.ac.technion.ie.model.NeighborsVector}
      * @return
      */
-    private <E extends NeighborsVector> int updateBlocks(List<Integer> itemsSeen, List<List<Integer>> result, E match, List<Integer> neighbors) {
+    private <E extends NeighborsVector> int updateBlocks(List<Integer> itemsSeen, List<Block> result, E match, List<Integer> neighbors) {
         itemsSeen.add(match.getReresentativeId());
-        result.add(neighbors);
-        logger.debug("Added to result block: " + neighbors.toString());
+        Block block = new Block(neighbors);
+        result.add(block);
+        logger.debug("Added to result block: " + block.toString());
         return neighbors.size();
     }
 

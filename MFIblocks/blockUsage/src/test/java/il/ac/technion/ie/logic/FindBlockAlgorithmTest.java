@@ -2,6 +2,7 @@ package il.ac.technion.ie.logic;
 
 import com.google.common.collect.Lists;
 import com.rits.cloning.Cloner;
+import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.NeighborsVector;
 import il.ac.technion.ie.model.NeighborsVectorsCompare;
 import org.junit.After;
@@ -42,7 +43,10 @@ public class FindBlockAlgorithmTest {
 
     @Test
     public void testFindBlocks() throws Exception {
-        List<ArrayList<Integer>> trueBlocks = Lists.newArrayList(Lists.newArrayList(1, 5), Lists.newArrayList(2, 3, 4), Lists.newArrayList(1, 2, 3));
+        ArrayList<Block> trueBlocks = Lists.newArrayList(
+                new Block(Lists.newArrayList(1, 5)),
+                new Block(Lists.newArrayList(2, 3, 4)),
+                new Block(Lists.newArrayList(1, 2, 3)));
         one.exitsNeighbors(Lists.newArrayList(1, 2, 3, 5));
         two.exitsNeighbors(Lists.newArrayList(1, 2, 3, 4));
         three.exitsNeighbors(Lists.newArrayList(1, 2, 3, 4));
@@ -55,11 +59,11 @@ public class FindBlockAlgorithmTest {
 
             Collections.shuffle(list);
             classUnderTest.sort(list, new NeighborsVectorsCompare());
-            List<List<Integer>> blocks = classUnderTest.findBlocks(list);
+            List<Block> blocks = classUnderTest.findBlocks(list);
 
             // create copy of trueBlocks
             Cloner cloner = new Cloner();
-            List<ArrayList<Integer>> tempList = cloner.deepClone(trueBlocks);
+            ArrayList<Block> tempList = cloner.deepClone(trueBlocks);
 
             // assert
             trueBlocks.removeAll(blocks);

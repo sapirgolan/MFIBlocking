@@ -1,5 +1,6 @@
 package il.ac.technion.ie.service;
 
+import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.logic.BlockLogic;
@@ -21,8 +22,8 @@ public class BlockService implements iBlockService {
         this.blockLogic = new BlockLogic();
     }
     @Override
-    public List<List<Integer>> getBlocks(CandidatePairs candidatePairs) {
-        List<List<Integer>> result = blockLogic.findBlocks(candidatePairs);
+    public List<Block> getBlocks(CandidatePairs candidatePairs) {
+        List<Block> result = blockLogic.findBlocks(candidatePairs);
         logger.debug("Finished finding blocks from input");
         return result;
     }

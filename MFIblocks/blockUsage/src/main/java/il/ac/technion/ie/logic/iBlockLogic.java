@@ -1,6 +1,7 @@
 package il.ac.technion.ie.logic;
 
 
+import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.CandidatePairs;
 
 import java.util.List;
@@ -10,5 +11,5 @@ import java.util.List;
  */
 public interface iBlockLogic {
 
-    List<List<Integer>> findBlocks(CandidatePairs candidatePairs);
+    List<Block> findBlocks(CandidatePairs candidatePairs);
 }

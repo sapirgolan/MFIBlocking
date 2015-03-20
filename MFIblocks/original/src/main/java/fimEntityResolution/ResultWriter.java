@@ -1,6 +1,7 @@
 package fimEntityResolution;
 
 
+import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.model.RecordMatches;
 
@@ -10,11 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,16 +22,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ResultWriter {
 
-	public File createOutputFile() {
-		DateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH_mm");
-		Date date = new Date();
-		String dateFormated = dateFormat.format(date);
-		String workingDir = System.getProperty("user.dir");
-		File file = new File(workingDir + "/MFIBlocksResult_" + dateFormated + ".txt");
-		return file;
+	public File createNeighborsOutputFile() {
+        return generateOutputFile("/MFIBlocksResult_", ".txt");
 	}
-	
-	public void writeBlocks(File file, CandidatePairs cps) throws IOException {
+
+    public File createBlocksOutputFile() {
+        return generateOutputFile("/Blocks_", ".txt");
+	}
+
+    private File generateOutputFile(String fileName, String fileFormat) {
+        DateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH_mm");
+        Date date = new Date();
+        String dateFormatted = dateFormat.format(date);
+        String workingDir = System.getProperty("user.dir");
+        return new File(workingDir + fileName + dateFormatted + fileFormat);
+    }
+
+    public void writeEachRecordNeighbors(File file, CandidatePairs cps) throws IOException {
 		FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 		ConcurrentHashMap<Integer,RecordMatches> allMatches = cps.getAllMatches();
@@ -57,4 +62,18 @@ public class ResultWriter {
 		}
 		bufferedWriter.close();
 	}
+
+    public void writeBlocks(File file, List<Block> blocks) throws IOException {
+        FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write("*****Printing blocks***");
+        bufferedWriter.newLine();
+        for (Block block : blocks) {
+            bufferedWriter.write(block.toString());
+            bufferedWriter.newLine();
+        }
+        bufferedWriter.write("*****Finish Printing***");
+        bufferedWriter.newLine();
+        bufferedWriter.close();
+    }
 }

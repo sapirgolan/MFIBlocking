@@ -8,6 +8,8 @@ import fimEntityResolution.statistics.*;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.service.BlockService;
+import il.ac.technion.ie.service.iBlockService;
 import il.ac.technion.ie.types.Alg;
 import il.ac.technion.ie.types.MFISetsCheckConfiguration;
 import lucene.search.SearchEngine;
@@ -153,7 +155,7 @@ public class BottomUp {
 				//obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
                 long actionStart = System.currentTimeMillis();
-                writeCandidatePairs(algorithmObtainedPairs);
+                printNeighborsAndBlocks(algorithmObtainedPairs);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
@@ -212,17 +214,20 @@ public class BottomUp {
 	 * the method write the blocking output to a file for later usage
 	 * @param cps
 	 */
-	private static void writeCandidatePairs(CandidatePairs cps) {
+	private static void printNeighborsAndBlocks(CandidatePairs cps) {
 		ResultWriter resultWriter = new ResultWriter();
-		File outputFile = resultWriter.createOutputFile();
-		try {
-			resultWriter.writeBlocks(outputFile, cps);
+		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
+        iBlockService blockService = new BlockService();
+        File blocksOutputFile = resultWriter.createBlocksOutputFile();
+        List<Block> blocks = blockService.getBlocks(cps);
+        try {
+			resultWriter.writeEachRecordNeighbors(neighborsOutputFile, cps);
+            resultWriter.writeBlocks(blocksOutputFile, blocks);
 		} catch (IOException e) {
-			System.err.println("***Failed to write blocks***");
-			e.printStackTrace();
+            logger.error("Failed to write blocks", e);
 			return;
 		}
-		System.out.println("Outfile was written to: " + outputFile.getAbsolutePath());
+        logProgress("Outfile was written to: " + neighborsOutputFile.getAbsolutePath());
 	}
 
 

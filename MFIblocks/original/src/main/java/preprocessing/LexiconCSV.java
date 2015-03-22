@@ -15,11 +15,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import fimEntityResolution.FrequentItem;
+import il.ac.technion.ie.model.FrequentItem;
 import fimEntityResolution.bitsets.SBS_BitSet_Factory;
 
-public class Lexicon {
+public class LexiconCSV {
 
+	//private Map<FrequentItem,Integer> wordsToColumns = new HashMap<FrequentItem,Integer>();	
 	private Map<Integer,AttributeItems> attIdToItems = new HashMap<Integer,AttributeItems>();	
 	private Map<Integer,Double> attIdToWeights = new HashMap<Integer, Double>();
 	private Map<Integer,Integer> columnIndexToId = new HashMap<Integer, Integer>();
@@ -31,7 +32,7 @@ public class Lexicon {
 	private int numOfWords = 0;
 	private int minWordSize = Integer.MAX_VALUE;
 	private int maxWordSize = 0;
-	public Lexicon(File weightsPropertiesFile){
+	public LexiconCSV(File weightsPropertiesFile){
 		FileReader fr;
 		try {
 			fr = new FileReader(weightsPropertiesFile);
@@ -81,7 +82,7 @@ public class Lexicon {
 	
 	private final static String DEFAULT_WEIGHTS = "0.99999";
 	private final static String SEP = ",";
-	public Lexicon(String weightsProperty){
+	public LexiconCSV(String weightsProperty){
 		if(weightsProperty == null || weightsProperty.length() == 0){
 			weightsProperty=DEFAULT_WEIGHTS;
 		}
@@ -94,6 +95,11 @@ public class Lexicon {
 	
 	
 	public int addWord(int columnIndex, int recordId, String word){
+		//FrequentItem wordItem = new F
+//		if (wordsToColumns.containsKey(new word)){
+//			return 
+//		}
+		
 		int attId = getAttId(columnIndex);
 		AttributeItems attFIs = null;
 		//do not want to waste time on this word, or have it participate in the algorithm
@@ -106,6 +112,7 @@ public class Lexicon {
 		}
 		else{
 			attFIs = new AttributeItems();
+			//attIdToItems.put(attId, attFIs); //20150129
 		}
 		FrequentItem wordItem = null;
 		word = word.trim().toLowerCase();
@@ -113,6 +120,7 @@ public class Lexicon {
 		if(wordsToIds.containsKey(word)){
 			int wordId = wordsToIds.get(word);
 			wordItem = attFIs.getItems().get(wordId);
+			
 			if(wordItem == null){
 				System.out.println("word " + word + " was in wordsToIds but doesnt have a frequentitem object as expected");
 			}
@@ -121,8 +129,10 @@ public class Lexicon {
 			int wordId = currItemId++;
 			wordsToIds.put(word, wordId);
 			//wordItem = new SparseFrequentItem(wordId, word,attIdToWeights.get(attId));
-			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*ProfileReader.dbSize.getTotalSize()));
+			wordItem = new FrequentItem(wordId, word, attIdToWeights.get(attId), SBS_BitSet_Factory.getInstance(2*csvFile.DB_Size));
 		}
+		
+		wordItem.addColumn(columnIndex);
 		wordItem.addSupport(recordId);
 		attFIs.getItems().put(wordItem.getId(), wordItem);
 		attIdToItems.put(attId, attFIs);
@@ -263,7 +273,9 @@ public class Lexicon {
 				propVal.setLength(0); //clear the stringBuilder		
 				propVal.append(fi.getItem()).append(",").
 						append(Double.toString(fi.getWeight())).append(",").
-							append(fi.getSupportString());
+							append(fi.getSupportString()).append(",").
+							append(fi.getColumnsString());
+				
 				props.put(Integer.toString(fi.getId()), propVal.toString());
 			}
 		}
@@ -286,6 +298,10 @@ public class Lexicon {
 		public AttributeItems(){
 			attItems = new HashMap<Integer, FrequentItem>();	
 			wordToId = new HashMap<String, Integer>();			
+//			for (Entry<Integer,FrequentItem> entry: attItems.entrySet()){
+//				if (!wordToId.containsKey(entry.getValue().getItem())) 
+//					wordToId.put(entry.getValue().getItem(),entry.getKey());
+//			}
 		}		
 		
 		public Map<Integer,FrequentItem> getItems(){

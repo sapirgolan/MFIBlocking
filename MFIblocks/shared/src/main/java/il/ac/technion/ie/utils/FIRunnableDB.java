@@ -1,11 +1,10 @@
-package fimEntityResolution;
+package il.ac.technion.ie.utils;
 
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.pools.FIRunnableDBPool;
-import fimEntityResolution.pools.GDSPool;
 import il.ac.technion.ie.data.structure.Clearer;
-import il.ac.technion.ie.model.IFRecord;
-import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.data.structure.IFRecord;
+import il.ac.technion.ie.model.BitSetIF;
+import il.ac.technion.ie.pools.FIRunnableDBPool;
+import il.ac.technion.ie.pools.GDSPool;
 
 import java.util.List;
 import java.util.Map;
@@ -15,37 +14,29 @@ public class FIRunnableDB implements Runnable, Clearer {
 
 	private List<Integer> currIS = null;
 	private int minSup;
-	private Map<Integer, Record> records = null;
-	private double NG_PARAM;
-	private int expectedSuppSize;
-	Map<Integer, GDS_NG> coverageIndexDB;
+    private double NG_PARAM;
+    private Map<Integer, GDS_NG> coverageIndexDB;
 
 	public FIRunnableDB(List<Integer> currIS, int minSup,
-			Map<Integer, Record> records, double NG_PARAM,
-			int expectedSuppSize, Map<Integer, GDS_NG> coverageIndexDB) {
+                        double NG_PARAM,
+                        Map<Integer, GDS_NG> coverageIndexDB) {
 		this.currIS = currIS;
 		this.minSup = minSup;
-		this.records = records;
-		this.NG_PARAM = NG_PARAM;
-		this.expectedSuppSize = expectedSuppSize;
-		this.coverageIndexDB = coverageIndexDB;
+        this.NG_PARAM = NG_PARAM;
+        this.coverageIndexDB = coverageIndexDB;
 	}
 
 	public void setParams(List<Integer> currIS, int minSup,
-			Map<Integer, Record> records, double NG_PARAM,
-			int expectedSuppSize,Map<Integer, GDS_NG> coverageIndexDB) {
+                          double NG_PARAM,
+                          Map<Integer, GDS_NG> coverageIndexDB) {
 		this.currIS = currIS;
 		this.minSup = minSup;
-		this.records = records;
-		this.NG_PARAM = NG_PARAM;
-		this.expectedSuppSize = expectedSuppSize;
-		this.coverageIndexDB = coverageIndexDB;
+        this.NG_PARAM = NG_PARAM;
+        this.coverageIndexDB = coverageIndexDB;
 	}
 
 	@Override
 	public void run() {
-		// EWAHCompressedBitmap support =
-		// getItemsetSupport_commpressed(currIS);
 		BitSetIF support = Utilities.getItemsetSupport(currIS);
 		if (support.getCardinality() < (long) minSup) {
 			Utilities.nonFIs.incrementAndGet();				
@@ -56,9 +47,8 @@ public class FIRunnableDB implements Runnable, Clearer {
 
 		long start = System.currentTimeMillis();
 		double currClusterScore = StringSimTools.softTFIDF(
-				FISupportRecords, currIS, Utilities.scoreThreshold);
-		FISupportRecords = null;
-		Utilities.timeSpentCalcScore
+                FISupportRecords, currIS, Utilities.scoreThreshold);
+        Utilities.timeSpentCalcScore
 				.addAndGet(System.currentTimeMillis() - start);
 		Utilities.clusterScores[cellForCluster(currClusterScore)]
 				.incrementAndGet();
@@ -72,12 +62,11 @@ public class FIRunnableDB implements Runnable, Clearer {
 				for (int i = begIndex; i <= clusterCell; i++) {
 					GDS_NG gds = coverageIndexDB.get(i);
 					if (gds == null) {
-						// bm = new BitMatrix(records.size());
 						gds = GDSPool.getInstance().getGDS(
 								NG_PARAM * minSup);
 						Utilities.numOfGDs.incrementAndGet();
 					}
-					support.markPairs(gds,currClusterScore);						
+					support.markPairs(gds,currClusterScore,currIS);						
 					/*
 					 * NG constraint compromised: this means that a
 					 * cluster of score currClusterScore caused the
@@ -94,7 +83,7 @@ public class FIRunnableDB implements Runnable, Clearer {
 					if (gds.getMaxNG() > NG_PARAM * minSup) {
 						double prevThresh = Utilities.scoreThreshold;
 						Utilities.scoreThreshold = i
-								* BottomUp.THRESH_STEP;
+								* Constants.THRESH_STEP;
 
 						// remove all BMs located below the new
 						// threshold
@@ -122,7 +111,7 @@ public class FIRunnableDB implements Runnable, Clearer {
 
 	@Override
 	public void clearAll() {
-		this.setParams(null, 0, null, 0, 0,null);
+		this.setParams(null, 0, 0, null);
 	}
 
 	private static int cellForCluster(final double score) {

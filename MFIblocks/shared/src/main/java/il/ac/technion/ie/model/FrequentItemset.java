@@ -1,4 +1,4 @@
-package fimEntityResolution;
+package il.ac.technion.ie.model;
 
 import java.util.BitSet;
 
@@ -35,12 +35,8 @@ public class FrequentItemset{
 		}
 		return true;
 	}
-	
-	public boolean isContained(FrequentItemset other){
-		return other.contains(this);
-	}
 
-	public boolean equals(Object obj){
+    public boolean equals(Object obj){
 		if(obj.hashCode() != this.hashCode())
 			return false;
 		FrequentItemset other = (FrequentItemset)obj;

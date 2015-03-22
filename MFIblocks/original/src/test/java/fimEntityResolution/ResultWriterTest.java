@@ -73,6 +73,8 @@ public class ResultWriterTest {
 				return result;
 			}
 		});
+
+		//classUnderTest.writeBlocksIDs(file, candidatePairs);
 		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
 		assertThat(fileContent, allOf(containsString("1"),containsString("4"), containsString("2") ));
@@ -101,6 +103,8 @@ public class ResultWriterTest {
 				return result;
 			}
 		});
+		
+		//classUnderTest.writeBlocksIDs(file, candidatePairs);
 		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
 		assertThat(fileContent, allOf(containsString("2 - [1, 4]"), containsString("90 - [16, 14, 11]") ));
@@ -125,6 +129,8 @@ public class ResultWriterTest {
 				return result;
 			}
 		});
+		
+		//classUnderTest.writeBlocksIDs(file, candidatePairs);
 		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
 		assertThat(fileContent, containsString("2 - [1, 4]"));

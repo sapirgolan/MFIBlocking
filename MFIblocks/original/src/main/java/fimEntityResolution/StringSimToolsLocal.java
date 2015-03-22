@@ -1,6 +1,7 @@
 package fimEntityResolution;
 
-import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.FrequentItem;
+import il.ac.technion.ie.data.structure.IFRecord;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.model.Record;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;

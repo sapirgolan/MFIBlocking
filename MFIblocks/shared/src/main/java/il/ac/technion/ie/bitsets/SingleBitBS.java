@@ -1,7 +1,7 @@
-package fimEntityResolution.bitsets;
+package il.ac.technion.ie.bitsets;
 
-import fimEntityResolution.interfaces.BitSetIF;
-import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.model.BitSetIF;
+import il.ac.technion.ie.data.structure.IFRecord;
 import il.ac.technion.ie.model.RecordSet;
 import il.ac.technion.ie.data.structure.SetPairIF;
 
@@ -82,7 +82,6 @@ public class SingleBitBS implements BitSetIF{
 		return Collections.singletonList(rec);
 	}
 
-	@Override
 	public int markPairs(SetPairIF spf, double score) {
 		return 0;//does nothing
 	}
@@ -92,6 +91,16 @@ public class SingleBitBS implements BitSetIF{
 		if(set){
 			other.set(index);
 		}
+	}
+
+	@Override
+	public List<Integer> getColumns() {
+		return Collections.singletonList(index);
+	}
+
+	@Override
+	public int markPairs(SetPairIF spf, double score, List<Integer> items) {
+		return 0;//does nothing
 	}
 
 }

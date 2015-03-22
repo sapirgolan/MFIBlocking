@@ -1,24 +1,23 @@
-package fimEntityResolution;
+package il.ac.technion.ie.utils;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.File;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
-import java.io.File;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.rule.PowerMockRule;
 
 @PrepareForTest({System.class, Utilities.class})
+@RunWith(PowerMockRunner.class)
 public class UtilitiesTest {
-	
-	@Rule
-	public PowerMockRule rule = new PowerMockRule();
 
 	@Before
 	public void setUp() throws Exception {

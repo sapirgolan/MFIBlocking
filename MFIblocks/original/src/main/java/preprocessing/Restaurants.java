@@ -13,7 +13,7 @@ import java.util.Set;
 public class Restaurants {
 	
 	private static Set<String> distinctRecords;
-	private static Lexicon lexicon;
+	private static LexiconProfiles lexicon;
 	private static String swFile;
 	private static WordProcessor wordProcessor;
 	
@@ -25,7 +25,7 @@ public class Restaurants {
 		String lexiconOutFile = args[4];
 		String noSWOutFile = args[5];
 		int ngrams = (args.length > 6 ? Integer.parseInt(args[6]):0);
-		lexicon = new Lexicon(new File(paramsFile));
+		lexicon = new LexiconProfiles(new File(paramsFile));
 		wordProcessor = ((ngrams == 0) ? new WordProcessor(new File(swFile)):
 			new WordProcessor(new File(swFile),ngrams,ngrams));
 		distinctRecords = new HashSet<String>();

@@ -1,8 +1,8 @@
-package fimEntityResolution.interfaces;
+package il.ac.technion.ie.model;
 
 
 import il.ac.technion.ie.data.structure.Clearer;
-import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.data.structure.IFRecord;
 import il.ac.technion.ie.data.structure.SetPairIF;
 
 import javax.transaction.NotSupportedException;
@@ -18,7 +18,8 @@ public interface BitSetIF extends Clearer {
 	public BitSetIF or(final BitSetIF other) throws NotSupportedException;
 	public boolean get(int recordId) throws NotSupportedException;
 	public List<IFRecord> getRecords();
-	public int markPairs(SetPairIF spf, double score);
+	public List<Integer> getColumns();
+	public int markPairs(SetPairIF spf, double score, List<Integer> items);
 	/**
 	 * Will set the current set bits into the other IF
 	 * @param other

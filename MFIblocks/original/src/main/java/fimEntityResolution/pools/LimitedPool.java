@@ -1,6 +1,6 @@
 package fimEntityResolution.pools;
 
-import fimEntityResolution.interfaces.ClearerFactory;
+import il.ac.technion.ie.utils.ClearerFactory;
 import il.ac.technion.ie.data.structure.Clearer;
 
 import java.util.concurrent.LinkedBlockingQueue;

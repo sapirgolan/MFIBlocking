@@ -9,7 +9,6 @@
   <artifactId>original</artifactId>
   <name>original</name>
   <properties>
-      <powermock.version>1.5.4</powermock.version>
       <easymock.version>3.2</easymock.version>
       <jar.destination>${env.TMP}</jar.destination>
   </properties>
@@ -90,29 +89,9 @@
 
 	<dependency>
 		<groupId>org.neo4j</groupId>
-		<artifactId>neo4j-kernel</artifactId>
-		<version>1.4.2</version>
-	</dependency>
-	<dependency>
-		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-lucene-index</artifactId>
 		<version>2.0.0</version>
 	</dependency>        
-   	<dependency>
-      	<groupId>org.hyperic</groupId>
-      	<artifactId>sigar</artifactId>
-      	<version>1.6.5.132</version>
-    </dependency>
-    <dependency>
-		<groupId>com.googlecode.javaewah</groupId>
-		<artifactId>JavaEWAH</artifactId>
-		<version>0.7.9</version>
-	</dependency>
-	<dependency>
-		<groupId>commons-io</groupId>
-		<artifactId>commons-io</artifactId>
-		<version>1.3.2</version>
-	</dependency>
 	<dependency>
         <groupId>dnl.utils</groupId>
         <artifactId>j-text-utils</artifactId>
@@ -158,61 +137,13 @@
 		<version>3.6.2</version>
 	</dependency>
     
-
-	<!-- Testing dependincies -->
-	<dependency>
-    	<groupId>org.powermock</groupId>
-     	<artifactId>powermock-module-junit4</artifactId>
-     	<version>${powermock.version}</version>
-     	<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.powermock</groupId>
-     	<artifactId>powermock-api-easymock</artifactId>
-     	<version>${powermock.version}</version>
-     	<scope>test</scope>  
-    </dependency>  
-	<dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
-      <version>${powermock.version}</version>
-	  <exclusions>
-			<exclusion>
-				<artifactId>hamcrest-core</artifactId>
-				<groupId>org.hamcrest</groupId>
-			</exclusion>
-		</exclusions>
-      <scope>test</scope>
-   </dependency>
-	<dependency>
-	    <groupId>org.powermock</groupId>
-		<artifactId>powermock-module-junit4-rule</artifactId>
-		<version>${powermock.version}</version>
-		<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.powermock</groupId>
-		<artifactId>powermock-classloading-xstream</artifactId>
-		<version>${powermock.version}</version>
-		<scope>test</scope>
-	</dependency>
-      <dependency>
-		<groupId>org.easymock</groupId>
-		<artifactId>easymock</artifactId>
-		<version>${easymock.version}</version>
-		<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.hamcrest</groupId>
-		<artifactId>hamcrest-all</artifactId>
-		<version>1.3</version>
-	</dependency>
 	<!-- Spark dependincies -->
 	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-core_2.10</artifactId>
-		<version>1.0.0</version>
+    	<groupId>org.apache.spark</groupId>
+    	<artifactId>spark-core_2.11</artifactId>
+    	<version>${spark.version}</version>
 	</dependency>
+
 	<!-- Mohout - distributed fpgrowth 
 	<dependency>
     	<groupId>org.apache.mahout</groupId>

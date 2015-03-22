@@ -1,6 +1,7 @@
-package fimEntityResolution;
+package il.ac.technion.ie.utils;
 
 import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.model.FrequentItem;
 
 import java.util.Map;
 
@@ -11,7 +12,7 @@ public class FrequentItemsetContext {
 	private int minimumSupport;
 	private MfiContext mfiContext;
 	private Map<Integer, FrequentItem> golbalItemsMap;
-	private double NeiborhoodGrowthLimit;
+	private double NeighborhoodGrowthLimit;
 	
 	public String getFrequentItemssetFilePath() {
 		return absolutePath;
@@ -43,21 +44,17 @@ public class FrequentItemsetContext {
 	public void setMfiContext(MfiContext mfiContext) {
 		this.mfiContext = mfiContext;
 	}
-	
-	public Map<Integer, FrequentItem> getGolbalItemsMap() {
-		return golbalItemsMap;
-	}
-	
-	public void setGolbalItemsMap(Map<Integer, FrequentItem> golbalItemsMap) {
+
+    public void setGolbalItemsMap(Map<Integer, FrequentItem> golbalItemsMap) {
 		this.golbalItemsMap = golbalItemsMap;
 	}
 	
-	public double getNeiborhoodGrowthLimit() {
-		return NeiborhoodGrowthLimit;
+	public double getNeighborhoodGrowthLimit() {
+		return NeighborhoodGrowthLimit;
 	}
 	
-	public void setNeiborhoodGrowthLimit(double neiborhoodGrowthLimit) {
-		NeiborhoodGrowthLimit = neiborhoodGrowthLimit;
+	public void setNeighborhoodGrowthLimit(double neighborhoodGrowthLimit) {
+		NeighborhoodGrowthLimit = neighborhoodGrowthLimit;
 	}
 	
 	

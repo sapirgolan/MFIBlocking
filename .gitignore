@@ -1,6 +1,7 @@
 #################
 ## Eclipse
 #################
+*.properties
 
 *.pydevproject
 .project
@@ -26,7 +27,7 @@ DS_weights.properties
 #Batch/jar files
 *.bat
 *.jar
-
+*.xml
 
 #Converter resources
 meta-blocking-converter/converter/*.csv
@@ -235,6 +236,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+meta-blocking-converter/converter/censusProfiles
+MFIblocks/original/PROFILES_CDDB
+MFIblocks/original/src/main/java/preprocessing/ProfileReader.java.orig
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm

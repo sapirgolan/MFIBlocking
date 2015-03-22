@@ -1,14 +1,13 @@
 package il.ac.technion.ie.model;
 
-import il.ac.technion.ie.data.structure.SetPairIF;
+
 import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.data.structure.SetPairIF;
+import il.ac.technion.ie.utils.Utilities;
 import org.apache.log4j.Logger;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -23,6 +22,7 @@ public class CandidatePairs implements SetPairIF {
 	private int maxMatches;
 	private double minThresh = 0.0;
 	private boolean limited = true;
+	private ConcurrentHashMap<Integer,Set<Integer>> supportColumns;
 
     static final Logger logger = Logger.getLogger(CandidatePairs.class);
 
@@ -31,12 +31,14 @@ public class CandidatePairs implements SetPairIF {
 		allMatches = new ConcurrentHashMap<Integer, RecordMatches>();
 		this.maxMatches = maxMatches;
 		limited = true;
+		supportColumns=new ConcurrentHashMap<Integer, Set<Integer>>();
 	}
 	//unlimited
 	public CandidatePairs(){
 		allMatches = new ConcurrentHashMap<Integer, RecordMatches>();
 		this.maxMatches = Integer.MAX_VALUE;
 		limited = false;
+		supportColumns=new ConcurrentHashMap<Integer, Set<Integer>>();
 	}
 	
 	public ConcurrentHashMap<Integer, RecordMatches> getAllMatches() {
@@ -52,25 +54,32 @@ public class CandidatePairs implements SetPairIF {
 	}
 	
 	public void addAll(final CandidatePairs other){
-        for (Entry<Integer, RecordMatches> entry : other.allMatches.entrySet()) {
-
-            Integer recordId = entry.getKey();
-            RecordMatches recordMatches = entry.getValue();
-            if ( !recordHasAnyMatch(recordId) ) {
-                // This is the first time we handle the possible matches of entry.getKey()
-                allMatches.put(recordId, recordMatches);
-            } else {
-                // Add more possible matches for entry.getKey()
-                RecordMatches currRM = allMatches.get(recordId);
-                RecordMatches otherRM = recordMatches;
-                for (CandidateMatch cm : otherRM.getCandidateMatches()) {
-                    currRM.addCandidate(cm.getRecordId(), cm.getScore());
-                }
-            }
-        }
-    }
-
-    /**
+		for (Entry<Integer,RecordMatches> entry: other.allMatches.entrySet()) {
+			if(!allMatches.containsKey(entry.getKey())){
+				allMatches.put(entry.getKey(), entry.getValue());
+				
+			}
+			else{
+				RecordMatches currRM = allMatches.get(entry.getKey());
+				RecordMatches otherRM = entry.getValue();
+				for (CandidateMatch cm : otherRM.getCandidateMatches()) {
+					currRM.addCandidate(cm.getRecordId(), cm.getScore());
+				}
+			}
+			if(!supportColumns.contains(entry.getKey())){
+				supportColumns.put(entry.getKey(), other.getColumnsSupport(entry.getKey()));
+				
+			}
+			else{
+				supportColumns.get(entry.getKey()).addAll(other.getColumnsSupport(entry.getKey()));
+			}
+			
+		}
+		
+		
+	}
+	
+	/**
 	 * Tries to create a pair of records with IDs <b>i</b> and <b>j</b>.<br>
 	 * It tries to add to the block of record <b>i</b> record <b>j</b> and to the block of record <b>j</b> record <b>i</b><br>
 	 * If record with ID <b>i</b> already has a record with id <b>j</b> than does nothing.<br>
@@ -99,6 +108,7 @@ public class CandidatePairs implements SetPairIF {
 		ri.addCandidate(j, score);		
 		RecordMatches rj = getRecordMatch(j);
 		rj.addCandidate(i, score);
+		
 		minThresh = Math.max(minThresh,ri.getMinThresh());
 		minThresh = Math.max(minThresh,rj.getMinThresh());
 	}
@@ -243,6 +253,35 @@ public class CandidatePairs implements SetPairIF {
 		return FN;	
 	
 	}
+	
+	public void setColumnsSupport(List<Integer> items, int recordID1, int recordID2){
+		for (Integer itemID: items){
+			//System.out.println("DEBUG" + " itemID=" + itemID);
+			Set<Integer> columns = new HashSet<Integer>();
+			columns.addAll(Utilities.globalItemsMap.get(itemID).getColumns().getColumns());
+			//System.out.println("DEBUG" + " columns=" + columns);
+			if (supportColumns.containsKey(recordID1)) {
+				supportColumns.get(recordID1).addAll(columns);
+			}
+			else supportColumns.put(recordID1,(Set)columns);
+			
+			if (supportColumns.containsKey(recordID2)) {
+				supportColumns.get(recordID2).addAll(columns);
+			}
+			else supportColumns.put(recordID2,(Set)columns);
+		}
+		//System.out.println("DEBUG" + " supportColumns=" + supportColumns.get(key));
+	}
+	
+	public Set<Integer> getColumnsSupport(int recordID){
+		Set<Integer> columns = new HashSet<Integer>();
+		if (supportColumns.containsKey(recordID))
+			columns.addAll(supportColumns.get(recordID));
+		else 
+			System.out.println("record id="+recordID+"doesn't exis" );
+		return columns;
+	}
+	
 	
 	public static void main(String[] args){
 		CandidatePairs cps = new CandidatePairs(10);

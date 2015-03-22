@@ -1,6 +1,6 @@
-package fimEntityResolution;
+package il.ac.technion.ie.data.structure;
 
-import il.ac.technion.ie.model.IFRecord;
+import il.ac.technion.ie.utils.Utilities;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;

@@ -1,4 +1,4 @@
-package fimEntityResolution.pools;
+package il.ac.technion.ie.pools;
 
 import il.ac.technion.ie.data.structure.BitMatrix;
 

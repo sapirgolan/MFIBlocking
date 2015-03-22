@@ -10,6 +10,8 @@ public class ParsedFrequentItemSet {
 		this.items = items;
 		this.supportSize = supportSize;
 	}
+	
+	
 
 	
 	

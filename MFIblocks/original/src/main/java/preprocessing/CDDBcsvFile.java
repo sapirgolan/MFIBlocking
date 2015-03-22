@@ -9,18 +9,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import au.com.bytecode.opencsv.CSVReader;
 
-public class csvFile {
+/***
+ * Translating CDDB dataset from CSV file (records + golden truth) into input files for MFIB
+ * @author Jonathan Svirsky
+ * 20141223
+ */
+public class CDDBcsvFile {
 
 	private static final String CLUSTER_ATT_NAME = "class";
 	private static final String SOURCE_ATT_NAME = "source";
-
-	private static Map<String,List<Integer>> matches;
+	//private static final char CSV_DELIMITER = ';';
+	//private static Map<String,List<Integer>> matches;
 	private static BufferedWriter numericOutputWriter;
 	private static BufferedWriter stringOutputWriter;
 	private static BufferedWriter matchWriter;	
@@ -28,26 +33,28 @@ public class csvFile {
 	private static String swFile;
 	private static WordProcessor wordProcessor;	
 	public static int DB_Size;
+	private static Map<Integer,Integer> pk_recordID;
+	
 	
 	public static void main(String[] args){
 		String inputFile = args[0];
-		matches = new HashMap<String,List<Integer>>();		
+		//matches = new HashMap<String,List<Integer>>();		
 		String numericOutputFile = args[1];
 		String matchFile = args[2];
 		String paramsFile = args[3];
 		swFile = args[4];
-		String LexiconOriginalOutFile = args[5];
+		String lexiconCSVOutFile = args[5];
 		String recordOutFile = args[6];
 		int NGramSize = Integer.parseInt(args[7]);		
 		double DBSize = Double.parseDouble(args[8]);
 		DB_Size =  (int)DBSize;
 		double IDFThresh = Double.parseDouble(args[9]);
-		String sourceMapFile = (args.length > 10 ? args[10] : null);
+		String goldenTruth = (args.length > 10 ? args[10] : null); 
 		System.out.println("Processing file with " + DBSize + " records");
 		System.out.println(new File(paramsFile).getAbsolutePath().toString());
 		lexicon = new LexiconCSV(new File(paramsFile));
 		wordProcessor = new WordProcessor(new File(swFile),NGramSize,NGramSize);
-		
+		pk_recordID=new HashMap<Integer, Integer>();
 		try {
 			numericOutputWriter = new BufferedWriter(new FileWriter(new File(
 					numericOutputFile)));
@@ -55,14 +62,15 @@ public class csvFile {
 					new FileWriter(new File(matchFile)));
 			stringOutputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(recordOutFile)));
 			BufferedWriter sourceWriter = null;
-			if(sourceMapFile != null && sourceMapFile.length() > 0){
-				sourceWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sourceMapFile)));
-			}
+			//if(sourceMapFile != null && sourceMapFile.length() > 0){
+			//	sourceWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sourceMapFile)));
+			//}
 			CSVReader cvsReader = null; 
 			
 			
 			cvsReader = new CSVReader(new FileReader(
 						new File(inputFile)));
+			
 			removeTooFrequentItems(lexicon,cvsReader, DBSize,IDFThresh );
 			cvsReader.close();
 			
@@ -75,26 +83,26 @@ public class csvFile {
 			String[] attNames= null;
 			while ((currLine = cvsReader.readNext()) != null) {				
 				if(first){
-					attNames = currLine;	
+					//attNames = currLine;	
 					first = false;
 					continue;
 				}
-				String[] parts = currLine;	
-				int clusterAttIndex = getClusterFieldIndex(attNames);
-				int sourceAttIndex = getSourceFieldIndex(attNames);
-				if(sourceAttIndex >= 0 && sourceWriter != null){
-					sourceWriter.write(parts[sourceAttIndex]);
-					sourceWriter.newLine();
-				}
-				String clusterId;
-				if (clusterAttIndex == -1 ) clusterId="";
-				else clusterId = parts[clusterAttIndex];
+				String[] parts = currLine;
+				pk_recordID.put(Integer.parseInt(parts[0]), recordId);
+				//recordId=Integer.parseInt(parts[0]);
+				//int clusterAttIndex = getClusterFieldIndex(attNames);
+				//int sourceAttIndex = getSourceFieldIndex(attNames);
+				//if(sourceAttIndex >= 0 && sourceWriter != null){
+				//	sourceWriter.write(parts[sourceAttIndex]);
+				//	sourceWriter.newLine();
+				//}
+				//String clusterId = parts[clusterAttIndex];
 				StringBuilder cleanStringBuilder = new StringBuilder();			
 				StringBuilder numericStringBuilder = new StringBuilder();
 				for(int i=0 ; i < parts.length ; i++){	
-					if(i == clusterAttIndex|| i == sourceAttIndex){
-						continue; // do not want to write this as part of the file
-					}					
+					//if(i == clusterAttIndex|| i == sourceAttIndex){
+					//	continue; // do not want to write this as part of the file
+					//}					
 					String toWrite = getCleanString(parts[i]);			
 					if(lexicon.getPrefixLengthForColumn(i) > 0){						
 						toWrite = toWrite.substring(0, 
@@ -116,39 +124,39 @@ public class csvFile {
 				stringOutputWriter.write(cleanStringBuilder.toString().trim());
 				stringOutputWriter.newLine();
 				
-				List<Integer> cluster = null;
-				if(matches.containsKey(clusterId)){
-					cluster = matches.get(clusterId);
-				}
-				else{
-					cluster = new ArrayList<Integer>();
-				}
-				cluster.add(recordId);
-				matches.put(clusterId, cluster);
+				//List<Integer> cluster = null;
+				//if(matches.containsKey(clusterId)){
+				//	cluster = matches.get(clusterId);
+				//}
+				//else{
+				//	cluster = new ArrayList<Integer>();
+				//}
+				//cluster.add(recordId);
+				//matches.put(clusterId, cluster);
 				recordId++;
 			}
 			
 			 //write the matches	       
-	        int numOfpairs = 0;
-	        for (List<Integer> cluster : matches.values()) {
-	        	StringBuilder sb = new StringBuilder();
-	        	Collections.sort(cluster);
-				if(cluster.size() < 2) continue;
-				numOfpairs += cluster.size()*(cluster.size()-1)*0.5;
-				for (Integer integer : cluster) {
-					sb.append(integer).append(" ");
-				}
+			cvsReader = new CSVReader(new FileReader(new File(goldenTruth)));
+			int numOfpairs = 0;
+			while ((currLine = cvsReader.readNext()) != null) {				
+				String[] parts = currLine;	
+				StringBuilder sb = new StringBuilder();
+				sb.append(pk_recordID.get(Integer.parseInt(parts[0]))).append(" ");
+				sb.append(pk_recordID.get(Integer.parseInt(parts[1]))).append(" ");
 				matchWriter.write(sb.toString());
 				matchWriter.newLine();
+				numOfpairs++;
 			}
+			cvsReader.close();
 	        numericOutputWriter.close();
 	        stringOutputWriter.close();
 	        matchWriter.close();	        
-	        lexicon.exportToPropFile(LexiconOriginalOutFile);
+	        lexicon.exportToPropFile(lexiconCSVOutFile);
 	        System.out.println("total number of pairs in match file: " + numOfpairs);
-	        if(sourceWriter != null){
-	        	sourceWriter.close();
-	        }
+	        //if(sourceWriter != null){
+	        	//sourceWriter.close();
+	        //}
 		
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -172,13 +180,13 @@ public class csvFile {
 					continue;
 				}
 				String[] parts = currLine;	
-				int clusterAttIndex = getClusterFieldIndex(attNames);
-				int sourceAttIndex = getSourceFieldIndex(attNames);
+				//int clusterAttIndex = getClusterFieldIndex(attNames);
+				//int sourceAttIndex = getSourceFieldIndex(attNames);
 				
 				for(int i=0 ; i < parts.length ; i++){	
-					if(i == clusterAttIndex|| i == sourceAttIndex){
-						continue; // do not want to write this as part of the file
-					}					
+					//if(i == clusterAttIndex|| i == sourceAttIndex){
+					//	continue; // do not want to write this as part of the file
+					//}					
 					if(lexiconOriginal.getColumnWeight(i) <= 0){
 						continue;
 					}

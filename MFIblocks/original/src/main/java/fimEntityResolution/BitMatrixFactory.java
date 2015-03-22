@@ -1,6 +1,6 @@
 package fimEntityResolution;
 
-import fimEntityResolution.interfaces.ClearerFactory;
+import il.ac.technion.ie.utils.ClearerFactory;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.data.structure.Clearer;
 import il.ac.technion.ie.model.RecordSet;

@@ -1,4 +1,4 @@
-package il.ac.technion.ie.model;
+package il.ac.technion.ie.data.structure;
 
 import java.io.Serializable;
 import java.util.Map;

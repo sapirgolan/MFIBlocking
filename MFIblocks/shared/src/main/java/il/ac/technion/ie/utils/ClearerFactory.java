@@ -1,4 +1,4 @@
-package fimEntityResolution.interfaces;
+package il.ac.technion.ie.utils;
 
 import il.ac.technion.ie.data.structure.Clearer;
 

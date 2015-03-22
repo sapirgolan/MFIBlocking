@@ -1,7 +1,7 @@
-package fimEntityResolution.bitsets;
+package il.ac.technion.ie.bitsets;
 
-import fimEntityResolution.interfaces.BitSetFactory;
-import fimEntityResolution.interfaces.BitSetIF;
+import il.ac.technion.ie.model.BitSetFactory;
+import il.ac.technion.ie.model.BitSetIF;
 
 public class SingleBSFactory implements BitSetFactory{
 	/**

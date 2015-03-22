@@ -1,8 +1,9 @@
-package fimEntityResolution;
+package il.ac.technion.ie.utils;
 
 import il.ac.technion.ie.data.structure.BitMatrix;
-import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.data.structure.DBRecord;
 import il.ac.technion.ie.data.structure.SetPairIF;
+import il.ac.technion.ie.model.RecordSet;
 import org.enerj.core.SparseBitSet.Iterator;
 import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
@@ -18,6 +19,7 @@ import org.neo4j.kernel.impl.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -313,8 +315,13 @@ public class GDS_NG implements SetPairIF {
         System.out.println("exportToBM: returning a matrix with "
                 + retval.numOfSet() + " set ");
         return retval;
+	}
 
-    }
+	@Override
+	public void setColumnsSupport(List<Integer> items, int recordID,int recordID1) {
+		// TODO Auto-generated method stub
+		
+	}
 
     private static enum RelTypes implements RelationshipType {
         CONNECTED

@@ -1,20 +1,22 @@
-package fimEntityResolution;
+package il.ac.technion.ie.utils;
 
+import com.google.common.base.Joiner;
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.IntIterator;
-import fimEntityResolution.bitsets.EWAH_BitSet;
-import fimEntityResolution.bitsets.EWAH_BitSet_Factory;
-import fimEntityResolution.bitsets.SingleBSFactory;
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.pools.BitMatrixPool;
-import fimEntityResolution.pools.FIRunnableDBPool;
-import fimEntityResolution.pools.FIRunnablePool;
-import fimEntityResolution.pools.GDSPool;
-import il.ac.technion.ie.data.structure.BitMatrix;
-import il.ac.technion.ie.model.CandidatePairs;
-import il.ac.technion.ie.model.IFRecord;
-import il.ac.technion.ie.model.Record;
-import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.bitsets.EWAH_BitSet;
+import il.ac.technion.ie.bitsets.EWAH_BitSet_Factory;
+import il.ac.technion.ie.bitsets.SingleBSFactory;
+import il.ac.technion.ie.data.structure.*;
+import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.pools.BitMatrixPool;
+import il.ac.technion.ie.pools.FIRunnableDBPool;
+import il.ac.technion.ie.pools.FIRunnablePool;
+import il.ac.technion.ie.pools.GDSPool;
+import il.ac.technion.ie.spark.SparkContextWrapper;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.mllib.fpm.FPGrowth;
+import org.apache.spark.mllib.fpm.FPGrowthModel;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -40,6 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class Utilities {
 
 	public static boolean DEBUG = false;
@@ -48,10 +51,11 @@ public class Utilities {
 	public static boolean WRITE_ALL_ERRORS = false;
 	public static GraphDatabaseService recordDB;
 	private static final String RECORD_DB_PATH = "target/records-db";
+	private final static String lexiconItemExpressionExtended = "(\\S+),(0.\\d+),\\{(.+)\\},\\{(.+)\\}";
 	private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\}";
 	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
 
-	
+
 
 	private static void clearRecordDb() {
 		try {
@@ -126,7 +130,7 @@ public class Utilities {
 					r.setSrc(src); // in the worst case this is null
 					String[] words = ws.split(numericLine);
 					if (numericLine.length() > 0) { // very special case when
-													// there is an empty line
+						// there is an empty line
 						for (String word : words) {
 							int item = Integer.parseInt(word);
 							r.addItem(item);
@@ -134,7 +138,7 @@ public class Utilities {
 					}
 					RecordSet.minRecordLength = (r.getSize() < RecordSet.minRecordLength) ? r
 							.getSize() : RecordSet.minRecordLength;
-					recordIndex++;
+							recordIndex++;
 				} catch (Exception e) {
 					System.out.println("Exception while reading line "
 							+ recordIndex + ":" + numericLine);
@@ -148,9 +152,6 @@ public class Utilities {
 			tx.success();
 			RecordSet.DB_SIZE = recordIndex - 1;
 
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -161,9 +162,16 @@ public class Utilities {
 
 	}
 
-	public static Map<Integer, FrequentItem> parseLexiconFile(String lexiconFile) {
+	public static Map<Integer, FrequentItem> parseLexiconFile(String lexiconFile, String printBlocksFormat) {
 		globalItemsMap = new HashMap<Integer, FrequentItem>();
-		Pattern lexiconPattern = Pattern.compile(lexiconItemExpression);
+		Pattern lexiconPattern;
+		if (printBlocksFormat.equalsIgnoreCase("N")){
+			lexiconPattern = Pattern.compile(lexiconItemExpression);
+		}
+		else{
+			lexiconPattern = Pattern.compile(lexiconItemExpressionExtended);
+        }
+
 		Properties itemsProps = new Properties();
 		FileInputStream fis;
 		try {
@@ -176,7 +184,7 @@ public class Utilities {
 				Matcher fiMatcher = lexiconPattern.matcher(itemVal);
 				boolean matched = fiMatcher.find();
 				assert matched : "failed to match " + itemVal + " to "
-						+ lexiconItemExpression;
+				+ lexiconItemExpression;
 				if (!matched) {
 					System.out.println("failed to match " + itemVal + " to "
 							+ lexiconItemExpression);
@@ -185,24 +193,34 @@ public class Utilities {
 				String weightsStr = fiMatcher.group(2);
 				String supportAsString = fiMatcher.group(3);
 				String[] supportStrings = supportAsString.split(", ");
+
+				String columnsAsString=null;
+				String[] columnsStrings=null;
+				if (!printBlocksFormat.equalsIgnoreCase("N")){
+					columnsAsString = fiMatcher.group(4);	//20150129
+					columnsStrings = columnsAsString.split(", "); //20150129
+				}
+
 				FrequentItem item;
 				if (supportStrings.length > 1) {
 					item = new FrequentItem(Integer.parseInt(itemId), wordVal,
 							Double.parseDouble(weightsStr), EWAH_BitSet_Factory
-									.getInstance());
-					// item = new FrequentItem_ewah(Integer.parseInt(itemId),
-					// wordVal,Double.parseDouble(weightsStr));
+							.getInstance());
 				} else {
-					// item = new
-					// SingleSupportFrequentItem(Integer.parseInt(itemId),
-					// wordVal,Double.parseDouble(weightsStr));
 					item = new FrequentItem(Integer.parseInt(itemId), wordVal,
 							Double.parseDouble(weightsStr), SingleBSFactory
-									.getInstance());
+							.getInstance());
 				}
 				int[] support = getSortedSupportArr(supportStrings);
+
 				for (int trans : support) {
 					item.addSupport(trans);
+				}
+				if (!printBlocksFormat.equalsIgnoreCase("N")){
+					int[] columns = getSortedSupportArr(columnsStrings);//20150129
+					for (int trans : columns) {	//20150129
+						item.addColumn(trans);	//20150129
+					}
 				}
 				if (item.getSupportSize() < support.length) {
 					System.out.println("support size should be "
@@ -212,9 +230,6 @@ public class Utilities {
 				item.setIDFWeight();
 				globalItemsMap.put(Integer.parseInt(itemId), item);
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -256,16 +271,13 @@ public class Utilities {
 			System.out.println("</ERROR>");
 
 			exitVal = p.waitFor();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return exitVal;
+        return exitVal;
 	}
-	
+
 	public static String getUnixMFICmdLine() throws FileNotFoundException {
 		String operatingSystem = getOSName();
 		boolean isWindows = operatingSystem.toLowerCase().contains("windows");
@@ -302,8 +314,10 @@ public class Utilities {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		file.deleteOnExit();
-		System.out.println("recordsFile= " + recordsFile);
+        if (file != null) {
+            file.deleteOnExit();
+        }
+        System.out.println("recordsFile= " + recordsFile);
 		String cmd = null;
 		try {
 			cmd = String.format(getUnixMFICmdLine(), minSup, recordsFile, file.getAbsolutePath());
@@ -312,7 +326,7 @@ public class Utilities {
 			e1.printStackTrace();
 			System.exit(1);
 		}
-		
+
 		System.out.println("About to execute: " + cmd);
 		try {
 			Socket client = new Socket("localhost", 7899);
@@ -356,16 +370,16 @@ public class Utilities {
 	}
 
 	public static CandidatePairs readFIs(FrequentItemsetContext itemsetContext) {
-		
+
 		int minSup = itemsetContext.getMinimumSupport();
-		double NG_PARAM = itemsetContext.getNeiborhoodGrowthLimit();
+		double NG_PARAM = itemsetContext.getNeighborhoodGrowthLimit();
 		String frequentItemsetFile = itemsetContext.getFrequentItemssetFilePath();
 		int numOfLines = 0;
 		BufferedReader FISReader = null;
 		StringBuilder stringBuilder = new StringBuilder();
 		double tooLarge = 0;
 		double scorePruned = 0;
-		
+
 		System.out.println("reading FIs");
 
 		Utilities.scoreThreshold = itemsetContext.getMinBlockingThreshold();
@@ -427,7 +441,7 @@ public class Utilities {
 						continue;
 					}
 					FIRunnable FIR = FIRunnablePool.getInstance().getRunnable(
-							currentItemSet, minSup, NG_PARAM, coverageIndex, candidatePairs);
+							currentItemSet, minSup, candidatePairs);
 					executorService.execute(FIR);
 					numOfLines++;
 					if (numOfLines % 100000 == 0) {
@@ -457,18 +471,17 @@ public class Utilities {
 			e.printStackTrace();
 		} finally {
 			try {
-				FISReader.close();
-				executorService.shutdown();
+                if (FISReader != null) {
+                    FISReader.close();
+                }
+                executorService.shutdown();
 				executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
+			} catch (IOException | InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+        }
 
 		System.out.println("Total number of FIs read: " + numOfFIs.get()
 				+ " out of " + numOfLines + " available");
@@ -586,8 +599,8 @@ public class Utilities {
 						continue;
 					}
 					FIRunnableDB FIR = FIRunnableDBPool.getInstance()
-							.getRunnable(currIS, minSup, records, NG_PARAM,
-									pfi.supportSize,coverageIndexDB);
+							.getRunnable(currIS, minSup, NG_PARAM,
+                                    coverageIndexDB);
 					exec.execute(FIR);
 					numOfLines++;
 					if (numOfLines % 100000 == 0) {
@@ -603,7 +616,7 @@ public class Utilities {
 								+ GDS_NG.getMem().getTotal());
 						System.out.println("number of FIRunnableDBs created: "
 								+ FIRunnableDBPool.getInstance()
-										.getNumCreated());
+								.getNumCreated());
 						System.out.println("number of GDS created: "
 								+ GDSPool.getInstance().getNumCreated());
 						System.gc();
@@ -620,18 +633,17 @@ public class Utilities {
 			e.printStackTrace();
 		} finally {
 			try {
-				FISReader.close();
-				exec.shutdown();
+                if (FISReader != null) {
+                    FISReader.close();
+                }
+                exec.shutdown();
 				exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
+			} catch (IOException | InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+        }
 
 		System.out.println("Total number of FIs read: " + numOfFIs.get()
 				+ " out of " + numOfLines + " available");
@@ -662,7 +674,7 @@ public class Utilities {
 				+ " correspondong to index "
 				+ getIntForThresh(Utilities.scoreThreshold));
 		System.out
-				.println("size of  coverageIndexDB " + coverageIndexDB.size());
+		.println("size of  coverageIndexDB " + coverageIndexDB.size());
 
 		System.out.println("cluster scores: " + Arrays.toString(clusterScores));
 		if (DEBUG) {
@@ -690,8 +702,6 @@ public class Utilities {
 
 	}
 
-	
-
 	public static void main(String[] args) {
 		BitMatrix test = new BitMatrix(100000);
 		long mem0 = Runtime.getRuntime().totalMemory()
@@ -707,7 +717,7 @@ public class Utilities {
 
 	public static int getIntForThresh(final double thresh) {
 		int temp = ((int) (thresh * 100));
-		int divisor = ((int) (BottomUp.THRESH_STEP * 100));
+		int divisor = ((int) (Constants.THRESH_STEP * 100));
 		return ((temp / divisor) + 1);
 
 	}
@@ -744,9 +754,9 @@ public class Utilities {
 		}
 		if (support.cardinality() != retVal.size()) {
 			System.out
-					.println("getRecords: support.cardinality()="
-							+ support.cardinality() + " retVal.size()="
-							+ retVal.size());
+			.println("getRecords: support.cardinality()="
+					+ support.cardinality() + " retVal.size()="
+					+ retVal.size());
 		}
 		return retVal;
 	}
@@ -761,9 +771,9 @@ public class Utilities {
 		}
 		if (support.cardinality() != retVal.size()) {
 			System.out
-					.println("getRecords: support.cardinality()="
-							+ support.cardinality() + " retVal.size()="
-							+ retVal.size());
+			.println("getRecords: support.cardinality()="
+					+ support.cardinality() + " retVal.size()="
+					+ retVal.size());
 		}
 		return retVal;
 	}
@@ -807,8 +817,8 @@ public class Utilities {
 			}
 			if (retVal.getCardinality() <= 0) {
 				System.out
-						.println("DEBUG: itemset with support retVal.getCardinality()"
-								+ retVal.getCardinality());
+				.println("DEBUG: itemset with support retVal.getCardinality()"
+						+ retVal.getCardinality());
 			}
 			time_in_supp_calc.addAndGet(System.currentTimeMillis() - start);
 			return retVal;
@@ -817,25 +827,6 @@ public class Utilities {
 			e.printStackTrace();
 			return null;
 		}
-
-	}
-
-	@SuppressWarnings("unused")
-	private static List<FrequentItem> getItemsetFromLine(String line,
-			Map<Integer, FrequentItem> globalItemsMap) {
-		Pattern ISPatters = Pattern.compile(ItemsetExpression);
-		Matcher fiMatcher = ISPatters.matcher(line);
-		boolean matchFound = fiMatcher.find();
-		if (!matchFound) {
-			System.out.println("no match found in " + line);
-		}
-		String itemsAsString = fiMatcher.group(1);
-		String[] items = itemsAsString.split(" ");
-		List<FrequentItem> retVal = new ArrayList<FrequentItem>();
-		for (String item : items) {
-			retVal.add(globalItemsMap.get(Integer.parseInt(item)));
-		}
-		return retVal;
 
 	}
 
@@ -903,8 +894,8 @@ public class Utilities {
 	 * @return
 	 */
 	public static Set<Pair> getPairs(Collection<Record> group) {
-		Set<Pair> pairs = new HashSet<Pair>();
-		List<Record> temp = new ArrayList<Record>(group.size());
+		Set<Pair> pairs = new HashSet<>();
+		List<Record> temp = new ArrayList<>(group.size());
 		temp.addAll(group);
 		for (int i = 0; i < temp.size(); i++) {
 			for (int j = i + 1; j < temp.size(); j++) {
@@ -1002,9 +993,73 @@ public class Utilities {
 				+ minScoreForFN);
 		return retval;
 	}
-	
+
 	public static double convertToSeconds(long miliseconds) {
 		return ((double)miliseconds)/1000;
+	}
+
+	public static File RunPFPGrowth(int minSup, int recordsCardinality, String recordsFile, File MFIDir) {
+		System.out.println("free mem before activating FPMax: "	+ Runtime.getRuntime().freeMemory());
+		File file = null;
+		if (!MFIDir.exists()) {
+			if ( !MFIDir.mkdir() ) {
+				System.err.println("Directory " + MFIDir.getAbsolutePath()
+						+ " doesn't exist and failed to create it");
+			}
+		}
+		try {
+			file = File.createTempFile("MFIs", null, MFIDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		file.deleteOnExit();
+		System.out.println("recordsFile= " + recordsFile);
+		Runtime runtime = Runtime.getRuntime();
+		runtime.gc();
+		int numOfCores = runtime.availableProcessors();
+		JavaRDD<String> records = SparkContextWrapper.getJavaSparkContext().textFile(recordsFile, numOfCores*3);
+		JavaRDD<List<String>> transactions = records.map(new ParseRecordLine());
+		
+		FPGrowth fpg = new FPGrowth().setMinSupport((double)minSup/recordsCardinality).setNumPartitions(10);
+		FPGrowthModel<String> model = fpg.run(transactions);
+		List<FPGrowth.FreqItemset<String>> itemsetList = model.freqItemsets().toJavaRDD().collect();
+		System.out.println("MinSupport="+minSup);
+		System.out.println("recordsCardinality="+recordsCardinality);
+		System.out.println("itemsetList.length()=" + itemsetList.size());
+
+		try{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			for (FPGrowth.FreqItemset<String> itemset: itemsetList) {
+				//System.out.println(Joiner.on(" ").join(itemset.javaItems()) + "  (" + itemset.freq()+")");
+
+				StringBuilder sb = new StringBuilder();
+				sb.append(Joiner.on(" ").join(itemset.javaItems()));
+				sb.append("  (");
+				sb.append(itemset.freq());
+				sb.append(")");		
+				writer.write(sb.toString());
+				writer.newLine();
+			}
+			writer.flush();
+			writer.close();
+		}
+		catch (IOException e){
+			System.out.println(e.getMessage().toString());
+		}
+
+		return file;
+	}
+	static class ParseRecordLine implements Function<String, List<String>> {
+
+		public List<String> call(String line) {
+			if (line == null) {
+				return null;
+            }
+			line = line.trim();
+			String[] items=line.split(" ");
+			List<String> retVal =Arrays.asList(items);
+			return retVal;
+		}
 	}
 
 }

@@ -1,4 +1,6 @@
-package fimEntityResolution;
+package il.ac.technion.ie.model;
+
+import il.ac.technion.ie.utils.Utilities;
 
 import java.util.Comparator;
 

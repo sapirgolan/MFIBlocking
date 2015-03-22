@@ -28,7 +28,7 @@ import DataStructures.IdDuplicates;
 
 public class ProfileReader {
 
-	private static Lexicon lexicon;
+	private static LexiconProfiles lexicon;
 	private static String stopWordsFile;
 	private static WordProcessor wordProcessor;	
 	public static HashSet<IdDuplicates> groundTruth;
@@ -44,6 +44,7 @@ public class ProfileReader {
 	public static int COLUMNS=10;
 	public static String MOVIES_DS_FILE="DS_weights_movies.properties";
 	public static String CDDB_DS_FILE="DS_weights_CDDB.properties";
+	public static String RESTS_DS_FILE="DS_weights_RESTS.properties";
 	public static DBSize dbSize;
 	private static DatasetType dataset;
 	//BufferWriters
@@ -226,11 +227,14 @@ public class ProfileReader {
 			System.out.println("Maximum number of attributes in profile: "+maximalAttributeNumber);
 		}
 		if (dataset.getName().equalsIgnoreCase("MOVIES")){
-			lexicon = new Lexicon(new File (MOVIES_DS_FILE));
+			lexicon = new LexiconProfiles(new File (MOVIES_DS_FILE));
 		}
 		else if (dataset.getName().equalsIgnoreCase("CDDB")){
-			lexicon = new Lexicon(new File (CDDB_DS_FILE));
+			lexicon = new LexiconProfiles(new File (CDDB_DS_FILE));
 		}
+//		else if (dataset.getName().equalsIgnoreCase("RESTS")){ //20141224 test for custom DS_WEIGHTS.properties file
+//			lexicon = new Lexicon(new File (RESTS_DS_FILE));
+//		}
 		else {
 			//4. create DS_weights.properties file
 			start = System.currentTimeMillis();
@@ -239,7 +243,7 @@ public class ProfileReader {
 			writeMapToDS_weightsFile(DS_weightsFile);
 			System.out.println("Time to create DS_weights.properties file: "+(System.currentTimeMillis()-start)/1000.0 + " seconds");
 			//5. construct lexicon object
-			lexicon = new Lexicon(DS_weightsFile);
+			lexicon = new LexiconProfiles(DS_weightsFile);
 			DS_weightsFile = null;
 
 		}

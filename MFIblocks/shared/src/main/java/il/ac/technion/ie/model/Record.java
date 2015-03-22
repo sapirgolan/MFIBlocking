@@ -1,6 +1,8 @@
 package il.ac.technion.ie.model;
 
 
+import il.ac.technion.ie.data.structure.IFRecord;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -94,11 +96,16 @@ public class Record implements IFRecord {
 	 * @return
 	 */
 	public String getNumericline(Set<Integer> appropriateItems){
+		Set<Integer> uniqueValues=new java.util.HashSet<Integer>();
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<Integer,Integer> itemIdFreqPair : getItemsToFrequency().entrySet()) {
 			if(appropriateItems.contains(itemIdFreqPair.getKey())){
 				for(int i=0 ; i < itemIdFreqPair.getValue() ; i++){
-					sb.append(itemIdFreqPair.getKey()).append(WORD_SEP);
+					if (!uniqueValues.contains(itemIdFreqPair.getKey())){
+						sb.append(itemIdFreqPair.getKey()).append(WORD_SEP);
+						uniqueValues.add(itemIdFreqPair.getKey());
+					}
+					
 				}
 			}
 		}

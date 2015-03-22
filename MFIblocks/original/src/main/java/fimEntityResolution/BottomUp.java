@@ -12,10 +12,10 @@ import il.ac.technion.ie.service.BlockService;
 import il.ac.technion.ie.service.iBlockService;
 import il.ac.technion.ie.types.Alg;
 import il.ac.technion.ie.types.MFISetsCheckConfiguration;
+import il.ac.technion.ie.utils.FrequentItemsetContext;
+import il.ac.technion.ie.utils.Utilities;
 import lucene.search.SearchEngine;
 import org.apache.log4j.Logger;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,8 +33,6 @@ public class BottomUp {
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
 	private static MfiContext context;
-	public final static double THRESH_STEP = 0.05;
-	public static JavaSparkContext sc;
     public static BitSet coveredRecords= null;
 	public static String srcFile = null;
 
@@ -53,6 +51,8 @@ public class BottomUp {
 		6. The set of min supports to use.
 		7. Must be set to MFI
 		8. The set of p parameters to use as the Neighberhood Growth constraints.
+		9. Blocks output format [S,Path], [B], [N] (S-statistics+blocks with a path of original CSV, B-only blocks, N-no print)
+		10.Size of the first dataset (optional, only for 2 and more dataset files)
 	 */
 	public static void main(String[] args){
 		context = readArguments(args);
@@ -73,7 +73,7 @@ public class BottomUp {
 		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		//System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(RecordSet.values.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 		start = System.currentTimeMillis();
-		Utilities.parseLexiconFile(context.getLexiconFile());
+		Utilities.parseLexiconFile(context.getLexiconFile(),context.getPrntFormat());
 		System.out.println("Time to read items (lexicon) " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		//System.out.println("DEBUG: Size of lexicon: " + MemoryUtil.deepMemoryUsageOfAll(Utilities.globalItemsMap.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 				
@@ -84,18 +84,13 @@ public class BottomUp {
 
 	private static void createSparkContext(MFISetsCheckConfiguration config) {
 		if (config.equals(MFISetsCheckConfiguration.SPARK)) {
-			System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-			System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
-			System.setProperty("spark.executor.memory", "5g");
+			//System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+			//System.setProperty("spark.kryo.registrator", "fimEntityResolution.MyRegistrator");
+			System.setProperty("spark.executor.memory", "2g");
+			System.setProperty("hadoop.home.dir", "C:\\workspace\\winutils\\");
 			//System.getProperty("spark.akka.askTimeout","50000");
 			Runtime runtime = Runtime.getRuntime();
 			runtime.gc();
-			int numOfCores = runtime.availableProcessors();		
-			SparkConf conf = new SparkConf();
-			conf.setMaster("local["+numOfCores+"]");
-			conf.setAppName("MFIBlocks");
-			sc=new JavaSparkContext(conf);
-			System.out.println("SPARK HOME="+sc.getSparkHome());
 		}
 	}
 	
@@ -125,6 +120,7 @@ public class BottomUp {
 		context.setNGs(args[8]);
 		context.setFirstDbSize(args);
 		context.setPerformanceFlag(args);
+		context.setPrintFormat(args[9]);
 		return context;
 	}
 
@@ -155,7 +151,7 @@ public class BottomUp {
 				//obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
                 long actionStart = System.currentTimeMillis();
-                printNeighborsAndBlocks(algorithmObtainedPairs);
+                printNeighborsAndBlocks(algorithmObtainedPairs, context);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
@@ -214,20 +210,29 @@ public class BottomUp {
 	 * the method write the blocking output to a file for later usage
 	 * @param cps
 	 */
-	private static void printNeighborsAndBlocks(CandidatePairs cps) {
+	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context) {
 		ResultWriter resultWriter = new ResultWriter();
 		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
         iBlockService blockService = new BlockService();
         File blocksOutputFile = resultWriter.createBlocksOutputFile();
         List<Block> blocks = blockService.getBlocks(cps);
+
         try {
-			resultWriter.writeEachRecordNeighbors(neighborsOutputFile, cps);
+            switch (context.getPrntFormat().toLowerCase()) {
+                case "s" :
+                    resultWriter.writeBlocksStatistics(blocksOutputFile, cps, context);
+                    break;
+                case "b":
+                    resultWriter.writeEachRecordNeighbors(blocksOutputFile, cps);
+                    break;
+                default:
+                    logger.debug("No blocks were printed");
+            }
             resultWriter.writeBlocks(blocksOutputFile, blocks);
+            logProgress("Outfile was written to: " + neighborsOutputFile.getAbsolutePath());
 		} catch (IOException e) {
             logger.error("Failed to write blocks", e);
-			return;
 		}
-        logProgress("Outfile was written to: " + neighborsOutputFile.getAbsolutePath());
 	}
 
 
@@ -277,6 +282,8 @@ public class BottomUp {
 
 			start = System.currentTimeMillis();
 			File mfiFile = Utilities.RunMFIAlg(minimumSupports[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
+			/*File mfiFile = Utilities.RunPFPGrowth(minimumSupports[i],
+						RecordSet.size-coveredRecords.cardinality(),uncoveredRecordsFile.getAbsolutePath(), mfiDir);*/
             logProgress("Time to run MFI with minsup=" + minimumSupports[i] +
                     " on table of size " + (RecordSet.size - coveredRecords.cardinality()) +
                     " is " + Double.toString((double) (System.currentTimeMillis() - start) / 1000.0));
@@ -284,16 +291,14 @@ public class BottomUp {
 			start = System.currentTimeMillis();
 
 			FrequentItemsetContext itemsetContext = createFrequentItemsetContext( mfiFile.getAbsolutePath(), minBlockingThreshold, minimumSupports[i], context);
-			CandidatePairs candidatePairs
-                    ;
+			CandidatePairs candidatePairs;
 			if (MFISetsCheckConfiguration.SPARK.equals(context.getConfig())) {
 				candidatePairs = SparkBlocksReader.readFIs(itemsetContext);
 			} else {
 				candidatePairs = Utilities.readFIs(itemsetContext);
 			}
             logProgress("Time to read MFIs: " + Double.toString((double) (System.currentTimeMillis() - start) / 1000.0) + " seconds");
-			
-					
+
 			start = System.currentTimeMillis();
 			BitMatrix coverageMatrix = candidatePairs.exportToBitMatrix();
 			updateCoveredRecords(coveredRecords, coverageMatrix.getCoveredRows());
@@ -345,7 +350,7 @@ public class BottomUp {
 		itemsetContext.setMinimumSupport(minimumSupport);
 		itemsetContext.setMfiContext(mfiContext);
 		itemsetContext.setGolbalItemsMap(Utilities.globalItemsMap);
-		itemsetContext.setNeiborhoodGrowthLimit(NG_LIMIT);
+		itemsetContext.setNeighborhoodGrowthLimit(NG_LIMIT);
 		
 		return itemsetContext;
 	}
@@ -354,18 +359,17 @@ public class BottomUp {
 		System.out.println("Excluding pairs if records from the same set..");
 		CandidatePairs updatedPairs=new CandidatePairs();
 		long start=System.currentTimeMillis();
-		//Set<Set<Integer>> actualPairs=new HashSet<>();
 		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
 				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()>firstDbSize) ||
 						(entry.getKey()<firstDbSize && cm.getRecordId()<firstDbSize)) 
 					continue;
-				else 
+//				if  (entry.getKey()>firstDbSize || cm.getRecordId()>firstDbSize) //for CDDB experiemtns (also add 500 to the command inputs)
+//					continue;
+				else
+                {
 					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
-				//Set<Integer> temp=new HashSet<Integer>();
-				//temp.add(cm.getRecordId());
-				//temp.add(entry.getKey());
-				//actualPairs.add(temp);
+                }
 			}
 		}
 		System.out.println("Time exclude pairs : " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
@@ -459,6 +463,7 @@ public class BottomUp {
 	
 	private static void updateCandidatePairs(CandidatePairs allResults, final CandidatePairs coveragePairs){	
 		allResults.addAll(coveragePairs);
+		
 	}
 
     public static String writeBlockingRR(Collection<BlockingRunResult> runResults){

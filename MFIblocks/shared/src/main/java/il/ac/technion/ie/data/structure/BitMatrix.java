@@ -7,6 +7,7 @@ import org.enerj.core.SparseBitSet.Iterator;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** should be made parallalizable**/
@@ -163,7 +164,8 @@ public class BitMatrix implements Clearer,SetPairIF {
 		bm2.setIndex(2,4);
 		bm2.setIndex(3,2);
 		bm2.setIndex(3,4);
-		
+		bm2.setIndex(3,4);
+		bm2.setIndex(2,4);
 		Iterator It = bm2.getSBS().getIterator();
 		int[] pair = new int[2];
 		while(It.hasNext()){
@@ -228,6 +230,12 @@ public class BitMatrix implements Clearer,SetPairIF {
 			this.bs.set(nextSetBit);
 		}		
 		return this;		
+	}
+
+	@Override
+	public void setColumnsSupport(List<Integer> items, int recordID1,int recordID2) {
+		
+		
 	}
 
 	

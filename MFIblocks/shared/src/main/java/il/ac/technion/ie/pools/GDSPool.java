@@ -1,8 +1,8 @@
-package fimEntityResolution.pools;
+package il.ac.technion.ie.pools;
+
+import il.ac.technion.ie.utils.GDS_NG;
 
 import java.util.LinkedList;
-
-import fimEntityResolution.GDS_NG;
 
 public class GDSPool {
 

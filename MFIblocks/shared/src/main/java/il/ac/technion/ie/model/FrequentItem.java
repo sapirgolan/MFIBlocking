@@ -1,22 +1,17 @@
-package fimEntityResolution;
+package il.ac.technion.ie.model;
 
 
-import fimEntityResolution.interfaces.BitSetFactory;
-import fimEntityResolution.interfaces.BitSetIF;
-import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.utils.StringSimTools;
 
 import java.io.Serializable;
 
 
 public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private int id;
 	private String item;
-	
+	private BitSetIF columns;
 	//protected BitSet support ;
 	protected BitSetIF support ;
 	private double weight = 1.0;
@@ -30,6 +25,7 @@ public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 		this.item = item;
 		this.factory = factory;
 		this.support = factory.createInstance();
+		this.columns=factory.createInstance();
 	}
 	
 	public FrequentItem(int id, String item, double weight,BitSetFactory factory){
@@ -45,11 +41,16 @@ public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 		if(createBS){
 			this.support = factory.createInstance();
 		}
+		this.columns=factory.createInstance();
 	}
 
 	public BitSetIF getSupport(){
 		return support;
 	}
+	public BitSetIF getColumns(){
+		return columns;
+	}
+	
 	public double getWeight(){
 		return weight;
 	}
@@ -61,6 +62,10 @@ public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 	public void addSupport(int recordId){		
 		support.set(recordId);
 	}
+	public void addColumn(int id){		
+		columns.set(id);
+	}
+	
 	public String getItem(){
 		return item;
 	}
@@ -114,5 +119,9 @@ public class FrequentItem implements Comparable<FrequentItem>,Serializable{
 			return this.id - o.getId();
 		}
 		return (supportDiff>0)? 1:-1;		
+	}
+
+	public String getColumnsString() {
+		return columns.getSupportString();
 	}
 }

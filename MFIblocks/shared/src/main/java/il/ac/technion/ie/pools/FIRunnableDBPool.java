@@ -1,8 +1,7 @@
-package fimEntityResolution.pools;
+package il.ac.technion.ie.pools;
 
-import fimEntityResolution.FIRunnableDB;
-import fimEntityResolution.GDS_NG;
-import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.utils.FIRunnableDB;
+import il.ac.technion.ie.utils.GDS_NG;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.Map;
 
 public class FIRunnableDBPool {
 
-	private LinkedList<FIRunnableDB> runnables = new LinkedList<FIRunnableDB>();
+	private LinkedList<FIRunnableDB> runnables = new LinkedList<>();
 	private int created = 0;
 	private static FIRunnableDBPool self = null;
 
@@ -29,22 +28,22 @@ public class FIRunnableDBPool {
 	}
 	
 	//assumption is all bms are the same size
-	public FIRunnableDB getRunnable(List<Integer> currIS,int minSup, Map<Integer,Record> records, double NG_PARAM,
-			int expectedSupportSize,Map<Integer, GDS_NG> coverageIndexDB){	
+	public FIRunnableDB getRunnable(List<Integer> currIS, int minSup, double NG_PARAM,
+                                    Map<Integer, GDS_NG> coverageIndexDB){
 		synchronized(this){
 			if(runnables.size() > 0){
 				FIRunnableDB toReturn = runnables.remove();
-				toReturn.setParams(currIS, minSup, records, NG_PARAM,expectedSupportSize, coverageIndexDB);
+				toReturn.setParams(currIS, minSup, NG_PARAM, coverageIndexDB);
 				return toReturn;
 			}
 			created++;			
-			return new FIRunnableDB(currIS, minSup, records, NG_PARAM,expectedSupportSize, coverageIndexDB);
+			return new FIRunnableDB(currIS, minSup, NG_PARAM, coverageIndexDB);
 		}		
 	}
 	
 	
 	public void returnRunnable(FIRunnableDB toReturn){	
-		toReturn.setParams(null, 0, null, 0,0,null);		
+		toReturn.setParams(null, 0, 0, null);
 		synchronized(this){
 			runnables.add(toReturn);
 		}
@@ -53,6 +52,6 @@ public class FIRunnableDBPool {
 	public void restart(){
 		System.out.println(" Clearing " + runnables.size() + " runnables");
 		runnables = null;
-		runnables =  new LinkedList<FIRunnableDB>();
+		runnables =  new LinkedList<>();
 	}
 }

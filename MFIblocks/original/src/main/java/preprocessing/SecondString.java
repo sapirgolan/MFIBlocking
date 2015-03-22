@@ -21,7 +21,7 @@ public class SecondString {
 	private static BufferedWriter numericOutputWriter;
 	private static BufferedWriter stringOutputWriter;
 	private static BufferedWriter matchWriter;	
-	private static Lexicon lexicon;
+	private static LexiconProfiles lexicon;
 	private static String swFile;
 	private static WordProcessor wordProcessor;
 	
@@ -37,7 +37,7 @@ public class SecondString {
 		String lexiconOutFile = args[5];
 		String recordOutFile = args[6];		
 		
-		lexicon = new Lexicon(new File(paramsFile));
+		lexicon = new LexiconProfiles(new File(paramsFile));
 		wordProcessor = new WordProcessor(new File(swFile));
 		
 		try {

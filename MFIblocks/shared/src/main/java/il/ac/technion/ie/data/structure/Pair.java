@@ -1,6 +1,8 @@
-package fimEntityResolution;
+package il.ac.technion.ie.data.structure;
 
 import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.utils.StringSimTools;
+import il.ac.technion.ie.utils.Utilities;
 
 public class Pair {
 

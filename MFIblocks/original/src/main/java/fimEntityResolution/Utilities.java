@@ -66,6 +66,7 @@ import fimEntityResolution.pools.LimitedPool;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.mllib.fpm.FPGrowth;
 import org.apache.spark.mllib.fpm.FPGrowth.FreqItemset;
 import org.apache.spark.mllib.fpm.FPGrowthModel;
@@ -1117,63 +1118,66 @@ public class Utilities {
 		runtime.gc();
 		int numOfCores = runtime.availableProcessors();
 		JavaRDD<String> records=BottomUp.sc.textFile(recordsFile,numOfCores*3);
-		JavaRDD<List<String>> transactions =records.map(new ParseRecordLine());
+		JavaRDD<List<Integer>> transactions =records.map(new ParseRecordLine());
 		
 		FPGrowth fpg = new FPGrowth().setMinSupport((double)minSup/recordsCardinality).setNumPartitions(10);	
-		FPGrowthModel<String> model = fpg.run(transactions);
-		List<FreqItemset<String>> itemsets= model.freqItemsets().toJavaRDD().collect();
-		System.out.println("MinSupport="+minSup);
-		System.out.println("recordsCardinality="+recordsCardinality);
-		System.out.println("itemsets.length()="+itemsets.size());
-
-		try{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			for (FreqItemset<String> itemset: itemsets) {
-				//System.out.println(Joiner.on(" ").join(itemset.javaItems()) + "  (" + itemset.freq()+")");
-
-				StringBuilder sb=new StringBuilder();		
-				sb.append(Joiner.on(" ").join(itemset.javaItems()));
-				sb.append("  (");
-				sb.append(itemset.freq());
-				sb.append(")");		
-				writer.write(sb.toString());
-				writer.newLine();
-			}
-			writer.flush();
-			writer.close();
-		}
-		catch (IOException e){
-			System.out.println(e.getMessage().toString());
-		}
+		FPGrowthModel<Integer> model = fpg.run(transactions);
+		JavaRDD<FreqItemset<Integer>> itemsets=model.freqItemsets().toJavaRDD();
+//		JavaRDD<FreqItemset<Integer>> maximalItemsets=itemsets.(new MaximalItemsetsReducer());
+//		
+//		//List<FreqItemset<String>> itemsets= model.freqItemsets().toJavaRDD().collect();
+//		System.out.println("MinSupport="+minSup);
+//		System.out.println("recordsCardinality="+recordsCardinality);
+//		System.out.println("itemsets.length()="+itemsets.size());
+//
+//		try{
+//			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+//			for (FreqItemset<String> itemset: itemsets) {
+//				//System.out.println(Joiner.on(" ").join(itemset.javaItems()) + "  (" + itemset.freq()+")");
+//
+//				StringBuilder sb=new StringBuilder();		
+//				sb.append(Joiner.on(" ").join(itemset.javaItems()));
+//				sb.append("  (");
+//				sb.append(itemset.freq());
+//				sb.append(")");		
+//				writer.write(sb.toString());
+//				writer.newLine();
+//			}
+//			writer.flush();
+//			writer.close();
+//		}
+//		catch (IOException e){
+//			System.out.println(e.getMessage().toString());
+//		}
 
 		return file;
 	}
-	static class ParseRecordLine implements Function<String, List<String>> {
+	static class ParseRecordLine implements Function<String, List<Integer>> {
 
-		public List<String> call(String line) {
+		public List<Integer> call(String line) {
 			if (line == null)
 				return null;
-			//			if (line.startsWith("(")) // the empty FI - ignore it
-			//				return null;
+			List<Integer> retVal=new ArrayList<Integer>();
 			line = line.trim();
 			String[] items=line.split(" ");
-			List<String> retVal =Arrays.asList(items);
-			//			Pattern ISPatters = Pattern.compile(ItemsetExpression);
-			//			Matcher fiMatcher = ISPatters.matcher(line);
-			//			boolean matchFound = fiMatcher.find();
-			//			if (!matchFound) {
-			//				System.out.println("no match found in " + line);
-			//			}
-			//			String itemsAsString = fiMatcher.group(1).trim();
-			//			String[] items = itemsAsString.split(" ");
-			//			for (String strItem : items) {
-			//				retVal.add(Integer.parseInt(strItem));
-			//			}
-			//			int supportSize = Integer.parseInt(fiMatcher.group(2).trim());
-			//			CandidateBlock pFI=new CandidateBlock(retVal, supportSize);
-			//return pFI;
+			for (String item : items){
+				retVal.add(Integer.parseInt(item));
+			}
+			//List<String> retVal =Arrays.asList(items);
 			return retVal;
 		}
+	}
+	static class MaximalItemsetsReducer implements Function2<FreqItemset<Integer>, FreqItemset<Integer>,FreqItemset<Integer>> {
+
+		public FreqItemset<Integer> call(FreqItemset<Integer> v1, FreqItemset<Integer> v2) throws Exception {
+			List<Integer> itemsV1=v1.javaItems();
+			List<Integer> itemsV2=v2.javaItems();
+			
+			
+			
+			return null;
+		}
+		
 	}
 
 }

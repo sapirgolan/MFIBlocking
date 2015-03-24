@@ -1,37 +1,28 @@
 package fimEntityResolution;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import lucene.search.SearchEngine;
-
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-
-import candidateMatches.CandidateMatch;
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
 import dnl.utils.text.table.TextTable;
 import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
 import fimEntityResolution.entityResulution.IComparison;
-import fimEntityResolution.statistics.BlockingResultContext;
-import fimEntityResolution.statistics.BlockingResultsSummary;
-import fimEntityResolution.statistics.BlockingRunResult;
-import fimEntityResolution.statistics.ExperimentResult;
-import fimEntityResolution.statistics.StatisticMeasuremnts;
+import fimEntityResolution.statistics.*;
+import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.service.BlockService;
+import il.ac.technion.ie.service.iBlockService;
+import il.ac.technion.ie.types.Alg;
+import il.ac.technion.ie.types.MFISetsCheckConfiguration;
+import il.ac.technion.ie.utils.FrequentItemsetContext;
+import il.ac.technion.ie.utils.Utilities;
+import lucene.search.SearchEngine;
+import org.apache.log4j.Logger;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class BottomUp {
 	
@@ -42,23 +33,12 @@ public class BottomUp {
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
 	private static MfiContext context;
-	public final static double THRESH_STEP = 0.05;
-	public static JavaSparkContext sc;
-	public static int DEDUP_MIN_SUP = 2;
-	public static BitSet coveredRecords= null;
+    public static BitSet coveredRecords= null;
 	public static String srcFile = null;
-	
-	
-	public enum Alg{
-		CFI,
-		MFI
-	}
-	public enum MFISetsCheckConfiguration{
-		SPARK,DEFAULT
-	}
-	
-	
-	/**
+
+    static final Logger logger = Logger.getLogger(BottomUp.class);
+
+    /**
 	 * The Main of the MFIBlocking Algorithm
 	 * @param args
 	 * The parameters are as follows:
@@ -88,8 +68,8 @@ public class BottomUp {
 		System.out.println("Main srcFile : " + srcFile);
 		long start = System.currentTimeMillis();
 		RecordSet.readRecords(context);
-		int numOfrecords = RecordSet.DB_SIZE;
-		System.out.println("After reading records numOfrecords=" + numOfrecords);
+		int numOfRecords = RecordSet.DB_SIZE;
+		System.out.println("After reading records numOfRecords=" + numOfRecords);
 		System.out.println("Time to read records " + (System.currentTimeMillis()-start)/1000.0 + " seconds");
 		//System.out.println("DEBUG: Size of records: " + MemoryUtil.deepMemoryUsageOfAll(RecordSet.values.values(), VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
 		start = System.currentTimeMillis();
@@ -102,7 +82,6 @@ public class BottomUp {
 		System.out.println("Total time for algorithm " + (System.currentTimeMillis()-start)/1000.0 + " seconds");	
 	}
 
-
 	private static void createSparkContext(MFISetsCheckConfiguration config) {
 		if (config.equals(MFISetsCheckConfiguration.SPARK)) {
 			//System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -112,15 +91,8 @@ public class BottomUp {
 			//System.getProperty("spark.akka.askTimeout","50000");
 			Runtime runtime = Runtime.getRuntime();
 			runtime.gc();
-			int numOfCores = runtime.availableProcessors();		
-			SparkConf conf = new SparkConf();
-			conf.setMaster("local["+numOfCores+"]");
-			conf.setAppName("MFIBlocks");
-			sc=new JavaSparkContext(conf);
-			System.out.println("SPARK HOME="+sc.getSparkHome());
 		}
 	}
-	
 	
 	private static void enterPerformanceModeIfNeeded(boolean inPerformanceMode) {
 		if( inPerformanceMode ){
@@ -134,7 +106,6 @@ public class BottomUp {
 			}
 		}
 	}
-
 
 	private static MfiContext readArguments(String[] args) {
 		MfiContext context = new MfiContext();
@@ -153,18 +124,11 @@ public class BottomUp {
 		return context;
 	}
 
-
 	/**
 	 * Core of the MFIBlocks algorithm
-	 * @param records
-	 * @param matchFile
-	 * @param minSups
-	 * @param minBlockingThresholds
-	 * @param alg
-	 * @param NGs
 	 */
 	public static void mfiBlocksCore() {
-		
+
 		int recordsSize = RecordSet.size;
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
 		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
@@ -172,20 +136,22 @@ public class BottomUp {
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
 		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
 		IComparison comparison = EntityResolutionFactory.createComparison(EntityResulutionComparisonType.Jaccard, engine);
-		for(double neiborhoodGrow: neighborhoodGrowth){
-			NG_LIMIT = neiborhoodGrow;
-		
+		for(double neighborhoodGrow: neighborhoodGrowth){
+			NG_LIMIT = neighborhoodGrow;
+
 			double[] minBlockingThresholds = context.getMinBlockingThresholds();
 			for (double minBlockingThreshold : minBlockingThresholds) { // test for each minimum blocking threshold
 				coveredRecords = new BitSet(recordsSize+1);
 				coveredRecords.set(0,true); // no such record
+                logger.info("running iterative " + context.getAlgName() + "s with minimum blocking threshold " + minBlockingThreshold +
+                        " and NGLimit: " + NG_LIMIT);
 				System.out.println("running iterative " + context.getAlgName() + "s with minimum blocking threshold " + minBlockingThreshold +
-						" and NGLimit: " + NG_LIMIT);			
+						" and NGLimit: " + NG_LIMIT);
 				long start = System.currentTimeMillis();
 				//obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
-				long actionStart = System.currentTimeMillis();
-				writeCandidatePairs(algorithmObtainedPairs,context);
+                long actionStart = System.currentTimeMillis();
+                printNeighborsAndBlocks(algorithmObtainedPairs, context);
 				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
 				
 				actionStart = System.currentTimeMillis();
@@ -215,20 +181,20 @@ public class BottomUp {
 			System.out.println(resultsString);
 		}
 		else{
-			System.out.println("Under current configuration, no clustering were achienved!!");
+			System.out.println("Under current configuration, no clustering were achieved!!");
 		}		
 	}
 	
 	private static double calcExecutionTime(long start,
 			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
 		long totalRunTime = System.currentTimeMillis() - start;
-		totalRunTime = reduceIreleventTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
+		totalRunTime = reduceIrrelevantTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
 		double totalRunTimeSeconds = Utilities.convertToSeconds(totalRunTime); 
 		return totalRunTimeSeconds;
 	}
 
-	private static long reduceIreleventTimes(long totalRunTime,
-			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
+	private static long reduceIrrelevantTimes(long totalRunTime,
+                                              long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
 		return (totalRunTime - (totalMaxRecallCalculationDuration + writeBlocksDuration));
 	}
 
@@ -244,26 +210,29 @@ public class BottomUp {
 	 * the method write the blocking output to a file for later usage
 	 * @param cps
 	 */
-	private static void writeCandidatePairs(CandidatePairs cps, MfiContext context) {
+	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context) {
 		ResultWriter resultWriter = new ResultWriter();
-		File outputFile = resultWriter.createOutputFile();
-		try {
-			if (context.getPrntFormat().equalsIgnoreCase("S")){
-				resultWriter.writeBlocksStatistics(outputFile, cps, context);
-			}
-			else if (context.getPrntFormat().equalsIgnoreCase("B")){
-				resultWriter.writeBlocksIDs(outputFile, cps);
-			}
-			else {
-				System.out.println("No blocks were printed (format 'N')");
-			}
-			
+		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
+        iBlockService blockService = new BlockService();
+        File blocksOutputFile = resultWriter.createBlocksOutputFile();
+        List<Block> blocks = blockService.getBlocks(cps);
+
+        try {
+            switch (context.getPrntFormat().toLowerCase()) {
+                case "s" :
+                    resultWriter.writeBlocksStatistics(blocksOutputFile, cps, context);
+                    break;
+                case "b":
+                    resultWriter.writeEachRecordNeighbors(blocksOutputFile, cps);
+                    break;
+                default:
+                    logger.debug("No blocks were printed");
+            }
+            resultWriter.writeBlocks(blocksOutputFile, blocks);
+            logProgress("Outfile was written to: " + neighborsOutputFile.getAbsolutePath());
 		} catch (IOException e) {
-			System.err.println("***Failed to write blocks***");
-			e.printStackTrace();
-			return;
+            logger.error("Failed to write blocks", e);
 		}
-		System.out.println("Outfile was written to: " + outputFile.getAbsolutePath());
 	}
 
 
@@ -291,82 +260,88 @@ public class BottomUp {
 		
 		int[] minimumSupports = context.getMinSup();
 		double[] usedThresholds = new double[minimumSupports.length];
-		//Map<Integer, Record> records = RecordSet.values;
 		File mfiDir = new File(FI_DIR);
 		if(!mfiDir.exists()){
-			if(!mfiDir.mkdir())
-				System.out.println("Failed to create directory " + mfiDir.getAbsolutePath());
+			if(!mfiDir.mkdir()) {
+                logger.error("Failed to create directory " + mfiDir.getAbsolutePath());
+                System.out.println("Failed to create directory " + mfiDir.getAbsolutePath());
+            }
 		}
 		
 		CandidatePairs allResults = new CandidatePairs(); //unlimited
-		
-		for(int i=(minimumSupports.length - 1) ; i >=0  && coveredRecords.cardinality() < RecordSet.size; i--){ // array is sorted in ascending order -
-			//begin with largest minSup
-			//continue until all records have been covered OR we have completed running over all minSups			
+
+        for (int i = (minimumSupports.length - 1); i >= 0 && coveredRecords.cardinality() < RecordSet.size; i--) {
+            /*
+		        array is sorted in ascending order begin with largest minSup
+		        continue until all records have been covered OR we have completed running over all minSups
+		     */
 			long start = System.currentTimeMillis();
 			//TODO: check content of file
-			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords, minimumSupports[i]);	
-			System.out.println("Time to createRecordFileFromRecords" +Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-			
+			File uncoveredRecordsFile = createRecordFileFromRecords(coveredRecords, minimumSupports[i]);
+            logProgress("Time to createRecordFileFromRecords" + Double.toString((double) (System.currentTimeMillis() - start) / 1000.0));
+
 			start = System.currentTimeMillis();
 			File mfiFile = Utilities.RunMFIAlg(minimumSupports[i], uncoveredRecordsFile.getAbsolutePath(), mfiDir);
-			//File mfiFile = Utilities.RunPFPGrowth(minimumSupports[i], RecordSet.size-coveredRecords.cardinality(),uncoveredRecordsFile.getAbsolutePath(), mfiDir);
-			System.out.println("Time to run MFI with minsup="+minimumSupports[i] +
-					" on table of size " + (RecordSet.size-coveredRecords.cardinality()) + 
-					" is " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
+			/*File mfiFile = Utilities.RunPFPGrowth(minimumSupports[i],
+						RecordSet.size-coveredRecords.cardinality(),uncoveredRecordsFile.getAbsolutePath(), mfiDir);*/
+            logProgress("Time to run MFI with minsup=" + minimumSupports[i] +
+                    " on table of size " + (RecordSet.size - coveredRecords.cardinality()) +
+                    " is " + Double.toString((double) (System.currentTimeMillis() - start) / 1000.0));
 		
 			start = System.currentTimeMillis();
+
 			FrequentItemsetContext itemsetContext = createFrequentItemsetContext( mfiFile.getAbsolutePath(), minBlockingThreshold, minimumSupports[i], context);
-			CandidatePairs candidatePairs = null;
+			CandidatePairs candidatePairs;
 			if (MFISetsCheckConfiguration.SPARK.equals(context.getConfig())) {
 				candidatePairs = SparkBlocksReader.readFIs(itemsetContext);
 			} else {
 				candidatePairs = Utilities.readFIs(itemsetContext);
 			}
-			System.out.println("Time to read MFIs: " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
-			
-					
+            logProgress("Time to read MFIs: " + Double.toString((double) (System.currentTimeMillis() - start) / 1000.0) + " seconds");
+
 			start = System.currentTimeMillis();
-			BitMatrix coveragematrix = candidatePairs.exportToBitMatrix();
-			updateCoveredRecords(coveredRecords,coveragematrix.getCoveredRows());
-			System.out.println("Time to updateCoveredRecords " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");				
+			BitMatrix coverageMatrix = candidatePairs.exportToBitMatrix();
+			updateCoveredRecords(coveredRecords, coverageMatrix.getCoveredRows());
+            logProgress("Time to updateCoveredRecords " + Double.toString((double) (System.currentTimeMillis() - start) / 1000.0) + " seconds");
 			start = System.currentTimeMillis();				
 			updateCandidatePairs(allResults,candidatePairs );
-			coveragematrix = null; 
-			System.out.println("Time to updateBlockingEfficiency " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
+            logProgress("Time to updateBlockingEfficiency " + Double.toString((double) (System.currentTimeMillis() - start) / 1000.0) + " seconds");
 			usedThresholds[i] = candidatePairs.getMinThresh();
 
 			lastUsedBlockingThreshold = candidatePairs.getMinThresh();
-			candidatePairs = null;
-			System.out.println("lastUsedBlockingThreshold: " + lastUsedBlockingThreshold);
-			
-			System.out.println("Number of covered records after running with Minsup=" +
-					minimumSupports[i] +  " is " + coveredRecords.cardinality() + " out of " + RecordSet.size);
-			
-			System.out.println("memory statuses:");
-			//System.out.println("DEBUG: Size of coveredRecords: " + MemoryUtil.deepMemoryUsageOf(coveredRecords,VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-			//System.out.println("DEBUG: Size of allResults: " + allResults.memoryUsage() + " GB");
-			
-				
-		}
-		System.out.println("Minsups used " + Arrays.toString(minimumSupports));
-		System.out.println("Total number of covered records under minimum blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + RecordSet.size + 
-				" which are: " + 100*(coveredRecords.cardinality()/RecordSet.size) + "%");		
+            logProgress("lastUsedBlockingThreshold: " + lastUsedBlockingThreshold);
 
-		System.out.println("After adding uncovered records: Total number of covered records under blocking threshold " + minBlockingThreshold + 
-				" and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + RecordSet.size + 
-				" which are: " + 100*(coveredRecords.cardinality()/RecordSet.size) + "%");
+            logProgress("Number of covered records after running with Minsup=" +
+                    minimumSupports[i] + " is " + coveredRecords.cardinality() + " out of " + RecordSet.size);
+			
+		}
+
+        logProgress("Minsups used " + Arrays.toString(minimumSupports));
+        logProgress("Total number of covered records under minimum blocking threshold " + minBlockingThreshold +
+                " and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + RecordSet.size +
+                " which are: " + 100 * (coveredRecords.cardinality() / RecordSet.size) + "%");
+
+        logProgress("After adding uncovered records: Total number of covered records under blocking threshold " + minBlockingThreshold +
+                " and minsups " + Arrays.toString(minimumSupports) + " is: " + coveredRecords.cardinality() + " out of " + RecordSet.size +
+                " which are: " + 100 * (coveredRecords.cardinality() / RecordSet.size) + "%");
 		int firstDbSize = context.getFirstDbSize();
 		if (firstDbSize>0) {
 			allResults=removePairsSameSet(allResults,firstDbSize);
 		}
 		
 		return allResults;
-		
 	}
-	
-	private static FrequentItemsetContext createFrequentItemsetContext(
+
+    /**
+     * This method is usage until logger will be productive in code
+     * @param message
+     */
+    private static void logProgress(String message) {
+        logger.info(message);
+        System.out.println(message);
+    }
+
+    private static FrequentItemsetContext createFrequentItemsetContext(
 			String absolutePath, double minBlockingThreshold, int minimumSupport,
 			MfiContext mfiContext) {
 		FrequentItemsetContext itemsetContext = new FrequentItemsetContext();
@@ -375,7 +350,7 @@ public class BottomUp {
 		itemsetContext.setMinimumSupport(minimumSupport);
 		itemsetContext.setMfiContext(mfiContext);
 		itemsetContext.setGolbalItemsMap(Utilities.globalItemsMap);
-		itemsetContext.setNeiborhoodGrowthLimit(NG_LIMIT);
+		itemsetContext.setNeighborhoodGrowthLimit(NG_LIMIT);
 		
 		return itemsetContext;
 	}
@@ -384,7 +359,6 @@ public class BottomUp {
 		System.out.println("Excluding pairs if records from the same set..");
 		CandidatePairs updatedPairs=new CandidatePairs();
 		long start=System.currentTimeMillis();
-		//Set<Set<Integer>> actualPairs=new HashSet<>();
 		for (Entry<Integer,RecordMatches> entry: actualCPs.getAllMatches().entrySet()) { //run over all records
 			for (CandidateMatch cm : entry.getValue().getCandidateMatches()) { //for each record, check out its match
 				if ( 	(entry.getKey()>firstDbSize && cm.getRecordId()>firstDbSize) ||
@@ -392,12 +366,10 @@ public class BottomUp {
 					continue;
 //				if  (entry.getKey()>firstDbSize || cm.getRecordId()>firstDbSize) //for CDDB experiemtns (also add 500 to the command inputs)
 //					continue;
-				else 
+				else
+                {
 					updatedPairs.setPair(entry.getKey(), cm.getRecordId(), actualCPs.getMinThresh());
-				//Set<Integer> temp=new HashSet<Integer>();
-				//temp.add(cm.getRecordId());
-				//temp.add(entry.getKey());
-				//actualPairs.add(temp);
+                }
 			}
 		}
 		System.out.println("Time exclude pairs : " + Double.toString((double)(System.currentTimeMillis() - start)/1000.0) + " seconds");
@@ -437,7 +409,7 @@ public class BottomUp {
 			writer = new BufferedWriter(new FileWriter(outputFle));
 			
 			for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1)){
-				Record currRecord = RecordSet.values.get(i);				
+				Record currRecord = RecordSet.values.get(i);
 				String toWrite = currRecord.getNumericline(appItems.keySet());
 				writer.write(toWrite);
 				writer.newLine();
@@ -493,34 +465,8 @@ public class BottomUp {
 		allResults.addAll(coveragePairs);
 		
 	}
-	
-	public static void comparePairSets(Set<Pair> prev, Set<Pair> next){
-		for (Pair pair : prev) {
-			if(!next.contains(pair)){
-				System.out.println("Pair " + pair.toString() + " doesn't appear in next!!");
-			}
-		}
-		
-		for (Pair pair : next) {
-			if(!prev.contains(pair)){
-				System.out.println("Pair " + pair.toString() + " doesn't appear in prev!!");
-			}
-		}
-	}
-	
-	
-	public static boolean sameSource(long r1_l, long r2_l){
-		int r1 = new Long(r1_l).intValue();
-		int r2 = new Long(r2_l).intValue();
-		String src1 = RecordSet.values.get(r1).getSrc();
-		String src2 = RecordSet.values.get(r2).getSrc();		
-		if(src1 == null || src2 == null){ //if null then assume different sources		
-			return false;
-		}
-		return (src1.equalsIgnoreCase(src2));
-	}
-	
-	public static String writeBlockingRR(Collection<BlockingRunResult> runResults){
+
+    public static String writeBlockingRR(Collection<BlockingRunResult> runResults){
 		StringBuilder sb = new StringBuilder();
 		//calculate average, Min & Max for all runs
 		BlockingResultsSummary brs = new BlockingResultsSummary(runResults);

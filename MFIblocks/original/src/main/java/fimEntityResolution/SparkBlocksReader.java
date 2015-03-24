@@ -1,12 +1,16 @@
 package fimEntityResolution;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.transaction.NotSupportedException;
+import il.ac.technion.ie.bitsets.EWAH_BitSet;
+import il.ac.technion.ie.model.BitSetIF;
+import il.ac.technion.ie.pools.BitMatrixPool;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.data.structure.IFRecord;
+import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.spark.SparkContextWrapper;
+import il.ac.technion.ie.utils.FrequentItemsetContext;
+import il.ac.technion.ie.utils.StringSimTools;
+import il.ac.technion.ie.utils.Utilities;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -14,11 +18,14 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 
 import scala.Tuple2;
-import candidateMatches.CandidatePairs;
-import fimEntityResolution.bitsets.EWAH_BitSet;
-import fimEntityResolution.interfaces.BitSetIF;
-import fimEntityResolution.interfaces.IFRecord;
-import fimEntityResolution.pools.BitMatrixPool;
+
+import javax.transaction.NotSupportedException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 /***
  * Reads frequent item-sets created by fpgrow and marks candidate blocks according to 3 parameters:
  * support condition, ClusterJaccard score, sparse neighborhood condition.
@@ -39,19 +46,14 @@ public class SparkBlocksReader {
 	
 	/**
 	 * Replaces Utilities.readFIs, uses SPARK.
-	 * @param frequentItemsetFile
-	 * @param globalItemsMap
-	 * @param scoreThreshold
-	 * @param records
-	 * @param minSup
-	 * @param NG_PARAM
+	 * @param itemsetContext
 	 * @return CandidatePairs object
 	 */
 	public static CandidatePairs readFIs(FrequentItemsetContext itemsetContext){
 		
 		MfiContext context = itemsetContext.getMfiContext();
 		int minSup = itemsetContext.getMinimumSupport();
-		double NG_PARAM = itemsetContext.getNeiborhoodGrowthLimit();
+		double NG_PARAM = itemsetContext.getNeighborhoodGrowthLimit();
 		
 		//StringSimToolsLocal.globalItemsMap = Utilities.parseLexiconFile(context .getLexiconFile());
 		//StringSimToolsLocal.globalRecords = Utilities.readRecords(context);
@@ -68,7 +70,7 @@ public class SparkBlocksReader {
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		int numOfCores = runtime.availableProcessors();
-		JavaRDD<String> fmiSets = BottomUp.sc.textFile(itemsetContext.getFrequentItemssetFilePath(), numOfCores*3); //JS: Spark tuning: minSplits=numOfCores*3
+		JavaRDD<String> fmiSets = SparkContextWrapper.getJavaSparkContext().textFile(itemsetContext.getFrequentItemssetFilePath(), numOfCores*3); //JS: Spark tuning: minSplits=numOfCores*3
 		JavaRDD<CandidateBlock> parsedBlocks = fmiSets.map(new ParseFILine());
 		JavaPairRDD<CandidateBlock,Double> blocksWithScores = parsedBlocks.mapToPair( new CalculateScores(context.getLexiconFile(),
 				context.getRecordsFile(), context.getOriginalFile(), itemsetContext.getMinBlockingThreshold(), minSup, NG_PARAM));

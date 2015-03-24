@@ -1,10 +1,11 @@
 package fimEntityResolution.statistics;
 
+import il.ac.technion.ie.model.RecordMatches;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import candidateMatches.RecordMatches;
 
 public class Duplicate {
 

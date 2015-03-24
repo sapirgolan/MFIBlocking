@@ -1,14 +1,6 @@
 package fimEntityResolution.statistics;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
+import il.ac.technion.ie.model.RecordMatches;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,7 +9,15 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import candidateMatches.RecordMatches;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 
 public class DuplicateTest {
 

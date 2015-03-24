@@ -1,6 +1,7 @@
 package fimEntityResolution.entityResulution;
 
-import candidateMatches.CandidatePairs;
+
+import il.ac.technion.ie.model.CandidatePairs;
 
 public interface IComparison {
 	public long measureComparisonExecution(

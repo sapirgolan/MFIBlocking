@@ -1,12 +1,11 @@
 package fimEntityResolution.pools;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import il.ac.technion.ie.utils.ClearerFactory;
+import il.ac.technion.ie.data.structure.Clearer;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import fimEntityResolution.interfaces.Clearer;
-import fimEntityResolution.interfaces.ClearerFactory;
 
 public class LimitedPool {
 

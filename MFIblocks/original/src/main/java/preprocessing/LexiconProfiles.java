@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import fimEntityResolution.FrequentItem;
+import il.ac.technion.ie.model.FrequentItem;
 import fimEntityResolution.bitsets.SBS_BitSet_Factory;
 
 public class LexiconProfiles {

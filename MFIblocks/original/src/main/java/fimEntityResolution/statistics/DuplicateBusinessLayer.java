@@ -1,13 +1,14 @@
 package fimEntityResolution.statistics;
 
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.RecordMatches;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
 
 public class DuplicateBusinessLayer {
 

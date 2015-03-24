@@ -1,21 +1,7 @@
 package fimEntityResolution;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isIn;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import il.ac.technion.ie.model.CandidateMatch;
+import il.ac.technion.ie.model.RecordMatches;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -31,8 +17,16 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import candidateMatches.CandidateMatch;
-import candidateMatches.RecordMatches;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TrueClusters.class)

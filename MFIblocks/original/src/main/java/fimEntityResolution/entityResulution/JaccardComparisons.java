@@ -1,16 +1,12 @@
 package fimEntityResolution.entityResulution;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import lucene.search.SearchEngine;
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
 import fimEntityResolution.comparison.ProfileComparison;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.RecordMatches;
+import lucene.search.SearchEngine;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class JaccardComparisons implements IComparison{
 
@@ -34,7 +30,7 @@ public class JaccardComparisons implements IComparison{
 			Entry<Integer, RecordMatches> entry = iterator.next();
 			
 			List<String> blockSeedAttributes = engine.getRecordAttributes(entry.getKey().toString());
-			final Set<Integer> matchedRecordsIds = entry.getValue().getMatchedRecordsIds();
+			final Set<Integer> matchedRecordsIds = entry.getValue().getMatchedIds();
 			for (Integer recordId : matchedRecordsIds) {
 				if (!didComparisonOccur(recordId, entry.getKey())) {
 					List<String> recordAttributes = engine.getRecordAttributes(recordId.toString());

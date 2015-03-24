@@ -1,12 +1,13 @@
 package fimEntityResolution;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.RecordMatches;
+import org.joda.time.DateTime;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,15 +18,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import candidateMatches.CandidatePairs;
-import candidateMatches.RecordMatches;
 
 public class ResultWriterTest {
 
@@ -43,7 +43,7 @@ public class ResultWriterTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateOutputFile() {
-		File outputFile = classUnderTest.createOutputFile();
+		File outputFile = classUnderTest.createNeighborsOutputFile();
 		assertNotNull("Output file was not created", outputFile);
 		assertThat(outputFile.getAbsolutePath(), containsString( System.getProperty("user.dir") ));
 		
@@ -73,7 +73,9 @@ public class ResultWriterTest {
 				return result;
 			}
 		});
-		classUnderTest.writeBlocksIDs(file, candidatePairs);
+
+		//classUnderTest.writeBlocksIDs(file, candidatePairs);
+		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
 		assertThat(fileContent, allOf(containsString("1"),containsString("4"), containsString("2") ));
 	}
@@ -101,7 +103,9 @@ public class ResultWriterTest {
 				return result;
 			}
 		});
-		classUnderTest.writeBlocksIDs(file, candidatePairs);
+		
+		//classUnderTest.writeBlocksIDs(file, candidatePairs);
+		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
 		assertThat(fileContent, allOf(containsString("2 - [1, 4]"), containsString("90 - [16, 14, 11]") ));
 	}
@@ -125,7 +129,9 @@ public class ResultWriterTest {
 				return result;
 			}
 		});
-		classUnderTest.writeBlocksIDs(file, candidatePairs);
+		
+		//classUnderTest.writeBlocksIDs(file, candidatePairs);
+		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
 		assertThat(fileContent, containsString("2 - [1, 4]"));
 		assertThat( fileContent, not(containsString("90")) );

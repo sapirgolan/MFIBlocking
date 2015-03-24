@@ -1,8 +1,8 @@
 package fimEntityResolution.statistics;
 
-import java.util.Collection;
+import il.ac.technion.ie.utils.Utilities;
 
-import fimEntityResolution.Utilities;
+import java.util.Collection;
 
 public class BlockingResultsSummary {
 	double[] pairsCompletenessSummary; //0

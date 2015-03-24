@@ -1,6 +1,5 @@
 package il.ac.technion.ie.utils;
 
-import com.google.common.base.Joiner;
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 import com.googlecode.javaewah.IntIterator;
 import il.ac.technion.ie.bitsets.EWAH_BitSet;
@@ -15,8 +14,9 @@ import il.ac.technion.ie.pools.GDSPool;
 import il.ac.technion.ie.spark.SparkContextWrapper;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.mllib.fpm.FPGrowth;
-import org.apache.spark.mllib.fpm.FPGrowthModel;
+import org.apache.spark.mllib.fpm.FPGrowth.FreqItemset;
 import org.enerj.core.SparseBitSet;
 import org.enerj.core.SparseBitSet.Iterator;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -41,13 +41,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.mllib.fpm.FPGrowth;
-import org.apache.spark.mllib.fpm.FPGrowth.FreqItemset;
-import org.apache.spark.mllib.fpm.FPGrowthModel;
 
 public class Utilities {
 
@@ -1027,8 +1020,8 @@ public class Utilities {
 		JavaRDD<List<String>> transactions = records.map(new ParseRecordLine());
 		
 		FPGrowth fpg = new FPGrowth().setMinSupport((double)minSup/recordsCardinality).setNumPartitions(10);
-		FPGrowthModel<Integer> model = fpg.run(transactions);
-		JavaRDD<FreqItemset<Integer>> itemsets=model.freqItemsets().toJavaRDD();
+//		FPGrowthModel<Integer> model = fpg.run(transactions);
+//		JavaRDD<FreqItemset<Integer>> itemsets=model.freqItemsets().toJavaRDD();
 //		JavaRDD<FreqItemset<Integer>> maximalItemsets=itemsets.(new MaximalItemsetsReducer());
 //		
 //		//List<FreqItemset<String>> itemsets= model.freqItemsets().toJavaRDD().collect();
@@ -1058,15 +1051,15 @@ public class Utilities {
 
 		return file;
 	}
-	static class ParseRecordLine implements Function<String, List<Integer>> {
+	static class ParseRecordLine implements Function<String, List<String>> {
 
-		public List<Integer> call(String line) {
+		public List<String> call(String line) {
 			if (line == null) {
 				return null;
             }
 			line = line.trim();
 			String[] items=line.split(" ");
-			List<String> retVal =Arrays.asList(items);
+			List<String> retVal = Arrays.asList(items);
 			return retVal;
 		}
 	}

@@ -17,13 +17,13 @@
             <artifactId>shared</artifactId>
             <version>0.0.1</version>
         </dependency>
-    <!-- Tests -->
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
-
+    <!-- Tests -->
         <dependency>
             <groupId>uk.com.robust-it</groupId>
             <artifactId>cloning</artifactId>

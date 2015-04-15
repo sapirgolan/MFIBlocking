@@ -1,0 +1,26 @@
+p auer n cesabianchi y freund and r e schapire   gambling in a rigged casino the adversarial multiarmed bandit problem  in proc 36th annual symposium on foundations of computer science  1995
+a blum m furst m j kearns and richard j lipton   cryptographic primitives based on hard learning problems  in preproceedings of crypto 93  1993
+avrim blum merrick furst michael kearns and richard j lipton   cryptographic primitives based on hard learning problems  in preproceedings of crypto 93  1993
+avrim blum merrick furst michael kearns and richard j lipton   cryptographic primitives based on hard learning problems  proc crypto 93  1994
+a blum m furst m kearns r lipton   cryptographic primitives based on hard learning problems  crypto  1993
+blum a furst m jackson j kearns m mansour y rudich s   weakly learning dnf and characterizing statistical query learning using fourier analysis  proceedings of the 26th annual acm symposium on theory of computing  1994
+blum a furst m jackson j kearns m mansour y rudich s   weakly learning dnf and characterizing statistical query learning using fourier analysis  in proceedings of the twentysixth annual acm symposium on theory of computing  1994
+blum a furst m jackson j kearns m mansour y and rudich s   weakly learning dnf 10 and characterizing statistical query learning using fourier analysis  in proc 26th annu acm sympos theory comput  1994
+a blum m furst j jackson m kearns y mansour and s rudich   weakly learning dnf and characterizing statistical query learning using fourier analysis  in proceedings of the 26th acm symposium on the theory of computing  1994
+avrim blum merrick furst jeffrey jackson michael kearns yishay mansour and steven rudich   weakly learning dnf and characterizing statistical query learning using fourier analysis  in t he 26 th annual acm symposium on t heory of computing  1994
+avrim blum merrick furst jeffery jackson michael kearns yishay mansour and steven rudich   weakly 8 learning dnf and characterizing statistical query learning using fourier analysis  in proceedings of the 26 th annual acm symposium on the theory of computing  1994  may
+avrim blum merrick furst jeffery jackson michael kearns yishay mansour and steven rudich   weakly learning dnf and characterizing statistical query learning using fourier analysis  in proceedings of the 26 th annual acm symposium on the theory of computing  1994  may
+avrim blum merrick furst jeffery jackson michael kearns yishay mansour and steven rudich   weakly learning dnf and characterizing statistical query learning using fourier analysis  in proceedings of the twentysixth annual acm symposium on the theory of computing  1994
+schapire r   the strength of weak learnability  machine learning 5 2  1990
+schapire r  5 2  the strength of weak learnability  machine learning  1990
+schapire r  5  the strength of weak learnability  machine learning  1990
+schapire r  2  the strength of weak learnability machine learning  5  1990
+schapire r e   the strength of weak learnability  machine learning 5 2  1990
+schapire r e   the strength of weak learnability  machine learning 5 2  1990
+schapire r e   the strength of weak learnability  machine learning 5 2  1990
+schapire r e  5 2  the strength of weak learnability  mach learn  1990
+schapire r e   the strength of weak learnability  machine learning  1990
+schapire r e  5 2  the strength of weak learnability  machine learning  1990
+schapire r e  5 2  the strength of weak learnability  machine learning  1990
+schapire r e  5 2  the strength of weak learnability  machine learning  1990
+schapire r e  5  the strength of weak learnability  machine learning  1990

@@ -215,7 +215,7 @@ public class BottomUp {
 		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
         iBlockService blockService = new BlockService();
         File blocksOutputFile = resultWriter.createBlocksOutputFile();
-        List<Block> blocks = blockService.getBlocks(cps);
+        List<Block> blocks = blockService.getBlocks(cps, context);
 
         try {
             switch (context.getPrntFormat().toLowerCase()) {
@@ -431,7 +431,7 @@ public class BottomUp {
 	}
 	
 	private static Map<Integer,Integer> appitems(BitSet coveredRecords, int minSup){
-		Map<Integer,Integer> retVal = new HashMap<Integer, Integer>();
+		Map<Integer,Integer> retVal = new HashMap<>();
 		for( int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1) ){
 			Record currRecord = RecordSet.values.get(i);		
 			Set<Integer> recordItems = currRecord.getItemsToFrequency().keySet();

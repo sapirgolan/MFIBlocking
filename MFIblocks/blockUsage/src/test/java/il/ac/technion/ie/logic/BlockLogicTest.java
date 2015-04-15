@@ -1,9 +1,12 @@
 package il.ac.technion.ie.logic;
 
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import il.ac.technion.ie.model.RecordMatches;
+import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.model.NeighborsVector;
+import il.ac.technion.ie.model.RecordMatches;
 import org.hamcrest.Matchers;
+import org.hamcrest.core.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +17,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,7 +31,6 @@ public class BlockLogicTest {
     public void setUp() throws Exception {
         classUnderTest = new BlockLogic();
     }
-
     @After
     public void tearDown() throws Exception {
 
@@ -70,5 +73,23 @@ public class BlockLogicTest {
         assertThat(list.get(2).getNeighbors(), Matchers.containsInAnyOrder(1,2,3,4));
         assertThat(list.get(3).getNeighbors(), Matchers.containsInAnyOrder(2,3,4));
         assertThat(list.get(4).getNeighbors(), Matchers.containsInAnyOrder(1,5));
+    }
+
+    @Test
+    public void testObtainTerms() throws Exception {
+        List list = PowerMockito.mock(List.class);
+        MfiContext context = PowerMockito.mock(MfiContext.class);
+        PowerMockito.when(context.getOriginalRecordsPath()).thenReturn("NoSw.txt");
+        Multimap<Integer, String> obtainTerms = Whitebox.invokeMethod(classUnderTest, "obtainTerms", list, context);
+        assertThat(obtainTerms, IsNull.notNullValue());
+    }
+
+    @Test
+    public void testRetriveRecords() throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
+        String recordsFilePath = classLoader.getResource("NoSw.txt").getFile();
+        Map<Integer, String> records = Whitebox.invokeMethod(classUnderTest, "retriveRecords", recordsFilePath);
+        assertThat(records.size(), Is.is(26));
+//        private AbstractMap<Integer, String> retriveRecords(String recordsPath) {
     }
 }

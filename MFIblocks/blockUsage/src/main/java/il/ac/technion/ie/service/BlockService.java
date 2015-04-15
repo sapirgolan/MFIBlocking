@@ -1,10 +1,11 @@
 package il.ac.technion.ie.service;
 
-import il.ac.technion.ie.model.Block;
-import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.logic.BlockLogic;
 import il.ac.technion.ie.logic.iBlockLogic;
+import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.CandidatePairs;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -22,9 +23,10 @@ public class BlockService implements iBlockService {
         this.blockLogic = new BlockLogic();
     }
     @Override
-    public List<Block> getBlocks(CandidatePairs candidatePairs) {
+    public List<Block> getBlocks(CandidatePairs candidatePairs, MfiContext context) {
         List<Block> result = blockLogic.findBlocks(candidatePairs);
         logger.debug("Finished finding blocks from input");
+        blockLogic.calcProbabilityOnRecords(result, context);
         return result;
     }
 

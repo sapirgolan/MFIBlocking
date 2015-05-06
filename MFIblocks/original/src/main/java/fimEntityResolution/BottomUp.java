@@ -8,13 +8,13 @@ import fimEntityResolution.statistics.*;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.service.BlockService;
 import il.ac.technion.ie.service.iBlockService;
 import il.ac.technion.ie.types.Alg;
 import il.ac.technion.ie.types.MFISetsCheckConfiguration;
 import il.ac.technion.ie.utils.FrequentItemsetContext;
 import il.ac.technion.ie.utils.Utilities;
-import lucene.search.SearchEngine;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;

@@ -1,4 +1,4 @@
-package fimEntityResolution.exception;
+package il.ac.technion.ie.search.exception;
 
 public class TooManySearchResults extends Exception {
 

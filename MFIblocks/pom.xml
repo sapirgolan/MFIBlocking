@@ -23,6 +23,7 @@
         <module>original</module>
         <module>blockUsage</module>
        <module>shared</module>
+       <module>searchEngine</module>
    </modules>
   
   <build>

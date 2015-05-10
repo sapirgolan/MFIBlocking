@@ -1,17 +1,13 @@
 package il.ac.technion.ie.search.core;
 
-import il.ac.technion.ie.search.exception.TooManySearchResults;
+import il.ac.technion.ie.search.module.ComparisonInteraction;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.ScoreDoc;
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
@@ -22,7 +18,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /*import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,60 +33,10 @@ public class SearchEngineTest {
 
     @Before
     public void setUp() {
-        engine = new SearchEngine();
+        engine = new SearchEngine(new ComparisonInteraction());
     }
 
-    @Test
-    public void testSeperateQgrams() throws Exception {
-        List<String> qgrams = Whitebox.<List<String>>invokeMethod(engine, "seperateQgrams", "1 2 3 ");
-        Set<String> expected = new HashSet<String>(Arrays.asList("1", "2", "3"));
-        Assert.assertTrue("don't have all qgrams", qgrams.containsAll(expected));
-    }
 
-    @Test
-    public void testSeperateQgrams_noItems() throws Exception {
-        List<String> qgrams = Whitebox.<List<String>>invokeMethod(engine, "seperateQgrams", "");
-        Assert.assertTrue("Didn't obtain empty result", qgrams.isEmpty());
-    }
-
-    @Test
-    public void testSeperateQgrams_space() throws Exception {
-        List<String> qgrams = Whitebox.<List<String>>invokeMethod(engine, "seperateQgrams", " ");
-        Assert.assertTrue("Didn't obtain empty result", qgrams.isEmpty());
-    }
-
-    @Test(expected = TooManySearchResults.class)
-    public void testObtainTopResult_noDocs() throws Exception {
-        IndexSearcher indexSearcher = PowerMockito.mock(IndexSearcher.class);
-        ScoreDoc[] docs = new ScoreDoc[0];
-        Whitebox.invokeMethod(engine, "obtainTopResult", indexSearcher, docs);
-    }
-
-    @Test(expected = TooManySearchResults.class)
-    public void testObtainTopResult_ToManyDocs() throws Exception {
-        IndexSearcher indexSearcher = PowerMockito.mock(IndexSearcher.class);
-        ScoreDoc[] docs = new ScoreDoc[]{new ScoreDoc(0, 0), new ScoreDoc(1, 0.1f)};
-        Whitebox.invokeMethod(engine, "obtainTopResult", indexSearcher, docs);
-    }
-
-    @Test
-    public void testObtainTopResult_oneDocs() throws Exception {
-        // We use PowerMock.createMock(..) to create the mock object.
-        Document document = PowerMock.createMock(Document.class);
-        EasyMock.expect(document.get("qgrams")).andReturn(" 1 8 4 ");
-
-        ScoreDoc[] docs = new ScoreDoc[]{new ScoreDoc(0, 0)};
-        IndexSearcher indexSearcher = PowerMockito.mock(IndexSearcher.class);
-        PowerMockito.when(indexSearcher.doc(0)).thenReturn(document);
-
-        // PowerMock.replay(..) must be used.
-        PowerMock.replay(document);
-
-        List<String> qgrams = Whitebox.<List<String>>invokeMethod(engine, "obtainTopResult", indexSearcher, docs);
-
-        Set<String> expected = new HashSet<String>(Arrays.asList("1", "4", "8"));
-        Assert.assertTrue("don't have all qgrams", qgrams.containsAll(expected));
-    }
 
     @Test(expected = FileNotFoundException.class)
     public void testconnectToFile_fileNotExists() throws Exception {
@@ -104,15 +52,13 @@ public class SearchEngineTest {
 
     private BufferedReader getBufferReaderToResutrantsQgramsFile() throws Exception {
         File file = getResturantsFile();
-        BufferedReader reader = Whitebox.invokeMethod(engine, "connectToFile", file.getAbsolutePath());
-        return reader;
+        return Whitebox.invokeMethod(engine, "connectToFile", file.getAbsolutePath());
     }
 
     private File getResturantsFile() throws URISyntaxException {
         String pathToFile = "/resturants_ids.txt";
         URL resourceUrl = getClass().getResource(pathToFile);
-        File file = new File(resourceUrl.toURI());
-        return file;
+        return new File(resourceUrl.toURI());
     }
 
     @Test
@@ -142,7 +88,7 @@ public class SearchEngineTest {
     public void testGetRecordAttributes_recordNotExists() throws URISyntaxException, IOException {
         //suppress Indexing phase
         PowerMock.suppress(PowerMock.method(SearchEngine.class, "indexFileContent"));
-        engine = new SearchEngine();
+        engine = new SearchEngine(new ComparisonInteraction());
 
         File resturantsFile = getResturantsFile();
         engine.addRecords(resturantsFile.getCanonicalPath());

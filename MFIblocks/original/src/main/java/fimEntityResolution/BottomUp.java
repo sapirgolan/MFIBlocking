@@ -9,6 +9,7 @@ import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.search.core.SearchEngine;
+import il.ac.technion.ie.search.module.ComparisonInteraction;
 import il.ac.technion.ie.service.BlockService;
 import il.ac.technion.ie.service.iBlockService;
 import il.ac.technion.ie.types.Alg;
@@ -26,17 +27,16 @@ import java.util.Map.Entry;
 
 public class BottomUp {
 	
+    static final Logger logger = Logger.getLogger(BottomUp.class);
 	private final static String FI_DIR = "FIs";
 	private final static String TEMP_RECORD_DIR = "TEMP_RECORD_DIR";
 	private final static File TempDir = new File(TEMP_RECORD_DIR);
 	private final static double MAX_SUPP_CONST = 1.0;//0.005;
+    public static BitSet coveredRecords= null;
+	public static String srcFile = null;
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
 	private static MfiContext context;
-    public static BitSet coveredRecords= null;
-	public static String srcFile = null;
-
-    static final Logger logger = Logger.getLogger(BottomUp.class);
 
     /**
 	 * The Main of the MFIBlocking Algorithm
@@ -200,7 +200,7 @@ public class BottomUp {
 
 
 	private static SearchEngine createAndInitSearchEngine(String recordsFile) {
-		SearchEngine engine = new SearchEngine();
+		SearchEngine engine = new SearchEngine(new ComparisonInteraction());
 		engine.addRecords(recordsFile);
 		return engine;
 	}

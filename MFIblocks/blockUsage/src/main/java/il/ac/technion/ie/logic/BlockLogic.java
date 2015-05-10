@@ -1,12 +1,12 @@
 package il.ac.technion.ie.logic;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.search.core.SearchEngine;
+import il.ac.technion.ie.search.module.BlockInteraction;
 import org.apache.log4j.Logger;
+import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 
-import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,52 +36,80 @@ public class BlockLogic implements iBlockLogic {
 
     @Override
     public void calcProbabilityOnRecords(final List<Block> blocks, MfiContext context) {
-        Multimap<Integer, String> termsOfEachRecord = obtainTerms(blocks, context);
-        tokenizeTerms(termsOfEachRecord);
-        calcProbability();
+        SearchEngine searchEngine = buildSearchEngineForRecords(context);
+        calcProbability(blocks, searchEngine);
     }
 
-    private void calcProbability() {
+    private void calcProbability(List<Block> blocks, SearchEngine searchEngine) {
+        SimilarityCalculator similarityCalculator = new SimilarityCalculator(new JaroWinkler());
+        //iterate on each block
+        for (Block block : blocks) {
+            List<Integer> blockMembers = block.getMembers();
+            //retrieve block Text attributes
+            Map<Integer, List<String>> blockAtributess = getMembersAtributes(blockMembers, searchEngine);
+            for (Integer currentRecordId : blockAtributess.keySet()) {
+                float currentRecordProb = calcRecordSimilarityInBlock(currentRecordId, blockAtributess, similarityCalculator);
+                block.setMemberSimScore(currentRecordId, currentRecordProb);
+            }
+            calcRecordsProbabilityInBlock(block);
+        }
     }
 
-    private void tokenizeTerms(Multimap<Integer, String> termsOfEachRecord) {
+    private void calcRecordsProbabilityInBlock(Block block) {
+        float allScores = 0;
+        for (Integer member : block.getMembers()) {
+            allScores += block.getMemberScore(member);
+        }
+
+        for (Integer member : block.getMembers()) {
+            block.setMemberProbability(member, block.getMemberScore(member) / allScores);
+        }
+
+    }
+
+    private float calcRecordSimilarityInBlock(Integer currentRecordId, final Map<Integer, List<String>> blockAtributess,
+                                              SimilarityCalculator similarityCalculator) {
+        float recordsSim = 0;
+        //case block contains a single record
+        if (blockAtributess.size() == 1) {
+            return 1;
+        }
+        for (Integer next : blockAtributess.keySet()) {
+            if (next != currentRecordId) {
+                recordsSim += similarityCalculator.calcRecordsSim(blockAtributess.get(next), blockAtributess.get(currentRecordId));
+            }
+        }
+        return recordsSim;
     }
 
     /**
-     * Each record is identified by an ID {@link java.lang.Integer}.
-     * The method obtains the terms that appear in each record, tokenize them
-     * and return a {@link Multimap} of it.
+     * The method retrieves list if IDs and an instance of @SearchEngine and returns for each ID a list
+     * with fields that record has.
      *
-     * @param blocks
+     * @param recordID
+     * @param searchEngine
+     * @return <Integer, List<String>>
+     */
+    private Map<Integer, List<String>> getMembersAtributes(List<Integer> recordID, SearchEngine searchEngine) {
+        Map<Integer, List<String>> blockFields = new HashMap<>();
+        for (Integer blockMemberID : recordID) {
+            List<String> recordAttributes = searchEngine.getRecordAttributes(String.valueOf(blockMemberID));
+            blockFields.put(blockMemberID, recordAttributes);
+        }
+        return blockFields;
+    }
+
+    /**
+     *
      * @param context
      * @return
      */
 
-    private Multimap<Integer, String> obtainTerms(List<Block> blocks, MfiContext context) {
-        //TODO: for each ID retrieve terms
-        //TODO: tokenize each term
-        ArrayListMultimap<Integer, String> arrayListMultimap = ArrayListMultimap.create();
+    private SearchEngine buildSearchEngineForRecords(MfiContext context) {
         String recordsPath = context.getOriginalRecordsPath();
-        Map<Integer, String> records = retriveRecords(recordsPath);
-        return arrayListMultimap;
-    }
-
-    private Map<Integer, String> retriveRecords(String recordsPath) {
-        int lineNumber = 1;
-        Map<Integer, String> map = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(recordsPath))))) {
-            String line = reader.readLine();
-            while (line != null) {
-                map.put(lineNumber, line);
-                lineNumber++;
-                line = reader.readLine();
-            }
-        } catch (FileNotFoundException e) {
-            logger.error(recordsPath + " was not found in system", e);
-        } catch (IOException e) {
-            logger.error("Failed to read lines form " + recordsPath, e);
-        }
-        return map;
+        SearchEngine searchEngine = new SearchEngine(new BlockInteraction());
+        searchEngine.addRecords(recordsPath);
+        return searchEngine;
     }
 
     private List<NeighborsVector> buildNeighborVectors(ConcurrentHashMap<Integer, RecordMatches> matches, Set<Integer> recordsIds) {

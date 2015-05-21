@@ -76,8 +76,9 @@ public class SearchEngineTest {
     public void testGetRecordAttributes_EndToEnd() throws URISyntaxException, IOException {
         File resturantsFile = getResturantsFile();
         engine.addRecords(resturantsFile.getCanonicalPath());
-        List<String> recordAttributes = engine.getRecordAttributes(Integer.toString(49));
-        ArrayList<String> expected = new ArrayList<String>(Arrays.asList("587", "35", "36", "37", "38", "39", "173", "404", "405", "588", "589", "590", "591"));
+        int recordId = 49; //this is also the row number in the text file
+        List<String> recordAttributes = engine.getRecordAttributes(Integer.toString(recordId));
+        ArrayList<String> expected = new ArrayList<>(Arrays.asList("587", "35", "36", "37", "38", "39", "173", "404", "405", "588", "589", "590", "591"));
         Assert.assertTrue("Didn't get all records", recordAttributes.containsAll(expected));
 
         recordAttributes.removeAll(expected);

@@ -1,7 +1,7 @@
 package fimEntityResolution.entityResulution;
 
 import il.ac.technion.ie.model.CandidatePairs;
-import lucene.search.SearchEngine;
+import il.ac.technion.ie.search.core.SearchEngine;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -63,11 +63,12 @@ public class SearchEngine {
 		}
 	}
 	
-	//tested
 	private void indexFileContent(BufferedReader bufferedReader, IndexWriter indexWriter) throws IOException {
 		String line = bufferedReader.readLine();
-		int recordIndex = 0;
-		while (line != null) {
+        //in the file that is being parred and indexed the first row which represents the first record
+        //is considered to be 1
+        int recordIndex = 1;
+        while (line != null) {
 			if ( isTermSizeValid(line) ) {
                 docInteraction.addDoc(indexWriter, Integer.toString(recordIndex), line);
 				recordIndex++;

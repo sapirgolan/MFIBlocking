@@ -82,13 +82,6 @@ public class BlockLogicTest {
         MatcherAssert.assertThat(list.get(4).getNeighbors(), Matchers.containsInAnyOrder(1, 5));
     }
 
-    @Test
-    public void testRetriveRecords() throws Exception {
-        String recordsFilePath = getRecordsFilePath();
-        Map<Integer, String> records = Whitebox.invokeMethod(classUnderTest, "retriveRecords", recordsFilePath);
-        MatcherAssert.assertThat(records.size(), is(26));
-    }
-
     private String getRecordsFilePath() {
         ClassLoader classLoader = getClass().getClassLoader();
         return classLoader.getResource(recordsFileName).getFile();
@@ -128,7 +121,7 @@ public class BlockLogicTest {
                 "a. blum  m. furst  m. j. kearns  and richard j. lipton.",
                 "avrim blum  merrick furst  michael kearns  and richard j. lipton.");
 
-        List blockMembers = new ArrayList(Arrays.asList(0, 1, 2));
+        List blockMembers = new ArrayList(Arrays.asList(1, 3, 2));
         recordsFileName = "dataset.csv";
         PowerMockito.when(context.getOriginalRecordsPath()).thenReturn(this.getRecordsFilePath());
         SearchEngine searchEngine = Whitebox.invokeMethod(classUnderTest, "buildSearchEngineForRecords", context);
@@ -141,7 +134,8 @@ public class BlockLogicTest {
         for (Map.Entry<Integer, List<String>> entry : membersFields.entrySet()) {
             List<String> fields = entry.getValue();
             MatcherAssert.assertThat(fields, Matchers.hasSize(6));
-            MatcherAssert.assertThat(fields, Matchers.hasItem(authors.get(entry.getKey())));
+            int authorIndexInList = entry.getKey() - 1;
+            MatcherAssert.assertThat(fields, Matchers.hasItem(authors.get(authorIndexInList)));
         }
     }
 

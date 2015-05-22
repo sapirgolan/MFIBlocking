@@ -4,6 +4,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Created by I062070 on 19/03/2015.
@@ -33,8 +34,27 @@ public class Block {
             builder.append(member);
             builder.append(",");
         }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("}");
+
+        builder.append(System.getProperty("line.separator"));
+
+        builder.append("Probs{");
+        for (Integer member : members) {
+            builder.append(membersProbability.get(member));
+            builder.append(",");
+        }
         builder.deleteCharAt(builder.length() -1);
         builder.append("}");
+
+        builder.append(System.getProperty("line.separator"));
+
+        builder.append("Block representative is: ");
+
+        Entry<Integer, Float> blockRepr = findBlockRepresentative();
+        builder.append(String.format("recordID %d, Probability %s", blockRepr.getKey(), blockRepr.getValue()));
+        builder.append(blockRepr.getKey());
+
         return builder.toString();
     }
 
@@ -76,5 +96,18 @@ public class Block {
 
     public float getMemberProbability(Integer memberId) {
         return membersProbability.get(memberId);
+    }
+
+    public Entry<Integer, Float> findBlockRepresentative() {
+        float maxProb = 0;
+        Entry<Integer, Float> blockRepresentative = null;
+        for (Entry<Integer, Float> entry : membersProbability.entrySet()) {
+            Float localProb = entry.getValue();
+            if (localProb.equals(Math.max(localProb, maxProb))) {
+                maxProb = localProb;
+                blockRepresentative = entry;
+            }
+        }
+        return blockRepresentative;
     }
 }

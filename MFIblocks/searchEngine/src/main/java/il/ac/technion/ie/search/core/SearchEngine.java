@@ -2,6 +2,7 @@ package il.ac.technion.ie.search.core;
 
 import il.ac.technion.ie.search.exception.TooManySearchResults;
 import il.ac.technion.ie.search.module.DocInteraction;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -23,7 +24,8 @@ import java.util.List;
 
 
 public class SearchEngine {
-	private StandardAnalyzer standardAnalyzer;
+    static final Logger logger = Logger.getLogger(SearchEngine.class);
+    private StandardAnalyzer standardAnalyzer;
 	private Directory index;
     private DocInteraction docInteraction;
 
@@ -65,6 +67,7 @@ public class SearchEngine {
 	
 	private void indexFileContent(BufferedReader bufferedReader, IndexWriter indexWriter) throws IOException {
 		String line = bufferedReader.readLine();
+        logger.debug("indexing flowing line:" + line);
         //in the file that is being parred and indexed the first row which represents the first record
         //is considered to be 1
         int recordIndex = 1;

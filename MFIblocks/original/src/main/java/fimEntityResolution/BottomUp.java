@@ -5,6 +5,7 @@ import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
 import fimEntityResolution.entityResulution.IComparison;
 import fimEntityResolution.statistics.*;
+import fimEntityResolution.statistics.Timer;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.model.*;
@@ -107,16 +108,33 @@ public class BottomUp {
 		}
 	}
 
-	private static MfiContext readArguments(String[] args) {
+    /**
+     * The args input looks like the following:
+     * SPARK [Configuration]
+     * datasets/lexicon.txt [LexiconFile]
+     * datasets/ids.txt [RecordsFile]
+     * 0,0.05,0.1,0.15,0.75,0.8,0.95,1 [MinBlockingThresholds]
+     * datasets/matching.txt [MatchFile]
+     * datasets/NoSW.txt [OrigRecordsFileWithoutCommas]
+     * <PATH_TO_FILE>/originalRecordsFile.csv [OriginalRecordsPath]
+     * 2 [MinSup]
+     * 1.5,2,3,5,10,20 [NG]
+     * N [PrintFormat]
+     *
+     * @param args
+     * @return
+     */
+    private static MfiContext readArguments(String[] args) {
 		MfiContext context = new MfiContext();
 		context.setConfiguration(args[0]);
 		context.setLexiconFile(args[1]);
 		context.setRecordsFile(args[2]);
 		context.setMinBlockingThresholds(args[3]);
 		context.setMatchFile(args[4]);
-		context.setOrigRecordsFile(args[5]);
-		context.setMinSup(args[6]);
-		context.setAlgorithm(Alg.MFI);
+        context.setOrigRecordsFileWithoutCommas(args[5]);
+        context.setOriginalRecordsPath(args[6]);
+        context.setMinSup(args[7]);
+        context.setAlgorithm(Alg.MFI);
 		context.setNGs(args[8]);
 		context.setFirstDbSize(args);
 		context.setPerformanceFlag(args);
@@ -147,24 +165,23 @@ public class BottomUp {
                         " and NGLimit: " + NG_LIMIT);
 				System.out.println("running iterative " + context.getAlgName() + "s with minimum blocking threshold " + minBlockingThreshold +
 						" and NGLimit: " + NG_LIMIT);
-				long start = System.currentTimeMillis();
-				//obtain all the clusters that has the minimum score
+                Timer timer = new Timer();
+                //obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
-                long actionStart = System.currentTimeMillis();
+                timer.startActionTimeMeassurment();
                 printNeighborsAndBlocks(algorithmObtainedPairs, context);
-				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
-				
-				actionStart = System.currentTimeMillis();
-				TrueClusters trueClusters = new TrueClusters();
+                long writeBlocksDuration = timer.getActionTimeDuration();
+
+                timer.startActionTimeMeassurment();
+                TrueClusters trueClusters = new TrueClusters();
 				trueClusters.findClustersAssingments(context.getMatchFile());
-				//System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-				
+
 				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
 				StatisticMeasuremnts results = experimentResult.calculate();
-				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
-				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration);
-				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, 
+                long totalMaxRecallCalculationDuration = timer.getActionTimeDuration();
+                long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+                double executionTime = calcExecutionTime(timer.getStartTime(), totalMaxRecallCalculationDuration, writeBlocksDuration);
+                BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT,
 						executionTime, Utilities.convertToSeconds(timeOfERComparison));
 				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
 				blockingRunResults.add(blockingRR);

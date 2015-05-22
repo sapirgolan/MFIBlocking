@@ -107,6 +107,7 @@ public class BlockLogic implements iBlockLogic {
 
     private SearchEngine buildSearchEngineForRecords(MfiContext context) {
         String recordsPath = context.getOriginalRecordsPath();
+        logger.debug("about to index: " + recordsPath);
         SearchEngine searchEngine = new SearchEngine(new BlockInteraction());
         searchEngine.addRecords(recordsPath);
         return searchEngine;

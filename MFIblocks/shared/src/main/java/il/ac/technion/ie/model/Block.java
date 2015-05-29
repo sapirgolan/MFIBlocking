@@ -1,15 +1,19 @@
 package il.ac.technion.ie.model;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
  * Created by I062070 on 19/03/2015.
  */
 public class Block {
+    private static final String CREATE_BLOCK_PATTERN = "Create (%s:Block)";
+    private static final String CREATE_RECORD_PATTERN = "Create (%s: Record {id: %d})";
+    private static final String ADD_RECORD_PATTERN = "Create (%s) -[:IN {probability:%s}]->(%s)";
+    private static final String SET_REPRESENTATIVE_PATTERN = "Create (%s) -[:REPRESENTS]->(%s)";
+    private static final String RECORD_PATTERN = "record_%d";
+    private static final String BLOCK_PATTERN = "block_%s";
+
     private List<Integer> members;
     private float score;
     private Map<Integer, Float> membersScores;
@@ -44,7 +48,7 @@ public class Block {
             builder.append(membersProbability.get(member));
             builder.append(",");
         }
-        builder.deleteCharAt(builder.length() -1);
+        builder.deleteCharAt(builder.length() - 1);
         builder.append("}");
 
         builder.append(System.getProperty("line.separator"));
@@ -56,6 +60,35 @@ public class Block {
         builder.append(blockRepr.getKey());
 
         return builder.toString();
+    }
+
+    public StringBuilder toCypher(int blockId, Set<Integer> set) {
+        StringBuilder builder = new StringBuilder();
+        StringBuilder memberBuilder = new StringBuilder();
+
+        String blockName = String.format(BLOCK_PATTERN, blockId);
+
+        builder.append(String.format(CREATE_BLOCK_PATTERN, blockName));
+        builder.append(System.getProperty("line.separator"));
+        for (Integer member : members) {
+            String recordName = String.format(RECORD_PATTERN, member);
+            if (!set.contains(member)) {
+                builder.append(String.format(CREATE_RECORD_PATTERN, recordName, member));
+                builder.append(System.getProperty("line.separator"));
+                set.add(member);
+            }
+
+            memberBuilder.append(String.format(ADD_RECORD_PATTERN, recordName, this.getMemberProbability(member), blockName));
+            memberBuilder.append(System.getProperty("line.separator"));
+        }
+        //adds members creation statements to main builder
+        builder.append(memberBuilder.toString());
+
+        Entry<Integer, Float> blockRepresentative = this.findBlockRepresentative();
+        String recordName = String.format(RECORD_PATTERN, blockRepresentative.getKey());
+
+        builder.append(String.format(SET_REPRESENTATIVE_PATTERN, recordName, blockName));
+        return builder;
     }
 
     @Override

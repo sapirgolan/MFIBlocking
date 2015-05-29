@@ -233,6 +233,7 @@ public class BottomUp {
         iBlockService blockService = new BlockService();
         File blocksOutputFile = resultWriter.createBlocksOutputFile();
         List<Block> blocks = blockService.getBlocks(cps, context);
+        File cypherOutputFile = resultWriter.createCyphrtOutputFile();
 
         try {
             switch (context.getPrntFormat().toLowerCase()) {

@@ -31,10 +31,18 @@ public class ResultWriter {
 	}
 
     public File createBlocksOutputFile() {
+        return createUniqueOutputFile("/Blocks_", ".txt");
+    }
+
+    public File createCyphrtOutputFile() {
+        return createUniqueOutputFile("/CypherCommands_", ".txt");
+    }
+
+    private File createUniqueOutputFile(String filePath, String fileExtension) {
         Random randomGenerator = new Random();
         String randomId = String.valueOf(randomGenerator.nextInt(1000));
-        return generateOutputFile("/Blocks_" + randomId, ".txt");
-	}
+        return generateOutputFile(filePath + randomId, fileExtension);
+    }
 
     private File generateOutputFile(String fileName, String fileFormat) {
         DateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH_mm");
@@ -172,6 +180,20 @@ public class ResultWriter {
         }
         bufferedWriter.write("*****Finish Printing***");
         bufferedWriter.newLine();
+        bufferedWriter.close();
+    }
+
+    public void writeBlocksToCypher(File cyphrtOutputFile, List<Block> blocks) throws IOException {
+        FileWriter fileWriter = new FileWriter(cyphrtOutputFile.getAbsoluteFile());
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        int i = 0;
+        Set<Integer> set = new HashSet<Integer>();
+        for (Block block : blocks) {
+            bufferedWriter.append(block.toCypher(i, set));
+            bufferedWriter.newLine();
+            i++;
+        }
+        bufferedWriter.append(";");
         bufferedWriter.close();
     }
 }

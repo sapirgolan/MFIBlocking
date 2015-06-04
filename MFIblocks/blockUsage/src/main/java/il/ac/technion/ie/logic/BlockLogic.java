@@ -40,6 +40,18 @@ public class BlockLogic implements iBlockLogic {
         calcProbability(blocks, searchEngine);
     }
 
+    @Override
+    public final List<Block> findBlocksOfRecord(List<Block> allBlocks, int recordId) {
+        List<Block> containedBlocks = new ArrayList<>();
+        for (Block block : allBlocks) {
+            boolean doesContainMember = block.hasMember(recordId);
+            if (doesContainMember) {
+                containedBlocks.add(block);
+            }
+        }
+        return containedBlocks;
+    }
+
     private void calcProbability(List<Block> blocks, SearchEngine searchEngine) {
         SimilarityCalculator similarityCalculator = new SimilarityCalculator(new JaroWinkler());
         //iterate on each block

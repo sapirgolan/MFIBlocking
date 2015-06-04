@@ -1,5 +1,7 @@
 package il.ac.technion.ie.model;
 
+import org.apache.log4j.Logger;
+
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -13,6 +15,8 @@ public class Block {
     private static final String SET_REPRESENTATIVE_PATTERN = "Create (%s) -[:REPRESENTS]->(%s)";
     private static final String RECORD_PATTERN = "record_%d";
     private static final String BLOCK_PATTERN = "block_%s";
+
+    static final Logger logger = Logger.getLogger(Block.class);
 
     private List<Integer> members;
     private float score;
@@ -142,5 +146,17 @@ public class Block {
             }
         }
         return blockRepresentative;
+    }
+
+    public boolean hasMember(int recordId) {
+        List<Integer> members = this.getMembers();
+        for (Integer member : members) {
+            if (member == recordId) {
+                logger.debug("Found " + recordId + " in Block " + this.toString());
+                return true;
+            }
+        }
+                logger.debug("Didn't found " + recordId + " in Block" + this.toString());
+        return false;
     }
 }

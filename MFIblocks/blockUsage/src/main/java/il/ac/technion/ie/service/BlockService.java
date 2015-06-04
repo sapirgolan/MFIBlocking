@@ -1,7 +1,6 @@
 package il.ac.technion.ie.service;
 
 import il.ac.technion.ie.context.MfiContext;
-import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.logic.BlockLogic;
 import il.ac.technion.ie.logic.iBlockLogic;
 import il.ac.technion.ie.model.Block;
@@ -31,10 +30,7 @@ public class BlockService implements iBlockService {
     }
 
     @Override
-    public List<Integer> getBlocksOfRecord(CandidatePairs candidatePairs, int record) {
-        String message = String.format("The method %s of class %s it not implemented yet", "getBlocksOfRecord", this.getClass().getSimpleName());
-        NotImplementedYetException exception = new NotImplementedYetException(message);
-        logger.error(message, exception);
-        throw exception;
+    public List<Block> getBlocksOfRecord(List<Block> allBlocks, int record) {
+        return blockLogic.findBlocksOfRecord(allBlocks, record);
     }
 }

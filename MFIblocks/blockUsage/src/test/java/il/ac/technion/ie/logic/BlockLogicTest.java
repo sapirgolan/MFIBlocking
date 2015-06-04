@@ -177,4 +177,21 @@ public class BlockLogicTest {
 
         MatcherAssert.assertThat(recordProbability, Matchers.is(1.0F));
     }
+
+    @Test
+    public void testFindBlocksOfRecord() throws Exception {
+        int searchRecord = 1;
+        List<Block> blocks = new ArrayList<>();
+        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5)));
+        blocks.add(new Block(Arrays.asList(5, 1, 7)));
+        blocks.add(new Block(Arrays.asList(22, 29, 30)));
+        blocks.add(new Block(Arrays.asList(7, 9, 1)));
+
+        List<Block> blocksOfRecord = classUnderTest.findBlocksOfRecord(blocks, searchRecord);
+        List<Block> expectedBlocks = new ArrayList<>(blocks);
+        expectedBlocks.remove(2);
+
+        MatcherAssert.assertThat(blocksOfRecord, hasSize(3));
+        MatcherAssert.assertThat(blocksOfRecord, containsInAnyOrder(expectedBlocks.toArray()));
+    }
 }

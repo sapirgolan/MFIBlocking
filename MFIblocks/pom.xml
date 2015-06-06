@@ -24,6 +24,7 @@
         <module>blockUsage</module>
        <module>shared</module>
        <module>searchEngine</module>
+	   <module>measurements</module>
    </modules>
   
   <build>

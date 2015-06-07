@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.model.NeighborsVector;
 import il.ac.technion.ie.model.RecordMatches;
 import il.ac.technion.ie.search.core.SearchEngine;
@@ -121,7 +122,7 @@ public class BlockLogicTest {
                 "a. blum  m. furst  m. j. kearns  and richard j. lipton.",
                 "avrim blum  merrick furst  michael kearns  and richard j. lipton.");
 
-        List blockMembers = new ArrayList(Arrays.asList(1, 3, 2));
+        List<Integer> blockMembers = new ArrayList(Arrays.asList(1, 3, 2));
         recordsFileName = "dataset.csv";
         PowerMockito.when(context.getOriginalRecordsPath()).thenReturn(this.getRecordsFilePath());
         SearchEngine searchEngine = Whitebox.invokeMethod(classUnderTest, "buildSearchEngineForRecords", context);
@@ -179,6 +180,38 @@ public class BlockLogicTest {
     }
 
     @Test
+    public void testFindBlocks_fromTrueMatch() throws Exception {
+        List<Integer> recordsIDsBlockOne = Arrays.asList(1160, 1161, 1162, 1163, 1164);
+        CandidatePairs pairs = createBlock(recordsIDsBlockOne);
+
+        List<Integer> recordsIDsBlockTwo = Arrays.asList(460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472);
+        pairs.addAll(createBlock(recordsIDsBlockTwo));
+
+
+        List<Block> blocks = classUnderTest.findBlocks(pairs);
+
+        MatcherAssert.assertThat(blocks, hasSize(2));
+        MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
+        MatcherAssert.assertThat(blocks.get(1).getMembers(), containsInAnyOrder(recordsIDsBlockTwo.toArray()));
+
+    }
+
+    private CandidatePairs createBlock(List<Integer> recordsIDs) {
+        CandidatePairs candidatePairs = new CandidatePairs();
+        for (int i = 0; i < recordsIDs.size(); i++) {
+            Integer outer = recordsIDs.get(i);
+            for (int j = i; j < recordsIDs.size(); j++) {
+                Integer inner = recordsIDs.get(j);
+                if (outer != inner) {
+                    candidatePairs.setPair(outer, inner, 0);
+                }
+
+            }
+        }
+        return candidatePairs;
+    }
+
+	@Test
     public void testFindBlocksOfRecord() throws Exception {
         int searchRecord = 1;
         List<Block> blocks = new ArrayList<>();

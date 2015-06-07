@@ -232,8 +232,8 @@ public class BottomUp {
 		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
         iBlockService blockService = new BlockService();
         File blocksOutputFile = resultWriter.createBlocksOutputFile();
-        List<Block> blocks = blockService.getBlocks(cps, context);
-        File cypherOutputFile = resultWriter.createCyphrtOutputFile();
+        List<Block> blocks = blockService.getBlocks(cps);
+        blockService.calcProbOnBlocks(blocks, context);
 
         try {
             switch (context.getPrntFormat().toLowerCase()) {

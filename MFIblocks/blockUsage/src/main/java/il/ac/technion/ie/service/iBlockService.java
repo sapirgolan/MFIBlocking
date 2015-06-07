@@ -11,7 +11,9 @@ import java.util.List;
  * Created by I062070 on 13/03/2015.
  */
 public interface iBlockService {
-    List<Block> getBlocks(CandidatePairs candidatePairs, MfiContext context);
+    public List<Block> getBlocks(CandidatePairs candidatePairs);
+
+    public void calcProbOnBlocks(List<Block> list, MfiContext context);
 
     List<Block> getBlocksOfRecord(List<Block> allBlocks, int record);
 }

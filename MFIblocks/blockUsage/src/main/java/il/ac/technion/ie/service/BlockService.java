@@ -22,11 +22,16 @@ public class BlockService implements iBlockService {
         this.blockLogic = new BlockLogic();
     }
     @Override
-    public List<Block> getBlocks(CandidatePairs candidatePairs, MfiContext context) {
+    public List<Block> getBlocks(CandidatePairs candidatePairs) {
         List<Block> result = blockLogic.findBlocks(candidatePairs);
         logger.debug("Finished finding blocks from input");
-        blockLogic.calcProbabilityOnRecords(result, context);
         return result;
+    }
+
+    @Override
+    public void calcProbOnBlocks(List<Block> list, MfiContext context) {
+        blockLogic.calcProbabilityOnRecords(list, context);
+        logger.debug("Finished calculating probabilities on blocks");
     }
 
     @Override

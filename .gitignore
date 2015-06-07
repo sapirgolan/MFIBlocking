@@ -27,7 +27,6 @@ DS_weights.properties
 #Batch/jar files
 *.bat
 *.jar
-*.xml
 
 #Converter resources
 meta-blocking-converter/converter/*.csv

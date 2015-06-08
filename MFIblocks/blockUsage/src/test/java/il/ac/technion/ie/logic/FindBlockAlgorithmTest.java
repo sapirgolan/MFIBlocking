@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.rits.cloning.Cloner;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.NeighborsVector;
-import il.ac.technion.ie.model.NeighborsVectorsCompare;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +57,6 @@ public class FindBlockAlgorithmTest {
         for (int i = 0; i < 6; i++) {
 
             Collections.shuffle(list);
-            classUnderTest.sort(list, new NeighborsVectorsCompare());
             List<Block> blocks = classUnderTest.findBlocks(list);
 
             // create copy of trueBlocks

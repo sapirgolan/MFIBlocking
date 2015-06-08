@@ -2,34 +2,32 @@ package il.ac.technion.ie.logic;
 
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.NeighborsVector;
+import il.ac.technion.ie.model.NeighborsVectorsCompare;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by I062070 on 13/03/2015.
  */
 public class FindBlockAlgorithm implements iFindBlockAlgorithm{
 
-    private static final int TWO = 2;
     static final Logger logger = Logger.getLogger(FindBlockAlgorithm.class);
-
-
-    @Override
-    public <T> void sort(List<T> matches, Comparator comparator) {
-        Collections.sort(matches, comparator);
-        logger.debug("Finished sorting input of algorithm");
-    }
+    private static final int TWO = 2;
 
     @Override
     public <E extends NeighborsVector> List<Block> findBlocks(List<E> matches) {
+
+        SortedSet<E> matchesWithoutDuplicates = new TreeSet<>(new NeighborsVectorsCompare());
+        matchesWithoutDuplicates.addAll(matches);
+
         int largestBlockCreated = 0;
-        ArrayList<Integer> itemsSeen = new ArrayList<>();
+        List<Integer> itemsSeen = new ArrayList<>();
         List<Block> result = new ArrayList<>();
-        for (E match : matches) {
+        for (E match : matchesWithoutDuplicates) {
             if (isSingleOrDoubleBlock(match)) {
                 logger.trace("input block is of size <=2, " + match.toString());
                 largestBlockCreated = updateBlocks(itemsSeen, result, match, match.getNeighbors());

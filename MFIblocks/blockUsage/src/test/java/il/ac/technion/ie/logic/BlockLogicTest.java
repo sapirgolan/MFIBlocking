@@ -180,13 +180,12 @@ public class BlockLogicTest {
     }
 
     @Test
-    public void testFindBlocks_fromTrueMatch() throws Exception {
+    public void testFindBlocks_fromTrueMatch_TwoBlocks() throws Exception {
         List<Integer> recordsIDsBlockOne = Arrays.asList(1160, 1161, 1162, 1163, 1164);
         CandidatePairs pairs = createBlock(recordsIDsBlockOne);
 
         List<Integer> recordsIDsBlockTwo = Arrays.asList(460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472);
         pairs.addAll(createBlock(recordsIDsBlockTwo));
-
 
         List<Block> blocks = classUnderTest.findBlocks(pairs);
 
@@ -196,16 +195,31 @@ public class BlockLogicTest {
 
     }
 
+    @Test
+    public void testFindBlocks_fromTrueMatch_OneBlock() throws Exception {
+        List<Integer> recordsIDsBlockOne = Arrays.asList(180, 181);
+        CandidatePairs pairs = createBlock(recordsIDsBlockOne);
+        MatcherAssert.assertThat(pairs.getAllMatches().size(), is(2));
+
+        List<Block> blocks = classUnderTest.findBlocks(pairs);
+
+        MatcherAssert.assertThat(blocks, hasSize(1));
+        MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
+    }
+
+    /**
+     * The real algorithm creates two CandidatePairs for each pair.
+     * For the block that holds records 180 & 181 following pairs will be created {180,181} and {181,180}
+     * @param recordsIDs
+     * @return
+     */
     private CandidatePairs createBlock(List<Integer> recordsIDs) {
         CandidatePairs candidatePairs = new CandidatePairs();
         for (int i = 0; i < recordsIDs.size(); i++) {
             Integer outer = recordsIDs.get(i);
-            for (int j = i; j < recordsIDs.size(); j++) {
+            for (int j = 0; j < recordsIDs.size(); j++) {
                 Integer inner = recordsIDs.get(j);
-                if (outer != inner) {
-                    candidatePairs.setPair(outer, inner, 0);
-                }
-
+                candidatePairs.setPair(outer, inner, 0);
             }
         }
         return candidatePairs;

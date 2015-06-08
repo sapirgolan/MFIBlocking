@@ -1,7 +1,10 @@
 package il.ac.technion.ie.logic;
 
 import il.ac.technion.ie.context.MfiContext;
-import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.NeighborsVector;
+import il.ac.technion.ie.model.RecordMatches;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.BlockInteraction;
 import org.apache.log4j.Logger;
@@ -31,7 +34,6 @@ public class BlockLogic implements iBlockLogic {
 
         List<NeighborsVector> neighborsVectors = buildNeighborVectors(matches, recordsIds);
 
-        algorithm.sort(neighborsVectors, new NeighborsVectorsCompare());
         return algorithm.findBlocks(neighborsVectors);
     }
 

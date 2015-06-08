@@ -5,7 +5,8 @@ import java.text.DecimalFormat;
 
 public class BlockingRunResult {
 
-	double ngLimit;
+    private final NonBinaryResults nonBRs;
+    double ngLimit;
 	double minBlockingThreshold;
 	double actualUsedThreshold;		
 	double recall; //0
@@ -31,19 +32,24 @@ public class BlockingRunResult {
 		}
 	}
 	
-	public String[] getCoulmnsName() {
+	public static String[] getColumnsNames() {
 		return new String[] {"MaxNG", "minBlockingThresh", "usedThresh", 
-			"Recall (PC)", "Precision (PQ)", "F-measure", "RR", 
-			"Duplicates found", "#Duplicates in dataset", "Comparisons made",
-			"time to run", "ER calcilate Time"};
+			    "Recall (PC)", "Precision (PQ)", "F-measure", "RR",
+                "NBRecall Blocks", "NBPrecision Blocks",
+                "BRecall Blocks", "BPrecision Blocks",
+			    "Duplicates found", "#Duplicates in dataset", "Comparisons made",
+			    "time to run", "ER calcilate Time"};
 	}
 	
 	public Object[] getValues() {
 		return new Object[] {ngLimit, minBlockingThreshold, format(actualUsedThreshold),
 				format(recall), format(precision), format(f_measure), format(reductionRatio),
+                format(nonBRs.getNonBinaryRecall()),format(nonBRs.getNonBinaryPrecision()),
+                format(nonBRs.getBinaryRecall()),format(nonBRs.getBinaryPrecision()),
 				duplicatesFound, totalDuplicates, comparisonsMade, timeToRunInSec, timeOfERComparison};
 	}	
-	
+
+    @Deprecated
 	public double[] asArray(){
 		double[] retVal = new double[8];
 		retVal[0] = ngLimit;
@@ -70,10 +76,11 @@ public class BlockingRunResult {
 		this.reductionRatio = resultContext.getStatisticMeasuremnts().getReductionRatio();
 		this.totalDuplicates = resultContext.getStatisticMeasuremnts().getTotalDuplicates();
 		this.comparisonsMade = resultContext.getStatisticMeasuremnts().getComparisonsMade();
+        this.nonBRs = resultContext.getNonBinaryResults();
 	}
 	
 	public String toString(){
-		StringBuilder sb = new StringBuilder();			
+		StringBuilder sb = new StringBuilder();
 		sb.append(ngLimit).append("\t")
 		.append(String.format("%.3f", minBlockingThreshold)).append("\t")
 		.append(String.format("%.3f",actualUsedThreshold)).append("\t")

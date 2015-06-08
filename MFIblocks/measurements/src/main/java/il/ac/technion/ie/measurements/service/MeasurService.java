@@ -24,8 +24,14 @@ public class MeasurService implements iMeasurService {
     }
 
     @Override
-    public DoubleMatrix1D buildSimilarityVector(DoubleMatrix2D doubleMatrix2D) {
-        return measureLogic.buildSimilarityVectorFromMatrix(doubleMatrix2D);
+    public DoubleMatrix1D buildSimilarityVector(DoubleMatrix2D similarityMatrix) {
+        return measureLogic.buildSimilarityVectorFromMatrix(similarityMatrix);
+    }
+
+    @Override
+    public DoubleMatrix1D buildSimilarityVector(List<Block> blocks) {
+        DoubleMatrix2D similarityMatrix = this.buildMatrixFromBlocks(blocks);
+        return this.buildSimilarityVector(similarityMatrix);
     }
 
     @Override

@@ -149,7 +149,7 @@ public class BottomUp {
 
 		int recordsSize = RecordSet.size;
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
-		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
+		List<BlockingRunResult> blockingRunResults = new ArrayList<>();
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
 		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
@@ -169,20 +169,30 @@ public class BottomUp {
                 //obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
                 timer.startActionTimeMeassurment();
-                printNeighborsAndBlocks(algorithmObtainedPairs, context);
+
+                List<Block> algorithmBlocks = findBlocks(algorithmObtainedPairs, true);
+                printNeighborsAndBlocks(algorithmObtainedPairs, context, algorithmBlocks);
                 long writeBlocksDuration = timer.getActionTimeDuration();
 
                 timer.startActionTimeMeassurment();
                 TrueClusters trueClusters = new TrueClusters();
 				trueClusters.findClustersAssingments(context.getMatchFile());
 
-				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
+                List<Block> trueBlocks = findBlocks(trueClusters.getGroundTruthCandidatePairs(), false);
+
+                NonBinaryResults nonBinaryResults = new NonBinaryResults(algorithmBlocks, trueBlocks);
+                ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
+
 				StatisticMeasuremnts results = experimentResult.calculate();
                 long totalMaxRecallCalculationDuration = timer.getActionTimeDuration();
+
                 long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
                 double executionTime = calcExecutionTime(timer.getStartTime(), totalMaxRecallCalculationDuration, writeBlocksDuration);
-                BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT,
+
+                BlockingResultContext resultContext = new BlockingResultContext(results, nonBinaryResults,
+                        minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT,
 						executionTime, Utilities.convertToSeconds(timeOfERComparison));
+
 				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
 				blockingRunResults.add(blockingRR);
 				
@@ -191,7 +201,7 @@ public class BottomUp {
 			}
 		}
 			
-		if(blockingRunResults != null && blockingRunResults.size() > 0){
+		if(!blockingRunResults.isEmpty()){
 			printExperimentMeasurments(blockingRunResults);
 			String resultsString = writeBlockingRR(blockingRunResults);
 			System.out.println();
@@ -201,8 +211,23 @@ public class BottomUp {
 			System.out.println("Under current configuration, no clustering were achieved!!");
 		}		
 	}
-	
-	private static double calcExecutionTime(long start,
+
+    /**
+     *
+     * @param candidatePairs
+     * @param calcProbabilities - whether or not to calc probabilities on given CandidatePairs
+     * @return
+     */
+    private static List<Block> findBlocks(CandidatePairs candidatePairs, boolean calcProbabilities) {
+        iBlockService blockService = new BlockService();
+        List<Block> blocks = blockService.getBlocks(candidatePairs);
+        if (calcProbabilities) {
+            blockService.calcProbOnBlocks(blocks, context);
+        }
+        return blocks;
+    }
+
+    private static double calcExecutionTime(long start,
 			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
 		long totalRunTime = System.currentTimeMillis() - start;
 		totalRunTime = reduceIrrelevantTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
@@ -227,13 +252,11 @@ public class BottomUp {
 	 * the method write the blocking output to a file for later usage
 	 * @param cps
 	 */
-	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context) {
+	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context, List<Block> blocks) {
 		ResultWriter resultWriter = new ResultWriter();
 		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
-        iBlockService blockService = new BlockService();
+
         File blocksOutputFile = resultWriter.createBlocksOutputFile();
-        List<Block> blocks = blockService.getBlocks(cps);
-        blockService.calcProbOnBlocks(blocks, context);
 
         try {
             switch (context.getPrntFormat().toLowerCase()) {
@@ -256,8 +279,8 @@ public class BottomUp {
 
 	private static void printExperimentMeasurments( List<BlockingRunResult> blockingRunResults) {
 		String[] columnNames = {}; 
-		if (blockingRunResults.size()>0) {
-			columnNames = blockingRunResults.get(0).getCoulmnsName();
+		if (!blockingRunResults.isEmpty()) {
+			columnNames = BlockingRunResult.getColumnsNames();
 		}
 		Object[][] rows = new Object [blockingRunResults.size()][columnNames.length];
 		int index = 0;
@@ -493,5 +516,5 @@ public class BottomUp {
 		sb.append(Utilities.NEW_LINE).append(Utilities.NEW_LINE);
 		return sb.toString();
 	}
-	
+
 }

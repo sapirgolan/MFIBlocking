@@ -13,7 +13,9 @@ import java.util.List;
 public interface iMeasurService {
     DoubleMatrix2D buildMatrixFromBlocks(List<Block> blocks);
 
-    DoubleMatrix1D buildSimilarityVector(DoubleMatrix2D similarityVector);
+    DoubleMatrix1D buildSimilarityVector(DoubleMatrix2D similarityMatrix);
+
+    DoubleMatrix1D buildSimilarityVector(List<Block> blocks);
 
     double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch);
 

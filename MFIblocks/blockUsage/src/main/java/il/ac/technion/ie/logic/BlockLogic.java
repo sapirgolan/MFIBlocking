@@ -26,6 +26,7 @@ public class BlockLogic implements iBlockLogic {
     @Override
     public List<Block> findBlocks(CandidatePairs candidatePairs) {
         ConcurrentHashMap<Integer, RecordMatches> matches = candidatePairs.getAllMatches();
+        logger.debug(String.format("Obtained %d records of matching records", matches.size()));
         Set<Integer> recordsIds = matches.keySet();
 
         List<NeighborsVector> neighborsVectors = buildNeighborVectors(matches, recordsIds);

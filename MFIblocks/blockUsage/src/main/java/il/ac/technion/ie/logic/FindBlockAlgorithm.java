@@ -31,12 +31,12 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
         List<Block> result = new ArrayList<>();
         for (E match : matches) {
             if (isSingleOrDoubleBlock(match)) {
-                logger.debug("input block is of size <=2, " + match.toString());
+                logger.trace("input block is of size <=2, " + match.toString());
                 largestBlockCreated = updateBlocks(itemsSeen, result, match, match.getNeighbors());
             } else {
                 logger.debug("input block is of size  " + match.numberOfNeighbors() + match.toString());
                 List<Integer> neighbors = new ArrayList<>(match.getNeighbors());
-                logger.debug("Removing following items from Block since their origin block" +
+                logger.debug("Removing following items from Block since their origin block " +
                         "was already processed: " + itemsSeen.toString());
                 neighbors.removeAll(itemsSeen);
                 logger.debug("After removal block's size is " + neighbors.size());

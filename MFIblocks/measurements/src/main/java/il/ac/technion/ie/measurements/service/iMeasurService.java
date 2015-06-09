@@ -2,6 +2,7 @@ package il.ac.technion.ie.measurements.service;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
+import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
 import il.ac.technion.ie.model.Block;
 
@@ -17,11 +18,11 @@ public interface iMeasurService {
 
     DoubleMatrix1D buildSimilarityVector(List<Block> blocks);
 
-    double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch);
+    double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException;
 
-    double calcNonBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch);
+    double calcNonBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException;
 
-    double calcBinaryRecall(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher);
+    double calcBinaryRecall(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException;
 
-    double calcBinaryPrecision(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher);
+    double calcBinaryPrecision(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException;
 }

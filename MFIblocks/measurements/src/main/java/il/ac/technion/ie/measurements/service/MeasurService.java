@@ -2,6 +2,7 @@ package il.ac.technion.ie.measurements.service;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
+import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.logic.MeasurLogic;
 import il.ac.technion.ie.measurements.logic.iMeasureLogic;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
@@ -35,22 +36,22 @@ public class MeasurService implements iMeasurService {
     }
 
     @Override
-    public double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+    public double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException {
         return measureLogic.calcNonBinaryRecall(results, trueMatch);
     }
 
     @Override
-    public double calcNonBinaryPrecision(final DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+    public double calcNonBinaryPrecision(final DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException {
         return measureLogic.calcNonBinaryPrecision(results, trueMatch);
     }
 
     @Override
-    public double calcBinaryRecall(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) {
+    public double calcBinaryRecall(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException {
         return measureLogic.calcBinaryRecall(results, trueMatch, matcher);
     }
 
     @Override
-    public double calcBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) {
+    public double calcBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException {
         return  measureLogic.calcBinaryPrecision(results, trueMatch, matcher);
     }
 }

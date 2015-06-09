@@ -2,6 +2,7 @@ package il.ac.technion.ie.measurements.matchers;
 
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.SparseDoubleMatrix1D;
+import il.ac.technion.ie.exception.MatrixSizeException;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -14,10 +15,17 @@ public class MaxMatcher extends AbstractMatcher {
     private static final Logger logger = Logger.getLogger(MaxMatcher.class);
 
     @Override
-    public DoubleMatrix1D match(DoubleMatrix1D matrix1D) {
+    public DoubleMatrix1D match(DoubleMatrix1D matrix1D) throws MatrixSizeException {
         SparseDoubleMatrix1D matchedMatrix = new SparseDoubleMatrix1D(matrix1D.size());
-        int windowSize = getWindowSize(matrix1D);
-        for (int startigIndex = 0; startigIndex < matrix1D.size(); startigIndex+=windowSize) {
+        int windowSize;
+        try {
+            windowSize = getWindowSize(matrix1D);
+        } catch (MatrixSizeException e) {
+            logger.error(String.format("Similarity Vector has %d cells. It cannot be generated from NxN matrix",
+                    matrix1D.size()), e);
+            throw e;
+        }
+        for (int startigIndex = 0; startigIndex < matrix1D.size(); startigIndex += windowSize) {
             DoubleMatrix1D row = matrix1D.viewPart(startigIndex, windowSize);
             Map.Entry<Double, Integer> maxScoreEntry = getMaxEntryInRow(windowSize, startigIndex, row);
             matchedMatrix.setQuick(maxScoreEntry.getValue(), maxScoreEntry.getKey());

@@ -4,6 +4,7 @@ import cern.colt.matrix.DoubleFactory1D;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
+import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.service.BlockService;
@@ -52,21 +53,23 @@ public class MeasurLogic implements iMeasureLogic {
     }
 
     @Override
-    public double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+    public double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException {
+        verifyVectorsSize(results, trueMatch);
         double product = results.zDotProduct(trueMatch);
         double manhattanL1Norm = trueMatch.zSum();
         return (product / manhattanL1Norm);
     }
 
     @Override
-    public double calcNonBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+    public double calcNonBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException {
+        verifyVectorsSize(results, trueMatch);
         double product = results.zDotProduct(trueMatch);
         double manhattanL1Norm = results.zSum();
         return (product / manhattanL1Norm);
     }
 
     @Override
-    public double calcBinaryRecall(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) {
+    public double calcBinaryRecall(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException {
         DoubleMatrix1D matchedResults = matcher.match(results);
         logger.debug(String.format("Matched similarity vector %s and obtained %s", results, matchedResults));
         logger.info("Finished matching process by Matcher, calling this.calcNonBinaryRecall");
@@ -74,7 +77,7 @@ public class MeasurLogic implements iMeasureLogic {
     }
 
     @Override
-    public double calcBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) {
+    public double calcBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException {
         DoubleMatrix1D matchedResults = matcher.match(results);
         logger.debug(String.format("Matched similarity vector %s and obtained %s", results, matchedResults));
         logger.info("Finished matching process by Matcher, calling this.calcNonBinaryPrecision");
@@ -109,6 +112,13 @@ public class MeasurLogic implements iMeasureLogic {
 
     private int getMatrixPosFromRecordID(int recordID) {
         return (recordID - 1);
+    }
+
+    private void verifyVectorsSize(DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException {
+        if (results.size() != trueMatch.size()) {
+            throw new MatrixSizeException(
+                    String.format("Alg results size: %d; TrueMatch Size: %d", results.size(), trueMatch.size()));
+        }
     }
 
 

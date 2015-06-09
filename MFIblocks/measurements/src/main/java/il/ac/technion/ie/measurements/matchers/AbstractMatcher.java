@@ -19,16 +19,13 @@ public abstract class AbstractMatcher {
      * @param matrix1D
      * @return matrix1D
      */
-    public abstract DoubleMatrix1D match(DoubleMatrix1D matrix1D);
+    public abstract DoubleMatrix1D match(DoubleMatrix1D matrix1D) throws MatrixSizeException;
 
-    protected int getWindowSize(DoubleMatrix1D matrix1D) {
+    protected int getWindowSize(DoubleMatrix1D matrix1D) throws MatrixSizeException {
         double windowSizeDouble = Math.sqrt(matrix1D.size());
         int windowSize = (int) windowSizeDouble;
         if (windowSizeDouble - (double) windowSize > 0.000001) {
-            MatrixSizeException exception = new MatrixSizeException("Matrix size is not square");
-            logger.error(String.format("Similarity Vector has %d cells. It cannot be generated from NxN matrix",
-                    matrix1D.size()), exception);
-            throw exception;
+            throw new MatrixSizeException("Matrix size is not square");
         }
         return windowSize;
     }

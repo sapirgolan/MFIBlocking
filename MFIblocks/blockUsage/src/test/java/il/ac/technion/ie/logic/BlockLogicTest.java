@@ -207,6 +207,28 @@ public class BlockLogicTest {
         MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
     }
 
+
+    @Test
+    public void testFindBlocks_fromTrueMatch_severalBlocks_sameSize() throws Exception {
+        List<Integer> recordsIDsBlockOne = Arrays.asList(180, 181);
+        List<Integer> recordsIDsBlockTwo = Arrays.asList(267, 268);
+        List<Integer> recordsIDsBlockThree = Arrays.asList(401, 402);
+        List<Integer> recordsIDsBlockFour = Arrays.asList(458, 459);
+
+        CandidatePairs pairs = createBlock(recordsIDsBlockOne);
+        pairs.addAll(createBlock(recordsIDsBlockTwo));
+        pairs.addAll(createBlock(recordsIDsBlockThree));
+        pairs.addAll(createBlock(recordsIDsBlockFour));
+
+        List<Block> blocks = classUnderTest.findBlocks(pairs);
+
+        MatcherAssert.assertThat(blocks, hasSize(4));
+        MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
+        MatcherAssert.assertThat(blocks.get(1).getMembers(), containsInAnyOrder(recordsIDsBlockTwo.toArray()));
+        MatcherAssert.assertThat(blocks.get(2).getMembers(), containsInAnyOrder(recordsIDsBlockThree.toArray()));
+        MatcherAssert.assertThat(blocks.get(3).getMembers(), containsInAnyOrder(recordsIDsBlockFour.toArray()));
+    }
+
     /**
      * The real algorithm creates two CandidatePairs for each pair.
      * For the block that holds records 180 & 181 following pairs will be created {180,181} and {181,180}

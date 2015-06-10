@@ -27,14 +27,16 @@ public class BlockLogic implements iBlockLogic {
     }
 
     @Override
-    public List<Block> findBlocks(CandidatePairs candidatePairs) {
+    public List<Block> findBlocks(CandidatePairs candidatePairs, int recordsSize) {
         ConcurrentHashMap<Integer, RecordMatches> matches = candidatePairs.getAllMatches();
         logger.debug(String.format("Obtained %d records of matching records", matches.size()));
         Set<Integer> recordsIds = matches.keySet();
 
         List<NeighborsVector> neighborsVectors = buildNeighborVectors(matches, recordsIds);
 
-        return algorithm.findBlocks(neighborsVectors);
+        List<Block> blocks = algorithm.findBlocks(neighborsVectors);
+        this.addMissingRecords(blocks, recordsSize);
+        return blocks;
     }
 
     @Override
@@ -53,6 +55,40 @@ public class BlockLogic implements iBlockLogic {
             }
         }
         return containedBlocks;
+    }
+
+    private void addMissingRecords(List<Block> blocks, int recordsSize) {
+        List<Integer> itemsNotDiscovered = findMissingRecordsFromBlocks(blocks, recordsSize);
+        List<Block> missingItemsBlocks = createBlocksForMissingRecords(itemsNotDiscovered);
+        blocks.addAll(missingItemsBlocks);
+    }
+
+    private List<Block> createBlocksForMissingRecords(List<Integer> itemsNotDiscovered) {
+        List<Block> singletontesBlocks = new ArrayList<>();
+        for (Integer recordId : itemsNotDiscovered) {
+            singletontesBlocks.add(new Block(new ArrayList<>(Arrays.asList(recordId))));
+        }
+        return singletontesBlocks;
+    }
+
+    private List<Integer> findMissingRecordsFromBlocks(List<Block> blocks, int recordsSize) {
+        BitSet bitSet = new BitSet(recordsSize);
+        for (Block block : blocks) {
+            List<Integer> members = block.getMembers();
+            for (Integer member : members) {
+                bitSet.set(member - 1);
+            }
+        }
+        List<Integer> itemsNotDiscovered = new ArrayList<>();
+
+        bitSet.flip(0, recordsSize);
+        for (int i = bitSet.nextSetBit(0); i >= 0; i = bitSet.nextSetBit(i + 1)) {
+            itemsNotDiscovered.add(i + 1);
+        }
+        if (itemsNotDiscovered.size() < recordsSize) {
+            logger.info("Following records are missing from blocks: " + itemsNotDiscovered.toString() + ". They will be added as single blocks each");
+        }
+        return itemsNotDiscovered;
     }
 
     private void calcProbability(List<Block> blocks, SearchEngine searchEngine) {

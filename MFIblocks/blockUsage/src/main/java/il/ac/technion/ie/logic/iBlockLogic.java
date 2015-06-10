@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface iBlockLogic {
 
-    List<Block> findBlocks(CandidatePairs candidatePairs);
+    List<Block> findBlocks(CandidatePairs candidatePairs, int recordsSize);
 
     void calcProbabilityOnRecords(final List<Block> result, MfiContext context);
 

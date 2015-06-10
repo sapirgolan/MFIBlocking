@@ -22,8 +22,8 @@ public class BlockService implements iBlockService {
         this.blockLogic = new BlockLogic();
     }
     @Override
-    public List<Block> getBlocks(CandidatePairs candidatePairs) {
-        List<Block> result = blockLogic.findBlocks(candidatePairs);
+    public List<Block> getBlocks(CandidatePairs candidatePairs, int recordsSize) {
+        List<Block> result = blockLogic.findBlocks(candidatePairs, recordsSize);
         logger.debug("Finished finding blocks from input");
         return result;
     }

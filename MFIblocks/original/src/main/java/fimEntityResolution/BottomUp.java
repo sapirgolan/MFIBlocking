@@ -170,7 +170,7 @@ public class BottomUp {
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
                 timer.startActionTimeMeassurment();
 
-                List<Block> algorithmBlocks = findBlocks(algorithmObtainedPairs, true);
+                List<Block> algorithmBlocks = findBlocks(algorithmObtainedPairs, true, recordsSize);
                 printNeighborsAndBlocks(algorithmObtainedPairs, context, algorithmBlocks);
                 long writeBlocksDuration = timer.getActionTimeDuration();
 
@@ -178,7 +178,7 @@ public class BottomUp {
                 TrueClusters trueClusters = new TrueClusters();
 				trueClusters.findClustersAssingments(context.getMatchFile());
 
-                List<Block> trueBlocks = findBlocks(trueClusters.getGroundTruthCandidatePairs(), false);
+                List<Block> trueBlocks = findBlocks(trueClusters.getGroundTruthCandidatePairs(), false, recordsSize);
 
                 NonBinaryResults nonBinaryResults = new NonBinaryResults(algorithmBlocks, trueBlocks);
                 ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
@@ -216,11 +216,12 @@ public class BottomUp {
      *
      * @param candidatePairs
      * @param calcProbabilities - whether or not to calc probabilities on given CandidatePairs
+     * @param recordsSize
      * @return
      */
-    private static List<Block> findBlocks(CandidatePairs candidatePairs, boolean calcProbabilities) {
+    private static List<Block> findBlocks(CandidatePairs candidatePairs, boolean calcProbabilities, int recordsSize) {
         iBlockService blockService = new BlockService();
-        List<Block> blocks = blockService.getBlocks(candidatePairs);
+        List<Block> blocks = blockService.getBlocks(candidatePairs, recordsSize);
         if (calcProbabilities) {
             blockService.calcProbOnBlocks(blocks, context);
         }

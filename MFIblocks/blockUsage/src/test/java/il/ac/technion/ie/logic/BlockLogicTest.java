@@ -181,13 +181,13 @@ public class BlockLogicTest {
 
     @Test
     public void testFindBlocks_fromTrueMatch_TwoBlocks() throws Exception {
-        List<Integer> recordsIDsBlockOne = Arrays.asList(1160, 1161, 1162, 1163, 1164);
+        List<Integer> recordsIDsBlockOne = Arrays.asList(1, 2, 3, 4, 5);
         CandidatePairs pairs = createBlock(recordsIDsBlockOne);
 
-        List<Integer> recordsIDsBlockTwo = Arrays.asList(460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472);
+        List<Integer> recordsIDsBlockTwo = Arrays.asList(6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
         pairs.addAll(createBlock(recordsIDsBlockTwo));
 
-        List<Block> blocks = classUnderTest.findBlocks(pairs);
+        List<Block> blocks = classUnderTest.findBlocks(pairs, 18);
 
         MatcherAssert.assertThat(blocks, hasSize(2));
         MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
@@ -197,11 +197,11 @@ public class BlockLogicTest {
 
     @Test
     public void testFindBlocks_fromTrueMatch_OneBlock() throws Exception {
-        List<Integer> recordsIDsBlockOne = Arrays.asList(180, 181);
+        List<Integer> recordsIDsBlockOne = Arrays.asList(1, 2);
         CandidatePairs pairs = createBlock(recordsIDsBlockOne);
         MatcherAssert.assertThat(pairs.getAllMatches().size(), is(2));
 
-        List<Block> blocks = classUnderTest.findBlocks(pairs);
+        List<Block> blocks = classUnderTest.findBlocks(pairs, 2);
 
         MatcherAssert.assertThat(blocks, hasSize(1));
         MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
@@ -210,17 +210,17 @@ public class BlockLogicTest {
 
     @Test
     public void testFindBlocks_fromTrueMatch_severalBlocks_sameSize() throws Exception {
-        List<Integer> recordsIDsBlockOne = Arrays.asList(180, 181);
-        List<Integer> recordsIDsBlockTwo = Arrays.asList(267, 268);
-        List<Integer> recordsIDsBlockThree = Arrays.asList(401, 402);
-        List<Integer> recordsIDsBlockFour = Arrays.asList(458, 459);
+        List<Integer> recordsIDsBlockOne = Arrays.asList(1, 2);
+        List<Integer> recordsIDsBlockTwo = Arrays.asList(3, 4);
+        List<Integer> recordsIDsBlockThree = Arrays.asList(5, 6);
+        List<Integer> recordsIDsBlockFour = Arrays.asList(7, 8);
 
         CandidatePairs pairs = createBlock(recordsIDsBlockOne);
         pairs.addAll(createBlock(recordsIDsBlockTwo));
         pairs.addAll(createBlock(recordsIDsBlockThree));
         pairs.addAll(createBlock(recordsIDsBlockFour));
 
-        List<Block> blocks = classUnderTest.findBlocks(pairs);
+        List<Block> blocks = classUnderTest.findBlocks(pairs, 8);
 
         MatcherAssert.assertThat(blocks, hasSize(4));
         MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
@@ -262,5 +262,72 @@ public class BlockLogicTest {
 
         MatcherAssert.assertThat(blocksOfRecord, hasSize(3));
         MatcherAssert.assertThat(blocksOfRecord, containsInAnyOrder(expectedBlocks.toArray()));
+    }
+
+    @Test
+    public void testFindMissingRecordsFromBlocks_inBetween() throws Exception {
+        List<Block> blocks = new ArrayList<>();
+        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5)));
+        blocks.add(new Block(Arrays.asList(5, 7)));
+
+        List<Integer> missingRecords = Whitebox.invokeMethod(classUnderTest, "findMissingRecordsFromBlocks", blocks, 7);
+        MatcherAssert.assertThat(missingRecords, contains(6));
+    }
+
+    @Test
+    public void testFindMissingRecordsFromBlocks_none() throws Exception {
+        List<Block> blocks = new ArrayList<>();
+        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5)));
+        blocks.add(new Block(Arrays.asList(5, 6)));
+
+        List<Integer> missingRecords = Whitebox.invokeMethod(classUnderTest, "findMissingRecordsFromBlocks", blocks, 6);
+        MatcherAssert.assertThat(missingRecords, is(empty()));
+    }
+
+    @Test
+    public void testFindMissingRecordsFromBlocks_several() throws Exception {
+        List<Block> blocks = new ArrayList<>();
+        blocks.add(new Block(Arrays.asList(2, 4, 3, 5)));
+        blocks.add(new Block(Arrays.asList(5, 6)));
+        blocks.add(new Block(Arrays.asList(3, 8)));
+
+        List<Integer> missingRecords = Whitebox.invokeMethod(classUnderTest, "findMissingRecordsFromBlocks", blocks, 10);
+        MatcherAssert.assertThat(missingRecords, contains(1, 7, 9, 10));
+    }
+
+    @Test
+    public void testCreateBlocksForMissingRecords() throws Exception {
+        List<Integer> integers = Arrays.asList(8, 11, 12, 20);
+        List<Block> singletoneBlocks = Whitebox.invokeMethod(classUnderTest, "createBlocksForMissingRecords", integers);
+        MatcherAssert.assertThat(singletoneBlocks.size(), is(4));
+        MatcherAssert.assertThat(singletoneBlocks, containsInAnyOrder(
+                new Block(Arrays.asList(8)),
+                new Block(Arrays.asList(11)),
+                new Block(Arrays.asList(12)),
+                new Block(Arrays.asList(20))
+        ));
+    }
+
+    @Test
+    public void testFindBlocks_integration() throws Exception {
+        List<Integer> recordsIDsBlockOne = new ArrayList<>(Arrays.asList(3, 2));
+        List<Integer> recordsIDsBlockTwo = new ArrayList<>(Arrays.asList(5, 6));
+
+        CandidatePairs pairs = createBlock(recordsIDsBlockOne);
+        pairs.addAll(createBlock(recordsIDsBlockTwo));
+
+        List<Block> blocks = classUnderTest.findBlocks(pairs, 8);
+
+        MatcherAssert.assertThat(blocks, hasSize(6));
+        MatcherAssert.assertThat(blocks.get(0).getMembers(), containsInAnyOrder(recordsIDsBlockOne.toArray()));
+        MatcherAssert.assertThat(blocks.get(1).getMembers(), containsInAnyOrder(recordsIDsBlockTwo.toArray()));
+
+        for (int recordId = 1; recordId <= 8; recordId++) {
+            if (!recordsIDsBlockOne.contains(recordId) && !recordsIDsBlockTwo.contains(recordId)) {
+                List<Block> blocksOfRecord = classUnderTest.findBlocksOfRecord(blocks, recordId);
+                MatcherAssert.assertThat(blocksOfRecord, allOf(hasSize(1)));
+                MatcherAssert.assertThat(blocksOfRecord, contains(new Block(Arrays.asList(recordId))));
+            }
+        }
     }
 }

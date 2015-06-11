@@ -16,4 +16,6 @@ public interface iBlockService {
     public void calcProbOnBlocks(List<Block> list, MfiContext context);
 
     List<Block> getBlocksOfRecord(List<Block> allBlocks, int record);
+
+    void setTrueMatch(List<Block> blocks);
 }

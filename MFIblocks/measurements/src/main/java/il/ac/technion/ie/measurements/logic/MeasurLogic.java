@@ -44,11 +44,13 @@ public class MeasurLogic implements iMeasureLogic {
     @Override
     public DoubleMatrix1D buildSimilarityVectorFromMatrix(DoubleMatrix2D matrix2D) {
         List<DoubleMatrix1D> list = new ArrayList<>();
+        logger.info("Before creation of matrix there were " + matrix2D.cardinality() + " non Zeros elements");
         for (int rowIndex = 0; rowIndex < matrix2D.rows(); rowIndex++) {
             list.add(matrix2D.viewRow(rowIndex));
         }
         DoubleMatrix1D matrix1D = sparseFactory.make(list.toArray(new DoubleMatrix1D[list.size()]));
-        logger.debug(String.format("bailed a Similarity Vector with %d cells", matrix1D.size()));
+        logger.info("After creation of matrix there are " + matrix1D.cardinality() + " non Zeros elements");
+        logger.debug(String.format("build a Similarity Vector with %d cells", matrix1D.size()));
         return matrix1D;
     }
 
@@ -85,15 +87,15 @@ public class MeasurLogic implements iMeasureLogic {
     }
 
     private void updateScoreInMatrix(DoubleMatrix2D matrix, int recordId, Block block) {
-        float score = block.getMemberScore(recordId);
+        float probability = block.getMemberProbability(recordId);
         int rawIndex = getMatrixPosFromRecordID(recordId);
         for (Integer member : block.getMembers()) {
             if (member != recordId) {
                 int colIndex = getMatrixPosFromRecordID(member);
-                double posScore = score + matrix.getQuick(rawIndex, colIndex);
-                logger.debug(String.format("Increasing score at pos (%d,%d) from by %s to %s",
-                        rawIndex, colIndex, score, posScore));
-                matrix.setQuick(rawIndex, colIndex, posScore);
+                double posProbability = probability + matrix.getQuick(rawIndex, colIndex);
+                logger.debug(String.format("Increasing probability at pos (%d,%d) from by %s to %s",
+                        rawIndex, colIndex, probability, posProbability));
+                matrix.setQuick(rawIndex, colIndex, posProbability);
             }
         }
     }

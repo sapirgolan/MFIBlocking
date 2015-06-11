@@ -38,4 +38,9 @@ public class BlockService implements iBlockService {
     public List<Block> getBlocksOfRecord(List<Block> allBlocks, int record) {
         return blockLogic.findBlocksOfRecord(allBlocks, record);
     }
+
+    @Override
+    public void setTrueMatch(List<Block> blocks) {
+        blockLogic.setRecordsInBlocksAsTrueMatch(blocks);
+    }
 }

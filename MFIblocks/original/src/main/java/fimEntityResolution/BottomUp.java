@@ -215,15 +215,17 @@ public class BottomUp {
     /**
      *
      * @param candidatePairs
-     * @param calcProbabilities - whether or not to calc probabilities on given CandidatePairs
+     * @param isAlgorithmResults - whether or not to calc probabilities on given CandidatePairs
      * @param recordsSize
      * @return
      */
-    private static List<Block> findBlocks(CandidatePairs candidatePairs, boolean calcProbabilities, int recordsSize) {
+    private static List<Block> findBlocks(CandidatePairs candidatePairs, boolean isAlgorithmResults, int recordsSize) {
         iBlockService blockService = new BlockService();
         List<Block> blocks = blockService.getBlocks(candidatePairs, recordsSize);
-        if (calcProbabilities) {
+        if (isAlgorithmResults) {
             blockService.calcProbOnBlocks(blocks, context);
+        } else {
+            blockService.setTrueMatch(blocks);
         }
         return blocks;
     }

@@ -57,6 +57,15 @@ public class BlockLogic implements iBlockLogic {
         return containedBlocks;
     }
 
+    @Override
+    public void setRecordsInBlocksAsTrueMatch(List<Block> blocks) {
+        for (Block block : blocks) {
+            for (Integer member : block.getMembers()) {
+                block.setMemberProbability(member, 1);
+            }
+        }
+    }
+
     private void addMissingRecords(List<Block> blocks, int recordsSize) {
         List<Integer> itemsNotDiscovered = findMissingRecordsFromBlocks(blocks, recordsSize);
         List<Block> missingItemsBlocks = createBlocksForMissingRecords(itemsNotDiscovered);

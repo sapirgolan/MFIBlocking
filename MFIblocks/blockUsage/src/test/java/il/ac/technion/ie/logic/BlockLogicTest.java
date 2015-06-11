@@ -330,4 +330,22 @@ public class BlockLogicTest {
             }
         }
     }
+
+    @Test
+    public void testSetRecordsInBlocksAsTrueMatch() throws Exception {
+        List<Block> blocks = new ArrayList<>();
+        blocks.add(new Block(Arrays.asList(2, 4, 3, 5)));
+        blocks.add(new Block(Arrays.asList(5, 6)));
+        blocks.add(new Block(Arrays.asList(3, 8)));
+
+        classUnderTest.setRecordsInBlocksAsTrueMatch(blocks);
+
+        for (Block block : blocks) {
+            for (Integer memberId : block.getMembers()) {
+                MatcherAssert.assertThat((double) block.getMemberProbability(memberId), closeTo(1.0, 0.00001));
+            }
+        }
+
+    }
 }
+

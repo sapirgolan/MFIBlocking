@@ -46,7 +46,8 @@ public class MeasurLogicTest {
         int recordId = 19;
         Block block = PowerMockito.mock(Block.class);
         PowerMockito.when(block.getMembers()).thenReturn(members);
-        PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 0.456);
+        PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 888);
+        PowerMockito.when(block.getMemberProbability(Mockito.eq(recordId))).thenReturn((float) 0.456);
 
         Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block);
 
@@ -66,7 +67,8 @@ public class MeasurLogicTest {
         int recordId = 19;
         Block block = PowerMockito.mock(Block.class);
         PowerMockito.when(block.getMembers()).thenReturn(members);
-        PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 0.456);
+        PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 0.999);
+        PowerMockito.when(block.getMemberProbability(Mockito.eq(recordId))).thenReturn((float) 0.456);
 
         Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block);
         for (int someMember = 1; someMember <= 100; someMember++) {
@@ -85,7 +87,8 @@ public class MeasurLogicTest {
         List<Integer> members = Arrays.asList(4, 8, 19, 5, 27);
         Block block = PowerMockito.mock(Block.class);
         PowerMockito.when(block.getMembers()).thenReturn(members);
-        PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 0.32);
+        PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 0.92);
+        PowerMockito.when(block.getMemberProbability(Mockito.eq(recordId))).thenReturn((float) 0.32);
 
         Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block);
         members = Arrays.asList(19, 5, 27);

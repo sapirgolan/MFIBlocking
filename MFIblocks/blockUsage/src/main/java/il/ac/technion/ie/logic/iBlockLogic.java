@@ -17,4 +17,6 @@ public interface iBlockLogic {
     void calcProbabilityOnRecords(final List<Block> result, MfiContext context);
 
     List<Block> findBlocksOfRecord(List<Block> allBlocks, int recordId);
+
+    void setRecordsInBlocksAsTrueMatch(List<Block> blocks);
 }

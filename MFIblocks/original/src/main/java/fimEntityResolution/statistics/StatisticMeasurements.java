@@ -7,9 +7,9 @@ package fimEntityResolution.statistics;
  * @author XPS_Sapir
  *
  */
-public class StatisticMeasuremnts {
-	
-	private double recall;
+public class StatisticMeasurements {
+
+    private double recall;
 	private double precision;
 	private double fMeasure;
 	private double reductionRatio;
@@ -17,8 +17,8 @@ public class StatisticMeasuremnts {
 	private double totalDuplicates;
 	private double comparisonsMade;
 
-	public StatisticMeasuremnts() {
-		recall = 0;
+    public StatisticMeasurements() {
+        recall = 0;
 		precision = 0;
 		fMeasure = 0;
 		reductionRatio = 0;
@@ -42,10 +42,6 @@ public class StatisticMeasuremnts {
 		this.precision = precision;
 	}
 
-	public void setFMeasure(double fmeasure) {
-		this.fMeasure = fmeasure;
-	}
-
 	public void setRR(double reductionRatio) {
 		this.reductionRatio = reductionRatio;
 	}
@@ -62,6 +58,10 @@ public class StatisticMeasuremnts {
 		return fMeasure;
 	}
 
+    public void setFMeasure(double fmeasure) {
+        this.fMeasure = fmeasure;
+    }
+
 	public double getReductionRatio() {
 		return reductionRatio;
 	}
@@ -70,20 +70,20 @@ public class StatisticMeasuremnts {
 		this.reductionRatio = reductionRatio;
 	}
 
-	public void setTotalDuplicates(double totalDuplicates) {
-		this.totalDuplicates = totalDuplicates;
-	}
-
 	public double getTotalDuplicates() {
 		return totalDuplicates;
 	}
 
-	public void setComparisonsMade(double comparisonsMade) {
-		this.comparisonsMade = comparisonsMade;
-	}
+    public void setTotalDuplicates(double totalDuplicates) {
+        this.totalDuplicates = totalDuplicates;
+    }
 
 	public double getComparisonsMade() {
 		return comparisonsMade;
-	}
+    }
+
+    public void setComparisonsMade(double comparisonsMade) {
+        this.comparisonsMade = comparisonsMade;
+    }
 
 }

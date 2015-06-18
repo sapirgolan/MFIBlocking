@@ -24,9 +24,9 @@ public class ExperimentResult {
 		this.algorithmAssignment = resultMatrix;
 		this.numOfRecords = numOfRecords;
 	}
-	
-	public StatisticMeasuremnts calculate() {
-		long start = System.currentTimeMillis();
+
+    public StatisticMeasurements calculate() {
+        long start = System.currentTimeMillis();
 		
 		this.calcTPFT();
 		
@@ -44,21 +44,21 @@ public class ExperimentResult {
 		
 		System.out.println("TP = " + truePositive +", FP= " + falsePositive + ", FN="+ falseNegative  + " totalComparisons= " + totalComparisonsAvailable);
 		System.out.println("recall = " + recall +", precision= " + precision + ", f-measure="+ fMeasure + " RR= " + reductionRatio);
-		
-		StatisticMeasuremnts statisticMeasuremnts = new StatisticMeasuremnts();
-		statisticMeasuremnts.setRecall(recall);
-		statisticMeasuremnts.setPrecision(precision);
-		statisticMeasuremnts.setFMeasure(fMeasure);
-		statisticMeasuremnts.setRR(reductionRatio);
-		
-		statisticMeasuremnts.setDuplicatesFound(duplicatesFound);
-		statisticMeasuremnts.setTotalDuplicates(totalDuplicates);
-		statisticMeasuremnts.setComparisonsMade(comparisonsMade);
-		
-		System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
-		
-		return statisticMeasuremnts;
-	}
+
+        StatisticMeasurements statisticMeasurements = new StatisticMeasurements();
+        statisticMeasurements.setRecall(recall);
+        statisticMeasurements.setPrecision(precision);
+        statisticMeasurements.setFMeasure(fMeasure);
+        statisticMeasurements.setRR(reductionRatio);
+
+        statisticMeasurements.setDuplicatesFound(duplicatesFound);
+        statisticMeasurements.setTotalDuplicates(totalDuplicates);
+        statisticMeasurements.setComparisonsMade(comparisonsMade);
+
+        System.out.println("time to calculateFinalResults: " + Double.toString((double)(System.currentTimeMillis()-start)/1000.0));
+
+        return statisticMeasurements;
+    }
 	
 	private void calcTPFT () {
 		long[] TPFP = groundTruth.getGroundTruthCandidatePairs().calcTrueAndFalsePositives( algorithmAssignment );

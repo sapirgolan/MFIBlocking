@@ -183,7 +183,7 @@ public class BottomUp {
                 NonBinaryResults nonBinaryResults = new NonBinaryResults(algorithmBlocks, trueBlocks);
                 ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
 
-				StatisticMeasuremnts results = experimentResult.calculate();
+                StatisticMeasurements results = experimentResult.calculate();
                 long totalMaxRecallCalculationDuration = timer.getActionTimeDuration();
 
                 long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);

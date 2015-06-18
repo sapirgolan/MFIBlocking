@@ -2,19 +2,19 @@ package fimEntityResolution.statistics;
 
 public class BlockingResultContext {
 
-	private StatisticMeasuremnts statisticMeasuremnts;
-	private double minBlockingThreshold;
+    private StatisticMeasurements statisticMeasurements;
+    private double minBlockingThreshold;
 	private double lastUsedBlockingThreshold;
 	private double ngLimit;
 	private double executionTime;
 	private double timeOfERComparison;
     private NonBinaryResults nonBinaryResults;
 
-    public BlockingResultContext(StatisticMeasuremnts results, NonBinaryResults nonBinaryResults,
+    public BlockingResultContext(StatisticMeasurements results, NonBinaryResults nonBinaryResults,
                                  double minBlockingThreshold, double lastUsedBlockingThreshold,
                                  double ngLimit, double executionTime, double timeOfERComparison) {
 
-        this.statisticMeasuremnts = results;
+        this.statisticMeasurements = results;
         this.nonBinaryResults = nonBinaryResults;
         this.minBlockingThreshold = minBlockingThreshold;
         this.lastUsedBlockingThreshold = lastUsedBlockingThreshold;
@@ -26,9 +26,9 @@ public class BlockingResultContext {
     /**
 	 * @return the statisticMeasuremnts
 	 */
-	public final StatisticMeasuremnts getStatisticMeasuremnts() {
-		return statisticMeasuremnts;
-	}
+    public final StatisticMeasurements getStatisticMeasurements() {
+        return statisticMeasurements;
+    }
 
     public NonBinaryResults getNonBinaryResults() {
         return nonBinaryResults;

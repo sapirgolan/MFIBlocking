@@ -5,6 +5,7 @@ import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.MaxMatcher;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
+import il.ac.technion.ie.measurements.type.CellType;
 import il.ac.technion.ie.model.Block;
 import org.apache.log4j.Logger;
 
@@ -32,8 +33,8 @@ public class NonBinaryResults {
 
     private void invoke() {
         iMeasurService measurService = new MeasurService();
-        DoubleMatrix1D algSimilarityVector = measurService.buildSimilarityVector(algorithmBlocks);
-        DoubleMatrix1D trueSimilarityVector = measurService.buildSimilarityVector(trueBlocks);
+        DoubleMatrix1D algSimilarityVector = measurService.buildSimilarityVector(algorithmBlocks, CellType.PROBABILITY);
+        DoubleMatrix1D trueSimilarityVector = measurService.buildSimilarityVector(trueBlocks, CellType.PROBABILITY);
         try {
             nonBinaryPrecision = measurService.calcNonBinaryPrecision(algSimilarityVector, trueSimilarityVector);
             nonBinaryRecall = measurService.calcNonBinaryRecall(algSimilarityVector, trueSimilarityVector);

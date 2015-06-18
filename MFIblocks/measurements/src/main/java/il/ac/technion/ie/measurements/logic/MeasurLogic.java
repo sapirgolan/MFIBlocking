@@ -6,6 +6,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
+import il.ac.technion.ie.measurements.type.CellType;
 import il.ac.technion.ie.measurements.utils.MeasurUtils;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.service.BlockService;
@@ -24,7 +25,7 @@ public class MeasurLogic implements iMeasureLogic {
     private iBlockService blockService = new BlockService();
 
     @Override
-    public DoubleMatrix2D convertBlocksToMatrix(List<Block> blocks) {
+    public DoubleMatrix2D convertBlocksToMatrix(List<Block> blocks, CellType type) {
         int numberOfRecords = getBlocksCardinality(blocks);
         logger.debug("There are " + numberOfRecords + " combined in all Blocks");
         SparseDoubleMatrix2D matrix = new SparseDoubleMatrix2D(numberOfRecords, numberOfRecords);
@@ -33,7 +34,7 @@ public class MeasurLogic implements iMeasureLogic {
             List<Block> blocksOfRecord = blockService.getBlocksOfRecord(blocks, recordId);
             for (Block block : blocksOfRecord) {
                 logger.debug("Updating score of " + recordId + " in Block " + block.toString());
-                this.updateScoreInMatrix(matrix, recordId, block);
+                this.updateScoreInMatrix(matrix, recordId, block, type);
             }
         }
         return matrix;
@@ -124,18 +125,38 @@ public class MeasurLogic implements iMeasureLogic {
         return clonedResults.cardinality();
     }
 
-    private void updateScoreInMatrix(DoubleMatrix2D matrix, int recordId, Block block) {
-        float probability = block.getMemberProbability(recordId);
-        int rawIndex = getMatrixPosFromRecordID(recordId);
+    /**
+     * The method updates the score in position (i,j)
+     * There is a chance that two records share more than one block together. Therefore if it happens we cannot simply
+     * override the existing value.
+     *
+     * @param matrix
+     * @param recordId
+     * @param block
+     * @param type
+     */
+    private void updateScoreInMatrix(DoubleMatrix2D matrix, int recordId, Block block, CellType type) {
+        iUpdateMatrixStrategy strategy = getRecordValueByType(type);
+        double currentValue = strategy.getRecordValue(recordId, block);
+        int rowIndex = getMatrixPosFromRecordID(recordId);
         for (Integer member : block.getMembers()) {
             if (member != recordId) {
                 int colIndex = getMatrixPosFromRecordID(member);
-                double posProbability = probability + matrix.getQuick(rawIndex, colIndex);
-                logger.debug(String.format("Increasing probability at pos (%d,%d) from by %s to %s",
-                        rawIndex, colIndex, probability, posProbability));
-                matrix.setQuick(rawIndex, colIndex, posProbability);
+                double posValue = strategy.calcCurrentCellValue(currentValue, matrix, rowIndex, colIndex);
+                logger.debug(strategy.getUpdateLogMessage(rowIndex, colIndex, currentValue, posValue));
+                matrix.setQuick(rowIndex, colIndex, posValue);
             }
         }
+    }
+
+    private iUpdateMatrixStrategy getRecordValueByType(CellType type) {
+        iUpdateMatrixStrategy strategy;
+        if (type.equals(CellType.PROBABILITY)) {
+            strategy = new ProbabilityStrategy();
+        } else {
+            strategy = new SimilarityStrategy();
+        }
+        return strategy;
     }
 
     private int getBlocksCardinality(List<Block> blocks) {

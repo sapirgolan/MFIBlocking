@@ -6,6 +6,7 @@ import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.logic.MeasurLogic;
 import il.ac.technion.ie.measurements.logic.iMeasureLogic;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
+import il.ac.technion.ie.measurements.type.CellType;
 import il.ac.technion.ie.model.Block;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public class MeasurService implements iMeasurService {
         measureLogic = new MeasurLogic();
     }
     @Override
-    public DoubleMatrix2D buildMatrixFromBlocks(List<Block> blocks) {
-        return measureLogic.convertBlocksToMatrix(blocks);
+    public DoubleMatrix2D buildMatrixFromBlocks(List<Block> blocks, CellType type) {
+        return measureLogic.convertBlocksToMatrix(blocks, type);
     }
 
     @Override
@@ -30,8 +31,8 @@ public class MeasurService implements iMeasurService {
     }
 
     @Override
-    public DoubleMatrix1D buildSimilarityVector(List<Block> blocks) {
-        DoubleMatrix2D similarityMatrix = this.buildMatrixFromBlocks(blocks);
+    public DoubleMatrix1D buildSimilarityVector(List<Block> blocks, CellType type) {
+        DoubleMatrix2D similarityMatrix = this.buildMatrixFromBlocks(blocks, type);
         return this.buildSimilarityVector(similarityMatrix);
     }
 

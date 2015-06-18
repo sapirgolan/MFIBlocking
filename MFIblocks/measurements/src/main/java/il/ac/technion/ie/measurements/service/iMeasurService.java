@@ -4,6 +4,7 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
+import il.ac.technion.ie.measurements.type.CellType;
 import il.ac.technion.ie.model.Block;
 
 import java.util.List;
@@ -12,11 +13,11 @@ import java.util.List;
  * Created by XPS_Sapir on 03/06/2015.
  */
 public interface iMeasurService {
-    DoubleMatrix2D buildMatrixFromBlocks(List<Block> blocks);
+    DoubleMatrix2D buildMatrixFromBlocks(List<Block> blocks, CellType type);
 
     DoubleMatrix1D buildSimilarityVector(DoubleMatrix2D similarityMatrix);
 
-    DoubleMatrix1D buildSimilarityVector(List<Block> blocks);
+    DoubleMatrix1D buildSimilarityVector(List<Block> blocks, CellType type);
 
     double calcNonBinaryRecall(DoubleMatrix1D results, DoubleMatrix1D trueMatch) throws MatrixSizeException;
 

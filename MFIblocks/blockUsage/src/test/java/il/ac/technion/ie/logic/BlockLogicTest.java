@@ -343,6 +343,7 @@ public class BlockLogicTest {
         for (Block block : blocks) {
             for (Integer memberId : block.getMembers()) {
                 MatcherAssert.assertThat((double) block.getMemberProbability(memberId), closeTo(1.0, 0.00001));
+                MatcherAssert.assertThat(block.getMemberAvgSimilarity(memberId), closeTo(1.0, 0.00001));
             }
         }
 

@@ -9,15 +9,13 @@ import java.util.Map.Entry;
  * Created by I062070 on 19/03/2015.
  */
 public class Block {
+    static final Logger logger = Logger.getLogger(Block.class);
     private static final String CREATE_BLOCK_PATTERN = "Create (%s:Block)";
     private static final String CREATE_RECORD_PATTERN = "Create (%s: Record {id: %d})";
     private static final String ADD_RECORD_PATTERN = "Create (%s) -[:IN {probability:%s}]->(%s)";
     private static final String SET_REPRESENTATIVE_PATTERN = "Create (%s) -[:REPRESENTS]->(%s)";
     private static final String RECORD_PATTERN = "record_%d";
     private static final String BLOCK_PATTERN = "block_%s";
-
-    static final Logger logger = Logger.getLogger(Block.class);
-
     private List<Integer> members;
     private float score;
     private Map<Integer, Float> membersScores;
@@ -158,5 +156,15 @@ public class Block {
         }
                 logger.debug("Didn't found " + recordId + " in Block" + this.toString());
         return false;
+    }
+
+    public double getMemberAvgSimilarity(Integer memberId) {
+        int size = members.size();
+        if (size == 1) {
+            return 1.0;
+        }
+
+        Float totalScore = membersScores.get(memberId);
+        return totalScore / (float) (size - 1);
     }
 }

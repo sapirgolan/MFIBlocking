@@ -62,6 +62,7 @@ public class BlockLogic implements iBlockLogic {
         for (Block block : blocks) {
             for (Integer member : block.getMembers()) {
                 block.setMemberProbability(member, 1);
+                block.setMemberSimScore(member, (float) (block.getMembers().size() - 1));
             }
         }
     }

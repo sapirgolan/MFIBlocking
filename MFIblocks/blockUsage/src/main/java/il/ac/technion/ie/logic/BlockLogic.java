@@ -104,14 +104,19 @@ public class BlockLogic implements iBlockLogic {
         SimilarityCalculator similarityCalculator = new SimilarityCalculator(new JaroWinkler());
         //iterate on each block
         for (Block block : blocks) {
-            List<Integer> blockMembers = block.getMembers();
-            //retrieve block Text attributes
-            Map<Integer, List<String>> blockAtributess = getMembersAtributes(blockMembers, searchEngine);
-            for (Integer currentRecordId : blockAtributess.keySet()) {
-                float currentRecordProb = calcRecordSimilarityInBlock(currentRecordId, blockAtributess, similarityCalculator);
-                block.setMemberSimScore(currentRecordId, currentRecordProb);
-            }
+            calcBlockSimilarity(similarityCalculator, block, searchEngine);
             calcRecordsProbabilityInBlock(block);
+        }
+    }
+
+    private void calcBlockSimilarity(SimilarityCalculator similarityCalculator, Block block, SearchEngine searchEngine) {
+        List<Integer> blockMembers = block.getMembers();
+        //retrieve block Text attributes
+        Map<Integer, List<String>> blockAttributes = getMembersAtributes(blockMembers, searchEngine);
+
+        for (Integer currentRecordId : blockAttributes.keySet()) {
+            float currentRecordSimilarity = calcRecordSimilarityInBlock(currentRecordId, blockAttributes, similarityCalculator);
+            block.setMemberSimScore(currentRecordId, currentRecordSimilarity);
         }
     }
 
@@ -127,6 +132,15 @@ public class BlockLogic implements iBlockLogic {
 
     }
 
+    /**
+     * The method sumup the similarity of a record (currentRecordId) to all other records in a block.
+     * It doesn't calculate the similarity of a record to itself.
+     *
+     * @param currentRecordId      - the record whose similarity with other we want to measure.
+     * @param blockAtributess      - Map where for each ID in it the corresponding list with all fields that the record has.
+     * @param similarityCalculator - a calculator to calc similarity by.
+     * @return
+     */
     private float calcRecordSimilarityInBlock(Integer currentRecordId, final Map<Integer, List<String>> blockAtributess,
                                               SimilarityCalculator similarityCalculator) {
         float recordsSim = 0;

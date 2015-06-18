@@ -54,4 +54,14 @@ public class MeasurService implements iMeasurService {
     public double calcBinaryPrecision(DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException {
         return  measureLogic.calcBinaryPrecision(results, trueMatch, matcher);
     }
+
+    @Override
+    public double calcTruePositiveRate(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+        return measureLogic.calcTruePositiveRate(results, trueMatch);
+    }
+
+    @Override
+    public double calcFalsePositiveRate(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+        return measureLogic.calcFalsePositiveRate(results, trueMatch);
+    }
 }

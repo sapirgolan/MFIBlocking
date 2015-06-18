@@ -6,23 +6,30 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 import il.ac.technion.ie.model.Block;
+import org.easymock.EasyMock;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.powermock.api.easymock.PowerMock;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Created by XPS_Sapir on 03/06/2015.
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(MeasurLogic.class)
 public class MeasurLogicTest {
     private final DoubleFactory1D doubleFactory1D = DoubleFactory1D.sparse;
     private final DoubleFactory2D doubleFactory2D = DoubleFactory2D.sparse;
@@ -127,5 +134,68 @@ public class MeasurLogicTest {
 
         double nonBinaryRecall = classUnderTest.calcNonBinaryPrecision(algVector, trueMatch);
         MatcherAssert.assertThat(nonBinaryRecall, closeTo((2.5 / 3.3), 0.0001));
+    }
+
+    @Test
+    public void testCalcTruePositiveRate() throws Exception {
+        classUnderTest = PowerMock.createPartialMock(MeasurLogic.class, "calcFalseNegative", "calcTruePositive");
+        PowerMock.expectPrivate(classUnderTest, "calcTruePositive", EasyMock.anyObject(), EasyMock.anyObject()).andReturn(7);
+        PowerMock.expectPrivate(classUnderTest, "calcFalseNegative", EasyMock.anyObject(), EasyMock.anyObject()).andReturn(6);
+//        PowerMockito.doNothing().when(MeasurLogicTest.class,"checkString");
+        PowerMock.replay(classUnderTest);
+
+        double truePositiveRate = classUnderTest.calcTruePositiveRate(doubleFactory1D.make(new double[0]), doubleFactory1D.make(new double[0]));
+        MatcherAssert.assertThat(truePositiveRate, closeTo(0.5384615384615385, 0.00001));
+    }
+
+    @Test
+    public void testCalcFalsePositiveRate() throws Exception {
+        classUnderTest = PowerMock.createPartialMock(MeasurLogic.class, "calcTrueNegative", "calcFalsePositive");
+        PowerMock.expectPrivate(classUnderTest, "calcTrueNegative", EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyInt()).andReturn(11);
+        PowerMock.expectPrivate(classUnderTest, "calcFalsePositive", EasyMock.anyObject(), EasyMock.anyObject()).andReturn(26);
+        PowerMock.replay(classUnderTest);
+
+        double falsePositiveRate = classUnderTest.calcFalsePositiveRate(doubleFactory1D.make(new double[0]), doubleFactory1D.make(new double[0]));
+        MatcherAssert.assertThat(falsePositiveRate, closeTo(0.7027027027027027, 0.00001));
+    }
+
+    @Test
+    public void testCalcTruePositive() throws Exception {
+        BitSet result = createBitSet(10, Arrays.asList(0, 4, 5));
+        BitSet trueMatch = createBitSet(10, Arrays.asList(1, 3, 4, 5));
+        int truePositive = Whitebox.invokeMethod(classUnderTest, "calcTruePositive", result, trueMatch);
+        MatcherAssert.assertThat(truePositive, is(equalTo(2)));
+    }
+
+    @Test
+    public void testCalcFalseNegative() throws Exception {
+        BitSet result = createBitSet(10, Arrays.asList(0, 4, 5));
+        BitSet trueMatch = createBitSet(10, Arrays.asList(1, 2, 3, 4, 5));
+        int truePositive = Whitebox.invokeMethod(classUnderTest, "calcFalseNegative", result, trueMatch);
+        MatcherAssert.assertThat(truePositive, is(equalTo(3)));
+    }
+
+    @Test
+    public void testCalcFalsePositive() throws Exception {
+        BitSet result = createBitSet(10, Arrays.asList(0, 4, 5, 6, 7, 8));
+        BitSet trueMatch = createBitSet(10, Arrays.asList(1, 3, 4, 5));
+        int falsePositive = Whitebox.invokeMethod(classUnderTest, "calcFalsePositive", result, trueMatch);
+        MatcherAssert.assertThat(falsePositive, is(equalTo(4)));
+    }
+
+    @Test
+    public void testCalcTrueNegative() throws Exception {
+        BitSet result = createBitSet(10, Arrays.asList(0, 4, 5));
+        BitSet trueMatch = createBitSet(10, Arrays.asList(1, 3, 4, 5));
+        int trueNegative = Whitebox.invokeMethod(classUnderTest, "calcTrueNegative", result, trueMatch, 10);
+        MatcherAssert.assertThat(trueNegative, is(equalTo(5)));
+    }
+
+    private BitSet createBitSet(int size, List<Integer> trueIndices) {
+        BitSet bitSet = new BitSet(size);
+        for (Integer integer : trueIndices) {
+            bitSet.set(integer);
+        }
+        return bitSet;
     }
 }

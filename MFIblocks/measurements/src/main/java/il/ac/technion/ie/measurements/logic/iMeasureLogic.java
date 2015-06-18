@@ -24,5 +24,26 @@ public interface iMeasureLogic {
 
     double calcBinaryPrecision(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException;
 
+    /**
+     * Also know as Sensitivity. This is (TP / TP + FN).
+     * TP - cases with the disease correctly classified as positive.
+     * FN - cases with the disease will be classified negative. (the actual value is 1 but I have thought it is 0)
+     *
+     * @param results
+     * @param trueMatch
+     * @return
+     */
 
+    double calcTruePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
+
+    /**
+     * Also know as  1 - specificity. This is (FP / FP + TN).
+     * FP - cases without the disease will be classified as positive (cases we thought were 1 but are actually 0)
+     * TN - cases without the disease will be correctly classified as negative (cases we thought were 0 and are also 0)
+     *
+     * @param results
+     * @param trueMatch
+     * @return
+     */
+    double calcFalsePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
 }

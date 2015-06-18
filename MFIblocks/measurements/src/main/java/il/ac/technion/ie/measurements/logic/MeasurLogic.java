@@ -6,15 +6,13 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
+import il.ac.technion.ie.measurements.utils.MeasurUtils;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.service.BlockService;
 import il.ac.technion.ie.service.iBlockService;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by XPS_Sapir on 03/06/2015.
@@ -84,6 +82,46 @@ public class MeasurLogic implements iMeasureLogic {
         logger.debug(String.format("Matched similarity vector %s and obtained %s", results, matchedResults));
         logger.info("Finished matching process by Matcher, calling this.calcNonBinaryPrecision");
         return this.calcNonBinaryPrecision(matchedResults, trueMatch);
+    }
+
+    @Override
+    public double calcTruePositiveRate(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+        BitSet resultsBS = MeasurUtils.convertVectorToBitSet(results);
+        BitSet trueMatchBS = MeasurUtils.convertVectorToBitSet(trueMatch);
+        int truePositive = calcTruePositive(resultsBS, trueMatchBS);
+        int falseNegative = calcFalseNegative(resultsBS, trueMatchBS);
+        return (double) truePositive / (double) (truePositive + falseNegative);
+    }
+
+    @Override
+    public double calcFalsePositiveRate(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
+        BitSet resultsBS = MeasurUtils.convertVectorToBitSet(results);
+        BitSet trueMatchBS = MeasurUtils.convertVectorToBitSet(trueMatch);
+        int falsePositive = calcFalsePositive(resultsBS, trueMatchBS);
+        int trueNegative = calcTrueNegative(resultsBS, trueMatchBS, trueMatch.size());
+        return (double) falsePositive / (double) (falsePositive + trueNegative);
+    }
+
+    private int calcTrueNegative(BitSet results, BitSet trueMatch, int size) {
+        BitSet clonedResults = (BitSet) results.clone();
+        clonedResults.or(trueMatch);
+        return size - clonedResults.cardinality();
+    }
+
+    private int calcFalsePositive(BitSet results, BitSet trueMatch) {
+        int truePositive = this.calcTruePositive(results, trueMatch);
+        return results.cardinality() - truePositive;
+    }
+
+    private int calcFalseNegative(BitSet results, BitSet trueMatch) {
+        int truePositive = this.calcTruePositive(results, trueMatch);
+        return trueMatch.cardinality() - truePositive;
+    }
+
+    private int calcTruePositive(BitSet results, BitSet trueMatch) {
+        BitSet clonedResults = (BitSet) results.clone();
+        clonedResults.and(trueMatch);
+        return clonedResults.cardinality();
     }
 
     private void updateScoreInMatrix(DoubleMatrix2D matrix, int recordId, Block block) {

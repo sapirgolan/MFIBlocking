@@ -25,4 +25,8 @@ public interface iMeasurService {
     double calcBinaryRecall(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException;
 
     double calcBinaryPrecision(final DoubleMatrix1D results, DoubleMatrix1D trueMatch, AbstractMatcher matcher) throws MatrixSizeException;
+
+    double calcTruePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
+
+    double calcFalsePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
 }

@@ -8,6 +8,7 @@ import fimEntityResolution.statistics.*;
 import fimEntityResolution.statistics.Timer;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
+import il.ac.technion.ie.measurements.roc.RocCurve;
 import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.ComparisonInteraction;
@@ -180,6 +181,8 @@ public class BottomUp {
 
                 List<Block> trueBlocks = findBlocks(trueClusters.getGroundTruthCandidatePairs(), false, recordsSize);
 
+                RocCurve roc = new RocCurve(algorithmBlocks, trueBlocks);
+                printRocCurveDots(roc.getCordinatesForPlot());
                 NonBinaryResults nonBinaryResults = new NonBinaryResults(algorithmBlocks, trueBlocks);
                 ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
 
@@ -211,6 +214,17 @@ public class BottomUp {
 			System.out.println("Under current configuration, no clustering were achieved!!");
 		}		
 	}
+
+    private static void printRocCurveDots(Map<Double, Double> cordinatesForPlot) {
+        ResultWriter resultWriter = new ResultWriter();
+        File rocOutputFile = resultWriter.createRocOutputFile();
+        try {
+            resultWriter.writeRocDots(rocOutputFile, cordinatesForPlot);
+            logger.info("Finished writing ROC dots");
+        } catch (IOException e) {
+            logger.error("Failed to write ROC dots", e);
+        }
+    }
 
     /**
      *
@@ -258,7 +272,6 @@ public class BottomUp {
 	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context, List<Block> blocks) {
 		ResultWriter resultWriter = new ResultWriter();
 		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
-
         File blocksOutputFile = resultWriter.createBlocksOutputFile();
 
         try {

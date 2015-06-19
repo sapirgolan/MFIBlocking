@@ -30,6 +30,9 @@ public class ResultWriter {
         return generateOutputFile("/MFIBlocksResult_", ".csv");
 	}
 
+    public File createRocOutputFile() {
+        return this.createUniqueOutputFile("/Roc_", ".txt");
+    }
     public File createBlocksOutputFile() {
         return createUniqueOutputFile("/Blocks_", ".txt");
     }
@@ -194,6 +197,16 @@ public class ResultWriter {
             i++;
         }
         bufferedWriter.append(";");
+        bufferedWriter.close();
+    }
+
+    public void writeRocDots(File file, Map<Double, Double> coordinatesForPlot) throws IOException {
+        FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        for (Entry<Double, Double> entry : coordinatesForPlot.entrySet()) {
+            bufferedWriter.write(String.format("%s|%s", entry.getKey(), entry.getValue()));
+            bufferedWriter.newLine();
+        }
         bufferedWriter.close();
     }
 }

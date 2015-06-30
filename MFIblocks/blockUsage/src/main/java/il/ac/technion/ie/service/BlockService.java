@@ -43,4 +43,10 @@ public class BlockService implements iBlockService {
     public void setTrueMatch(List<Block> blocks) {
         blockLogic.setRecordsInBlocksAsTrueMatch(blocks);
     }
+
+    @Override
+    public void findAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
+        blockLogic.findAmbiguousRepresentatives(algorithmBlocks, context);
+        logger.info("Finished finding Ambiguous Representatives in blocks");
+    }
 }

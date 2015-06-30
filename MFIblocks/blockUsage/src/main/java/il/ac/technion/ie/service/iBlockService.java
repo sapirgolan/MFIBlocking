@@ -18,4 +18,6 @@ public interface iBlockService {
     List<Block> getBlocksOfRecord(List<Block> allBlocks, int record);
 
     void setTrueMatch(List<Block> blocks);
+
+    void findAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context);
 }

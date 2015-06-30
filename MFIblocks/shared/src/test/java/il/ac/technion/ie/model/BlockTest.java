@@ -1,6 +1,7 @@
 package il.ac.technion.ie.model;
 
 import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.hamcrest.core.*;
 import org.junit.After;
 import org.junit.Before;
@@ -8,10 +9,10 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.*;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.Is.is;
 
 public class BlockTest {
 
@@ -67,7 +68,6 @@ public class BlockTest {
         for (Integer member : members) {
             MatcherAssert.assertThat(block.hasMember(member), is(true));
         }
-
         MatcherAssert.assertThat(block.hasMember(5), is(false));
     }
 
@@ -83,5 +83,45 @@ public class BlockTest {
         MatcherAssert.assertThat(block.getMemberAvgSimilarity(7), closeTo(0.6666, 0.001));
         MatcherAssert.assertThat(block.getMemberAvgSimilarity(220), closeTo(0.7, 0.001));
         MatcherAssert.assertThat(block.getMemberAvgSimilarity(2), closeTo(0.8666, 0.001));
+    }
+
+    @Test
+    public void testFindRep() throws Exception {
+        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        block.setMemberProbability(1, 0.26F);
+        block.setMemberProbability(7, 0.26F);
+        block.setMemberProbability(22, 0.25F);
+        block.setMemberProbability(2, 0.23F);
+
+        Map<Integer, Float> blockRepresentatives = block.findBlockRepresentatives();
+        MatcherAssert.assertThat(blockRepresentatives.size(), Matchers.is(2));
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        block.setMemberProbability(1, 0.26F);
+        block.setMemberProbability(7, 0.26F);
+        block.setMemberProbability(22, 0.25F);
+        block.setMemberProbability(2, 0.23F);
+
+        String expectedResult = "Block{1,7,22,2}\n" +
+                "Probs{0.26,0.26,0.25,0.23}\n" +
+                "Block representative is: recordIDs 1,7 Probability 0.26";
+
+        MatcherAssert.assertThat(block.toString(), Matchers.is(equalToIgnoringWhiteSpace(expectedResult)));
+    }
+
+    @Test
+    public void testToCsv() throws Exception {
+        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        block.setMemberProbability(1, 0.26F);
+        block.setMemberProbability(7, 0.26F);
+        block.setMemberProbability(22, 0.25F);
+        block.setMemberProbability(2, 0.23F);
+
+        String expectedResult = "{1,7,22,2}|{0.26,0.26,0.25,0.23}| Block representatives are: |1,7";
+
+        MatcherAssert.assertThat(block.toCsv(), Matchers.is(equalToIgnoringWhiteSpace(expectedResult)));
     }
 }

@@ -8,7 +8,6 @@ import fimEntityResolution.statistics.*;
 import fimEntityResolution.statistics.Timer;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
-import il.ac.technion.ie.measurements.roc.RocCurve;
 import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.ComparisonInteraction;
@@ -134,14 +133,15 @@ public class BottomUp {
 		context.setMatchFile(args[4]);
         context.setOrigRecordsFileWithoutCommas(args[5]);
         context.setOriginalRecordsPath(args[6]);
-        context.setMinSup(args[7]);
+        context.setDatasetName(args[7]);
+        context.setMinSup(args[8]);
         context.setAlgorithm(Alg.MFI);
-		context.setNGs(args[8]);
-		context.setFirstDbSize(args);
-		context.setPerformanceFlag(args);
-		context.setPrintFormat(args[9]);
-		return context;
-	}
+        context.setNGs(args[9]);
+        context.setFirstDbSize(args);
+        context.setPerformanceFlag(args);
+        context.setPrintFormat(args[10]);
+        return context;
+    }
 
 	/**
 	 * Core of the MFIBlocks algorithm
@@ -173,6 +173,7 @@ public class BottomUp {
 
                 List<Block> algorithmBlocks = findBlocks(algorithmObtainedPairs, true, recordsSize);
                 printNeighborsAndBlocks(algorithmObtainedPairs, context, algorithmBlocks);
+                findBlocksAmbiguousRepresentatives(algorithmBlocks, context);
                 long writeBlocksDuration = timer.getActionTimeDuration();
 
                 timer.startActionTimeMeassurment();
@@ -181,8 +182,6 @@ public class BottomUp {
 
                 List<Block> trueBlocks = findBlocks(trueClusters.getGroundTruthCandidatePairs(), false, recordsSize);
 
-                RocCurve roc = new RocCurve(algorithmBlocks, trueBlocks);
-                printRocCurveDots(roc.getCordinatesForPlot());
                 NonBinaryResults nonBinaryResults = new NonBinaryResults(algorithmBlocks, trueBlocks);
                 ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
 
@@ -214,6 +213,11 @@ public class BottomUp {
 			System.out.println("Under current configuration, no clustering were achieved!!");
 		}		
 	}
+
+    private static void findBlocksAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
+        iBlockService blockService = new BlockService();
+        blockService.findAmbiguousRepresentatives(algorithmBlocks, context);
+    }
 
     private static void printRocCurveDots(Map<Double, Double> cordinatesForPlot) {
         ResultWriter resultWriter = new ResultWriter();
@@ -272,7 +276,7 @@ public class BottomUp {
 	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context, List<Block> blocks) {
 		ResultWriter resultWriter = new ResultWriter();
 		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
-        File blocksOutputFile = resultWriter.createBlocksOutputFile();
+        File blocksOutputFile = resultWriter.createBlocksOutputFile(context.getDatasetName());
 
         try {
             switch (context.getPrntFormat().toLowerCase()) {

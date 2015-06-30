@@ -1,12 +1,10 @@
 package il.ac.technion.ie.logic;
 
 import il.ac.technion.ie.context.MfiContext;
-import il.ac.technion.ie.model.Block;
-import il.ac.technion.ie.model.CandidatePairs;
-import il.ac.technion.ie.model.NeighborsVector;
-import il.ac.technion.ie.model.RecordMatches;
+import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.BlockInteraction;
+import il.ac.technion.ie.utils.BlockUtils;
 import org.apache.log4j.Logger;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 
@@ -63,6 +61,59 @@ public class BlockLogic implements iBlockLogic {
             for (Integer member : block.getMembers()) {
                 block.setMemberProbability(member, 1);
                 block.setMemberSimScore(member, (float) (block.getMembers().size() - 1));
+            }
+        }
+    }
+
+    @Override
+    public Map<Integer, List<BlockDescriptor>> findAmbiguousRepresentatives(List<Block> blocks, MfiContext context) {
+        Map<Integer, List<Block>> map = new HashMap<>();
+        for (Block block : blocks) {
+            updateBlockRepresentativesMap(map, block);
+        }
+        findRecordsWithSeveralBlocks(map);
+        SearchEngine searchEngine = buildSearchEngineForRecords(context);
+        Map<Integer, List<BlockDescriptor>> ambiguousRepresentativesList = retriveTextRecords(map, searchEngine);
+        return ambiguousRepresentativesList;
+    }
+
+    private Map<Integer, List<BlockDescriptor>> retriveTextRecords(Map<Integer, List<Block>> map, SearchEngine searchEngine) {
+        Map<Integer, List<BlockDescriptor>> ambiguousRepresentativesList = new HashMap<>();
+        for (Map.Entry<Integer, List<Block>> entry : map.entrySet()) {
+            List<BlockDescriptor> blockDescriptors = BlockUtils.convertBlocksToDescriptors(entry.getValue(), searchEngine);
+            ambiguousRepresentativesList.put(entry.getKey(), blockDescriptors);
+        }
+        return ambiguousRepresentativesList;
+    }
+
+
+    private void findRecordsWithSeveralBlocks(Map<Integer, List<Block>> map) {
+        Iterator<Map.Entry<Integer, List<Block>>> iter = map.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Integer, List<Block>> entry = iter.next();
+            if (entry.getValue().size() < 2) {
+                iter.remove();
+            }
+        }
+    }
+
+    /**
+     * The method update @map and for each blockRepresentative it keep track of the blocks he represents.
+     *
+     * @param map
+     * @param block
+     */
+    private void updateBlockRepresentativesMap(Map<Integer, List<Block>> map, Block block) {
+        Map<Integer, Float> blockRepresentatives = block.findBlockRepresentatives();
+
+        for (Map.Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
+            if (map.containsKey(blockRepresentative.getKey())) {
+                List<Block> list = map.get(blockRepresentative.getKey());
+                list.add(block);
+            } else {
+                ArrayList<Block> list = new ArrayList<>();
+                list.add(block);
+                map.put(blockRepresentative.getKey(), list);
             }
         }
     }
@@ -183,7 +234,7 @@ public class BlockLogic implements iBlockLogic {
     private SearchEngine buildSearchEngineForRecords(MfiContext context) {
         String recordsPath = context.getOriginalRecordsPath();
         logger.debug("about to index: " + recordsPath);
-        SearchEngine searchEngine = new SearchEngine(new BlockInteraction());
+        SearchEngine searchEngine = new SearchEngine(new BlockInteraction(context.getDatasetName()));
         searchEngine.addRecords(recordsPath);
         return searchEngine;
     }

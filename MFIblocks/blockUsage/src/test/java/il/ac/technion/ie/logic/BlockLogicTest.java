@@ -96,6 +96,7 @@ public class BlockLogicTest {
 
         recordsFileName = "dataset.csv";
         PowerMockito.when(context.getOriginalRecordsPath()).thenReturn(this.getRecordsFilePath());
+        PowerMockito.when(context.getDatasetName()).thenReturn("cora");
 
         classUnderTest.calcProbabilityOnRecords(blocks, context);
 
@@ -125,6 +126,7 @@ public class BlockLogicTest {
         List<Integer> blockMembers = new ArrayList(Arrays.asList(1, 3, 2));
         recordsFileName = "dataset.csv";
         PowerMockito.when(context.getOriginalRecordsPath()).thenReturn(this.getRecordsFilePath());
+        PowerMockito.when(context.getDatasetName()).thenReturn("cora");
         SearchEngine searchEngine = Whitebox.invokeMethod(classUnderTest, "buildSearchEngineForRecords", context);
 
         //test
@@ -346,7 +348,72 @@ public class BlockLogicTest {
                 MatcherAssert.assertThat(block.getMemberAvgSimilarity(memberId), closeTo(1.0, 0.00001));
             }
         }
+    }
 
+    @Test
+    public void testUpdateBlockRepresentativesMap_addOneNewRepresentative() throws Exception {
+        Map<Integer, List<Block>> map = new HashMap<>();
+        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        block.setMemberProbability(1, 0.26F);
+        block.setMemberProbability(7, 0.27F);
+        block.setMemberProbability(22, 0.24F);
+        block.setMemberProbability(2, 0.23F);
+
+        Whitebox.invokeMethod(classUnderTest, "updateBlockRepresentativesMap", map, block);
+        MatcherAssert.assertThat(map.get(7), contains(block));
+    }
+
+    @Test
+    public void testUpdateBlockRepresentativesMap_addTwoNewRepresentatives() throws Exception {
+        Map<Integer, List<Block>> map = new HashMap<>();
+        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        block.setMemberProbability(1, 0.26F);
+        block.setMemberProbability(7, 0.26F);
+        block.setMemberProbability(22, 0.25F);
+        block.setMemberProbability(2, 0.23F);
+
+        Whitebox.invokeMethod(classUnderTest, "updateBlockRepresentativesMap", map, block);
+        MatcherAssert.assertThat(map.get(7), contains(block));
+        MatcherAssert.assertThat(map.get(1), contains(block));
+    }
+
+    @Test
+    public void testUpdateBlockRepresentativesMap_addBlockToExistingRepresentative() throws Exception {
+        Map<Integer, List<Block>> map = new HashMap<>();
+        Block existingBlock = PowerMockito.mock(Block.class);
+        List<Block> blocks = new ArrayList<>(Arrays.asList(existingBlock));
+        map.put(7, blocks);
+
+        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        block.setMemberProbability(1, 0.26F);
+        block.setMemberProbability(7, 0.26F);
+        block.setMemberProbability(22, 0.25F);
+        block.setMemberProbability(2, 0.23F);
+
+        Whitebox.invokeMethod(classUnderTest, "updateBlockRepresentativesMap", map, block);
+        MatcherAssert.assertThat(map.get(1), contains(block));
+        MatcherAssert.assertThat(map.get(7), containsInAnyOrder(block, existingBlock));
+    }
+
+    @Test
+    public void testFindRecordsWithSeveralBlocks() throws Exception {
+        List<Block> listOneSizeOne = PowerMockito.mock(List.class);
+        PowerMockito.when(listOneSizeOne.size()).thenReturn(1);
+        List<Block> listTwoSizeTwo = PowerMockito.mock(List.class);
+        PowerMockito.when(listTwoSizeTwo.size()).thenReturn(2);
+        List<Block> listThreeSizeOne = PowerMockito.mock(List.class);
+        PowerMockito.when(listThreeSizeOne.size()).thenReturn(1);
+        List<Block> listFourSizeThree = PowerMockito.mock(List.class);
+        PowerMockito.when(listFourSizeThree.size()).thenReturn(3);
+        Map<Integer, List<Block>> map = Maps.newHashMap(ImmutableMap.of(
+                127, listOneSizeOne,
+                158, listTwoSizeTwo,
+                7, listThreeSizeOne,
+                2, listFourSizeThree));
+
+        Whitebox.invokeMethod(classUnderTest, "findRecordsWithSeveralBlocks", map);
+        MatcherAssert.assertThat(map.size(), Matchers.is(2));
+        MatcherAssert.assertThat(map, allOf(hasEntry(158, listTwoSizeTwo), hasEntry(2, listFourSizeThree)));
     }
 }
 

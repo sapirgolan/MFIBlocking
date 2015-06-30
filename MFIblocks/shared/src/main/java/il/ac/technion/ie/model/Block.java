@@ -2,7 +2,10 @@ package il.ac.technion.ie.model;
 
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -10,16 +13,11 @@ import java.util.Map.Entry;
  */
 public class Block {
     static final Logger logger = Logger.getLogger(Block.class);
-    private static final String CREATE_BLOCK_PATTERN = "Create (%s:Block)";
-    private static final String CREATE_RECORD_PATTERN = "Create (%s: Record {id: %d})";
-    private static final String ADD_RECORD_PATTERN = "Create (%s) -[:IN {probability:%s}]->(%s)";
-    private static final String SET_REPRESENTATIVE_PATTERN = "Create (%s) -[:REPRESENTS]->(%s)";
-    private static final String RECORD_PATTERN = "record_%d";
-    private static final String BLOCK_PATTERN = "block_%s";
     private List<Integer> members;
     private float score;
     private Map<Integer, Float> membersScores;
     private Map<Integer, Float> membersProbability;
+    private Map<Integer, Float> blockRepresentatives;
 
     public Block(List<Integer> members) {
         this.members = members;
@@ -38,7 +36,7 @@ public class Block {
         builder.append("Block{");
         for (Integer member : members) {
             builder.append(member);
-            builder.append(",");
+            addCharSeparator(builder);
         }
         builder.deleteCharAt(builder.length() - 1);
         builder.append("}");
@@ -48,7 +46,7 @@ public class Block {
         builder.append("Probs{");
         for (Integer member : members) {
             builder.append(membersProbability.get(member));
-            builder.append(",");
+            addCharSeparator(builder);
         }
         builder.deleteCharAt(builder.length() - 1);
         builder.append("}");
@@ -57,40 +55,18 @@ public class Block {
 
         builder.append("Block representative is: ");
 
-        Entry<Integer, Float> blockRepr = findBlockRepresentative();
-        builder.append(String.format("recordID %d, Probability %s", blockRepr.getKey(), blockRepr.getValue()));
-        builder.append(blockRepr.getKey());
+        Map<Integer, Float> blockRepresentatives = findBlockRepresentatives();
+        StringBuilder sb = new StringBuilder();
+        for (Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
+            sb.append(blockRepresentative.getKey());
+            addCharSeparator(sb);
+        }
+        String representatives = sb.substring(0, sb.length() - 1);
+
+        //all entries in the list have the same value. Therefore can use the value of the first entry
+        builder.append(String.format("recordIDs %s Probability %s", representatives, blockRepresentatives.values().iterator().next()));
 
         return builder.toString();
-    }
-
-    public StringBuilder toCypher(int blockId, Set<Integer> set) {
-        StringBuilder builder = new StringBuilder();
-        StringBuilder memberBuilder = new StringBuilder();
-
-        String blockName = String.format(BLOCK_PATTERN, blockId);
-
-        builder.append(String.format(CREATE_BLOCK_PATTERN, blockName));
-        builder.append(System.getProperty("line.separator"));
-        for (Integer member : members) {
-            String recordName = String.format(RECORD_PATTERN, member);
-            if (!set.contains(member)) {
-                builder.append(String.format(CREATE_RECORD_PATTERN, recordName, member));
-                builder.append(System.getProperty("line.separator"));
-                set.add(member);
-            }
-
-            memberBuilder.append(String.format(ADD_RECORD_PATTERN, recordName, this.getMemberProbability(member), blockName));
-            memberBuilder.append(System.getProperty("line.separator"));
-        }
-        //adds members creation statements to main builder
-        builder.append(memberBuilder.toString());
-
-        Entry<Integer, Float> blockRepresentative = this.findBlockRepresentative();
-        String recordName = String.format(RECORD_PATTERN, blockRepresentative.getKey());
-
-        builder.append(String.format(SET_REPRESENTATIVE_PATTERN, recordName, blockName));
-        return builder;
     }
 
     @Override
@@ -133,17 +109,28 @@ public class Block {
         return membersProbability.get(memberId);
     }
 
-    public Entry<Integer, Float> findBlockRepresentative() {
-        float maxProb = 0;
-        Entry<Integer, Float> blockRepresentative = null;
-        for (Entry<Integer, Float> entry : membersProbability.entrySet()) {
-            Float localProb = entry.getValue();
-            if (localProb.equals(Math.max(localProb, maxProb))) {
-                maxProb = localProb;
-                blockRepresentative = entry;
+    public Map<Integer, Float> findBlockRepresentatives() {
+
+        //caching internally blockRepresentatives
+        if (blockRepresentatives == null) {
+            float maxProb = 0;
+            blockRepresentatives = new HashMap<>();
+            //find the max probability score in the block
+            for (Entry<Integer, Float> entry : membersProbability.entrySet()) {
+                Float localProb = entry.getValue();
+                if (localProb.equals(Math.max(localProb, maxProb))) {
+                    maxProb = localProb;
+                }
+            }
+            //add all entries that have the max score.
+            //More that one entry can the max score
+            for (Entry<Integer, Float> entry : membersProbability.entrySet()) {
+                if (maxProb == entry.getValue()) {
+                    blockRepresentatives.put(entry.getKey(), entry.getValue());
+                }
             }
         }
-        return blockRepresentative;
+        return blockRepresentatives;
     }
 
     public boolean hasMember(int recordId) {
@@ -166,5 +153,48 @@ public class Block {
 
         Float totalScore = membersScores.get(memberId);
         return totalScore / (float) (size - 1);
+    }
+
+    public String toCsv() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        for (Integer member : members) {
+            builder.append(member);
+            addCharSeparator(builder);
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("}");
+
+        addCsvSeperator(builder);
+
+        builder.append("{");
+        for (Integer member : members) {
+            builder.append(membersProbability.get(member));
+            addCharSeparator(builder);
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("}");
+
+        addCsvSeperator(builder);
+        builder.append(" Block representatives are: ");
+        addCsvSeperator(builder);
+
+        //add representatives
+        Map<Integer, Float> blockRepresentatives = findBlockRepresentatives();
+        for (Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
+            builder.append(blockRepresentative.getKey());
+            addCharSeparator(builder);
+        }
+        builder.deleteCharAt(builder.length() - 1);
+
+        return builder.toString();
+    }
+
+    private void addCharSeparator(StringBuilder builder) {
+        builder.append(",");
+    }
+
+    private void addCsvSeperator(StringBuilder builder) {
+        builder.append("|");
     }
 }

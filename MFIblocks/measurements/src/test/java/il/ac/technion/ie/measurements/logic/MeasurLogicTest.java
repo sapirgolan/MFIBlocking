@@ -5,6 +5,7 @@ import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
+import il.ac.technion.ie.measurements.type.CellType;
 import il.ac.technion.ie.model.Block;
 import org.easymock.EasyMock;
 import org.hamcrest.MatcherAssert;
@@ -56,7 +57,7 @@ public class MeasurLogicTest {
         PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 888);
         PowerMockito.when(block.getMemberProbability(Mockito.eq(recordId))).thenReturn((float) 0.456);
 
-        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block);
+        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block, CellType.PROBABILITY);
 
         for (Integer member : members) {
             if (recordId != member) {
@@ -77,7 +78,7 @@ public class MeasurLogicTest {
         PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 0.999);
         PowerMockito.when(block.getMemberProbability(Mockito.eq(recordId))).thenReturn((float) 0.456);
 
-        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block);
+        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block, CellType.PROBABILITY);
         for (int someMember = 1; someMember <= 100; someMember++) {
             if (!members.contains(someMember)) {
                 int rawIndex = Whitebox.invokeMethod(classUnderTest, "getMatrixPosFromRecordID", recordId);
@@ -97,9 +98,9 @@ public class MeasurLogicTest {
         PowerMockito.when(block.getMemberScore(Mockito.eq(recordId))).thenReturn((float) 0.92);
         PowerMockito.when(block.getMemberProbability(Mockito.eq(recordId))).thenReturn((float) 0.32);
 
-        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block);
+        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block, CellType.PROBABILITY);
         members = Arrays.asList(19, 5, 27);
-        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block);
+        Whitebox.invokeMethod(classUnderTest, "updateScoreInMatrix", matrix2D, recordId, block, CellType.PROBABILITY);
 
         int rawIndex = Whitebox.invokeMethod(classUnderTest, "getMatrixPosFromRecordID", recordId);
         int colIndex = Whitebox.invokeMethod(classUnderTest, "getMatrixPosFromRecordID", 5);

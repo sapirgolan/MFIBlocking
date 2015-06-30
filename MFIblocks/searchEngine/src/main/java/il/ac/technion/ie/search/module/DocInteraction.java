@@ -16,11 +16,12 @@ public abstract class DocInteraction {
 
     protected List<String> fieldNames;
 
-    public DocInteraction() {
-        this.initFieldList();
+    public DocInteraction(String scenario) {
+        this.initFieldList(scenario);
     }
     public abstract void addDoc(IndexWriter indexWriter, String recordId, String recordText) throws IOException;
-    public abstract void initFieldList();
+
+    public abstract void initFieldList(String scenario);
     public final List<String> obtainTopResult(IndexSearcher searcher, ScoreDoc[] hits) throws TooManySearchResults, IOException {
         if (hits.length != 1) {
             throw new TooManySearchResults(String.format("Search has obtained %d results", hits.length));

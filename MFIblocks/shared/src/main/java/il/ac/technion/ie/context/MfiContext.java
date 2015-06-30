@@ -23,6 +23,7 @@ public class MfiContext {
 	private int firstDbSize;
 	private String printFormat;
 	private String originalRecordsPath;
+    private String datasetName;
 
     public MfiContext() {
         this.firstDbSize = 0;
@@ -187,4 +188,11 @@ public class MfiContext {
         this.originalRecordsPath = recordsPath;
     }
 
+    public String getDatasetName() {
+        return datasetName;
+    }
+
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
 }

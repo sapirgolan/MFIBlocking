@@ -17,6 +17,10 @@ import java.util.List;
  */
 public class ComparisonInteraction extends DocInteraction {
 
+    public ComparisonInteraction() {
+        super(null);
+    }
+
     @Override
     public void addDoc(IndexWriter indexWriter, String recordId, String recordText) throws IOException {
         recordId = "#" + recordId;
@@ -27,7 +31,7 @@ public class ComparisonInteraction extends DocInteraction {
     }
 
     @Override
-    public void initFieldList() {
+    public void initFieldList(String scenario) {
     }
 
     @Override

@@ -1,6 +1,9 @@
 package il.ac.technion.ie.search.module;
 
+import il.ac.technion.ie.utils.PropertiesReader;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -9,7 +12,6 @@ import org.apache.lucene.index.IndexWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,6 +19,11 @@ import java.util.List;
  */
 public class BlockInteraction extends DocInteraction {
 
+    static final Logger logger = Logger.getLogger(BlockInteraction.class);
+
+    public BlockInteraction(String scenario) {
+        super(scenario);
+    }
 
     @Override
     public void addDoc(IndexWriter indexWriter, String recordId, String recordText) throws IOException {
@@ -31,9 +38,18 @@ public class BlockInteraction extends DocInteraction {
         indexWriter.addDocument(doc);
     }
 
+    /**
+     * For any dataset (scenario), make sure it has a key,value pair in fieldsName.properties
+     *
+     * @param scenario
+     */
     @Override
-    public void initFieldList() {
-        fieldNames = new ArrayList<>( Arrays.asList("author", "volume", "title", "venue", "year", "month") );
+    public void initFieldList(String scenario) {
+        try {
+            fieldNames = PropertiesReader.getFields(scenario);
+        } catch (ConfigurationException e) {
+            logger.error("Didn't find any attributes for scenario name'" + scenario + "'", e);
+        }
     }
 
     @Override

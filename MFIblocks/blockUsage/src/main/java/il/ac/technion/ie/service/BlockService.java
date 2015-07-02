@@ -4,10 +4,12 @@ import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.logic.BlockLogic;
 import il.ac.technion.ie.logic.iBlockLogic;
 import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.BlockDescriptor;
 import il.ac.technion.ie.model.CandidatePairs;
 import org.apache.log4j.Logger;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by I062070 on 13/03/2015.
@@ -45,8 +47,9 @@ public class BlockService implements iBlockService {
     }
 
     @Override
-    public void findAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
-        blockLogic.findAmbiguousRepresentatives(algorithmBlocks, context);
+    public Map<Integer, List<BlockDescriptor>> findAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
+        Map<Integer, List<BlockDescriptor>> ambiguousRepresentatives = blockLogic.findAmbiguousRepresentatives(algorithmBlocks, context);
         logger.info("Finished finding Ambiguous Representatives in blocks");
+        return ambiguousRepresentatives;
     }
 }

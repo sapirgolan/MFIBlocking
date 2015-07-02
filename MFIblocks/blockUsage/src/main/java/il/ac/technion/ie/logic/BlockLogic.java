@@ -71,9 +71,12 @@ public class BlockLogic implements iBlockLogic {
         for (Block block : blocks) {
             updateBlockRepresentativesMap(map, block);
         }
+        logger.info("Finished finding the blocks for all block representatives");
         findRecordsWithSeveralBlocks(map);
+        logger.info("Retained only block representative that represent more than one block");
         SearchEngine searchEngine = buildSearchEngineForRecords(context);
         Map<Integer, List<BlockDescriptor>> ambiguousRepresentativesList = retriveTextRecords(map, searchEngine);
+        logger.info("Retrieved the actual content of records inside those blocks");
         return ambiguousRepresentativesList;
     }
 
@@ -92,6 +95,7 @@ public class BlockLogic implements iBlockLogic {
         while (iter.hasNext()) {
             Map.Entry<Integer, List<Block>> entry = iter.next();
             if (entry.getValue().size() < 2) {
+                logger.debug("Removing '" + entry.getKey() + "', it represents just one block");
                 iter.remove();
             }
         }
@@ -158,6 +162,7 @@ public class BlockLogic implements iBlockLogic {
         for (Block block : blocks) {
             calcBlockSimilarity(similarityCalculator, block, searchEngine);
             calcRecordsProbabilityInBlock(block);
+            block.findBlockRepresentatives();
         }
     }
 

@@ -28,6 +28,7 @@ public class Block {
             membersScores.put(member, 0F);
             membersProbability.put(member, 0F);
         }
+        blockRepresentatives = null;
     }
 
     @Override
@@ -55,16 +56,17 @@ public class Block {
 
         builder.append("Block representative is: ");
 
-        Map<Integer, Float> blockRepresentatives = findBlockRepresentatives();
-        StringBuilder sb = new StringBuilder();
-        for (Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
-            sb.append(blockRepresentative.getKey());
-            addCharSeparator(sb);
-        }
-        String representatives = sb.substring(0, sb.length() - 1);
+        if (blockRepresentatives != null && !blockRepresentatives.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
+                sb.append(blockRepresentative.getKey());
+                addCharSeparator(sb);
+            }
+            String representatives = sb.substring(0, sb.length() - 1);
 
-        //all entries in the list have the same value. Therefore can use the value of the first entry
-        builder.append(String.format("recordIDs %s Probability %s", representatives, blockRepresentatives.values().iterator().next()));
+            //all entries in the list have the same value. Therefore can use the value of the first entry
+            builder.append(String.format("recordIDs %s Probability %s", representatives, blockRepresentatives.values().iterator().next()));
+        }
 
         return builder.toString();
     }
@@ -118,14 +120,15 @@ public class Block {
             //find the max probability score in the block
             for (Entry<Integer, Float> entry : membersProbability.entrySet()) {
                 Float localProb = entry.getValue();
-                if (localProb.equals(Math.max(localProb, maxProb))) {
-                    maxProb = localProb;
-                }
+                maxProb = Math.max(localProb, maxProb);
             }
+            logger.debug("Max probability of records in this Block is:" + maxProb + ". Block Members: " + members);
+
             //add all entries that have the max score.
             //More that one entry can the max score
             for (Entry<Integer, Float> entry : membersProbability.entrySet()) {
                 if (maxProb == entry.getValue()) {
+                    logger.debug("Adding '" + entry.getKey() + "' as representative of the block");
                     blockRepresentatives.put(entry.getKey(), entry.getValue());
                 }
             }
@@ -180,12 +183,13 @@ public class Block {
         addCsvSeperator(builder);
 
         //add representatives
-        Map<Integer, Float> blockRepresentatives = findBlockRepresentatives();
-        for (Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
-            builder.append(blockRepresentative.getKey());
-            addCharSeparator(builder);
+        if (blockRepresentatives != null) {
+            for (Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
+                builder.append(blockRepresentative.getKey());
+                addCharSeparator(builder);
+            }
+            builder.deleteCharAt(builder.length() - 1);
         }
-        builder.deleteCharAt(builder.length() - 1);
 
         return builder.toString();
     }

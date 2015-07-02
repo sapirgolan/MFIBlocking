@@ -173,7 +173,8 @@ public class BottomUp {
 
                 List<Block> algorithmBlocks = findBlocks(algorithmObtainedPairs, true, recordsSize);
                 printNeighborsAndBlocks(algorithmObtainedPairs, context, algorithmBlocks);
-                findBlocksAmbiguousRepresentatives(algorithmBlocks, context);
+                Map<Integer, List<BlockDescriptor>> blocksAmbiguousRepresentatives = findBlocksAmbiguousRepresentatives(algorithmBlocks, context);
+                printAmbiguousRepresentatives(blocksAmbiguousRepresentatives, context);
                 long writeBlocksDuration = timer.getActionTimeDuration();
 
                 timer.startActionTimeMeassurment();
@@ -214,9 +215,20 @@ public class BottomUp {
 		}		
 	}
 
-    private static void findBlocksAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
+    private static void printAmbiguousRepresentatives(Map<Integer, List<BlockDescriptor>> blocksAmbiguousRepresentatives, MfiContext context) {
+        ResultWriter resultWriter = new ResultWriter();
+        File outputFile = resultWriter.createAmbiguousRepresentativesOutputFile(context.getDatasetName());
+        try {
+            resultWriter.writeAmbiguousRepresentatives(outputFile, blocksAmbiguousRepresentatives);
+        } catch (IOException e) {
+            logger.error("Failed to write the AmbiguousRepresentatives", e);
+        }
+    }
+
+    private static Map<Integer, List<BlockDescriptor>> findBlocksAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
         iBlockService blockService = new BlockService();
-        blockService.findAmbiguousRepresentatives(algorithmBlocks, context);
+        Map<Integer, List<BlockDescriptor>> ambiguousRepresentatives = blockService.findAmbiguousRepresentatives(algorithmBlocks, context);
+        return ambiguousRepresentatives;
     }
 
     private static void printRocCurveDots(Map<Double, Double> cordinatesForPlot) {

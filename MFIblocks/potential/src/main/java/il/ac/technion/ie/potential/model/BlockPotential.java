@@ -18,7 +18,7 @@ public class BlockPotential {
         this.potential = new HashMap<>();
 
         for (Integer recordId : block.getMembers()) {
-            double memberScore = (double)block.getMemberScore(recordId);
+            double memberScore = (double)block.getMemberProbability(recordId);
             potential.put(recordId, Math.log(memberScore));
         }
     }

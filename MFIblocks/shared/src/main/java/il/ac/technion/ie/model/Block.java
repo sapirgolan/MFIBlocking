@@ -201,4 +201,8 @@ public class Block {
     private void addCsvSeperator(StringBuilder builder) {
         builder.append("|");
     }
+
+    public int size() {
+        return this.members.size();
+    }
 }

@@ -25,6 +25,7 @@
        <module>shared</module>
        <module>searchEngine</module>
 	   <module>measurements</module>
+       <module>potential</module>
    </modules>
   
   <build>

@@ -2,7 +2,7 @@ package il.ac.technion.ie.model;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsNot;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,43 +28,43 @@ public class BlockTest {
 
     @Test
     public void testEquals_true() throws Exception {
-        Block blockOne = new Block(Arrays.asList(1,2,3));
-        Block blockTwo = new Block(Arrays.asList(1,2,3));
+        Block blockOne = new Block(Arrays.asList(1,2,3), Block.RANDOM_ID);
+        Block blockTwo = new Block(Arrays.asList(1,2,3), Block.RANDOM_ID);
         MatcherAssert.assertThat(blockOne, is(equalTo(blockTwo)));
     }
 
     @Test
     public void testEquals_sameDifferentOrder() throws Exception {
-        Block blockOne = new Block(Arrays.asList(1,2,3));
-        Block blockTwo = new Block(Arrays.asList(2,3,1));
+        Block blockOne = new Block(Arrays.asList(1,2,3), Block.RANDOM_ID);
+        Block blockTwo = new Block(Arrays.asList(2,3,1), Block.RANDOM_ID);
         MatcherAssert.assertThat(blockOne, is(equalTo(blockTwo)));
     }
 
     @Test
     public void testEquals_secondSmaller() throws Exception {
-        Block blockOne = new Block(Arrays.asList(1,2,3));
-        Block blockTwo = new Block(Arrays.asList(1,2));
+        Block blockOne = new Block(Arrays.asList(1,2,3), Block.RANDOM_ID);
+        Block blockTwo = new Block(Arrays.asList(1,2), Block.RANDOM_ID);
         MatcherAssert.assertThat(blockOne, IsNot.not(equalTo(blockTwo)));
     }
 
     @Test
     public void testEquals_secondBigger() throws Exception {
-        Block blockOne = new Block(Arrays.asList(1,2));
-        Block blockTwo = new Block(Arrays.asList(1,2,3));
+        Block blockOne = new Block(Arrays.asList(1,2), Block.RANDOM_ID);
+        Block blockTwo = new Block(Arrays.asList(1,2,3), Block.RANDOM_ID);
         MatcherAssert.assertThat(blockOne, IsNot.not(equalTo(blockTwo)));
     }
 
     @Test
     public void testEquals_firstAndLastMembersAreTheSame() throws Exception {
-        Block blockOne = new Block(Arrays.asList(1,7,220,2));
-        Block blockTwo = new Block(Arrays.asList(1,9,2));
+        Block blockOne = new Block(Arrays.asList(1,7,220,2), Block.RANDOM_ID);
+        Block blockTwo = new Block(Arrays.asList(1,9,2), Block.RANDOM_ID);
         MatcherAssert.assertThat(blockOne, IsNot.not(equalTo(blockTwo)));
     }
 
     @Test
     public void testHasMember() throws Exception {
         List<Integer> members = Arrays.asList(1, 7, 220, 2);
-        Block block = new Block(members);
+        Block block = new Block(members, Block.RANDOM_ID);
         for (Integer member : members) {
             MatcherAssert.assertThat(block.hasMember(member), is(true));
         }
@@ -73,7 +73,7 @@ public class BlockTest {
 
     @Test
     public void testGetMemberAvgSimilarity() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 220, 2));
+        Block block = new Block(Arrays.asList(1, 7, 220, 2), Block.RANDOM_ID);
         block.setMemberSimScore(1, 2.2F);
         block.setMemberSimScore(7, 2F);
         block.setMemberSimScore(220, 2.1F);
@@ -87,7 +87,7 @@ public class BlockTest {
 
     @Test
     public void testFindRep() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.26F);
         block.setMemberProbability(22, 0.25F);
@@ -99,7 +99,7 @@ public class BlockTest {
 
     @Test
     public void testToString_noRepresentatives() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.26F);
         block.setMemberProbability(22, 0.25F);
@@ -114,7 +114,7 @@ public class BlockTest {
 
     @Test
     public void testToString_withRepresentatives() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.26F);
         block.setMemberProbability(22, 0.25F);
@@ -130,7 +130,7 @@ public class BlockTest {
 
     @Test
     public void testToCsv_noRepresentatives() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.26F);
         block.setMemberProbability(22, 0.25F);
@@ -143,7 +143,7 @@ public class BlockTest {
 
     @Test
     public void testToCsv_withRepresentatives() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.26F);
         block.setMemberProbability(22, 0.25F);

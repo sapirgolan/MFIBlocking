@@ -131,7 +131,7 @@ public class BlockLogic implements iBlockLogic {
     private List<Block> createBlocksForMissingRecords(List<Integer> itemsNotDiscovered) {
         List<Block> singletontesBlocks = new ArrayList<>();
         for (Integer recordId : itemsNotDiscovered) {
-            singletontesBlocks.add(new Block(new ArrayList<>(Arrays.asList(recordId))));
+            singletontesBlocks.add(new Block(new ArrayList<>(Arrays.asList(recordId)),Block.RANDOM_ID));
         }
         return singletontesBlocks;
     }

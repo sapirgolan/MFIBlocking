@@ -91,8 +91,8 @@ public class BlockLogicTest {
     @Test
     public void testCalcProbabilityOnRecords() {
         List<Block> blocks = new ArrayList<>();
-        blocks.add(new Block(Arrays.asList(2, 4, 3, 5)));
-        blocks.add(new Block(Arrays.asList(1)));
+        blocks.add(new Block(Arrays.asList(2, 4, 3, 5), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(1), Block.RANDOM_ID));
 
         recordsFileName = "dataset.csv";
         PowerMockito.when(context.getOriginalRecordsPath()).thenReturn(this.getRecordsFilePath());
@@ -253,10 +253,10 @@ public class BlockLogicTest {
     public void testFindBlocksOfRecord() throws Exception {
         int searchRecord = 1;
         List<Block> blocks = new ArrayList<>();
-        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5)));
-        blocks.add(new Block(Arrays.asList(5, 1, 7)));
-        blocks.add(new Block(Arrays.asList(22, 29, 30)));
-        blocks.add(new Block(Arrays.asList(7, 9, 1)));
+        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(5, 1, 7), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(22, 29, 30), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(7, 9, 1), Block.RANDOM_ID));
 
         List<Block> blocksOfRecord = classUnderTest.findBlocksOfRecord(blocks, searchRecord);
         List<Block> expectedBlocks = new ArrayList<>(blocks);
@@ -269,8 +269,8 @@ public class BlockLogicTest {
     @Test
     public void testFindMissingRecordsFromBlocks_inBetween() throws Exception {
         List<Block> blocks = new ArrayList<>();
-        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5)));
-        blocks.add(new Block(Arrays.asList(5, 7)));
+        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(5, 7), Block.RANDOM_ID));
 
         List<Integer> missingRecords = Whitebox.invokeMethod(classUnderTest, "findMissingRecordsFromBlocks", blocks, 7);
         MatcherAssert.assertThat(missingRecords, contains(6));
@@ -279,8 +279,8 @@ public class BlockLogicTest {
     @Test
     public void testFindMissingRecordsFromBlocks_none() throws Exception {
         List<Block> blocks = new ArrayList<>();
-        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5)));
-        blocks.add(new Block(Arrays.asList(5, 6)));
+        blocks.add(new Block(Arrays.asList(1, 2, 4, 3, 5), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(5, 6), Block.RANDOM_ID));
 
         List<Integer> missingRecords = Whitebox.invokeMethod(classUnderTest, "findMissingRecordsFromBlocks", blocks, 6);
         MatcherAssert.assertThat(missingRecords, is(empty()));
@@ -289,9 +289,9 @@ public class BlockLogicTest {
     @Test
     public void testFindMissingRecordsFromBlocks_several() throws Exception {
         List<Block> blocks = new ArrayList<>();
-        blocks.add(new Block(Arrays.asList(2, 4, 3, 5)));
-        blocks.add(new Block(Arrays.asList(5, 6)));
-        blocks.add(new Block(Arrays.asList(3, 8)));
+        blocks.add(new Block(Arrays.asList(2, 4, 3, 5), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(5, 6), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(3, 8), Block.RANDOM_ID));
 
         List<Integer> missingRecords = Whitebox.invokeMethod(classUnderTest, "findMissingRecordsFromBlocks", blocks, 10);
         MatcherAssert.assertThat(missingRecords, contains(1, 7, 9, 10));
@@ -303,10 +303,10 @@ public class BlockLogicTest {
         List<Block> singletoneBlocks = Whitebox.invokeMethod(classUnderTest, "createBlocksForMissingRecords", integers);
         MatcherAssert.assertThat(singletoneBlocks.size(), is(4));
         MatcherAssert.assertThat(singletoneBlocks, containsInAnyOrder(
-                new Block(Arrays.asList(8)),
-                new Block(Arrays.asList(11)),
-                new Block(Arrays.asList(12)),
-                new Block(Arrays.asList(20))
+                new Block(Arrays.asList(8), Block.RANDOM_ID),
+                new Block(Arrays.asList(11), Block.RANDOM_ID),
+                new Block(Arrays.asList(12), Block.RANDOM_ID),
+                new Block(Arrays.asList(20), Block.RANDOM_ID)
         ));
     }
 
@@ -328,7 +328,7 @@ public class BlockLogicTest {
             if (!recordsIDsBlockOne.contains(recordId) && !recordsIDsBlockTwo.contains(recordId)) {
                 List<Block> blocksOfRecord = classUnderTest.findBlocksOfRecord(blocks, recordId);
                 MatcherAssert.assertThat(blocksOfRecord, allOf(hasSize(1)));
-                MatcherAssert.assertThat(blocksOfRecord, contains(new Block(Arrays.asList(recordId))));
+                MatcherAssert.assertThat(blocksOfRecord, contains(new Block(Arrays.asList(recordId), Block.RANDOM_ID)));
             }
         }
     }
@@ -336,9 +336,9 @@ public class BlockLogicTest {
     @Test
     public void testSetRecordsInBlocksAsTrueMatch() throws Exception {
         List<Block> blocks = new ArrayList<>();
-        blocks.add(new Block(Arrays.asList(2, 4, 3, 5)));
-        blocks.add(new Block(Arrays.asList(5, 6)));
-        blocks.add(new Block(Arrays.asList(3, 8)));
+        blocks.add(new Block(Arrays.asList(2, 4, 3, 5), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(5, 6), Block.RANDOM_ID));
+        blocks.add(new Block(Arrays.asList(3, 8), Block.RANDOM_ID));
 
         classUnderTest.setRecordsInBlocksAsTrueMatch(blocks);
 
@@ -353,7 +353,7 @@ public class BlockLogicTest {
     @Test
     public void testUpdateBlockRepresentativesMap_addOneNewRepresentative() throws Exception {
         Map<Integer, List<Block>> map = new HashMap<>();
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.27F);
         block.setMemberProbability(22, 0.24F);
@@ -366,7 +366,7 @@ public class BlockLogicTest {
     @Test
     public void testUpdateBlockRepresentativesMap_addTwoNewRepresentatives() throws Exception {
         Map<Integer, List<Block>> map = new HashMap<>();
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.26F);
         block.setMemberProbability(22, 0.25F);
@@ -384,7 +384,7 @@ public class BlockLogicTest {
         List<Block> blocks = new ArrayList<>(Arrays.asList(existingBlock));
         map.put(7, blocks);
 
-        Block block = new Block(Arrays.asList(1, 7, 22, 2));
+        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.26F);
         block.setMemberProbability(7, 0.26F);
         block.setMemberProbability(22, 0.25F);

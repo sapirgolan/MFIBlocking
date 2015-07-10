@@ -2,10 +2,7 @@ package il.ac.technion.ie.model;
 
 import org.apache.log4j.Logger;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -13,13 +10,15 @@ import java.util.Map.Entry;
  */
 public class Block {
     static final Logger logger = Logger.getLogger(Block.class);
+    public static int RANDOM_ID = -1;
     private List<Integer> members;
     private float score;
     private Map<Integer, Float> membersScores;
     private Map<Integer, Float> membersProbability;
     private Map<Integer, Float> blockRepresentatives;
+    private int id;
 
-    public Block(List<Integer> members) {
+    public Block(List<Integer> members, int blockId) {
         this.members = members;
         score = 0;
         membersScores = new HashMap<>();
@@ -29,6 +28,12 @@ public class Block {
             membersProbability.put(member, 0F);
         }
         blockRepresentatives = null;
+        if (blockId == RANDOM_ID) {
+            Random random = new Random();
+            this.id = random.nextInt(2000) + 10000000;
+        } else {
+            this.id = blockId;
+        }
     }
 
     @Override
@@ -204,5 +209,9 @@ public class Block {
 
     public int size() {
         return this.members.size();
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

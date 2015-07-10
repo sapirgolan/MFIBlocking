@@ -24,7 +24,7 @@ public class BlockUtilsTest {
 
     @Test
     public void testConvertBlockToDescriptor() throws Exception {
-        Block block = PowerMockito.spy(new Block(Arrays.asList(1, 7, 2)));
+        Block block = PowerMockito.spy(new Block(Arrays.asList(1, 7, 2), Block.RANDOM_ID));
         SearchEngine engine = PowerMockito.mock(SearchEngine.class);
         List<String> value = Arrays.asList("record 7", "attributes", "list");
         PowerMockito.when(engine.getRecordAttributes(Mockito.eq("7"))).thenReturn(value);
@@ -42,8 +42,8 @@ public class BlockUtilsTest {
     @Test
     public void testConvertBlocksToDescriptors_cache() throws Exception {
         //Variables
-        Block blockOne = new Block(Arrays.asList(1, 7, 2));
-        Block blockTwo = new Block(Arrays.asList(8, 10, 2));
+        Block blockOne = new Block(Arrays.asList(1, 7, 2), Block.RANDOM_ID);
+        Block blockTwo = new Block(Arrays.asList(8, 10, 2), Block.RANDOM_ID);
         SearchEngine searchEngine = PowerMockito.mock(SearchEngine.class);
 
         //Mock Behavior

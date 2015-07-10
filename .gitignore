@@ -1,7 +1,6 @@
 #################
 ## Eclipse
 #################
-*.properties
 
 *.pydevproject
 .project

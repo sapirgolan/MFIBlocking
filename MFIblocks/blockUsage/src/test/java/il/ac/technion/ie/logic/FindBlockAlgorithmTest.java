@@ -43,9 +43,9 @@ public class FindBlockAlgorithmTest {
     @Test
     public void testFindBlocks() throws Exception {
         ArrayList<Block> trueBlocks = Lists.newArrayList(
-                new Block(Lists.newArrayList(1, 5)),
-                new Block(Lists.newArrayList(2, 3, 4)),
-                new Block(Lists.newArrayList(1, 2, 3)));
+                new Block(Lists.newArrayList(1, 5), Block.RANDOM_ID),
+                new Block(Lists.newArrayList(2, 3, 4), Block.RANDOM_ID),
+                new Block(Lists.newArrayList(1, 2, 3), Block.RANDOM_ID));
         one.exitsNeighbors(Lists.newArrayList(1, 2, 3, 5));
         two.exitsNeighbors(Lists.newArrayList(1, 2, 3, 4));
         three.exitsNeighbors(Lists.newArrayList(1, 2, 3, 4));

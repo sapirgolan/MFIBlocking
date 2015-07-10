@@ -17,6 +17,7 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
 
     static final Logger logger = Logger.getLogger(FindBlockAlgorithm.class);
     private static final int TWO = 2;
+    private int blockId;
 
     @Override
     public <E extends NeighborsVector> List<Block> findBlocks(List<E> matches) {
@@ -27,6 +28,7 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
         int largestBlockCreated = 0;
         List<Integer> itemsSeen = new ArrayList<>();
         List<Block> result = new ArrayList<>();
+        blockId = 1;
         for (E match : matchesWithoutDuplicates) {
             if (isSingleOrDoubleBlock(match)) {
                 logger.trace("input block is of size <=2, " + match.toString());
@@ -43,6 +45,7 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
                     largestBlockCreated = updateBlocks(itemsSeen, result, match, neighbors);
                 }
             }
+            blockId++;
         }
         return result;
     }
@@ -58,7 +61,7 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
      */
     private <E extends NeighborsVector> int updateBlocks(List<Integer> itemsSeen, List<Block> result, E match, List<Integer> neighbors) {
         itemsSeen.add(match.getReresentativeId());
-        Block block = new Block(neighbors);
+        Block block = new Block(neighbors, blockId);
         result.add(block);
         logger.debug("Added to result block: " + block.toString());
         return neighbors.size();

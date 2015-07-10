@@ -22,7 +22,7 @@ public class BlockPotentialTest {
 
     @Test
     public void testGetPotentialValues() throws Exception {
-        Block block = new Block(Arrays.asList(1, 3, 2));
+        Block block = new Block(Arrays.asList(1, 3, 2), Block.RANDOM_ID);
         block.setMemberProbability(1, 0.6F);
         block.setMemberProbability(3, 0.3F);
         block.setMemberProbability(2, 0.1F);

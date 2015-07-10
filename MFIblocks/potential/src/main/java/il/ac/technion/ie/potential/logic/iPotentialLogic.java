@@ -1,6 +1,7 @@
 package il.ac.technion.ie.potential.logic;
 
 import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
 
 import java.util.List;
@@ -10,4 +11,6 @@ import java.util.List;
  */
 public interface iPotentialLogic {
     List<BlockPotential> getLocalPotential(List<Block> blocks);
+
+    AdjustedMatrix calculateAdjustedMatrix(List<Block> blocks);
 }

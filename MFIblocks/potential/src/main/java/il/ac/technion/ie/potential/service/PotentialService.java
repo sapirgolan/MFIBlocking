@@ -19,7 +19,8 @@ public class PotentialService implements iPotentialService {
 
     @Override
     public AdjustedMatrix getAdjustedMatrix(List<Block> blocks) {
-        return null;
+        logger.info("calculating an Adjusted Matrix");
+        return potentialLogic.calculateAdjustedMatrix(blocks);
     }
 
     @Override

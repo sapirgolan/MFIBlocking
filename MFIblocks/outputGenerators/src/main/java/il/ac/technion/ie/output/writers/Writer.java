@@ -59,10 +59,10 @@ public class Writer {
     }
 
     public static void printAmbiguousRepresentatives(Map<Integer, List<BlockDescriptor>> blocksAmbiguousRepresentatives, MfiContext context) {
-        ResultWriter resultWriter = new ResultWriter();
-        File outputFile = resultWriter.createAmbiguousRepresentativesOutputFile(context.getDatasetName());
+        AmbiguousRepresentativesWriter writer = new AmbiguousRepresentativesWriter();
+        File outputFile = writer.generateFile(context.getDatasetName(), ".csv");
         try {
-            resultWriter.writeAmbiguousRepresentatives(outputFile, blocksAmbiguousRepresentatives);
+            writer.writeResults(outputFile, blocksAmbiguousRepresentatives);
         } catch (IOException e) {
             logger.error("Failed to write the AmbiguousRepresentatives", e);
         }

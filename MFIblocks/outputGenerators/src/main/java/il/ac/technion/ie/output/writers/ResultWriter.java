@@ -3,7 +3,10 @@ package il.ac.technion.ie.output.writers;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import il.ac.technion.ie.context.MfiContext;
-import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.model.RecordMatches;
+import il.ac.technion.ie.model.RecordSet;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,11 +36,6 @@ public class ResultWriter {
     public File createBlocksOutputFile(String datasetName) {
         return createUniqueOutputFile("/Blocks_"+datasetName, ".txt");
     }
-
-    public File createAmbiguousRepresentativesOutputFile(String datasetName) {
-        return createUniqueOutputFile("/AmbiguousRepresentatives_" + datasetName, ".csv");
-    }
-
     public File createCyphrtOutputFile() {
         return createUniqueOutputFile("/CypherCommands_", ".txt");
     }
@@ -195,53 +193,6 @@ public class ResultWriter {
             bufferedWriter.newLine();
         }
         bufferedWriter.close();
-    }
-
-    public void writeAmbiguousRepresentatives(File outputFile, Map<Integer, List<BlockDescriptor>> blocksAmbiguousRepresentatives) throws IOException {
-        FileWriter fileWriter = new FileWriter(outputFile.getAbsoluteFile());
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        for (Entry<Integer, List<BlockDescriptor>> entry : blocksAmbiguousRepresentatives.entrySet()) {
-            String csvEntry = ambiguousRepresentativeBlocksToCsv(entry);
-            bufferedWriter.write(csvEntry);
-            bufferedWriter.newLine();
-        }
-        bufferedWriter.close();
-    }
-
-    /**
-     * Gets a record ID that represents several blocks and a List of those blocks
-     *
-     * @param entry
-     * @return
-     */
-    private String ambiguousRepresentativeBlocksToCsv(Entry<Integer, List<BlockDescriptor>> entry) {
-        StringBuilder builder = new StringBuilder();
-        Integer recordRepresentSeveralBlocks = entry.getKey();
-        List<BlockDescriptor> representedBlocks = entry.getValue();
-
-        for (BlockDescriptor blockDescriptor : representedBlocks) {
-            for (Integer recordId : blockDescriptor.getMembers()) {
-                //adding the root cause for this entry
-                builder.append(recordRepresentSeveralBlocks);
-                addCsvSeperator(builder);
-
-                //adding current record in Block
-                builder.append(recordId);
-                addCsvSeperator(builder);
-
-                //adding the content of the block
-                List<String> contentOfRecord = blockDescriptor.getContentOfRecord(recordId);
-                for (String text : contentOfRecord) {
-                    builder.append(text);
-                    builder.append(" ");
-                }
-                builder.deleteCharAt(builder.length() - 1);
-                addCsvSeperator(builder);
-                builder.append("\r\n");
-            }
-            builder.append("\r\n");
-        }
-        return builder.toString();
     }
 
     private void addCsvSeperator(StringBuilder builder) {

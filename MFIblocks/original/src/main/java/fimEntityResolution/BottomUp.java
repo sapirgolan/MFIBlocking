@@ -9,6 +9,10 @@ import fimEntityResolution.statistics.Timer;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.output.writers.Writer;
+import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.service.PotentialService;
+import il.ac.technion.ie.potential.service.iPotentialService;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.ComparisonInteraction;
 import il.ac.technion.ie.service.BlockService;
@@ -172,9 +176,14 @@ public class BottomUp {
                 timer.startActionTimeMeassurment();
 
                 List<Block> algorithmBlocks = findBlocks(algorithmObtainedPairs, true, recordsSize);
-                printNeighborsAndBlocks(algorithmObtainedPairs, context, algorithmBlocks);
+                Writer.printNeighborsAndBlocks(algorithmObtainedPairs, context, algorithmBlocks);
                 Map<Integer, List<BlockDescriptor>> blocksAmbiguousRepresentatives = findBlocksAmbiguousRepresentatives(algorithmBlocks, context);
-                printAmbiguousRepresentatives(blocksAmbiguousRepresentatives, context);
+                Writer.printAmbiguousRepresentatives(blocksAmbiguousRepresentatives, context);
+
+                //Fetching and printing local potential from algorithmBlocks
+                iPotentialService potentialService = new PotentialService();
+                List<BlockPotential> localPotential = potentialService.getLocalPotential(algorithmBlocks);
+                Writer.printBlockPotential(localPotential, context);
                 long writeBlocksDuration = timer.getActionTimeDuration();
 
                 timer.startActionTimeMeassurment();
@@ -215,31 +224,10 @@ public class BottomUp {
 		}		
 	}
 
-    private static void printAmbiguousRepresentatives(Map<Integer, List<BlockDescriptor>> blocksAmbiguousRepresentatives, MfiContext context) {
-        ResultWriter resultWriter = new ResultWriter();
-        File outputFile = resultWriter.createAmbiguousRepresentativesOutputFile(context.getDatasetName());
-        try {
-            resultWriter.writeAmbiguousRepresentatives(outputFile, blocksAmbiguousRepresentatives);
-        } catch (IOException e) {
-            logger.error("Failed to write the AmbiguousRepresentatives", e);
-        }
-    }
-
     private static Map<Integer, List<BlockDescriptor>> findBlocksAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
         iBlockService blockService = new BlockService();
         Map<Integer, List<BlockDescriptor>> ambiguousRepresentatives = blockService.findAmbiguousRepresentatives(algorithmBlocks, context);
         return ambiguousRepresentatives;
-    }
-
-    private static void printRocCurveDots(Map<Double, Double> cordinatesForPlot) {
-        ResultWriter resultWriter = new ResultWriter();
-        File rocOutputFile = resultWriter.createRocOutputFile();
-        try {
-            resultWriter.writeRocDots(rocOutputFile, cordinatesForPlot);
-            logger.info("Finished writing ROC dots");
-        } catch (IOException e) {
-            logger.error("Failed to write ROC dots", e);
-        }
     }
 
     /**
@@ -279,35 +267,6 @@ public class BottomUp {
 		engine.addRecords(recordsFile);
 		return engine;
 	}
-
-
-	/**
-	 * the method write the blocking output to a file for later usage
-	 * @param cps
-	 */
-	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context, List<Block> blocks) {
-		ResultWriter resultWriter = new ResultWriter();
-		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
-        File blocksOutputFile = resultWriter.createBlocksOutputFile(context.getDatasetName());
-
-        try {
-            switch (context.getPrntFormat().toLowerCase()) {
-                case "s" :
-                    resultWriter.writeBlocksStatistics(blocksOutputFile, cps, context);
-                    break;
-                case "b":
-                    resultWriter.writeEachRecordNeighbors(blocksOutputFile, cps);
-                    break;
-                default:
-                    logger.debug("No blocks were printed");
-            }
-            resultWriter.writeBlocks(blocksOutputFile, blocks);
-            logProgress("Outfile was written to: " + neighborsOutputFile.getAbsolutePath());
-		} catch (IOException e) {
-            logger.error("Failed to write blocks", e);
-		}
-	}
-
 
 	private static void printExperimentMeasurments( List<BlockingRunResult> blockingRunResults) {
 		String[] columnNames = {}; 

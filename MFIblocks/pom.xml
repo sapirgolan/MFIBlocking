@@ -26,6 +26,7 @@
        <module>searchEngine</module>
 	   <module>measurements</module>
        <module>potential</module>
+       <module>outputGenerators</module>
    </modules>
   
   <build>

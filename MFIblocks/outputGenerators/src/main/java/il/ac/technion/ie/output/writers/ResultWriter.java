@@ -1,4 +1,4 @@
-package fimEntityResolution;
+package il.ac.technion.ie.output.writers;
 
 
 import au.com.bytecode.opencsv.CSVWriter;

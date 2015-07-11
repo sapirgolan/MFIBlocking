@@ -1,6 +1,7 @@
 package il.ac.technion.ie.potential.service;
 
 import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.potential.logic.PotentialLogic;
 import il.ac.technion.ie.potential.logic.iPotentialLogic;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
@@ -16,6 +17,9 @@ public class PotentialService implements iPotentialService {
     private iPotentialLogic potentialLogic;
     static final Logger logger = Logger.getLogger(PotentialService.class);
 
+    public PotentialService() {
+        potentialLogic = new PotentialLogic();
+    }
 
     @Override
     public AdjustedMatrix getAdjustedMatrix(List<Block> blocks) {

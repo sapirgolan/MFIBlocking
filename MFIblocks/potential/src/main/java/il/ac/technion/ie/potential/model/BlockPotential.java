@@ -13,10 +13,11 @@ import java.util.Map;
 public class BlockPotential {
 
     private Map<Integer, Double> potential;
+    private int blockID;
 
     public BlockPotential(Block block) {
         this.potential = new HashMap<>();
-
+        this.blockID = block.getId();
         for (Integer recordId : block.getMembers()) {
             double memberScore = (double)block.getMemberProbability(recordId);
             potential.put(recordId, Math.log(memberScore));
@@ -25,5 +26,9 @@ public class BlockPotential {
 
     public List<Double> getPotentialValues() {
         return new ArrayList<>(potential.values());
+    }
+
+    public int getBlockID() {
+        return blockID;
     }
 }

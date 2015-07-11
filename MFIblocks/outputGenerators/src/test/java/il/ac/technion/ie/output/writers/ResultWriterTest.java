@@ -1,11 +1,16 @@
-package fimEntityResolution;
+package il.ac.technion.ie.output.writers;
 
 import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.model.RecordMatches;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -17,14 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class ResultWriterTest {
@@ -44,23 +41,23 @@ public class ResultWriterTest {
 	@Test
 	public void testCreateOutputFile() {
 		File outputFile = classUnderTest.createNeighborsOutputFile();
-		assertNotNull("Output file was not created", outputFile);
-		assertThat(outputFile.getAbsolutePath(), containsString( System.getProperty("user.dir") ));
+		Assert.assertNotNull("Output file was not created", outputFile);
+		MatcherAssert.assertThat(outputFile.getAbsolutePath(), Matchers.containsString(System.getProperty("user.dir")));
 		
 		DateTime dateTime = new DateTime();
 		String fileName = outputFile.getName();
 		String day = String.valueOf(dateTime.getDayOfMonth());
 		String month = String.valueOf(dateTime.getMonthOfYear());
 		String year = String.valueOf(dateTime.getYear());
-		assertThat(fileName, allOf( containsString(day), containsString(month), containsString(year)));
+		MatcherAssert.assertThat(fileName, CoreMatchers.allOf(Matchers.containsString(day), Matchers.containsString(month), Matchers.containsString(year)));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testWriteSingleBlock() throws IOException {
 		File file = new File("result.txt");
-		CandidatePairs candidatePairs = mock(CandidatePairs.class);
-		when(candidatePairs.getAllMatches()).thenAnswer(new Answer<ConcurrentHashMap<Integer,RecordMatches>>() {
+		CandidatePairs candidatePairs = Mockito.mock(CandidatePairs.class);
+		Mockito.when(candidatePairs.getAllMatches()).thenAnswer(new Answer<ConcurrentHashMap<Integer,RecordMatches>>() {
 			//create an answer for getAllMatches() call
 			@Override
 			public ConcurrentHashMap<Integer, RecordMatches> answer(
@@ -77,15 +74,15 @@ public class ResultWriterTest {
 		//classUnderTest.writeBlocksIDs(file, candidatePairs);
 		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
-		assertThat(fileContent, allOf(containsString("1"),containsString("4"), containsString("2") ));
+		MatcherAssert.assertThat(fileContent, CoreMatchers.allOf(Matchers.containsString("1"), Matchers.containsString("4"), Matchers.containsString("2")));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testWriteSeveralBlocks() throws IOException{
 		File file = new File("result.txt");
-		CandidatePairs candidatePairs = mock(CandidatePairs.class);
-		when(candidatePairs.getAllMatches()).thenAnswer(new Answer<ConcurrentHashMap<Integer,RecordMatches>>() {
+		CandidatePairs candidatePairs = Mockito.mock(CandidatePairs.class);
+		Mockito.when(candidatePairs.getAllMatches()).thenAnswer(new Answer<ConcurrentHashMap<Integer,RecordMatches>>() {
 			//create an answer for getAllMatches() call
 			@Override
 			public ConcurrentHashMap<Integer, RecordMatches> answer(
@@ -107,14 +104,14 @@ public class ResultWriterTest {
 		//classUnderTest.writeBlocksIDs(file, candidatePairs);
 		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
-		assertThat(fileContent, allOf(containsString("2 - [1, 4]"), containsString("90 - [16, 14, 11]") ));
+		MatcherAssert.assertThat(fileContent, CoreMatchers.allOf(Matchers.containsString("2 - [1, 4]"), Matchers.containsString("90 - [16, 14, 11]")));
 	}
 	
 	@Test
 	public void testWriteSkipEmptyBlocks() throws IOException{
 		File file = new File("result.txt");
-		CandidatePairs candidatePairs = mock(CandidatePairs.class);
-		when(candidatePairs.getAllMatches()).thenAnswer(new Answer<ConcurrentHashMap<Integer,RecordMatches>>() {
+		CandidatePairs candidatePairs = Mockito.mock(CandidatePairs.class);
+		Mockito.when(candidatePairs.getAllMatches()).thenAnswer(new Answer<ConcurrentHashMap<Integer,RecordMatches>>() {
 			//create an answer for getAllMatches() call
 			@Override
 			public ConcurrentHashMap<Integer, RecordMatches> answer(
@@ -133,8 +130,8 @@ public class ResultWriterTest {
 		//classUnderTest.writeBlocksIDs(file, candidatePairs);
 		classUnderTest.writeEachRecordNeighbors(file, candidatePairs);
 		String fileContent = readFile(file.getAbsolutePath(), StandardCharsets.UTF_8);
-		assertThat(fileContent, containsString("2 - [1, 4]"));
-		assertThat( fileContent, not(containsString("90")) );
+		MatcherAssert.assertThat(fileContent, Matchers.containsString("2 - [1, 4]"));
+		MatcherAssert.assertThat(fileContent, CoreMatchers.not(Matchers.containsString("90")));
 	}
 	
 	private String readFile(String path, Charset encoding) throws IOException {

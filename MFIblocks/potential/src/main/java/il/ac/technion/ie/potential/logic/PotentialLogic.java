@@ -33,7 +33,9 @@ public class PotentialLogic implements iPotentialLogic {
 
         //A mapping for each recordID. For each record we store a Set with all
         //blocks is appears in.
+        logger.info("Creating a MAP between each record and the block it is in");
         Map<Integer, Set<Integer>> recordBlockMap = buildMapBlock(filteredBlocks);
+        logger.info("Building Adjusted Matrix from Blocks who have more than one record");
         return buildAdjustedMatrixFromMap(recordBlockMap, filteredBlocks);
     }
 
@@ -54,12 +56,14 @@ public class PotentialLogic implements iPotentialLogic {
             for (Integer outerElement : blocksRecordAppearIn) {
                 for (Integer innerElement : blocksRecordAppearIn) {
                     if (!innerElement.equals(outerElement)) {
+                        logger.debug(String.format("Both Blocks #%d ,#%d contain record %d",
+                                outerElement, innerElement, entry.getKey()));
                         adjustedMatrix.setQuick(outerElement, innerElement, 1.0);
                     }
                 }
             }
         }
-
+        logger.info(String.format("%d records share a common block", adjustedMatrix.cardinality() / 2));
         return adjustedMatrix;
     }
 
@@ -86,6 +90,7 @@ public class PotentialLogic implements iPotentialLogic {
                 filtered.add(block);
             }
         }
+        logger.info("Total of #" + filtered.size() + " were kept after filtering");
         return filtered;
     }
 }

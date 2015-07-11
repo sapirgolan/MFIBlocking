@@ -10,6 +10,7 @@ import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.output.writers.Writer;
+import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
 import il.ac.technion.ie.potential.service.PotentialService;
 import il.ac.technion.ie.potential.service.iPotentialService;
@@ -183,7 +184,8 @@ public class BottomUp {
                 //Fetching and printing local potential from algorithmBlocks
                 iPotentialService potentialService = new PotentialService();
                 List<BlockPotential> localPotential = potentialService.getLocalPotential(algorithmBlocks);
-                Writer.printBlockPotential(localPotential, context);
+                AdjustedMatrix adjustedMatrix = potentialService.getAdjustedMatrix(algorithmBlocks);
+                Writer.printBlockPotential(localPotential, adjustedMatrix, context);
                 long writeBlocksDuration = timer.getActionTimeDuration();
 
                 timer.startActionTimeMeassurment();

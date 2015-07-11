@@ -1,5 +1,6 @@
 package il.ac.technion.ie.output.writers;
 
+import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
 
 import java.io.BufferedWriter;
@@ -20,20 +21,54 @@ public class PotentialWriter extends AbstractWriter {
 
     @Override
     public void writeResults(File file, Object... other) throws IOException {
-        FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        if (other[0] instanceof List<?>) {
-            List<?> list = (List<?>) other[0];
-            if (list.get(0) instanceof BlockPotential) {
-                List<BlockPotential> blockPotentials = (List<BlockPotential>) list;
+
+        for (Object o : other) {
+            FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            List<BlockPotential> blockPotentials = isBlockPotential(o);
+            AdjustedMatrix adjustedMatrix = isAdjustedMatrix(o);
+            if (blockPotentials != null) {
                 for (BlockPotential blockPotential : blockPotentials) {
                     String csvEntry = generateCsvRow(blockPotential);
                     bufferedWriter.write(csvEntry);
                     bufferedWriter.newLine();
                 }
             }
+            if (adjustedMatrix != null) {
+                for (int i = 0; i < adjustedMatrix.size(); i++) {
+                    List<Integer> rowValues = adjustedMatrix.viewRow(i);
+                    String csvEntry = generateCsvRow(rowValues);
+                    bufferedWriter.write(csvEntry);
+                    bufferedWriter.newLine();
+                }
+            }
+            bufferedWriter.close();
         }
-        bufferedWriter.close();
+    }
+
+    private List<BlockPotential> isBlockPotential(Object parameter) {
+        if (parameter instanceof List<?>) {
+            List<?> list = (List<?>) parameter;
+            if (list.get(0) instanceof BlockPotential) {
+                return (List<BlockPotential>) list;
+            }
+        }
+        return null;
+    }
+
+    private AdjustedMatrix isAdjustedMatrix(Object parameter) {
+        if (parameter instanceof AdjustedMatrix) {
+            return (AdjustedMatrix) parameter;
+        }
+        return null;
+    }
+
+    private <T> T isType(Object parameter, Class<T> tClass){
+        if (parameter.getClass().isAssignableFrom(tClass)) {
+            return (T) parameter;
+        }
+        return null;
     }
 
     private String generateCsvRow(BlockPotential blockPotential) {
@@ -46,6 +81,17 @@ public class PotentialWriter extends AbstractWriter {
         for (Double potentialValue : potentialValues) {
             builder.append(potentialValue);
             builder.append(" ");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+
+        return builder.toString();
+    }
+
+    private String generateCsvRow(List<Integer> rowValues) {
+        StringBuilder builder = new StringBuilder();
+        for (Integer cellValue : rowValues) {
+            builder.append(cellValue);
+            this.addCsvSeperator(builder);
         }
         builder.deleteCharAt(builder.length() - 1);
 

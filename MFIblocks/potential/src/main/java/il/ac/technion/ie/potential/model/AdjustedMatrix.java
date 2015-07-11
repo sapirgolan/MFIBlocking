@@ -3,6 +3,7 @@ package il.ac.technion.ie.potential.model;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
 import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -53,6 +54,13 @@ public class AdjustedMatrix {
         return this.matrix2D.cardinality();
     }
 
+    /**
+     * @return number of rows\columns in matrix
+     */
+    public int size() {
+        return this.matrix2D.rows();
+    }
+
     public List<MatrixCell<Double>> getCellsCongaingNonZeroValue() {
         List<MatrixCell<Double>> matrixCells = new ArrayList<>();
         IntArrayList rowList = new IntArrayList();
@@ -65,5 +73,22 @@ public class AdjustedMatrix {
                                             valueList.getQuick(i)));
         }
         return matrixCells;
+    }
+
+    public List<Integer> viewRow(int rowId) {
+        DoubleMatrix1D row = matrix2D.viewRow(rowId);
+        int numberOfCellsInARow = row.size();
+        List<Integer> list = new ArrayList<Integer>(numberOfCellsInARow);
+        IntArrayList intArrayList = new IntArrayList();
+        row.getNonZeros(intArrayList, new DoubleArrayList());
+
+        for (int index = 0; index < numberOfCellsInARow; index++) {
+            if (intArrayList.contains(index)) {
+                list.add(1);
+            } else {
+                list.add(0);
+            }
+        }
+        return list;
     }
 }

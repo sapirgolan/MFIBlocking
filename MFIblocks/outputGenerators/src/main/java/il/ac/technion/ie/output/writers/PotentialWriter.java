@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class PotentialWriter extends AbstractWriter {
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             List<BlockPotential> blockPotentials = isBlockPotential(o);
-            AdjustedMatrix adjustedMatrix = isAdjustedMatrix(o);
+            AdjustedMatrix adjustedMatrix = isType(o, AdjustedMatrix.class);
             if (blockPotentials != null) {
                 for (BlockPotential blockPotential : blockPotentials) {
                     String csvEntry = generateCsvRow(blockPotential);
@@ -48,18 +49,12 @@ public class PotentialWriter extends AbstractWriter {
     }
 
     private List<BlockPotential> isBlockPotential(Object parameter) {
-        if (parameter instanceof List<?>) {
-            List<?> list = (List<?>) parameter;
-            if (list.get(0) instanceof BlockPotential) {
+        List list = isType(parameter, ArrayList.class);
+        if (list != null && !list.isEmpty()) {
+            BlockPotential blockPotential = isType(list.get(0), BlockPotential.class);
+            if (blockPotential != null) {
                 return (List<BlockPotential>) list;
             }
-        }
-        return null;
-    }
-
-    private AdjustedMatrix isAdjustedMatrix(Object parameter) {
-        if (parameter instanceof AdjustedMatrix) {
-            return (AdjustedMatrix) parameter;
         }
         return null;
     }

@@ -2,9 +2,7 @@ package il.ac.technion.ie.potential.model;
 
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
-import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.DoubleMatrix2D;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import il.ac.technion.ie.model.Block;
@@ -15,14 +13,14 @@ import java.util.List;
 /**
  * Created by XPS_Sapir on 09/07/2015.
  */
-public class AdjustedMatrix {
-    private DoubleMatrix2D matrix2D;
-    private BiMap<Integer, Integer> blockIdToMatPosMap;
+public class AdjustedMatrix extends AbstractPotentialMatrix {
+
+    protected BiMap<Integer, Integer> blockIdToMatPosMap;
 
     public AdjustedMatrix(List<Block> filteredBlocks) {
-        this.matrix2D = DoubleFactory2D.sparse.make(filteredBlocks.size(), filteredBlocks.size());
         blockIdToMatPosMap = HashBiMap.create();
         createMatrixBlockMappping(filteredBlocks);
+        this.matrix2D = matrixFactory(filteredBlocks.size(), filteredBlocks.size());
     }
 
     private void createMatrixBlockMappping(List<Block> filteredBlocks) {
@@ -31,34 +29,6 @@ public class AdjustedMatrix {
             blockIdToMatPosMap.put(block.getId(), matrixIndex);
             matrixIndex++;
         }
-    }
-
-    /**
-     * Sets the matrix cell that corresponds to blocks [blockI,blockJ] to the specified value.
-     * @param blockI - the id of block corresponding to row i
-     * @param blockJ - the id of block corresponding to column j
-     * @param value - the value that should be stored in A{i,j} and A{j,i}
-     */
-    public void  setQuick(int blockI, int blockJ, double value) {
-        Integer matrixPosI = blockIdToMatPosMap.get(blockI);
-        Integer matrixPosJ = blockIdToMatPosMap.get(blockJ);
-        matrix2D.setQuick(matrixPosI, matrixPosJ, value);
-        matrix2D.setQuick(matrixPosJ, matrixPosI, value);
-    }
-
-    /**
-     * Returns the number of cells having non-zero values.
-     * @return number of cells having non-zero values
-     */
-    public int cardinality() {
-        return this.matrix2D.cardinality();
-    }
-
-    /**
-     * @return number of rows\columns in matrix
-     */
-    public int size() {
-        return this.matrix2D.rows();
     }
 
     public List<MatrixCell<Double>> getCellsCongaingNonZeroValue() {
@@ -90,5 +60,18 @@ public class AdjustedMatrix {
             }
         }
         return list;
+    }
+
+    /**
+     * Sets the matrix cell that corresponds to blocks [blockI,blockJ] to the specified value.
+     * @param blockI - the id of block corresponding to row i
+     * @param blockJ - the id of block corresponding to column j
+     * @param value - the value that should be stored in A{i,j} and A{j,i}
+     */
+    public void  setQuick(int blockI, int blockJ, double value) {
+        Integer matrixPosI = blockIdToMatPosMap.get(blockI);
+        Integer matrixPosJ = blockIdToMatPosMap.get(blockJ);
+        matrix2D.setQuick(matrixPosI, matrixPosJ, value);
+        matrix2D.setQuick(matrixPosJ, matrixPosI, value);
     }
 }

@@ -31,24 +31,10 @@ public class AdjustedMatrix extends AbstractPotentialMatrix {
         }
     }
 
-    public List<MatrixCell<Double>> getCellsCongaingNonZeroValue() {
-        List<MatrixCell<Double>> matrixCells = new ArrayList<>();
-        IntArrayList rowList = new IntArrayList();
-        IntArrayList columnList = new IntArrayList();
-        DoubleArrayList valueList = new DoubleArrayList();
-        matrix2D.getNonZeros(rowList, columnList, valueList);
-        for (int i = 0; i < columnList.size(); i++) {
-            matrixCells.add(new MatrixCell<>(blockIdToMatPosMap.inverse().get(rowList.getQuick(i)),
-                                            blockIdToMatPosMap.inverse().get(columnList.getQuick(i)),
-                                            valueList.getQuick(i)));
-        }
-        return matrixCells;
-    }
-
     public List<Integer> viewRow(int rowId) {
         DoubleMatrix1D row = matrix2D.viewRow(rowId);
         int numberOfCellsInARow = row.size();
-        List<Integer> list = new ArrayList<Integer>(numberOfCellsInARow);
+        List<Integer> list = new ArrayList<>(numberOfCellsInARow);
         IntArrayList intArrayList = new IntArrayList();
         row.getNonZeros(intArrayList, new DoubleArrayList());
 
@@ -73,5 +59,15 @@ public class AdjustedMatrix extends AbstractPotentialMatrix {
         Integer matrixPosJ = blockIdToMatPosMap.get(blockJ);
         matrix2D.setQuick(matrixPosI, matrixPosJ, value);
         matrix2D.setQuick(matrixPosJ, matrixPosI, value);
+    }
+
+    @Override
+    protected int getRecordIDRepresentsRowIndex(int rowIndex) {
+        return blockIdToMatPosMap.inverse().get(rowIndex);
+    }
+
+    @Override
+    protected int getRecordIDRepresentsColumnIndex(int columnIndex) {
+        return blockIdToMatPosMap.inverse().get(columnIndex);
     }
 }

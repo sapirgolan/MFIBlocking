@@ -3,6 +3,7 @@ package il.ac.technion.ie.potential.service;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.SharedMatrix;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface iPotentialService {
     AdjustedMatrix getAdjustedMatrix(List<Block> blocks);
 
     List<BlockPotential> getLocalPotential(List<Block> blocks);
+
+    List<SharedMatrix> getSharedMatrices(List<Block> blocks);
 }

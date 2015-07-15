@@ -49,4 +49,22 @@ public class SharedMatrix extends AbstractPotentialMatrix{
         Integer columnIndex = recordToColumnsPosMap.get(sharedRecord);
         matrix2D.setQuick(rowIndex, columnIndex, value);
     }
+
+    /**
+     * @return number of rows*columns in matrix
+     */
+    @Override
+    public int size() {
+        return this.matrix2D.rows() * this.matrix2D.columns();
+    }
+
+    @Override
+    protected int getRecordIDRepresentsRowIndex(int rowIndex) {
+        return recordToRowsPosMap.inverse().get(rowIndex);
+    }
+
+    @Override
+    protected int getRecordIDRepresentsColumnIndex(int columnIndex) {
+        return recordToColumnsPosMap.inverse().get(columnIndex);
+    }
 }

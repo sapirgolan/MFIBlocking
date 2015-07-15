@@ -5,6 +5,7 @@ import il.ac.technion.ie.potential.logic.PotentialLogic;
 import il.ac.technion.ie.potential.logic.iPotentialLogic;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.SharedMatrix;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -31,5 +32,10 @@ public class PotentialService implements iPotentialService {
     public List<BlockPotential> getLocalPotential(List<Block> blocks) {
         logger.info("getting local potential of blocks");
         return potentialLogic.getLocalPotential(blocks);
+    }
+
+    @Override
+    public List<SharedMatrix> getSharedMatrices(List<Block> blocks) {
+        return potentialLogic.getSharedMatrices(blocks);
     }
 }

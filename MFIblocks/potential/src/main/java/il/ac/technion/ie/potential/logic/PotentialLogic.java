@@ -3,7 +3,10 @@ package il.ac.technion.ie.potential.logic;
 import com.google.common.collect.Sets;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
+import il.ac.technion.ie.potential.model.BlockPair;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.SharedMatrix;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -37,6 +40,62 @@ public class PotentialLogic implements iPotentialLogic {
         Map<Integer, Set<Integer>> recordBlockMap = buildMapBlock(filteredBlocks);
         logger.info("Building Adjusted Matrix from Blocks who have more than one record");
         return buildAdjustedMatrixFromMap(recordBlockMap, filteredBlocks);
+    }
+
+    @Override
+    public List<SharedMatrix> getSharedMatrices(List<Block> blocks) {
+        List<Block> filteredBlocks = filterBlockBySize(blocks, 2);
+
+        //A mapping for each recordID. For each record we store a Set with all
+        //blocks is appears in.
+        logger.info("Creating a MAP between each record and the block it is in");
+        Map<Integer, Set<Integer>> recordBlockMap = buildMapBlock(filteredBlocks);
+        return buildSharedMatrices(recordBlockMap, filteredBlocks);
+    }
+
+    private List<SharedMatrix> buildSharedMatrices(Map<Integer, Set<Integer>> recordBlockMap,
+                                                   List<Block> filteredBlocks) {
+        Map<Integer,Block> blockMap = blockMapping(filteredBlocks);
+        Map<Pair<Integer, Integer>, SharedMatrix> map = new HashMap<>();
+        for (Map.Entry<Integer, Set<Integer>> entry : recordBlockMap.entrySet()) {
+            Set<Integer> blocksRecordAppearIn = entry.getValue();
+            for (Integer outerElement : blocksRecordAppearIn) {
+                for (Integer innerElement : blocksRecordAppearIn) {
+                    if (!innerElement.equals(outerElement)) {
+                        logger.debug(String.format("Both Blocks #%d ,#%d contain record %d",
+                                outerElement, innerElement, entry.getKey()));
+                        BlockPair<Integer, Integer> pair = new BlockPair<>(outerElement, innerElement);
+                        SharedMatrix sharedMatrix = getSharedMatix(pair, map, blockMap);
+                        sharedMatrix.setQuick(entry.getKey(), -10);
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(map.values());
+    }
+
+    private Map<Integer, Block> blockMapping(List<Block> filteredBlocks) {
+        Map<Integer, Block> blockMap = new HashMap<>();
+        for (Block block : filteredBlocks) {
+            blockMap.put(block.getId(), block);
+        }
+        return blockMap;
+    }
+
+    private SharedMatrix getSharedMatix(BlockPair<Integer, Integer> pair,
+                                        Map<Pair<Integer, Integer>, SharedMatrix> map,
+                                        Map<Integer, Block> blockMap) {
+        SharedMatrix matrix;
+        if (map.containsKey(pair)) {
+            matrix = map.get(pair);
+        } else {
+            Block blockOfRows = blockMap.get(pair.getLeft());
+            Block blockOfColumns = blockMap.get(pair.getRight());
+            matrix = new SharedMatrix(blockOfRows, blockOfColumns);
+            map.put(pair, matrix);
+            return matrix;
+        }
+        return matrix;
     }
 
     /**

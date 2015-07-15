@@ -2,6 +2,7 @@ package il.ac.technion.ie.output.writers;
 
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.SharedMatrix;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,6 +30,7 @@ public class PotentialWriter extends AbstractWriter {
 
             List<BlockPotential> blockPotentials = isBlockPotential(o);
             AdjustedMatrix adjustedMatrix = isType(o, AdjustedMatrix.class);
+            SharedMatrix sharedMatrix = isType(o, SharedMatrix.class);
             if (blockPotentials != null) {
                 for (BlockPotential blockPotential : blockPotentials) {
                     String csvEntry = generateCsvRow(blockPotential);
@@ -39,6 +41,14 @@ public class PotentialWriter extends AbstractWriter {
             if (adjustedMatrix != null) {
                 for (int i = 0; i < adjustedMatrix.size(); i++) {
                     List<Integer> rowValues = adjustedMatrix.viewRow(i);
+                    String csvEntry = generateCsvRow(rowValues);
+                    bufferedWriter.write(csvEntry);
+                    bufferedWriter.newLine();
+                }
+            }
+            if (sharedMatrix != null) {
+                for (int i = 0; i < sharedMatrix.numberOfRows(); i++) {
+                    List<Integer> rowValues = sharedMatrix.viewRow(i);
                     String csvEntry = generateCsvRow(rowValues);
                     bufferedWriter.write(csvEntry);
                     bufferedWriter.newLine();

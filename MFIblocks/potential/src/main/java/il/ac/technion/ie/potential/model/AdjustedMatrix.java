@@ -1,13 +1,9 @@
 package il.ac.technion.ie.potential.model;
 
-import cern.colt.list.DoubleArrayList;
-import cern.colt.list.IntArrayList;
-import cern.colt.matrix.DoubleMatrix1D;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import il.ac.technion.ie.model.Block;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,23 +27,6 @@ public class AdjustedMatrix extends AbstractPotentialMatrix {
         }
     }
 
-    public List<Integer> viewRow(int rowId) {
-        DoubleMatrix1D row = matrix2D.viewRow(rowId);
-        int numberOfCellsInARow = row.size();
-        List<Integer> list = new ArrayList<>(numberOfCellsInARow);
-        IntArrayList intArrayList = new IntArrayList();
-        row.getNonZeros(intArrayList, new DoubleArrayList());
-
-        for (int index = 0; index < numberOfCellsInARow; index++) {
-            if (intArrayList.contains(index)) {
-                list.add(1);
-            } else {
-                list.add(0);
-            }
-        }
-        return list;
-    }
-
     /**
      * Sets the matrix cell that corresponds to blocks [blockI,blockJ] to the specified value.
      * @param blockI - the id of block corresponding to row i
@@ -59,6 +38,11 @@ public class AdjustedMatrix extends AbstractPotentialMatrix {
         Integer matrixPosJ = blockIdToMatPosMap.get(blockJ);
         matrix2D.setQuick(matrixPosI, matrixPosJ, value);
         matrix2D.setQuick(matrixPosJ, matrixPosI, value);
+    }
+
+    @Override
+    protected Integer valueInMatirxRowIfValueExists() {
+        return 1;
     }
 
     @Override

@@ -14,11 +14,13 @@ public class SharedMatrix extends AbstractPotentialMatrix{
 
     protected BiMap<Integer, Integer> recordToRowsPosMap;
     protected BiMap<Integer, Integer> recordToColumnsPosMap;
+    private BlockPair<Integer, Integer> representsBlocks;
 
     public SharedMatrix(Block rowsBlock, Block columnsBlock) {
         this.matrix2D = matrixFactory(rowsBlock.size(), columnsBlock.size());
         this.mapRows(rowsBlock);
         this.mapColumns(columnsBlock);
+        this.representsBlocks = new BlockPair<>(rowsBlock.getId(), columnsBlock.getId());
     }
 
     private void mapColumns(Block columnsBlock) {
@@ -59,6 +61,11 @@ public class SharedMatrix extends AbstractPotentialMatrix{
     }
 
     @Override
+    protected Integer valueInMatirxRowIfValueExists() {
+        return -10;
+    }
+
+    @Override
     protected int getRecordIDRepresentsRowIndex(int rowIndex) {
         return recordToRowsPosMap.inverse().get(rowIndex);
     }
@@ -66,5 +73,13 @@ public class SharedMatrix extends AbstractPotentialMatrix{
     @Override
     protected int getRecordIDRepresentsColumnIndex(int columnIndex) {
         return recordToColumnsPosMap.inverse().get(columnIndex);
+    }
+
+    public String getName() {
+        return "Block_" + representsBlocks.getLeft() + "X" + representsBlocks.getRight();
+    }
+
+    public int numberOfRows() {
+        return this.matrix2D.rows();
     }
 }

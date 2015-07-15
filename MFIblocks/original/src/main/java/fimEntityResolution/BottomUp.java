@@ -12,6 +12,7 @@ import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.output.writers.Writer;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.SharedMatrix;
 import il.ac.technion.ie.potential.service.PotentialService;
 import il.ac.technion.ie.potential.service.iPotentialService;
 import il.ac.technion.ie.search.core.SearchEngine;
@@ -185,7 +186,8 @@ public class BottomUp {
                 iPotentialService potentialService = new PotentialService();
                 List<BlockPotential> localPotential = potentialService.getLocalPotential(algorithmBlocks);
                 AdjustedMatrix adjustedMatrix = potentialService.getAdjustedMatrix(algorithmBlocks);
-                Writer.printBlockPotential(localPotential, adjustedMatrix, context);
+				List<SharedMatrix> sharedMatrices = potentialService.getSharedMatrices(algorithmBlocks);
+				Writer.printBlockPotential(localPotential, adjustedMatrix, sharedMatrices, context);
                 long writeBlocksDuration = timer.getActionTimeDuration();
 
                 timer.startActionTimeMeassurment();

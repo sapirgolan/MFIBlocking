@@ -3,6 +3,7 @@ package il.ac.technion.ie.potential.model;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
 import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 
 import java.util.ArrayList;
@@ -46,6 +47,29 @@ public abstract class AbstractPotentialMatrix {
         }
         return matrixCells;
     }
+
+    protected final int valueInMatrixRowIfValueMissing() {
+        return 0;
+    }
+
+    public final List<Integer> viewRow(int rowId) {
+        DoubleMatrix1D row = matrix2D.viewRow(rowId);
+        int numberOfCellsInARow = row.size();
+        List<Integer> list = new ArrayList<>(numberOfCellsInARow);
+        IntArrayList intArrayList = new IntArrayList();
+        row.getNonZeros(intArrayList, new DoubleArrayList());
+
+        for (int index = 0; index < numberOfCellsInARow; index++) {
+            if (intArrayList.contains(index)) {
+                list.add(this.valueInMatirxRowIfValueExists());
+            } else {
+                list.add(this.valueInMatrixRowIfValueMissing());
+            }
+        }
+        return list;
+    }
+
+    protected abstract Integer valueInMatirxRowIfValueExists();
 
     protected abstract int getRecordIDRepresentsRowIndex(int rowIndex);
     protected abstract int getRecordIDRepresentsColumnIndex(int columnIndex);

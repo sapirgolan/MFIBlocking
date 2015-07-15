@@ -6,6 +6,7 @@ import il.ac.technion.ie.model.BlockDescriptor;
 import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.SharedMatrix;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -68,7 +69,8 @@ public class Writer {
         }
     }
 
-    public static void printBlockPotential(List<BlockPotential> potentials, AdjustedMatrix adjustedMatrix, MfiContext context) {
+    public static void printBlockPotential(List<BlockPotential> potentials, AdjustedMatrix adjustedMatrix,
+                                           List<SharedMatrix> sharedMatrices, MfiContext context) {
         PotentialWriter potentialWriter = new PotentialWriter();
         File blockPotentialFile = potentialWriter.generateFile(context.getDatasetName() + "_BlockPotential", ".csv");
         File adjustedMatrixFile = potentialWriter.generateFile(context.getDatasetName() + "_AdjustedMatrix", ".csv");
@@ -76,6 +78,13 @@ public class Writer {
         try {
             potentialWriter.writeResults(blockPotentialFile, potentials);
             potentialWriter.writeResults(adjustedMatrixFile, adjustedMatrix);
+            for (SharedMatrix sharedMatrix : sharedMatrices) {
+                File sharedRecordsFile = potentialWriter.generateFile(
+                        String.format("%s_SharedRecords_%s_", context.getDatasetName(), sharedMatrix.getName()),
+                        ".csv");
+                potentialWriter.writeResults(sharedRecordsFile, sharedMatrix);
+            }
+
         } catch (IOException e) {
             logger.error("Failed to write the Block Potential", e);
         }

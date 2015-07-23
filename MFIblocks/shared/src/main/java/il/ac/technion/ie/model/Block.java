@@ -163,48 +163,8 @@ public class Block {
         return totalScore / (float) (size - 1);
     }
 
-    public String toCsv() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{");
-        for (Integer member : members) {
-            builder.append(member);
-            addCharSeparator(builder);
-        }
-        builder.deleteCharAt(builder.length() - 1);
-        builder.append("}");
-
-        addCsvSeperator(builder);
-
-        builder.append("{");
-        for (Integer member : members) {
-            builder.append(membersProbability.get(member));
-            addCharSeparator(builder);
-        }
-        builder.deleteCharAt(builder.length() - 1);
-        builder.append("}");
-
-        addCsvSeperator(builder);
-        builder.append(" Block representatives are: ");
-        addCsvSeperator(builder);
-
-        //add representatives
-        if (blockRepresentatives != null) {
-            for (Entry<Integer, Float> blockRepresentative : blockRepresentatives.entrySet()) {
-                builder.append(blockRepresentative.getKey());
-                addCharSeparator(builder);
-            }
-            builder.deleteCharAt(builder.length() - 1);
-        }
-
-        return builder.toString();
-    }
-
     private void addCharSeparator(StringBuilder builder) {
         builder.append(",");
-    }
-
-    private void addCsvSeperator(StringBuilder builder) {
-        builder.append("|");
     }
 
     public int size() {
@@ -213,5 +173,9 @@ public class Block {
 
     public int getId() {
         return this.id;
+    }
+
+    public Map<Integer, Float> getBlockRepresentatives() {
+        return blockRepresentatives;
     }
 }

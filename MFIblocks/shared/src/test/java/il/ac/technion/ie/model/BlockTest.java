@@ -127,31 +127,4 @@ public class BlockTest {
 
         MatcherAssert.assertThat(block.toString(), Matchers.is(equalToIgnoringWhiteSpace(expectedResult)));
     }
-
-    @Test
-    public void testToCsv_noRepresentatives() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
-        block.setMemberProbability(1, 0.26F);
-        block.setMemberProbability(7, 0.26F);
-        block.setMemberProbability(22, 0.25F);
-        block.setMemberProbability(2, 0.23F);
-
-        String expectedResult = "{1,7,22,2}|{0.26,0.26,0.25,0.23}| Block representatives are: |";
-
-        MatcherAssert.assertThat(block.toCsv(), Matchers.is(equalToIgnoringWhiteSpace(expectedResult)));
-    }
-
-    @Test
-    public void testToCsv_withRepresentatives() throws Exception {
-        Block block = new Block(Arrays.asList(1, 7, 22, 2), Block.RANDOM_ID);
-        block.setMemberProbability(1, 0.26F);
-        block.setMemberProbability(7, 0.26F);
-        block.setMemberProbability(22, 0.25F);
-        block.setMemberProbability(2, 0.23F);
-        block.findBlockRepresentatives();
-
-        String expectedResult = "{1,7,22,2}|{0.26,0.26,0.25,0.23}| Block representatives are: |1,7";
-
-        MatcherAssert.assertThat(block.toCsv(), Matchers.is(equalToIgnoringWhiteSpace(expectedResult)));
-    }
 }

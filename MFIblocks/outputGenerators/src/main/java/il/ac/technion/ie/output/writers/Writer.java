@@ -4,6 +4,8 @@ import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.BlockDescriptor;
 import il.ac.technion.ie.model.CandidatePairs;
+import il.ac.technion.ie.output.strategy.block.BlockCsvFormat;
+import il.ac.technion.ie.output.strategy.block.MatlabFormat;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
 import il.ac.technion.ie.potential.model.SharedMatrix;
@@ -29,6 +31,7 @@ public class Writer {
         ResultWriter resultWriter = new ResultWriter();
         File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
         File blocksOutputFile = resultWriter.createBlocksOutputFile(context.getDatasetName());
+        File matlabOutputFile = resultWriter.createMillerOutputFile(context.getDatasetName());
 
         try {
             switch (context.getPrntFormat().toLowerCase()) {
@@ -41,7 +44,8 @@ public class Writer {
                 default:
                     logger.debug("No blocks were printed");
             }
-            resultWriter.writeBlocks(blocksOutputFile, blocks);
+            resultWriter.writeBlocks(blocksOutputFile, blocks, new BlockCsvFormat());
+            resultWriter.writeBlocks(matlabOutputFile, blocks, new MatlabFormat());
             logger.info("Outfile was written to: " + neighborsOutputFile.getAbsolutePath());
         } catch (IOException e) {
             logger.error("Failed to write blocks", e);

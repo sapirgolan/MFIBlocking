@@ -7,6 +7,7 @@ import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.model.RecordMatches;
 import il.ac.technion.ie.model.RecordSet;
+import il.ac.technion.ie.output.strategy.block.BlockFormat;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +35,11 @@ public class ResultWriter {
         return this.createUniqueOutputFile("/Roc_", ".txt");
     }
     public File createBlocksOutputFile(String datasetName) {
-        return createUniqueOutputFile("/Blocks_"+datasetName, ".txt");
+        return createUniqueOutputFile("/Blocks_" + datasetName, ".txt");
+    }
+
+    public File createMillerOutputFile(String datasetName) {
+        return createUniqueOutputFile("/Blocks_Miller_" + datasetName, ".csv");
     }
     public File createCyphrtOutputFile() {
         return createUniqueOutputFile("/CypherCommands_", ".txt");
@@ -171,13 +176,13 @@ public class ResultWriter {
         stringBuilder.append(entry.getKey());
     }
 
-    public void writeBlocks(File file, List<Block> blocks) throws IOException {
+    public void writeBlocks(File file, List<Block> blocks, BlockFormat blockFormat) throws IOException {
         FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
         bufferedWriter.write("*****Printing blocks***");
         bufferedWriter.newLine();
         for (Block block : blocks) {
-            bufferedWriter.write(block.toCsv());
+            bufferedWriter.write(blockFormat.format(block));
             bufferedWriter.newLine();
         }
         bufferedWriter.write("*****Finish Printing***");

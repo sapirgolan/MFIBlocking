@@ -23,6 +23,10 @@
         <module>original</module>
         <module>blockUsage</module>
        <module>shared</module>
+       <module>searchEngine</module>
+	   <module>measurements</module>
+       <module>potential</module>
+       <module>outputGenerators</module>
    </modules>
   
   <build>

@@ -5,16 +5,24 @@ import fimEntityResolution.entityResulution.EntityResolutionFactory;
 import fimEntityResolution.entityResulution.EntityResulutionComparisonType;
 import fimEntityResolution.entityResulution.IComparison;
 import fimEntityResolution.statistics.*;
+import fimEntityResolution.statistics.Timer;
 import il.ac.technion.ie.context.MfiContext;
 import il.ac.technion.ie.data.structure.BitMatrix;
 import il.ac.technion.ie.model.*;
+import il.ac.technion.ie.output.writers.Writer;
+import il.ac.technion.ie.potential.model.AdjustedMatrix;
+import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.SharedMatrix;
+import il.ac.technion.ie.potential.service.PotentialService;
+import il.ac.technion.ie.potential.service.iPotentialService;
+import il.ac.technion.ie.search.core.SearchEngine;
+import il.ac.technion.ie.search.module.ComparisonInteraction;
 import il.ac.technion.ie.service.BlockService;
 import il.ac.technion.ie.service.iBlockService;
 import il.ac.technion.ie.types.Alg;
 import il.ac.technion.ie.types.MFISetsCheckConfiguration;
 import il.ac.technion.ie.utils.FrequentItemsetContext;
 import il.ac.technion.ie.utils.Utilities;
-import lucene.search.SearchEngine;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
@@ -26,17 +34,16 @@ import java.util.Map.Entry;
 
 public class BottomUp {
 	
+    static final Logger logger = Logger.getLogger(BottomUp.class);
 	private final static String FI_DIR = "FIs";
 	private final static String TEMP_RECORD_DIR = "TEMP_RECORD_DIR";
 	private final static File TempDir = new File(TEMP_RECORD_DIR);
 	private final static double MAX_SUPP_CONST = 1.0;//0.005;
+    public static BitSet coveredRecords= null;
+	public static String srcFile = null;
 	private static double NG_LIMIT = 3;
 	private static double lastUsedBlockingThreshold;
 	private static MfiContext context;
-    public static BitSet coveredRecords= null;
-	public static String srcFile = null;
-
-    static final Logger logger = Logger.getLogger(BottomUp.class);
 
     /**
 	 * The Main of the MFIBlocking Algorithm
@@ -107,22 +114,40 @@ public class BottomUp {
 		}
 	}
 
-	private static MfiContext readArguments(String[] args) {
+    /**
+     * The args input looks like the following:
+     * SPARK [Configuration]
+     * datasets/lexicon.txt [LexiconFile]
+     * datasets/ids.txt [RecordsFile]
+     * 0,0.05,0.1,0.15,0.75,0.8,0.95,1 [MinBlockingThresholds]
+     * datasets/matching.txt [MatchFile]
+     * datasets/NoSW.txt [OrigRecordsFileWithoutCommas]
+     * <PATH_TO_FILE>/originalRecordsFile.csv [OriginalRecordsPath]
+     * 2 [MinSup]
+     * 1.5,2,3,5,10,20 [NG]
+     * N [PrintFormat]
+     *
+     * @param args
+     * @return
+     */
+    private static MfiContext readArguments(String[] args) {
 		MfiContext context = new MfiContext();
 		context.setConfiguration(args[0]);
 		context.setLexiconFile(args[1]);
 		context.setRecordsFile(args[2]);
 		context.setMinBlockingThresholds(args[3]);
 		context.setMatchFile(args[4]);
-		context.setOrigRecordsFile(args[5]);
-		context.setMinSup(args[6]);
-		context.setAlgorithm(Alg.MFI);
-		context.setNGs(args[8]);
-		context.setFirstDbSize(args);
-		context.setPerformanceFlag(args);
-		context.setPrintFormat(args[9]);
-		return context;
-	}
+        context.setOrigRecordsFileWithoutCommas(args[5]);
+        context.setOriginalRecordsPath(args[6]);
+        context.setDatasetName(args[7]);
+        context.setMinSup(args[8]);
+        context.setAlgorithm(Alg.MFI);
+        context.setNGs(args[9]);
+        context.setFirstDbSize(args);
+        context.setPerformanceFlag(args);
+        context.setPrintFormat(args[10]);
+        return context;
+    }
 
 	/**
 	 * Core of the MFIBlocks algorithm
@@ -131,7 +156,7 @@ public class BottomUp {
 
 		int recordsSize = RecordSet.size;
 		System.out.println("order of minsups used: " + Arrays.toString(context.getMinSup()));
-		List<BlockingRunResult> blockingRunResults = new ArrayList<BlockingRunResult>();
+		List<BlockingRunResult> blockingRunResults = new ArrayList<>();
 		//iterate for each neighborhood grow value that was set in input
 		double[] neighborhoodGrowth = context.getNeighborhoodGrowth();
 		SearchEngine engine = createAndInitSearchEngine(context.getRecordsFile());
@@ -147,25 +172,43 @@ public class BottomUp {
                         " and NGLimit: " + NG_LIMIT);
 				System.out.println("running iterative " + context.getAlgName() + "s with minimum blocking threshold " + minBlockingThreshold +
 						" and NGLimit: " + NG_LIMIT);
-				long start = System.currentTimeMillis();
-				//obtain all the clusters that has the minimum score
+                Timer timer = new Timer();
+                //obtain all the clusters that has the minimum score
 				CandidatePairs algorithmObtainedPairs = getClustersToUse(context, minBlockingThreshold);
-                long actionStart = System.currentTimeMillis();
-                printNeighborsAndBlocks(algorithmObtainedPairs, context);
-				long writeBlocksDuration = System.currentTimeMillis() - actionStart;
-				
-				actionStart = System.currentTimeMillis();
-				TrueClusters trueClusters = new TrueClusters();
+                timer.startActionTimeMeassurment();
+
+                List<Block> algorithmBlocks = findBlocks(algorithmObtainedPairs, true, recordsSize);
+                Writer.printNeighborsAndBlocks(algorithmObtainedPairs, context, algorithmBlocks);
+                Map<Integer, List<BlockDescriptor>> blocksAmbiguousRepresentatives = findBlocksAmbiguousRepresentatives(algorithmBlocks, context);
+                Writer.printAmbiguousRepresentatives(blocksAmbiguousRepresentatives, context);
+
+                //Fetching and printing local potential from algorithmBlocks
+                iPotentialService potentialService = new PotentialService();
+                List<BlockPotential> localPotential = potentialService.getLocalPotential(algorithmBlocks);
+                AdjustedMatrix adjustedMatrix = potentialService.getAdjustedMatrix(algorithmBlocks);
+				List<SharedMatrix> sharedMatrices = potentialService.getSharedMatrices(algorithmBlocks);
+				Writer.printBlockPotential(localPotential, adjustedMatrix, sharedMatrices, context);
+                long writeBlocksDuration = timer.getActionTimeDuration();
+
+                timer.startActionTimeMeassurment();
+                TrueClusters trueClusters = new TrueClusters();
 				trueClusters.findClustersAssingments(context.getMatchFile());
-				//System.out.println("DEBUG: Size of trueClusters: " + MemoryUtil.deepMemoryUsageOf(trueClusters, VisibilityFilter.ALL)/Math.pow(2,30) + " GB");
-				
-				ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
-				StatisticMeasuremnts results = experimentResult.calculate();
-				long totalMaxRecallCalculationDuration = System.currentTimeMillis() - actionStart;
-				long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
-				double executionTime = calcExecutionTime(start, totalMaxRecallCalculationDuration, writeBlocksDuration);
-				BlockingResultContext resultContext = new BlockingResultContext(results, minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT, 
+
+                List<Block> trueBlocks = findBlocks(trueClusters.getGroundTruthCandidatePairs(), false, recordsSize);
+
+                NonBinaryResults nonBinaryResults = new NonBinaryResults(algorithmBlocks, trueBlocks);
+                ExperimentResult experimentResult = new ExperimentResult(trueClusters, algorithmObtainedPairs, recordsSize);
+
+                StatisticMeasurements results = experimentResult.calculate();
+                long totalMaxRecallCalculationDuration = timer.getActionTimeDuration();
+
+                long timeOfERComparison = comparison.measureComparisonExecution(algorithmObtainedPairs);
+                double executionTime = calcExecutionTime(timer.getStartTime(), totalMaxRecallCalculationDuration, writeBlocksDuration);
+
+                BlockingResultContext resultContext = new BlockingResultContext(results, nonBinaryResults,
+                        minBlockingThreshold, lastUsedBlockingThreshold, NG_LIMIT,
 						executionTime, Utilities.convertToSeconds(timeOfERComparison));
+
 				BlockingRunResult blockingRR = new BlockingRunResult(resultContext);
 				blockingRunResults.add(blockingRR);
 				
@@ -174,7 +217,7 @@ public class BottomUp {
 			}
 		}
 			
-		if(blockingRunResults != null && blockingRunResults.size() > 0){
+		if(!blockingRunResults.isEmpty()){
 			printExperimentMeasurments(blockingRunResults);
 			String resultsString = writeBlockingRR(blockingRunResults);
 			System.out.println();
@@ -184,8 +227,32 @@ public class BottomUp {
 			System.out.println("Under current configuration, no clustering were achieved!!");
 		}		
 	}
-	
-	private static double calcExecutionTime(long start,
+
+    private static Map<Integer, List<BlockDescriptor>> findBlocksAmbiguousRepresentatives(List<Block> algorithmBlocks, MfiContext context) {
+        iBlockService blockService = new BlockService();
+        Map<Integer, List<BlockDescriptor>> ambiguousRepresentatives = blockService.findAmbiguousRepresentatives(algorithmBlocks, context);
+        return ambiguousRepresentatives;
+    }
+
+    /**
+     *
+     * @param candidatePairs
+     * @param isAlgorithmResults - whether or not to calc probabilities on given CandidatePairs
+     * @param recordsSize
+     * @return
+     */
+    private static List<Block> findBlocks(CandidatePairs candidatePairs, boolean isAlgorithmResults, int recordsSize) {
+        iBlockService blockService = new BlockService();
+        List<Block> blocks = blockService.getBlocks(candidatePairs, recordsSize);
+        if (isAlgorithmResults) {
+            blockService.calcProbOnBlocks(blocks, context);
+        } else {
+            blockService.setTrueMatch(blocks);
+        }
+        return blocks;
+    }
+
+    private static double calcExecutionTime(long start,
 			long totalMaxRecallCalculationDuration, long writeBlocksDuration) {
 		long totalRunTime = System.currentTimeMillis() - start;
 		totalRunTime = reduceIrrelevantTimes(totalRunTime, totalMaxRecallCalculationDuration, writeBlocksDuration);
@@ -200,46 +267,15 @@ public class BottomUp {
 
 
 	private static SearchEngine createAndInitSearchEngine(String recordsFile) {
-		SearchEngine engine = new SearchEngine();
+		SearchEngine engine = new SearchEngine(new ComparisonInteraction());
 		engine.addRecords(recordsFile);
 		return engine;
 	}
 
-
-	/**
-	 * the method write the blocking output to a file for later usage
-	 * @param cps
-	 */
-	private static void printNeighborsAndBlocks(CandidatePairs cps, MfiContext context) {
-		ResultWriter resultWriter = new ResultWriter();
-		File neighborsOutputFile = resultWriter.createNeighborsOutputFile();
-        iBlockService blockService = new BlockService();
-        File blocksOutputFile = resultWriter.createBlocksOutputFile();
-        List<Block> blocks = blockService.getBlocks(cps);
-
-        try {
-            switch (context.getPrntFormat().toLowerCase()) {
-                case "s" :
-                    resultWriter.writeBlocksStatistics(blocksOutputFile, cps, context);
-                    break;
-                case "b":
-                    resultWriter.writeEachRecordNeighbors(blocksOutputFile, cps);
-                    break;
-                default:
-                    logger.debug("No blocks were printed");
-            }
-            resultWriter.writeBlocks(blocksOutputFile, blocks);
-            logProgress("Outfile was written to: " + neighborsOutputFile.getAbsolutePath());
-		} catch (IOException e) {
-            logger.error("Failed to write blocks", e);
-		}
-	}
-
-
 	private static void printExperimentMeasurments( List<BlockingRunResult> blockingRunResults) {
 		String[] columnNames = {}; 
-		if (blockingRunResults.size()>0) {
-			columnNames = blockingRunResults.get(0).getCoulmnsName();
+		if (!blockingRunResults.isEmpty()) {
+			columnNames = BlockingRunResult.getColumnsNames();
 		}
 		Object[][] rows = new Object [blockingRunResults.size()][columnNames.length];
 		int index = 0;
@@ -431,7 +467,7 @@ public class BottomUp {
 	}
 	
 	private static Map<Integer,Integer> appitems(BitSet coveredRecords, int minSup){
-		Map<Integer,Integer> retVal = new HashMap<Integer, Integer>();
+		Map<Integer,Integer> retVal = new HashMap<>();
 		for( int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1) ){
 			Record currRecord = RecordSet.values.get(i);		
 			Set<Integer> recordItems = currRecord.getItemsToFrequency().keySet();
@@ -475,5 +511,5 @@ public class BottomUp {
 		sb.append(Utilities.NEW_LINE).append(Utilities.NEW_LINE);
 		return sb.toString();
 	}
-	
+
 }

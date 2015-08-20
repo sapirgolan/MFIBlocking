@@ -1,7 +1,6 @@
 #################
 ## Eclipse
 #################
-*.properties
 
 *.pydevproject
 .project
@@ -27,7 +26,6 @@ DS_weights.properties
 #Batch/jar files
 *.bat
 *.jar
-*.xml
 
 #Converter resources
 meta-blocking-converter/converter/*.csv
@@ -296,3 +294,8 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 dependency-reduced-pom.xml
+
+
+### MFIB ###
+Blocks*.txt
+fpgrowth.exe

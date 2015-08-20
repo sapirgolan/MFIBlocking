@@ -10,11 +10,6 @@ import java.util.Arrays;
 
 public class MfiContext {
 	
-	public MfiContext() {
-		this.firstDbSize = 0;
-		this.configuration = MFISetsCheckConfiguration.DEFAULT;
-	}
-
 	private double[] minBlockingThresholds;
 	private int[] minSup;
 	private double[] neighborhoodGrowth;
@@ -23,137 +18,131 @@ public class MfiContext {
 	private Alg alg;
 	private String lexiconFile;
 	private String recordsFile;
-	private String origRecordsFile;
-	//private Map<Integer, Record> records;
-	private boolean inPerformanceMode;
+    private String origRecordsFileWithoutCommas;
+    private boolean inPerformanceMode;
 	private int firstDbSize;
 	private String printFormat;
 	private String originalRecordsPath;
-	
+    private String datasetName;
 
-	public void setMatchFile(String matchFile) {
-		this.matchFile = matchFile;
-	}
+    public MfiContext() {
+        this.firstDbSize = 0;
+        this.configuration = MFISetsCheckConfiguration.DEFAULT;
+    }
 
-	public void setMinSup(String minSup) {
-		int[] minSupInt = getInts(minSup);
-		Arrays.sort(minSupInt);
-		this.minSup = minSupInt;
-	}
+    public void setAlgorithm(Alg alg) {
+        this.alg = alg;
+    }
 
-	public void setMinBlockingThresholds(String minBlockingThresholds) {
-		this.minBlockingThresholds = getThresholds(minBlockingThresholds);
-		
-	}
+    public void setNGs(String neighborhoodGrowth) {
+        this.neighborhoodGrowth = getDoubles(neighborhoodGrowth);
+    }
 
-	public void setAlgorithm(Alg alg) {
-		this.alg = alg;
-	}
+    public void setOrigRecordsFileWithoutCommas(String origRecordsFileWithoutCommas) {
+        this.origRecordsFileWithoutCommas = origRecordsFileWithoutCommas;
+    }
 
-	public void setNGs(String neighborhoodGrowth) {
-		this.neighborhoodGrowth = getDoubles(neighborhoodGrowth);
-		
-	}
+    public void setPerformanceFlag(String[] args) {
+        this.inPerformanceMode = false;
+        int lastArgument = args.length - 1;
+        if ("perf".equalsIgnoreCase(args[lastArgument])) {
+            this.inPerformanceMode = true;
+        }
+    }
+
+    public String getLexiconFile() {
+        return lexiconFile;
+    }
 
 	public void setLexiconFile(String lexiconFile) {
 		this.lexiconFile = lexiconFile;
 	}
 
+    public String getRecordsFile() {
+        return recordsFile;
+    }
+
 	public void setRecordsFile(String recordsFile) {
 		this.recordsFile = recordsFile;
 	}
 
-	public void setOrigRecordsFile(String origRecordsFile) {
-		this.origRecordsFile = origRecordsFile;
-		
+    public String getOriginalFile() {
+        return origRecordsFileWithoutCommas;
+    }
+
+    private double[] getThresholds(String strDoubles) {
+        String[] thresholds = strDoubles.split(",");
+        double[] dThresholds = new double[thresholds.length];
+        for (int i = 0; i < thresholds.length; i++) {
+            dThresholds[i] = Double.parseDouble(thresholds[i].trim());
+        }
+        return dThresholds;
+    }
+
+    private int[] getInts(String strInts) {
+        String[] intStrs = strInts.trim().split(",");
+        int[] ints = new int[intStrs.length];
+        for (int i = 0; i < intStrs.length; i++) {
+            ints[i] = Integer.parseInt(intStrs[i].trim());
+        }
+        return ints;
+    }
+
+    private double[] getDoubles(String strDbs) {
+        String[] dbStrs = strDbs.trim().split(",");
+        double[] dbs = new double[dbStrs.length];
+        for (int i = 0; i < dbStrs.length; i++) {
+            dbs[i] = Double.parseDouble(dbStrs[i].trim());
+        }
+        return dbs;
+    }
+
+    public double[] getMinBlockingThresholds() {
+        return this.minBlockingThresholds;
+    }
+
+    public void setMinBlockingThresholds(String minBlockingThresholds) {
+        this.minBlockingThresholds = getThresholds(minBlockingThresholds);
+
 	}
 
-//	public void setRecords(Map<Integer, Record> records) {
-//		this.records = records;
-//	}
-	
-	public void setPerformanceFlag(String[] args) {
-		this.inPerformanceMode = false;
-		int lastArgument = args.length - 1;
-		if ("perf".equalsIgnoreCase(args[lastArgument])) {
-			this.inPerformanceMode = true;
-		}
-	}
+    public String getAlgName() {
+        return alg.toString();
+    }
 
-	public String getLexiconFile() {
-		return lexiconFile;
-	}
+    public double[] getNeighborhoodGrowth() {
+        return neighborhoodGrowth;
+    }
 
-	public String getRecordsFile() {
-		return recordsFile;
-	}
-	
-	public String getOriginalFile() {
-		return origRecordsFile;
-	}
-	
-	private double[] getThresholds(String strDoubles){
-		String[] thresholds = strDoubles.split(",");
-		double[] dThresholds = new double[thresholds.length];
-		for(int i=0 ; i < thresholds.length ; i++ ){
-			dThresholds[i] = Double.parseDouble(thresholds[i].trim());
-		}
-		return dThresholds;
-	}
-	
-	private int[] getInts(String strInts){
-		String[] intStrs = strInts.trim().split(",");
-		int[] ints = new int[intStrs.length];
-		for(int i=0 ; i < intStrs.length ; i++ ){
-			ints[i] = Integer.parseInt(intStrs[i].trim());
-		}
-		return ints;
-	}
+    public int[] getMinSup() {
+        return this.minSup;
+    }
 
-	private  double[] getDoubles(String strDbs){
-		String[] dbStrs = strDbs.trim().split(",");
-		double[] dbs = new double[dbStrs.length];
-		for(int i=0 ; i < dbStrs.length ; i++ ){
-			dbs[i] = Double.parseDouble(dbStrs[i].trim());
-		}
-		return dbs;
-	}
+    public void setMinSup(String minSup) {
+        int[] minSupInt = getInts(minSup);
+        Arrays.sort(minSupInt);
+        this.minSup = minSupInt;
+    }
 
-	public double[] getMinBlockingThresholds() {
-		return this.minBlockingThresholds;
-	}
+    public String getMatchFile() {
+        return this.matchFile;
+    }
 
-	public String getAlgName() {
-		return alg.toString();
-	}
-
-	public double[] getNeighborhoodGrowth() {
-		return neighborhoodGrowth;
-	}
-
-	public int[] getMinSup() {
-		return this.minSup;
-	}
-
-	public String getMatchFile() {
-		return this.matchFile;
-	}
-
-//	public int getRecordsSize() {
-//		return this.records.size();
-//	}
+    public void setMatchFile(String matchFile) {
+        this.matchFile = matchFile;
+    }
 
 	public MFISetsCheckConfiguration getConfig() {
 		return this.configuration;
 	}
 
-//	public Map<Integer, Record> getRecords() {
-//		return this.records;
-//	}
-
 	public boolean isInPerformanceMode() {
 		return this.inPerformanceMode;
-	}
+    }
+
+    public int getFirstDbSize() {
+        return firstDbSize;
+    }
 
 	public void setFirstDbSize(String[] args) {
 		if(args.length > 10 && args[10] != null){
@@ -163,17 +152,12 @@ public class MfiContext {
 		}
 	}
 
-	public int getFirstDbSize() {
-		return firstDbSize;
-	}
-
 	public void setConfiguration(String configuration) {
 		try {
 			this.configuration = MFISetsCheckConfiguration.valueOf(configuration);
 		} catch (Exception e) {
 			System.err.println(String.format("Failed to read value of configuration, will use %s instead", MFISetsCheckConfiguration.DEFAULT.toString()));
 		}
-		
 	}
 
 	public void setPrintFormat(String string) {
@@ -184,8 +168,8 @@ public class MfiContext {
 		else {
 			if (input[0].equalsIgnoreCase("B") || input[0].equalsIgnoreCase("N") || input[0].equalsIgnoreCase("S"))
 				printFormat=input[0];
-			else 
-				System.err.println("The chosen format for block printing is unsupported.");
+            else
+                System.err.println("The chosen format for block printing is unsupported.");
 			if (input.length>1){
 			originalRecordsPath=input[1];
 			}
@@ -195,8 +179,20 @@ public class MfiContext {
 	public String getPrntFormat() {
 		return printFormat;
 	}
+
 	public String getOriginalRecordsPath() {
 		return originalRecordsPath;
 	}
 
+    public void setOriginalRecordsPath(String recordsPath) {
+        this.originalRecordsPath = recordsPath;
+    }
+
+    public String getDatasetName() {
+        return datasetName;
+    }
+
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
 }

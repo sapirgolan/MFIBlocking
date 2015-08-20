@@ -2,41 +2,41 @@ package il.ac.technion.ie.logic;
 
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.NeighborsVector;
+import il.ac.technion.ie.model.NeighborsVectorsCompare;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by I062070 on 13/03/2015.
  */
 public class FindBlockAlgorithm implements iFindBlockAlgorithm{
 
-    private static final int TWO = 2;
     static final Logger logger = Logger.getLogger(FindBlockAlgorithm.class);
-
-
-    @Override
-    public <T> void sort(List<T> matches, Comparator comparator) {
-        Collections.sort(matches, comparator);
-        logger.debug("Finished sorting input of algorithm");
-    }
+    private static final int TWO = 2;
+    private int blockId;
 
     @Override
     public <E extends NeighborsVector> List<Block> findBlocks(List<E> matches) {
+
+        SortedSet<E> matchesWithoutDuplicates = new TreeSet<>(new NeighborsVectorsCompare());
+        matchesWithoutDuplicates.addAll(matches);
+
         int largestBlockCreated = 0;
-        ArrayList<Integer> itemsSeen = new ArrayList<>();
+        List<Integer> itemsSeen = new ArrayList<>();
         List<Block> result = new ArrayList<>();
-        for (E match : matches) {
+        blockId = 1;
+        for (E match : matchesWithoutDuplicates) {
             if (isSingleOrDoubleBlock(match)) {
-                logger.debug("input block is of size <=2, " + match.toString());
+                logger.trace("input block is of size <=2, " + match.toString());
                 largestBlockCreated = updateBlocks(itemsSeen, result, match, match.getNeighbors());
             } else {
                 logger.debug("input block is of size  " + match.numberOfNeighbors() + match.toString());
                 List<Integer> neighbors = new ArrayList<>(match.getNeighbors());
-                logger.debug("Removing following items from Block since their origin block" +
+                logger.debug("Removing following items from Block since their origin block " +
                         "was already processed: " + itemsSeen.toString());
                 neighbors.removeAll(itemsSeen);
                 logger.debug("After removal block's size is " + neighbors.size());
@@ -45,6 +45,7 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
                     largestBlockCreated = updateBlocks(itemsSeen, result, match, neighbors);
                 }
             }
+            blockId++;
         }
         return result;
     }
@@ -60,7 +61,7 @@ public class FindBlockAlgorithm implements iFindBlockAlgorithm{
      */
     private <E extends NeighborsVector> int updateBlocks(List<Integer> itemsSeen, List<Block> result, E match, List<Integer> neighbors) {
         itemsSeen.add(match.getReresentativeId());
-        Block block = new Block(neighbors);
+        Block block = new Block(neighbors, blockId);
         result.add(block);
         logger.debug("Added to result block: " + block.toString());
         return neighbors.size();

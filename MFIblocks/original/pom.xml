@@ -86,6 +86,21 @@
           <artifactId>blockUsage</artifactId>
           <version>0.0.1</version>
       </dependency>
+      <dependency>
+          <groupId>il.ac.technion.ie</groupId>
+          <artifactId>measurements</artifactId>
+          <version>0.0.1</version>
+      </dependency>
+      <dependency>
+          <groupId>il.ac.technion.ie</groupId>
+          <artifactId>outputGenerators</artifactId>
+          <version>0.0.1</version>
+      </dependency>
+      <dependency>
+          <groupId>il.ac.technion.ie</groupId>
+          <artifactId>potential</artifactId>
+          <version>0.0.1</version>
+      </dependency>
 
 	<dependency>
 		<groupId>org.neo4j</groupId>

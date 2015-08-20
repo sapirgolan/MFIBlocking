@@ -44,17 +44,27 @@ import java.util.regex.Pattern;
 
 public class Utilities {
 
-	public static boolean DEBUG = false;
+    private static final String RECORD_DB_PATH = "target/records-db";
+    private final static String lexiconItemExpressionExtended = "(\\S+),(0.\\d+),\\{(.+)\\},\\{(.+)\\}";
+    private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\}";
+    private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
+    private final static String CFICmdLine = "D:\\Batya\\EntityResolution\\fimi06\\FP\\Debug\\FPClosed.exe %s %d %s";
+    private final static double NR_PROCS_MULT = 4;
+    public static boolean DEBUG = false;
 	public static String NEW_LINE = System.getProperty("line.separator");
 	public static Map<Integer, FrequentItem> globalItemsMap;
 	public static boolean WRITE_ALL_ERRORS = false;
 	public static GraphDatabaseService recordDB;
-	private static final String RECORD_DB_PATH = "target/records-db";
-	private final static String lexiconItemExpressionExtended = "(\\S+),(0.\\d+),\\{(.+)\\},\\{(.+)\\}";
-	private final static String lexiconItemExpression = "(\\S+),(0.\\d+),\\{(.+)\\}";
-	private final static String ItemsetExpression = "([0-9\\s]+)\\(([0-9]+)\\)$";
-
-
+    public static AtomicInteger nonFIs = new AtomicInteger(0);
+    public static AtomicInteger numOfFIs = new AtomicInteger(0);
+    public static AtomicLong timeSpentCalcScore = new AtomicLong(0);
+    public static AtomicInteger[] clusterScores = new AtomicInteger[21];
+    public static AtomicInteger numOfGDs = new AtomicInteger(0);
+    public static double scoreThreshold;
+    private static AtomicLong timeSpentUpdatingCoverage = new AtomicLong(0);
+    private static AtomicInteger numOfBMs = new AtomicInteger(0);
+    private static AtomicInteger numSet = new AtomicInteger(0);
+    private static AtomicLong time_in_supp_calc = new AtomicLong(0);
 
 	private static void clearRecordDb() {
 		try {
@@ -78,8 +88,8 @@ public class Utilities {
 
 	/**
 	 * Will read records to a neo4j DB
-	 * 
-	 * @param numericRecordsFile
+     *
+     * @param numericRecordsFile
 	 * @param origRecordsFile
 	 * @param srcFile
 	 * @return
@@ -162,17 +172,11 @@ public class Utilities {
 	}
 
 	public static Map<Integer, FrequentItem> parseLexiconFile(String lexiconFile, String printBlocksFormat) {
-		globalItemsMap = new HashMap<Integer, FrequentItem>();
-		Pattern lexiconPattern;
-		if (printBlocksFormat.equalsIgnoreCase("N")){
-			lexiconPattern = Pattern.compile(lexiconItemExpression);
-		}
-		else{
-			lexiconPattern = Pattern.compile(lexiconItemExpressionExtended);
-        }
+        globalItemsMap = new HashMap<>();
+        Pattern lexiconPattern = getLexiconFilePatern(printBlocksFormat);
 
-		Properties itemsProps = new Properties();
-		FileInputStream fis;
+        Properties itemsProps = new Properties();
+        FileInputStream fis;
 		try {
 			fis = new FileInputStream(lexiconFile);
 			itemsProps.load(fis);
@@ -237,8 +241,25 @@ public class Utilities {
 		return globalItemsMap;
 	}
 
-	private static int[] getSortedSupportArr(String[] supportStrings) {
-		int[] supports = new int[supportStrings.length];
+    private static Pattern getLexiconFilePatern(String printBlocksFormat) {
+        return Pattern.compile(lexiconItemExpression);
+
+        /*
+        The entire block is probably related to the way the lexicon file is build.
+        As long as using Batya's way to build it that login is not needed
+        */
+        /*Pattern lexiconPattern;
+        if ("N".equalsIgnoreCase(printBlocksFormat) ){
+            lexiconPattern = Pattern.compile(lexiconItemExpression);
+        }
+        else{
+            lexiconPattern = Pattern.compile(lexiconItemExpressionExtended);
+}
+        return lexiconPattern;*/
+    }
+
+    private static int[] getSortedSupportArr(String[] supportStrings) {
+        int[] supports = new int[supportStrings.length];
 		for (int i = 0; i < supportStrings.length; i++) {
 			supports[i] = Integer.parseInt(supportStrings[i]);
 		}
@@ -350,8 +371,6 @@ public class Utilities {
 		return file;
 	}
 
-	private final static String CFICmdLine = "D:\\Batya\\EntityResolution\\fimi06\\FP\\Debug\\FPClosed.exe %s %d %s";
-
 	public static void RunCFIAlg(int minSup, String recordsFile, String CFIFile) {
 		String cmd = String.format(CFICmdLine, recordsFile, minSup, CFIFile);
 		runAlg(cmd, CFIFile);
@@ -389,8 +408,8 @@ public class Utilities {
 		numOfBMs.set(0);
 		numSet.set(0);
 		time_in_supp_calc.set(0);
-		resetAtomicIntegerArr(clusterScores);	
-		ConcurrentHashMap<Integer, BitMatrix> coverageIndex = new ConcurrentHashMap<Integer, BitMatrix>(21);
+        resetAtomicIntegerArr(clusterScores);
+        ConcurrentHashMap<Integer, BitMatrix> coverageIndex = new ConcurrentHashMap<Integer, BitMatrix>(21);
 		int maxSize = (int) Math.floor(minSup*NG_PARAM);
 		CandidatePairs candidatePairs = new CandidatePairs(maxSize);
 		StringSimTools.numOfMFIs.set(0);
@@ -403,8 +422,8 @@ public class Utilities {
 
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
-		int numOfProcessors = runtime.availableProcessors();		
-		System.out.println("Running on a system with  " + numOfProcessors
+        int numOfProcessors = runtime.availableProcessors();
+        System.out.println("Running on a system with  " + numOfProcessors
 				+ " processors");
 		LimitedQueue<Runnable> LQ = new LimitedQueue<Runnable>(
 				2 * numOfProcessors);
@@ -519,8 +538,6 @@ public class Utilities {
 		return candidatePairs;
 	}
 
-	private final static double NR_PROCS_MULT = 4;
-
 	public static Map<Integer, GDS_NG> readFIsDB(String frequentItemsetFile,
 			Map<Integer, FrequentItem> globalItemsMap, double scoreThreshold,
 			Map<Integer, Record> records, int minSup, double NG_PARAM) {
@@ -539,8 +556,8 @@ public class Utilities {
 		numOfBMs.set(0);
 		numSet.set(0);
 		time_in_supp_calc.set(0);
-		resetAtomicIntegerArr(clusterScores);	
-		ConcurrentHashMap<Integer, GDS_NG> coverageIndexDB = new ConcurrentHashMap<Integer, GDS_NG>(21);
+        resetAtomicIntegerArr(clusterScores);
+        ConcurrentHashMap<Integer, GDS_NG> coverageIndexDB = new ConcurrentHashMap<Integer, GDS_NG>(21);
 		StringSimTools.numOfMFIs.set(0);
 		StringSimTools.numOfRoughMFIs.set(0);
 		StringSimTools.timeInGetClose.set(0);
@@ -684,16 +701,6 @@ public class Utilities {
 		return coverageIndexDB;
 	}
 
-	public static AtomicInteger nonFIs = new AtomicInteger(0);
-	public static AtomicInteger numOfFIs = new AtomicInteger(0);
-	public static AtomicLong timeSpentCalcScore = new AtomicLong(0);
-	private static AtomicLong timeSpentUpdatingCoverage = new AtomicLong(0);
-	public static AtomicInteger[] clusterScores = new AtomicInteger[21];	
-	private static AtomicInteger numOfBMs = new AtomicInteger(0);
-	public static AtomicInteger numOfGDs = new AtomicInteger(0);
-	private static AtomicInteger numSet = new AtomicInteger(0);
-	public static double scoreThreshold;
-
 	private static void resetAtomicIntegerArr(AtomicInteger[] arr) {
 		for (int i = 0; i < arr.length; i++) {
 			arr[i] = new AtomicInteger(0);
@@ -789,9 +796,6 @@ public class Utilities {
 		return null;
 	}
 
-	private static AtomicLong time_in_supp_calc = new AtomicLong(0);
-
-
     /***
 	 * Returns set of tuples as BitSetIF object (Jonathan Svirsky)
 	 * @param items - q-grams ids returned by FP-growth (Jonathan Svirsky)
@@ -848,46 +852,35 @@ public class Utilities {
 		return pFI;
 	}
 
-	private class ParsedFrequentItemSet {
-		public ParsedFrequentItemSet(List<Integer> items, int supportSize) {
-			this.items = items;
-			this.supportSize = supportSize;
-		}
+    public static Set<Integer> convertFromBitSet(BitSet bs) {
+        Set<Integer> retVal = new HashSet<Integer>(bs.cardinality());
+        for (Integer transaction = bs.nextSetBit(0); transaction >= 0; transaction = bs
+                .nextSetBit(transaction + 1)) {
+            retVal.add(transaction);
+        }
+        return retVal;
+    }
 
-		public List<Integer> items;
-		public int supportSize;
-	}
-
-	public static Set<Integer> convertFromBitSet(BitSet bs) {
-		Set<Integer> retVal = new HashSet<Integer>(bs.cardinality());
-		for (Integer transaction = bs.nextSetBit(0); transaction >= 0; transaction = bs
-				.nextSetBit(transaction + 1)) {
-			retVal.add(transaction);
-		}
-		return retVal;
-	}
-
-	/**
-	 * 
-	 * @param bs1
-	 * @param bs2
-	 * @return true if bs1 contains all indexes in bs2
-	 */
-	public static boolean contains(BitSet bs1, BitSet bs2) {
-		if (bs1.cardinality() < bs2.cardinality())
-			return false;
-		for (Integer index = bs2.nextSetBit(0); index >= 0; index = bs2
-				.nextSetBit(index + 1)) {
-			if (!bs1.get(index))
-				return false;
-		}
-		return true;
-	}
+    /**
+     * @param bs1
+     * @param bs2
+     * @return true if bs1 contains all indexes in bs2
+     */
+    public static boolean contains(BitSet bs1, BitSet bs2) {
+        if (bs1.cardinality() < bs2.cardinality())
+            return false;
+        for (Integer index = bs2.nextSetBit(0); index >= 0; index = bs2
+                .nextSetBit(index + 1)) {
+            if (!bs1.get(index))
+                return false;
+        }
+        return true;
+    }
 
 	/**
 	 * This method will return the set of pairs which can be created in group,
 	 * and whose scpre passes the defined threshold
-	 * 
+     *
 	 * @param group
 	 *            - from which to generate pairs
 	 * @return
@@ -1018,12 +1011,12 @@ public class Utilities {
 		int numOfCores = runtime.availableProcessors();
 		JavaRDD<String> records = SparkContextWrapper.getJavaSparkContext().textFile(recordsFile, numOfCores*3);
 		JavaRDD<List<String>> transactions = records.map(new ParseRecordLine());
-		
+
 		FPGrowth fpg = new FPGrowth().setMinSupport((double)minSup/recordsCardinality).setNumPartitions(10);
 //		FPGrowthModel<Integer> model = fpg.run(transactions);
 //		JavaRDD<FreqItemset<Integer>> itemsets=model.freqItemsets().toJavaRDD();
 //		JavaRDD<FreqItemset<Integer>> maximalItemsets=itemsets.(new MaximalItemsetsReducer());
-//		
+//
 //		//List<FreqItemset<String>> itemsets= model.freqItemsets().toJavaRDD().collect();
 //		System.out.println("MinSupport="+minSup);
 //		System.out.println("recordsCardinality="+recordsCardinality);
@@ -1034,11 +1027,11 @@ public class Utilities {
 //			for (FreqItemset<String> itemset: itemsets) {
 //				//System.out.println(Joiner.on(" ").join(itemset.javaItems()) + "  (" + itemset.freq()+")");
 //
-//				StringBuilder sb=new StringBuilder();		
+//				StringBuilder sb=new StringBuilder();
 //				sb.append(Joiner.on(" ").join(itemset.javaItems()));
 //				sb.append("  (");
 //				sb.append(itemset.freq());
-//				sb.append(")");		
+//				sb.append(")");
 //				writer.write(sb.toString());
 //				writer.newLine();
 //			}
@@ -1051,6 +1044,7 @@ public class Utilities {
 
 		return file;
 	}
+
 	static class ParseRecordLine implements Function<String, List<String>> {
 
 		public List<String> call(String line) {
@@ -1063,17 +1057,28 @@ public class Utilities {
 			return retVal;
 		}
 	}
+
 	static class MaximalItemsetsReducer implements Function2<FreqItemset<Integer>, FreqItemset<Integer>,FreqItemset<Integer>> {
 
 		public FreqItemset<Integer> call(FreqItemset<Integer> v1, FreqItemset<Integer> v2) throws Exception {
 			List<Integer> itemsV1=v1.javaItems();
 			List<Integer> itemsV2=v2.javaItems();
-			
-			
-			
+
+
+
 			return null;
-		}
-		
+        }
+
+    }
+
+    private class ParsedFrequentItemSet {
+        public List<Integer> items;
+        public int supportSize;
+
+        public ParsedFrequentItemSet(List<Integer> items, int supportSize) {
+            this.items = items;
+            this.supportSize = supportSize;
+        }
 	}
 
 }

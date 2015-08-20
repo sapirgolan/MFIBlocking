@@ -3,7 +3,7 @@ package fimEntityResolution.entityResulution;
 import fimEntityResolution.comparison.ProfileComparison;
 import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.model.RecordMatches;
-import lucene.search.SearchEngine;
+import il.ac.technion.ie.search.core.SearchEngine;
 
 import java.util.*;
 import java.util.Map.Entry;

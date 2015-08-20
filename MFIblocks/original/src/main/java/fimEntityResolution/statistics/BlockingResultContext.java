@@ -2,31 +2,37 @@ package fimEntityResolution.statistics;
 
 public class BlockingResultContext {
 
-	private StatisticMeasuremnts statisticMeasuremnts;
-	private double minBlockingThreshold;
+    private StatisticMeasurements statisticMeasurements;
+    private double minBlockingThreshold;
 	private double lastUsedBlockingThreshold;
 	private double ngLimit;
 	private double executionTime;
 	private double timeOfERComparison;
+    private NonBinaryResults nonBinaryResults;
 
-	public BlockingResultContext(StatisticMeasuremnts results,
-			double minBlockingThreshold, double lastUsedBlockingThreshold,
-			double nG_LIMIT, double executionTime, double timeOfERComparison) {
-		
-		this.statisticMeasuremnts = results;
-		this.minBlockingThreshold = minBlockingThreshold;
-		this.lastUsedBlockingThreshold = lastUsedBlockingThreshold;
-		this.ngLimit = nG_LIMIT;
-		this.executionTime = executionTime;
-		this.timeOfERComparison = timeOfERComparison;
-	}
+    public BlockingResultContext(StatisticMeasurements results, NonBinaryResults nonBinaryResults,
+                                 double minBlockingThreshold, double lastUsedBlockingThreshold,
+                                 double ngLimit, double executionTime, double timeOfERComparison) {
 
-	/**
+        this.statisticMeasurements = results;
+        this.nonBinaryResults = nonBinaryResults;
+        this.minBlockingThreshold = minBlockingThreshold;
+        this.lastUsedBlockingThreshold = lastUsedBlockingThreshold;
+        this.ngLimit = ngLimit;
+        this.executionTime = executionTime;
+        this.timeOfERComparison = timeOfERComparison;
+    }
+
+    /**
 	 * @return the statisticMeasuremnts
 	 */
-	public final StatisticMeasuremnts getStatisticMeasuremnts() {
-		return statisticMeasuremnts;
-	}
+    public final StatisticMeasurements getStatisticMeasurements() {
+        return statisticMeasurements;
+    }
+
+    public NonBinaryResults getNonBinaryResults() {
+        return nonBinaryResults;
+    }
 
 	/**
 	 * @return the minBlockingThreshold

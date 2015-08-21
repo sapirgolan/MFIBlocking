@@ -9,18 +9,13 @@ import java.util.Set;
 
 public class Record implements IFRecord {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private int id;
-	private Map<Integer,Integer> itemToFrequency = new HashMap<Integer, Integer>();
+	private Map<Integer,Integer> itemToFrequency = new HashMap<>();
 	private String recordStr = null;
 	private String NEW_LINE = System.getProperty("line.separator");
 	private String src = null; // if we want to keep track of the record's source
-//	private SparseBitSet ng = new SparseBitSet(20);
-	private long currCardinality = 0;
-	
+
 		
 	public Record(int id, String recordStr){
 		this.id = id;
@@ -54,36 +49,6 @@ public class Record implements IFRecord {
 	public void setSrc(String src){
 		this.src = src;
 	}
-/*	public void clearNG(){	
-		if(currCardinality > 0){
-			ng.clear();
-			currCardinality = 0;
-		}
-	}
-	
-	
-	public void updateNG(SparseBitSet support){
-		Iterator It = support.getIterator();
-		while(It.hasNext()){
-			long recordId = It.next();
-			ng.set(recordId);
-		}
-		
-		currCardinality = ng.getNumBitsSet();
-	}
-	
-	public void updateNG(BitSet support){
-		for(int recInd=support.nextSetBit(0); recInd>=0; recInd=support.nextSetBit(recInd+1)) {			
-			ng.set(recInd);
-		}
-		
-		currCardinality = ng.getNumBitsSet();
-	}
-	
-	public long getNG(){
-		return currCardinality;
-	}
-	*/
 	private final static String WORD_SEP = " ";
 	
 	public int getSize(){
@@ -105,7 +70,6 @@ public class Record implements IFRecord {
 						sb.append(itemIdFreqPair.getKey()).append(WORD_SEP);
 						uniqueValues.add(itemIdFreqPair.getKey());
 					}
-					
 				}
 			}
 		}

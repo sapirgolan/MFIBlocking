@@ -27,6 +27,7 @@
 	   <module>measurements</module>
        <module>potential</module>
        <module>outputGenerators</module>
+       <module>experiments</module>
    </modules>
   
   <build>

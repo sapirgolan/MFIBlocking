@@ -1,8 +1,8 @@
 package il.ac.technion.ie.experiments.dao;
 
 import com.univocity.parsers.csv.CsvParser;
-import il.ac.technion.ie.experiments.logic.FebrlBlockBuilder;
-import il.ac.technion.ie.experiments.logic.iBlockBuilder;
+import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
+import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 
 import java.util.ArrayList;

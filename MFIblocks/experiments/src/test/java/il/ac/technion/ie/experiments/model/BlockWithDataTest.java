@@ -2,6 +2,7 @@ package il.ac.technion.ie.experiments.model;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -37,9 +38,9 @@ public class BlockWithDataTest {
     @Test
     public void testGetTrueRepresentativePosition() throws Exception {
         //prepare
-        List<String> value1 = hugeStringToList("rec-100-dup-0, usa, m, 3l, , m s, ch|o  , washin ton, q");
-        List<String> value2 = hugeStringToList("rec-100-dup-1, usa, r,3, , ms, ch   e, washington, ql  ");
-        List<String> value3 = hugeStringToList("rec-100-org,   usa, m,31, , ms, chloe, washington, qld");
+        List<String> value1 = ExperimentsUtils.hugeStringToList("rec-100-dup-0, usa, m, 3l, , m s, ch|o  , washin ton, q");
+        List<String> value2 = ExperimentsUtils.hugeStringToList("rec-100-dup-1, usa, r,3, , ms, ch   e, washington, ql  ");
+        List<String> value3 = ExperimentsUtils.hugeStringToList("rec-100-org,   usa, m,31, , ms, chloe, washington, qld");
         initRecords(value1, value2, value3);
 
         HashMap<String, Double> probabilitiesMap = Maps.newHashMap(ImmutableMap.<String, Double>builder().
@@ -63,11 +64,6 @@ public class BlockWithDataTest {
         for (List<String> fieldsValues : values) {
             records.add(new Record(fieldNames, fieldsValues));
         }
-    }
-
-    private List<String> hugeStringToList(String huge) {
-        String[] strings = huge.split(",");
-        return new ArrayList<>( Arrays.asList(strings) );
     }
 
     private void createBlock(Map<String, Double> map) {

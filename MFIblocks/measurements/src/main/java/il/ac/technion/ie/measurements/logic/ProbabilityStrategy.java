@@ -19,7 +19,7 @@ public class ProbabilityStrategy implements iUpdateMatrixStrategy {
 
     @Override
     public String getUpdateLogMessage(int rowIndex, int colIndex, double currentValue, double posValue) {
-        return String.format("Increasing probability at pos (%d,%d) from by %s to %s",
+        return String.format("Increasing service at pos (%d,%d) from by %s to %s",
                 rowIndex, colIndex, currentValue, posValue);
     }
 }

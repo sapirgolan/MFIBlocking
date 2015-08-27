@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class FebrlBlockBuilder implements iBlockBuilder {
 
+    private static final String EMPTY_STRING = "";
     private List<String> fieldsNames;
     @Override
     public List<BlockWithData> build(CsvParser parser, List<String> fieldsNames) {
@@ -67,6 +68,12 @@ public class FebrlBlockBuilder implements iBlockBuilder {
 
     private Record createRecord(String[] row) {
         List<String> values = new ArrayList<>(Arrays.asList(row));
+        for (int i = 0; i < values.size(); i++) {
+            String val = values.get(i);
+            if (val == null) {
+                values.set(i, EMPTY_STRING);
+            }
+        }
         return new Record(fieldsNames, values);
     }
 }

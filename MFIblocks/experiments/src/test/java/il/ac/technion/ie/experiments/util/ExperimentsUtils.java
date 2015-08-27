@@ -1,5 +1,8 @@
 package il.ac.technion.ie.experiments.util;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,5 +18,11 @@ public class ExperimentsUtils {
 
     public static String[] hugeStringToArray(String huge) {
         return huge.split(",");
+    }
+
+    public static String getPathToRecordsFile() throws URISyntaxException {
+        String pathToFile = "/20Records.csv";
+        URL resourceUrl = ExperimentsUtils.class.getResource(pathToFile);
+        return new File(resourceUrl.toURI()).getAbsolutePath();
     }
 }

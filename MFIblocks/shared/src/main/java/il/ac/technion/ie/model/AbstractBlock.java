@@ -65,12 +65,12 @@ public abstract class AbstractBlock<T> {
         if (blockRepresentatives == null) {
             float maxProb = 0;
             blockRepresentatives = new HashMap<>();
-            //find the max probability score in the block
+            //find the max service score in the block
             for (Map.Entry<T, Float> entry : membersProbability.entrySet()) {
                 Float localProb = entry.getValue();
                 maxProb = Math.max(localProb, maxProb);
             }
-            Block.logger.debug("Max probability of records in this Block is:" + maxProb + ". Block Members: " + members);
+            Block.logger.debug("Max service of records in this Block is:" + maxProb + ". Block Members: " + members);
 
             //add all entries that have the max score.
             //More that one entry can the max score

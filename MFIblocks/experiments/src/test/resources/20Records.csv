@@ -1,0 +1,21 @@
+rec_id, culture, sex, age, date_of_birth, title, given_name, surname, state, suburb, postcode, street_number, address_1, address_2, phone_number, soc_sec_id, blocking_number
+rec-0-dup-0, usa, m,21,19941003, , juja, pefqy, nsw, hawthorne,4207,5151, terryplse, , 612 60757572,9024896,5
+rec-0-dup-1, usa, f,21,19940103, , jukket, pettyd, vibc, hawthorne,4207,53, terrt lcose, , 03 94754580,9024896,5
+rec-0-dup-2, usa, ,35,19940103, , julia, pet ty, nsw, hawthorne, ,255, terry close, , 612 60757572,9024896,5
+rec-0-org,   usa, f,21,19940103, , julia, petty, nsw, hawthorne,4207,53, terry close, , 612 60757572,9024896,5
+rec-1-dup-0, abo, f, ,19990610, , lac h an, ofane n ave, wa, har   ,392,1, cockcro f t  venue, , 08826 885,5073459,7
+rec-1-dup-1, abo, f, , 1999O610, , lac hlan, ofane   ue,    , har ey,3928,1, cockcr ft  venue, , 08 82 7 2885, 5074 59,7
+rec-1-dup-2, abo, f, ,1999010, , lachlan, ofane   e, w a, ha r v y,3928, |, cockcr o t a venue, ,882672885,5073459,7
+rec-1-org,   abo, f, ,19990610, , lachlan, ofanengaue, wa, harvey,3928,14, cockcroft avenue, , 08 82672885,5073459,7
+rec-2-dup-0, ind, f,21,19330701, , , tikji, sab, degilbo,4242,119, armbrustet street, , 613 44253303,9787271,2
+rec-2-dup-1, ind, ,21,19940228, , teresa, tikoo, wod, degkb,2024,112, hirschfeld crescent, , 04 51940054,9787271,2
+rec-2-dup-2, ind, f,12,19940228, , teresa, tko, , ,2024,7, halford ckescent, , 613 44253303,9787217,2
+rec-2-dup-3, ind, ,21,19220310, , teresa, tikom, qld, degilbo,2024,112, hirschfelprescent, , 613 44253303,4935833,2
+rec-2-org,   ind, f,21,19940228, , teresa, tikoo, qld, degilbo,2024,112, hirschfeld crescent, , 613 44253303,9787271,2
+rec-3-dup-0, unk, m,27,19880423, , scolkzod, patrick, vz, balmattm,2450,58, wilson fgedqcent, , 618 48054783,1566046,0
+rec-3-dup-1, unk, b, ,19880423, , , scollard, vic, balmattum,2450,3, wilson frescent, , 618 48054783,1566046,0
+rec-3-dup-2, unk, m,98,19880423, , patrcck, scollard, nsw, balmattum,2509,5, wilson escent, , 04 88410179,1566046,0
+rec-3-dup-3, unk, m,27,19884033, , patdikce, sconlkard, vic, ,2450,8, wilson cgescent, , 618 48054783,1566046,0
+rec-3-dup-4, unk, m, ,19880423, , pateick, sclods mbd, vict, balmattum,2450,5, wilsonvswrcent, , 618 41050783,1566046,0
+rec-3-dup-5, unk, m, ,19880423, , paiurkp, scollard, bg, balmatfum,2450,5, wilson crescent, , 618 48504783,1569645,0
+rec-3-org,   unk, m,27,19880423, , patrick, scollard, vic, balmattum,2450,5, wilson crescent, , 618 48054783,1566046,0

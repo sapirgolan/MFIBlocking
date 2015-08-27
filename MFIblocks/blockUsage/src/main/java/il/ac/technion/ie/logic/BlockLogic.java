@@ -1,6 +1,7 @@
 package il.ac.technion.ie.logic;
 
 import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.lprobability.SimilarityCalculator;
 import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.BlockInteraction;

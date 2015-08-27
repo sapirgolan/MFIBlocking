@@ -1,8 +1,9 @@
-package il.ac.technion.ie.experiments.dao;
+package il.ac.technion.ie.experiments.service;
 
 import com.univocity.parsers.csv.CsvParser;
 import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
+import il.ac.technion.ie.experiments.dao.DatasetParser;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 
 import java.util.ArrayList;
@@ -12,12 +13,12 @@ import java.util.List;
 /**
  * Created by I062070 on 22/08/2015.
  */
-public class FebrlParser {
+public class ParsingService {
 
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
-    public FebrlParser() {
+    public ParsingService() {
         this.dataParser = new DatasetParser();
         blockBuilder = new FebrlBlockBuilder();
     }

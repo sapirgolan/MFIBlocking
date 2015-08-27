@@ -2,9 +2,7 @@ package il.ac.technion.ie.experiments.model;
 
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by I062070 on 21/08/2015.
@@ -16,7 +14,7 @@ public class Record {
     static final Logger logger = Logger.getLogger(Record.class);
 
     public Record(List<String> fieldsName, List<String> values) {
-        fields = new HashMap<>();
+        fields = new TreeMap<>();
 
         if (fieldsName.size() != values.size()) {
             String message = String.format("Number of fields and values doesn't match! There are %d and %d values",
@@ -40,5 +38,16 @@ public class Record {
 
     public String getRecordID() {
         return recordID;
+    }
+
+    /**
+     * @return {@link java.util.List List} a List with the values of all the fields
+     */
+    public List<String> getEntries() {
+        List<String> entries = new ArrayList<>();
+        for (Field field : fields.values()) {
+            entries.add(field.getValue());
+        }
+        return entries;
     }
 }

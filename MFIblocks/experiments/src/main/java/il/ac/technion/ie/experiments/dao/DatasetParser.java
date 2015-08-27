@@ -30,7 +30,7 @@ public class DatasetParser {
         // The settings object provides many configuration options
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
-        parserSettings.setHeaderExtractionEnabled(true);
+//        parserSettings.setEmptyValue(" ");
         CsvParser parser = new CsvParser(parserSettings);
         // the 'parse' method will parse the file and delegate each parsed row to the RowProcessor you defined
         parser.beginParsing(getReader(pathToFile));

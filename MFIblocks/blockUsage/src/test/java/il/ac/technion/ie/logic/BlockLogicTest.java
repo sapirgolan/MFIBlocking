@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import il.ac.technion.ie.context.MfiContext;
+import il.ac.technion.ie.lprobability.SimilarityCalculator;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.model.CandidatePairs;
 import il.ac.technion.ie.model.NeighborsVector;

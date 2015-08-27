@@ -56,4 +56,12 @@ public interface iMeasureLogic {
      * @return average value of "Ranked Value"
      */
     double calcRankedValue(final List<? extends AbstractBlock> blocks);
+
+    /**
+     * This method calculate the Mean Reciprocal Rank score of a List of Blocks
+     *
+     * @param blocks
+     * @return MRR score
+     */
+    double calcMRR(List<? extends AbstractBlock> blocks);
 }

@@ -71,4 +71,9 @@ public class MeasurService implements iMeasurService {
     public double calcRankedValue(final List<? extends AbstractBlock> blocks) {
         return measureLogic.calcRankedValue(blocks);
     }
+
+    @Override
+    public double calcMRR(List<? extends AbstractBlock> blocks) {
+        return measureLogic.calcMRR(blocks);
+    }
 }

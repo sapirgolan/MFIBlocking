@@ -45,11 +45,6 @@ public class MeasurLogicTest {
     }
 
     @Test
-    public void testConvertBlocksToMatrix() throws Exception {
-
-    }
-
-    @Test
     public void testUpdateScoreInMatrix_forFirstTime() throws Exception {
         SparseDoubleMatrix2D matrix2D = new SparseDoubleMatrix2D(100, 100);
         List<Integer> members = Arrays.asList(4, 8, 19, 5, 27);
@@ -212,6 +207,17 @@ public class MeasurLogicTest {
 
         double rankedValue = classUnderTest.calcRankedValue(Lists.newArrayList(block1, block2, block3, block4));
         MatcherAssert.assertThat(rankedValue, closeTo(0.35, 0.0000001));
+    }
+
+    @Test
+    public void testCalcMRR() throws Exception {
+        AbstractBlock block1 = buildMockBlockRankedValue(1, 1);
+        AbstractBlock block2 = buildMockBlockRankedValue(1, 2);
+        AbstractBlock block3 = buildMockBlockRankedValue(3, 6);
+        AbstractBlock block4 = buildMockBlockRankedValue(4, 4);
+
+        double mrr = classUnderTest.calcMRR(Lists.newArrayList(block1, block2, block3, block4));
+        MatcherAssert.assertThat(mrr, closeTo(0.64583333333, 0.0000001));
     }
 
     private AbstractBlock buildMockBlockRankedValue(Integer trueRepPosition, Integer blockSize) {

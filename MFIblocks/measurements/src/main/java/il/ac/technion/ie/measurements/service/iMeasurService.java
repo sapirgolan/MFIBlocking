@@ -33,4 +33,12 @@ public interface iMeasurService {
     double calcFalsePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
 
     double calcRankedValue(final List<? extends AbstractBlock> blocks);
+
+    /**
+     * please refer to https://en.wikipedia.org/wiki/Mean_reciprocal_rank
+     *
+     * @param blocks
+     * @return the Mean Reciprocal Rank score
+     */
+    double calcMRR(final List<? extends AbstractBlock> blocks);
 }

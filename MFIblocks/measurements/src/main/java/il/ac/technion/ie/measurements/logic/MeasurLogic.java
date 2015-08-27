@@ -117,6 +117,15 @@ public class MeasurLogic implements iMeasureLogic {
         return (averageRakedValue / blocks.size());
     }
 
+    @Override
+    public double calcMRR(List<? extends AbstractBlock> blocks) {
+        double meanReciprocalRank = 0;
+        for (AbstractBlock block : blocks) {
+            meanReciprocalRank += (1 / (double) block.getTrueRepresentativePosition());
+        }
+        return (meanReciprocalRank / blocks.size());
+    }
+
     private int calcTrueNegative(BitSet results, BitSet trueMatch, int size) {
         BitSet clonedResults = (BitSet) results.clone();
         clonedResults.or(trueMatch);

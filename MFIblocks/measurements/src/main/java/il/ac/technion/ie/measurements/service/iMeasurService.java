@@ -32,5 +32,5 @@ public interface iMeasurService {
 
     double calcFalsePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
 
-    <T> double calcRankedValue(final List<AbstractBlock<T>> blocks);
+    double calcRankedValue(final List<? extends AbstractBlock> blocks);
 }

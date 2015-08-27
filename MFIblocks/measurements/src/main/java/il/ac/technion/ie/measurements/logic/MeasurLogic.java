@@ -105,12 +105,14 @@ public class MeasurLogic implements iMeasureLogic {
     }
 
     @Override
-    public <T> double calcRankedValue(List<AbstractBlock<T>> blocks) {
+    public double calcRankedValue(final List<? extends AbstractBlock> blocks) {
         double averageRakedValue = 0;
-        for (AbstractBlock<T> block : blocks) {
-            int numerator = block.getTrueRepresentativePosition() - 1;
-            int denominator = block.size() - 1;
-            averageRakedValue += (double) numerator / denominator;
+        for (AbstractBlock block : blocks) {
+            if (block.size() != 1) {
+                int numerator = block.getTrueRepresentativePosition() - 1;
+                int denominator = block.size() - 1;
+                averageRakedValue += (double) numerator / denominator;
+            }
         }
         return (averageRakedValue / blocks.size());
     }

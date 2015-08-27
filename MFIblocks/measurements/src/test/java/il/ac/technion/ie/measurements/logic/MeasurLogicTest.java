@@ -5,7 +5,9 @@ import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
+import com.google.common.collect.Lists;
 import il.ac.technion.ie.measurements.type.CellType;
+import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Block;
 import org.easymock.EasyMock;
 import org.hamcrest.MatcherAssert;
@@ -190,6 +192,33 @@ public class MeasurLogicTest {
         BitSet trueMatch = createBitSet(10, Arrays.asList(1, 3, 4, 5));
         int trueNegative = Whitebox.invokeMethod(classUnderTest, "calcTrueNegative", result, trueMatch, 10);
         MatcherAssert.assertThat(trueNegative, is(equalTo(5)));
+    }
+
+    @Test
+    public void testCalcRankedValue_singleBlock() throws Exception {
+        AbstractBlock singleBlock = buildMockBlockRankedValue(1, 1);
+
+        List<AbstractBlock> blocks = Lists.newArrayList(singleBlock);
+        double rankedValue = classUnderTest.calcRankedValue(blocks);
+        MatcherAssert.assertThat(rankedValue, closeTo(0.0, 0.0000001));
+    }
+
+    @Test
+    public void testCalcRankedValue() throws Exception {
+        AbstractBlock block1 = buildMockBlockRankedValue(1, 1);
+        AbstractBlock block2 = buildMockBlockRankedValue(1, 2);
+        AbstractBlock block3 = buildMockBlockRankedValue(3, 6);
+        AbstractBlock block4 = buildMockBlockRankedValue(4, 4);
+
+        double rankedValue = classUnderTest.calcRankedValue(Lists.newArrayList(block1, block2, block3, block4));
+        MatcherAssert.assertThat(rankedValue, closeTo(0.35, 0.0000001));
+    }
+
+    private AbstractBlock buildMockBlockRankedValue(Integer trueRepPosition, Integer blockSize) {
+        AbstractBlock block1 = PowerMockito.mock(AbstractBlock.class);
+        PowerMockito.when(block1.getTrueRepresentativePosition()).thenReturn(trueRepPosition);
+        PowerMockito.when(block1.size()).thenReturn(blockSize);
+        return block1;
     }
 
     private BitSet createBitSet(int size, List<Integer> trueIndices) {

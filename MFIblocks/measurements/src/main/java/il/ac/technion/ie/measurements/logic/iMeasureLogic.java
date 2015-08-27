@@ -55,5 +55,5 @@ public interface iMeasureLogic {
      * @param blocks
      * @return average value of "Ranked Value"
      */
-    <T> double calcRankedValue(List<AbstractBlock<T>> blocks);
+    double calcRankedValue(final List<? extends AbstractBlock> blocks);
 }

@@ -68,6 +68,11 @@ public class BlockWithData extends AbstractBlock<Record>{
 
     }
 
+    @Override
+    public void setMemberSimScore(Record memberId, Float score) {
+        membersScores.put(memberId, score);
+    }
+
     private class Pair{
         private Record record;
         private double score;

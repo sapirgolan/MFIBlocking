@@ -42,6 +42,7 @@ public class BlockWithData extends AbstractBlock<Record>{
         return recordIds;
     }
 
+    @Override
     public int getTrueRepresentativePosition() {
         ArrayList<Pair> pairs = new ArrayList<>();
         for (Map.Entry<Record, Float> entry : membersProbability.entrySet()) {

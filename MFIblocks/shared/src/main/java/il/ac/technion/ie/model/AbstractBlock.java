@@ -95,6 +95,8 @@ public abstract class AbstractBlock<T> {
         return false;
     }
 
+    public abstract int getTrueRepresentativePosition();
+
     public void setMemberSimScore(T memberId, Float score) {
         if (membersScores.containsKey(memberId)) {
             membersScores.put(memberId, score);

@@ -1,5 +1,6 @@
 package il.ac.technion.ie.model;
 
+import il.ac.technion.ie.exception.NotImplementedYetException;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -91,5 +92,10 @@ public class Block extends AbstractBlock<Integer> {
 
     public int getId() {
         return this.id;
+    }
+
+    @Override
+    public int getTrueRepresentativePosition() {
+        throw new NotImplementedYetException("This method is not implemented since the True Representative is unknown");
     }
 }

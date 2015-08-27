@@ -7,6 +7,7 @@ import il.ac.technion.ie.measurements.logic.MeasurLogic;
 import il.ac.technion.ie.measurements.logic.iMeasureLogic;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
 import il.ac.technion.ie.measurements.type.CellType;
+import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Block;
 
 import java.util.List;
@@ -64,5 +65,10 @@ public class MeasurService implements iMeasurService {
     @Override
     public double calcFalsePositiveRate(DoubleMatrix1D results, DoubleMatrix1D trueMatch) {
         return measureLogic.calcFalsePositiveRate(results, trueMatch);
+    }
+
+    @Override
+    public <T> double calcRankedValue(List<AbstractBlock<T>> blocks) {
+        return measureLogic.calcRankedValue(blocks);
     }
 }

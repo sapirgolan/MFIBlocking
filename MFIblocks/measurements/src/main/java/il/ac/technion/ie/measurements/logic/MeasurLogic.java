@@ -8,6 +8,7 @@ import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
 import il.ac.technion.ie.measurements.type.CellType;
 import il.ac.technion.ie.measurements.utils.MeasurUtils;
+import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Block;
 import il.ac.technion.ie.service.BlockService;
 import il.ac.technion.ie.service.iBlockService;
@@ -101,6 +102,17 @@ public class MeasurLogic implements iMeasureLogic {
         int falsePositive = calcFalsePositive(resultsBS, trueMatchBS);
         int trueNegative = calcTrueNegative(resultsBS, trueMatchBS, trueMatch.size());
         return (double) falsePositive / (double) (falsePositive + trueNegative);
+    }
+
+    @Override
+    public <T> double calcRankedValue(List<AbstractBlock<T>> blocks) {
+        double averageRakedValue = 0;
+        for (AbstractBlock<T> block : blocks) {
+            int numerator = block.getTrueRepresentativePosition() - 1;
+            int denominator = block.size() - 1;
+            averageRakedValue += (double) numerator / denominator;
+        }
+        return (averageRakedValue / blocks.size());
     }
 
     private int calcTrueNegative(BitSet results, BitSet trueMatch, int size) {

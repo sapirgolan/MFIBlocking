@@ -5,6 +5,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 import il.ac.technion.ie.exception.MatrixSizeException;
 import il.ac.technion.ie.measurements.matchers.AbstractMatcher;
 import il.ac.technion.ie.measurements.type.CellType;
+import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Block;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface iMeasurService {
     double calcTruePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
 
     double calcFalsePositiveRate(final DoubleMatrix1D results, DoubleMatrix1D trueMatch);
+
+    <T> double calcRankedValue(final List<AbstractBlock<T>> blocks);
 }

@@ -159,12 +159,11 @@
     	<artifactId>spark-core_2.11</artifactId>
     	<version>${spark.version}</version>
 	</dependency>
+      <dependency>
+          <groupId>org.apache.spark</groupId>
+          <artifactId>spark-mllib_2.11</artifactId>
+          <version>${spark.version}</version>
+      </dependency>
 
-	<!-- Mohout - distributed fpgrowth 
-	<dependency>
-    	<groupId>org.apache.mahout</groupId>
-    	<artifactId>mahout-core</artifactId>
-    	<version>0.9</version>
-	</dependency>-->
   </dependencies>
 </project>

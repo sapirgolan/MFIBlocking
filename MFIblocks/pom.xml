@@ -17,11 +17,12 @@
       <powermock.version>1.5.6</powermock.version>
       <easymock.version>3.2</easymock.version>
       <spark.version>1.3.0</spark.version>
+      <gueva.version>18.0</gueva.version>
   </properties>
   
    <modules>
-        <module>original</module>
-        <module>blockUsage</module>
+       <module>original</module>
+       <module>blockUsage</module>
        <module>shared</module>
        <module>searchEngine</module>
 	   <module>measurements</module>
@@ -67,13 +68,13 @@
 		
 	</repositories>
 	<dependencyManagement>
-		<dependencies>
-		  <dependency>
-			<groupId>il.ac.technion.ie</groupId>
-			<artifactId>original</artifactId>
-			<version>0.0.1</version>
-		  </dependency>
-	  </dependencies>
+        <!--		<dependencies>
+                  <dependency>
+                    <groupId>il.ac.technion.ie</groupId>
+                    <artifactId>original</artifactId>
+                    <version>0.0.1</version>
+                  </dependency>
+              </dependencies>-->
   </dependencyManagement>
 	
 
@@ -97,11 +98,6 @@
           <groupId>org.hyperic</groupId>
           <artifactId>sigar</artifactId>
           <version>1.6.5.132</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.spark</groupId>
-          <artifactId>spark-mllib_2.11</artifactId>
-          <version>${spark.version}</version>
       </dependency>
 
       <!-- JARS that were installed manually -->

@@ -2,6 +2,8 @@ package il.ac.technion.ie.experiments.dao;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -17,7 +19,6 @@ public class DatasetParser {
         try {
             FileInputStream fileInputStream = new FileInputStream(pathToFile);
             return new InputStreamReader(fileInputStream, "UTF-8");
-//            return new InputStreamReader(this.getClass().getResourceAsStream(pathToFile), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             logger.error("Failed to retrieve stream from input at: " + pathToFile, e);
         } catch (FileNotFoundException e) {
@@ -30,12 +31,48 @@ public class DatasetParser {
         // The settings object provides many configuration options
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
-//        parserSettings.setEmptyValue(" ");
         CsvParser parser = new CsvParser(parserSettings);
         // the 'parse' method will parse the file and delegate each parsed row to the RowProcessor you defined
         parser.beginParsing(getReader(pathToFile));
 
         return parser;
+    }
+
+    public CsvWriter preparOutputFile(String pathToFile) {
+        CsvWriter writer = null;
+
+        File file = createFile(pathToFile);
+        if (!file.exists() || !file.canWrite()) {
+            logger.warn("Can't write output to file. Either it doesn't exists or nothing can be written");
+            return null;
+        }
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            Writer outputWriter = new OutputStreamWriter(fileOutputStream);
+
+            writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+        } catch (FileNotFoundException e) {
+            logger.error("Output File doesn't exists", e);
+        }
+        return writer;
+    }
+
+    private File createFile(String pathToFile) {
+        File outputFile = new File(pathToFile);
+        if (outputFile.exists()) {
+            logger.info("Output file exists. Deleting " + pathToFile);
+            if (!outputFile.delete()) {
+                logger.warn("Failed to delete output file");
+            }
+        }
+        try {
+            logger.info("Creating the output file");
+            outputFile.createNewFile();
+        } catch (IOException e) {
+            logger.error("Failed to create output file", e);
+        }
+        return outputFile;
     }
 
 }

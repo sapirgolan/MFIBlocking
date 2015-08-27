@@ -50,4 +50,15 @@ public class Record {
         }
         return entries;
     }
+
+    /**
+     * @return {@link java.util.List List} a List with the names of all the fields
+     */
+    public List<String> getFieldNames() {
+        List<String> fieldNames = new ArrayList<>();
+        for (Field field : fields.values()) {
+            fieldNames.add(field.getName());
+        }
+        return fieldNames;
+    }
 }

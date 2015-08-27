@@ -1,10 +1,12 @@
 package il.ac.technion.ie.experiments.service;
 
 import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvWriter;
 import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.dao.DatasetParser;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.Record;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,5 +34,35 @@ public class ParsingService {
             blocksWithData = blockBuilder.build(parser, fieldsNames);
         }
         return blocksWithData;
+    }
+
+    public void writeBlocks(List<BlockWithData> blocks, String pathToFile) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(pathToFile);
+        if (csvWriter != null) {
+            // Write the record headers of this file
+            List<String> fieldsNames = getBlockFieldsNames(blocks);
+            csvWriter.writeHeaders(fieldsNames);
+
+            // Let's write the rows one by one
+            for (BlockWithData block : blocks) {
+                for (Record record : block.getMembers()) {
+                    for (String recordEntry : record.getEntries()) {
+                        csvWriter.writeValue(recordEntry);
+                    }
+                    csvWriter.writeValuesToRow();
+                }
+            }
+            // Here we just tell the writer to write everything and close the given output Writer instance.
+            csvWriter.close();
+        }
+
+    }
+
+    private List<String> getBlockFieldsNames(List<BlockWithData> blocks) {
+        if (blocks != null && !blocks.isEmpty()) {
+            final BlockWithData blockWithData = blocks.get(0);
+            return blockWithData.getFieldNames();
+        }
+        return null;
     }
 }

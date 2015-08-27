@@ -91,4 +91,8 @@ public class BlockWithData extends AbstractBlock<Record>{
             return record;
         }
     }
+
+    public List<String> getFieldNames() {
+        return trueRepresentative.getFieldNames();
+    }
 }

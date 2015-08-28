@@ -41,6 +41,7 @@ public class ParsingService {
         if (csvWriter != null) {
             // Write the record headers of this file
             List<String> fieldsNames = getBlockFieldsNames(blocks);
+            fieldsNames.add("Probability");
             csvWriter.writeHeaders(fieldsNames);
 
             // Let's write the rows one by one
@@ -49,6 +50,7 @@ public class ParsingService {
                     for (String recordEntry : record.getEntries()) {
                         csvWriter.writeValue(recordEntry);
                     }
+                    csvWriter.writeValues(block.getMemberProbability(record));
                     csvWriter.writeValuesToRow();
                 }
             }

@@ -74,6 +74,14 @@ public class BlockWithData extends AbstractBlock<Record>{
         membersScores.put(memberId, score);
     }
 
+    public boolean isRepresentative(Record record) {
+        return trueRepresentative.equals(record);
+    }
+
+    public Record getTrueRepresentative() {
+        return trueRepresentative;
+    }
+
     private class Pair{
         private Record record;
         private double score;

@@ -27,28 +27,6 @@ public class ExperimentRunner {
         exprimentsService = new ExprimentsService();
     }
 
-    public void runExp(String datasetPath) {
-        List<BlockWithData> blockWithDatas = parsingService.parseDataset(datasetPath);
-        probabilityService.calcProbabilitiesOfRecords(blockWithDatas);
-        double rankedValue = measurService.calcRankedValue(blockWithDatas);
-        double mrr = measurService.calcMRR(blockWithDatas);
-        System.out.println("The RankedValue is: " + rankedValue);
-        System.out.println("The MRR score is: " + mrr);
-        if (rankedValue > 0 || mrr < 1) {
-            List<BlockWithData> filteredBlocks = exprimentsService.filterBlocksWhoseTrueRepIsNotFirst(blockWithDatas);
-            String outputFilePath = getOutputFilePath();
-            parsingService.writeBlocks(filteredBlocks, outputFilePath);
-            System.out.print("Total of " + filteredBlocks.size() + " blocks representative is wrong. ");
-            System.out.println("output file can be found at: " + outputFilePath);
-        }
-    }
-
-    private String getOutputFilePath() {
-        File runningDir = new File(System.getProperty("user.dir"));
-        File parentFile = runningDir.getParentFile();
-        return parentFile.getAbsolutePath() + File.separator + "blocks.csv";
-    }
-
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
             System.err.println("There are no file arguments!");
@@ -57,6 +35,30 @@ public class ExperimentRunner {
         String datasetFile = args[0];
         ExperimentRunner experimentRunner = new ExperimentRunner();
         experimentRunner.runExp(datasetFile);
+    }
+
+    public void runExp(String datasetPath) {
+        List<BlockWithData> blockWithDatas = parsingService.parseDataset(datasetPath);
+        probabilityService.calcProbabilitiesOfRecords(blockWithDatas);
+        double rankedValue = measurService.calcRankedValue(blockWithDatas);
+        double mrr = measurService.calcMRR(blockWithDatas);
+        System.out.println("The RankedValue is: " + rankedValue);
+        System.out.println("The MRR score is: " + mrr);
+        String allBlocksFilePath = getOutputFilePath("AllBlocks");
+        parsingService.writeBlocks(blockWithDatas, allBlocksFilePath);
+        if (rankedValue > 0 || mrr < 1) {
+            List<BlockWithData> filteredBlocks = exprimentsService.filterBlocksWhoseTrueRepIsNotFirst(blockWithDatas);
+            String outputFilePath = getOutputFilePath("BlocksWhereMillerWasWrong");
+            parsingService.writeBlocks(filteredBlocks, outputFilePath);
+            System.out.print("Total of " + filteredBlocks.size() + " blocks representative is wrong. ");
+            System.out.println("output file can be found at: " + outputFilePath);
+        }
+    }
+
+    private String getOutputFilePath(String fileName) {
+        File runningDir = new File(System.getProperty("user.dir"));
+        File parentFile = runningDir.getParentFile();
+        return parentFile.getAbsolutePath() + File.separator + fileName + ".csv";
     }
 
 

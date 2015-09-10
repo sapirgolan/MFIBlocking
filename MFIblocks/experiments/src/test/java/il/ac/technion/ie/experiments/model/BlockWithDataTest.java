@@ -1,77 +1,87 @@
 package il.ac.technion.ie.experiments.model;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import il.ac.technion.ie.experiments.util.ExperimentsUtils;
+import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-@RunWith(Parameterized.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BlockWithData.class)
 public class BlockWithDataTest {
 
-    private final List<Double> probabilities;
-    private final int expectedPosition;
+    @InjectMocks
     private BlockWithData classUnderTest;
-    private List<Record> records;
-    private List<String> fieldNames = Arrays.asList("rec_id", "culture", "sex",  "age", "date_of_birth",
-                                                "title", "given_name", "surname", "state");
 
-    public BlockWithDataTest(List<Double> probabilities, int expectedPosition) {
-        this.probabilities = probabilities;
-        this.expectedPosition = expectedPosition;
+    @Mock
+    private Record trueRepresentative;
+
+    @Spy
+    private List<Record> members = new ArrayList<>();
+
+    @Before
+    public void setUp() throws Exception {
+        PowerMockito.suppress(PowerMockito.constructor(BlockWithData.class));
+        classUnderTest = PowerMockito.spy(new BlockWithData(new ArrayList<Record>()));
+
+        MockitoAnnotations.initMocks(this);
     }
 
-    @Parameterized.Parameters(name = "{index}: probabilities({0}); TruePos{1}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {Arrays.asList(0.2, 0.3, 0.5), 1},
-                {Arrays.asList(0.2, 0.7, 0.1), 3},
-                {Arrays.asList(0.1, 0.6, 0.3), 2}
-        });
+    @Test (expected = SizeNotEqualException.class)
+    public void testReplaceMembers_throwSizeNotEqualException() throws Exception {
+        List newMembers = PowerMockito.mock(List.class);
+        PowerMockito.when(newMembers.size()).thenReturn(9);
+
+        classUnderTest.replaceMembers(newMembers);
     }
 
     @Test
-    public void testGetTrueRepresentativePosition() throws Exception {
-        //prepare
-        List<String> value1 = ExperimentsUtils.hugeStringToList("rec-100-dup-0, usa, m, 3l, , m s, ch|o  , washin ton, q");
-        List<String> value2 = ExperimentsUtils.hugeStringToList("rec-100-dup-1, usa, r,3, , ms, ch   e, washington, ql  ");
-        List<String> value3 = ExperimentsUtils.hugeStringToList("rec-100-org,   usa, m,31, , ms, chloe, washington, qld");
-        initRecords(value1, value2, value3);
+    public void testReplaceMembers() throws Exception {
+        //create Existing members
+        List<Record> existingMembers = createMockRecords(6, Record.class);
+        Record oldRepresentative = PowerMockito.mock(Record.class);
+        PowerMockito.when(oldRepresentative.getRecordID()).thenReturn("org");
+        existingMembers.add(oldRepresentative);
+        List<Record> copyOfExistingMembers = new ArrayList<>(existingMembers);
+        Whitebox.setInternalState(classUnderTest, "members", existingMembers);
+        //set one member as representative
+        Whitebox.setInternalState(classUnderTest, "trueRepresentative", oldRepresentative);
 
-        HashMap<String, Double> probabilitiesMap = Maps.newHashMap(ImmutableMap.<String, Double>builder().
-                put("rec-100-dup-0", probabilities.get(0)).
-                put("rec-100-dup-1", probabilities.get(1)).
-                put("rec-100-org", probabilities.get(2)).
-                build());
+        //create new members
+        List<RecordSplit> newMembers = createMockRecords(6, RecordSplit.class);
+        RecordSplit newRepresentative = PowerMockito.mock(RecordSplit.class);
+        PowerMockito.when(newRepresentative.getRecordID()).thenReturn("org");
+        newMembers.add(newRepresentative);
+        Collections.shuffle(newMembers);
 
-        createBlock(probabilitiesMap);
+        classUnderTest.replaceMembers(newMembers);
 
-        //execute
-        int trueRepresentativePosition = classUnderTest.getTrueRepresentativePosition();
-
-        //assertion
-        MatcherAssert.assertThat(trueRepresentativePosition, Matchers.is(expectedPosition));
+        MatcherAssert.assertThat(Collections.disjoint(classUnderTest.getMembers(), copyOfExistingMembers), Matchers.is(true));
+        MatcherAssert.assertThat(classUnderTest.getTrueRepresentative(), Matchers.isIn(classUnderTest.getMembers()));
 
     }
 
-    private void initRecords(List<String>... values) {
-        records = new ArrayList<>();
-        for (List<String> fieldsValues : values) {
-            records.add(new Record(fieldNames, fieldsValues));
+    private <T extends Record> List<T> createMockRecords(int numberOfMembers, Class aClass) {
+
+        List<T> records = new ArrayList<>();
+        for (int i = 0; i < numberOfMembers; i++) {
+            T record = (T) PowerMockito.mock(aClass);
+            PowerMockito.when(record.getRecordID()).thenReturn(String.valueOf(i));
+            records.add(record);
         }
+        return records;
     }
-
-    private void createBlock(Map<String, Double> map) {
-        classUnderTest = new BlockWithData(records);
-        for (Record record : records) {
-            Double score = map.get(record.getRecordID());
-            classUnderTest.setMemberProbability(record, score.floatValue());
-        }
-    }
-
 }

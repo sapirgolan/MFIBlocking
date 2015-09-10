@@ -8,8 +8,8 @@ import java.util.*;
  * Created by I062070 on 21/08/2015.
  */
 public class Record {
-    private Map<String, Field> fields;
-    private String recordID;
+    protected Map<String, Field> fields;
+    protected String recordID;
 
     static final Logger logger = Logger.getLogger(Record.class);
 
@@ -32,7 +32,15 @@ public class Record {
         }
     }
 
-    private boolean isFieldRecordID(String fieldName) {
+
+    /**
+     * DO NOT USE THIS CONSTRUCTOR
+     */
+    protected Record() {
+
+    }
+
+    protected boolean isFieldRecordID(String fieldName) {
         return FieldTypes.RECORD_ID.toString().equalsIgnoreCase(fieldName);
     }
 

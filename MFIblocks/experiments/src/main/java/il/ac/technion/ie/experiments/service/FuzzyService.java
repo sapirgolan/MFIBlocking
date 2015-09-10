@@ -1,8 +1,12 @@
 package il.ac.technion.ie.experiments.service;
 
+import il.ac.technion.ie.exception.NotImplementedYetException;
+import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.Record;
+import il.ac.technion.ie.experiments.model.RecordSplit;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +17,13 @@ import java.util.List;
 public class FuzzyService {
 
     private UniformRealDistribution splitBlockProbThresh;
+    static final Logger logger = Logger.getLogger(FuzzyService.class);
+
 
     public FuzzyService() {
         splitBlockProbThresh = new UniformRealDistribution();
     }
+
 
     /**
      * The method split blocks in half if the block inner threshold is lower than the given threshold.
@@ -39,7 +46,26 @@ public class FuzzyService {
             }
         }
         return newBlocks;
+    }
 
+    public void splitRecords(List<BlockWithData> blocks) {
+        try {
+            addProbabilityToRecords(blocks);
+        } catch (SizeNotEqualException e) {
+            logger.error("failed to add split probability to records", e);
+        }
+        throw new NotImplementedYetException("At this stage we do not support splitting of records from blocks");
+    }
+
+    private void addProbabilityToRecords(List<BlockWithData> blocks) throws SizeNotEqualException {
+        for (BlockWithData block : blocks) {
+            List<RecordSplit> newRecords = new ArrayList<>(block.getMembers().size());
+            for (Record record : block.getMembers()) {
+                RecordSplit recordWithSplitProbability = new RecordSplit(record);
+                newRecords.add(recordWithSplitProbability);
+            }
+            block.replaceMembers(newRecords);
+        }
     }
 
     private void collectRecordsForSplitedBlocks(BlockWithData origBlock, List<Record> blockOneRecords, List<Record> blockTwoRecords) {

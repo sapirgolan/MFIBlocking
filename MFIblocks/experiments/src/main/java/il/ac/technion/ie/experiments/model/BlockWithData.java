@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.model;
 
+import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.model.AbstractBlock;
 
 import java.util.*;
@@ -14,11 +15,18 @@ public class BlockWithData extends AbstractBlock<Record>{
     public BlockWithData(List<Record> members) {
         super(members);
         for (Record member : members) {
-            if (member.getRecordID().endsWith("org")) {
-                trueRepresentative = member;
+            if (checkAndSetRepresentative(member)) {
                 break;
             }
         }
+    }
+
+    private boolean checkAndSetRepresentative(Record record) {
+        if (record.getRecordID().endsWith("org")) {
+            trueRepresentative = record;
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -80,6 +88,30 @@ public class BlockWithData extends AbstractBlock<Record>{
 
     public Record getTrueRepresentative() {
         return trueRepresentative;
+    }
+
+    /**
+     * Given a list of new members this method replace the given block members.
+     * It also modify the block representative (reference it to one of the newRecords)
+     *
+     * @param newRecords
+     * @throws SizeNotEqualException
+     */
+    public void replaceMembers(List<RecordSplit> newRecords) throws SizeNotEqualException {
+        if (newRecords == null || newRecords.size() != members.size()) {
+            String message = "Cannot replace records in Blocks Since size of new Records is not as equal to existing records";
+            throw new SizeNotEqualException(message);
+        }
+        HashMap<String, Record> stringRecordHashMap = new HashMap<>();
+        for (Record record : members) {
+            stringRecordHashMap.put(record.getRecordID(), record);
+        }
+
+        for (RecordSplit newRecord : newRecords) {
+            Record recordToReplace = stringRecordHashMap.get(newRecord.getRecordID());
+            Collections.replaceAll(members, recordToReplace, newRecord);
+            checkAndSetRepresentative(newRecord);
+        }
     }
 
     private class Pair{

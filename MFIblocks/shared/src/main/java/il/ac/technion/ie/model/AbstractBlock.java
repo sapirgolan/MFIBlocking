@@ -16,8 +16,8 @@ public abstract class AbstractBlock<T> {
     protected Map<T, Float> blockRepresentatives;
 
     public AbstractBlock(List<T> members) {
-        membersProbability = new HashMap<>();
         this.members = members;
+        membersProbability = new HashMap<>();
         membersScores = new HashMap<>();
         blockRepresentatives = null;
     }

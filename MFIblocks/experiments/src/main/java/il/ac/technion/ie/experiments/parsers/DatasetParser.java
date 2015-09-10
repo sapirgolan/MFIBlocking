@@ -1,4 +1,4 @@
-package il.ac.technion.ie.experiments.dao;
+package il.ac.technion.ie.experiments.parsers;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;

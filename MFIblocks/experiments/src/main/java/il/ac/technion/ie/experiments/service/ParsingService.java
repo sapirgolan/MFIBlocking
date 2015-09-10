@@ -4,7 +4,7 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvWriter;
 import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
-import il.ac.technion.ie.experiments.dao.DatasetParser;
+import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.Record;
 

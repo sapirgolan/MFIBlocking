@@ -3,7 +3,7 @@ package il.ac.technion.ie.experiments.service;
 import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.Record;
+import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.experiments.model.RecordSplit;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.log4j.Logger;

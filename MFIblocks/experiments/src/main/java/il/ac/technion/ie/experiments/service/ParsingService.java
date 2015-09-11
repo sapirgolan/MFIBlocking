@@ -6,7 +6,7 @@ import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.Record;
+import il.ac.technion.ie.model.Record;
 
 import java.util.ArrayList;
 import java.util.Arrays;

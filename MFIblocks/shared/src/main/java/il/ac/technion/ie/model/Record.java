@@ -1,4 +1,4 @@
-package il.ac.technion.ie.experiments.model;
+package il.ac.technion.ie.model;
 
 import org.apache.log4j.Logger;
 
@@ -68,5 +68,13 @@ public class Record {
             fieldNames.add(field.getName());
         }
         return fieldNames;
+    }
+
+    public Map<String, Field> getFields() {
+        return fields;
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 }

@@ -1,7 +1,7 @@
 package il.ac.technion.ie.experiments.service;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.Record;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;

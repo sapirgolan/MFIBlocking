@@ -2,7 +2,7 @@ package il.ac.technion.ie.experiments.builder;
 
 import com.univocity.parsers.csv.CsvParser;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.Record;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;

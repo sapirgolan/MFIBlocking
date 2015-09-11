@@ -2,6 +2,7 @@ package il.ac.technion.ie.experiments.model;
 
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.model.AbstractBlock;
+import il.ac.technion.ie.model.Record;
 
 import java.util.*;
 

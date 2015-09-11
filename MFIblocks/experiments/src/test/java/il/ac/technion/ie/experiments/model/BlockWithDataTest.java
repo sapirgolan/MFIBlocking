@@ -1,6 +1,7 @@
 package il.ac.technion.ie.experiments.model;
 
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
+import il.ac.technion.ie.model.Record;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;

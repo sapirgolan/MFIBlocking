@@ -1,5 +1,7 @@
 package il.ac.technion.ie.experiments.model;
 
+import il.ac.technion.ie.model.Field;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 
 import java.util.HashMap;
@@ -30,8 +32,8 @@ public class RecordSplit extends Record {
     }
 
     private void copyFromOrigRecord(Record origRecord) {
-        fields = origRecord.fields;
-        recordID = origRecord.recordID;
+        fields = origRecord.getFields();
+        recordID = origRecord.getRecordID();
     }
 
     private void sampleProbabilities() {

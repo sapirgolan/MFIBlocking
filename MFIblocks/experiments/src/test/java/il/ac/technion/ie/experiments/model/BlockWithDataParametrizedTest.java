@@ -3,6 +3,7 @@ package il.ac.technion.ie.experiments.model;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import il.ac.technion.ie.experiments.util.ExperimentsUtils;
+import il.ac.technion.ie.model.Record;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;

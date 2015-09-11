@@ -1,9 +1,8 @@
 package il.ac.technion.ie.experiments.builder;
 
 import com.univocity.parsers.csv.CsvParser;
-import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.Record;
+import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;

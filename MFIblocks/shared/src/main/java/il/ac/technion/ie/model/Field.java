@@ -1,4 +1,4 @@
-package il.ac.technion.ie.experiments.model;
+package il.ac.technion.ie.model;
 
 /**
  * Created by I062070 on 21/08/2015.

@@ -1,7 +1,7 @@
 package il.ac.technion.ie.experiments.service;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.Record;
+import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.lprobability.SimilarityCalculator;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 

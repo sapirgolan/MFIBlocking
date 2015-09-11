@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class RecordSet {
-    public static Map<Integer, Record> values;
+    public static Map<Integer, MfiRecord> values;
     public static String[][] originalRecords;
     public static String[] columnNames;
     public static int size;
@@ -18,7 +18,7 @@ public class RecordSet {
     public static int SCHEMA_SIZE;
 
 
-    public static void setRecords(Map<Integer, Record> records) {
+    public static void setRecords(Map<Integer, MfiRecord> records) {
         values = records;
         size = values.size();
     }
@@ -53,7 +53,7 @@ public class RecordSet {
         String numericRecordsFile = context.getRecordsFile();
         String origRecordsFile = context.getOriginalFile();
         String srcFile = context.getRecordsFile();
-        Map<Integer, Record> outputRecords = new HashMap<Integer, Record>();
+        Map<Integer, MfiRecord> outputRecords = new HashMap<Integer, MfiRecord>();
         try {
             BufferedReader recordsFileReader = new BufferedReader(
                     new FileReader(new File(numericRecordsFile)));
@@ -82,7 +82,7 @@ public class RecordSet {
                     if (srcFileReader != null) {
                         src = srcFileReader.readLine().trim();
                     }
-                    Record r = new Record(recordIndex, recordLine);
+                    MfiRecord r = new MfiRecord(recordIndex, recordLine);
                     r.setSrc(src); // in the worst case this is null
                     String[] words = ws.split(numericLine);
                     if (numericLine.length() > 0) { // very special case when

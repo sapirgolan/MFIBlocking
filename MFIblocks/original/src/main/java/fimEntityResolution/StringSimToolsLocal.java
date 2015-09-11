@@ -3,7 +3,7 @@ package fimEntityResolution;
 import il.ac.technion.ie.model.FrequentItem;
 import il.ac.technion.ie.data.structure.IFRecord;
 import il.ac.technion.ie.context.MfiContext;
-import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.model.MfiRecord;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 
 import java.util.*;
@@ -22,9 +22,9 @@ public class StringSimToolsLocal {
 	public static Map<Integer, FrequentItem> globalItemsMap= new HashMap<Integer, FrequentItem>();
 			
 	//public static Map<Integer, FrequentItem> globalItemsMap=Utilities.parseLexiconFile(LEXICON_FILE);
-	public static Map<Integer,Record> globalRecords=new HashMap<Integer, Record>();
-			
-	//public static Map<Integer,Record> globalRecords=Utilities.readRecords(RECORDS_FILE,ORIGRECORDS_FILE,"");
+    public static Map<Integer, MfiRecord> globalRecords = new HashMap<Integer, MfiRecord>();
+
+    //public static Map<Integer,Record> globalRecords=Utilities.readRecords(RECORDS_FILE,ORIGRECORDS_FILE,"");
 	
 	private final static JaroWinkler jwMetric = new JaroWinkler();
 	private final static double SIMILARITY_THRESHOLD = 0.9;
@@ -34,8 +34,8 @@ public class StringSimToolsLocal {
 	 * @param S
 	 * @param T
 	 */
-	private static Set<Integer> getCloseTerms(Record S, Record T){
-		//first place all common items in the close words set
+    private static Set<Integer> getCloseTerms(MfiRecord S, MfiRecord T) {
+        //first place all common items in the close words set
 		//because clearly these items are identical and thus close
 		Set<Integer> closeWords = getCommonItems(S,T);
 		
@@ -245,8 +245,9 @@ public class StringSimToolsLocal {
 		}
 		return retVal;
 	}
-	private static Set<Integer> getCommonItems(Record S, Record T){
-		Set<Integer> commonItems = new HashSet<Integer>();	
+
+    private static Set<Integer> getCommonItems(MfiRecord S, MfiRecord T) {
+        Set<Integer> commonItems = new HashSet<Integer>();
 		commonItems.addAll(S.getItemsToFrequency().keySet());
 		commonItems.retainAll(T.getItemsToFrequency().keySet());
 		return commonItems;
@@ -339,9 +340,9 @@ public class StringSimToolsLocal {
 		int frequency = TF(wordId,records) + 1;
 		return getTermWeight(wordId)*logBase2(frequency)*log2IDF(wordId);
 	}
-	
-	private static double normalized_Word_TFIDF(int wordId, Record S){
-		double nominator = Word_TFIDF(wordId,S);
+
+    private static double normalized_Word_TFIDF(int wordId, MfiRecord S) {
+        double nominator = Word_TFIDF(wordId,S);
 		double denominator = 0 ;
 		for (Integer itemId : S.getItemsToFrequency().keySet()) {
 			denominator+= Math.pow(Word_TFIDF(itemId, S), 2); 
@@ -376,8 +377,8 @@ public class StringSimToolsLocal {
 	}
 	
 	@SuppressWarnings("unused")
-	private static double TFIDF(Record S, Record T){
-		double retVal = 0;
+    private static double TFIDF(MfiRecord S, MfiRecord T) {
+        double retVal = 0;
 		Set<Integer> commonTerms = getCommonItems(S, T);
 		for (Integer term : commonTerms) {			
 			retVal += normalized_Word_TFIDF(term,S)*normalized_Word_TFIDF(term,T)

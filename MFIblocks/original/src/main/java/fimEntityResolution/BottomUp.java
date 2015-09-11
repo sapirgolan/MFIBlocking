@@ -445,9 +445,9 @@ public class BottomUp {
 			writer = new BufferedWriter(new FileWriter(outputFle));
 			
 			for(int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1)){
-				Record currRecord = RecordSet.values.get(i);
-				String toWrite = currRecord.getNumericline(appItems.keySet());
-				writer.write(toWrite);
+                MfiRecord currMfiRecord = RecordSet.values.get(i);
+                String toWrite = currMfiRecord.getNumericline(appItems.keySet());
+                writer.write(toWrite);
 				writer.newLine();
 				numOfWrittenLines++;
 			}			
@@ -469,9 +469,9 @@ public class BottomUp {
 	private static Map<Integer,Integer> appitems(BitSet coveredRecords, int minSup){
 		Map<Integer,Integer> retVal = new HashMap<>();
 		for( int i=coveredRecords.nextClearBit(0); i>=0 && i <= RecordSet.size ; i=coveredRecords.nextClearBit(i+1) ){
-			Record currRecord = RecordSet.values.get(i);		
-			Set<Integer> recordItems = currRecord.getItemsToFrequency().keySet();
-			for (Integer recorditem : recordItems) {
+            MfiRecord currMfiRecord = RecordSet.values.get(i);
+            Set<Integer> recordItems = currMfiRecord.getItemsToFrequency().keySet();
+            for (Integer recorditem : recordItems) {
 				int itemSuppSize = 1;
 				if(retVal.containsKey(recorditem)){
 					itemSuppSize = retVal.get(recorditem) + 1;

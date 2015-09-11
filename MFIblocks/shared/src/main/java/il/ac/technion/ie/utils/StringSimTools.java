@@ -1,7 +1,7 @@
 package il.ac.technion.ie.utils;
 
 import il.ac.technion.ie.data.structure.IFRecord;
-import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.model.MfiRecord;
 import il.ac.technion.ie.model.RecordSet;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 
@@ -18,8 +18,8 @@ public class StringSimTools {
 	 * @param S
 	 * @param T
 	 */
-	private static Set<Integer> getCloseTerms(Record S, Record T){
-		//first place all common items in the close words set
+    private static Set<Integer> getCloseTerms(MfiRecord S, MfiRecord T) {
+        //first place all common items in the close words set
 		//because clearly these items are identical and thus close
 		Set<Integer> closeWords = getCommonItems(S,T);
 		
@@ -229,8 +229,9 @@ public class StringSimTools {
 		}
 		return retVal;
 	}
-	private static Set<Integer> getCommonItems(Record S, Record T){
-		Set<Integer> commonItems = new HashSet<Integer>();	
+
+    private static Set<Integer> getCommonItems(MfiRecord S, MfiRecord T) {
+        Set<Integer> commonItems = new HashSet<Integer>();
 		commonItems.addAll(S.getItemsToFrequency().keySet());
 		commonItems.retainAll(T.getItemsToFrequency().keySet());
 		return commonItems;
@@ -329,9 +330,9 @@ public class StringSimTools {
 		int frequency = TF(wordId,records) + 1;
 		return getTermWeight(wordId)*logBase2(frequency)*log2IDF(wordId);
 	}
-	
-	private static double normalized_Word_TFIDF(int wordId, Record S){
-		double nominator = Word_TFIDF(wordId,S);
+
+    private static double normalized_Word_TFIDF(int wordId, MfiRecord S) {
+        double nominator = Word_TFIDF(wordId,S);
 		double denominator = 0 ;
 		for (Integer itemId : S.getItemsToFrequency().keySet()) {
 			denominator+= Math.pow(Word_TFIDF(itemId, S), 2); 
@@ -379,8 +380,8 @@ public class StringSimTools {
 	}
 	
 	@SuppressWarnings("unused")
-	private static double TFIDF(Record S, Record T){
-		double retVal = 0;
+    private static double TFIDF(MfiRecord S, MfiRecord T) {
+        double retVal = 0;
 		Set<Integer> commonTerms = getCommonItems(S, T);
 		for (Integer term : commonTerms) {			
 			retVal += normalized_Word_TFIDF(term,S)*normalized_Word_TFIDF(term,T)

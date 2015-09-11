@@ -370,10 +370,10 @@ public class Utilities {
 		runAlg(cmd, CFIFile);
 	}
 
-	public static Collection<Record> getClusterRecords(FrequentItemset fi,
-			Map<Integer, Record> records) {
-		Collection<Record> retVal = new ArrayList<Record>();
-		BitSet support = fi.getSupport();
+    public static Collection<MfiRecord> getClusterRecords(FrequentItemset fi,
+                                                          Map<Integer, MfiRecord> records) {
+        Collection<MfiRecord> retVal = new ArrayList<MfiRecord>();
+        BitSet support = fi.getSupport();
 		for (int recordid = support.nextSetBit(0); recordid >= 0; recordid = support
 				.nextSetBit(recordid + 1)) {
 			retVal.add(records.get(recordid));
@@ -534,8 +534,8 @@ public class Utilities {
 
 	public static Map<Integer, GDS_NG> readFIsDB(String frequentItemsetFile,
 			Map<Integer, FrequentItem> globalItemsMap, double scoreThreshold,
-			Map<Integer, Record> records, int minSup, double NG_PARAM) {
-		System.out.println("reading FIs");
+            Map<Integer, MfiRecord> records, int minSup, double NG_PARAM) {
+        System.out.println("reading FIs");
 		int numOfLines = 0;
 		BufferedReader FISReader = null;
 		StringBuilder sb = new StringBuilder();
@@ -722,10 +722,10 @@ public class Utilities {
 
 	}
 
-	public static List<Record> getRecords(SparseBitSet support) {
-		int size = new Long(support.getNumBitsSet()).intValue();
-		List<Record> retVal = new ArrayList<Record>(size);
-		Iterator It = support.getIterator();
+    public static List<MfiRecord> getRecords(SparseBitSet support) {
+        int size = new Long(support.getNumBitsSet()).intValue();
+        List<MfiRecord> retVal = new ArrayList<MfiRecord>(size);
+        Iterator It = support.getIterator();
 
 		while (It.hasNext()) {
 			int recordId = new Long(It.next()).intValue();
@@ -735,9 +735,9 @@ public class Utilities {
 
 	}
 
-	public static List<Record> getRecords(BitSet support) {
-		List<Record> retVal = new ArrayList<Record>(support.cardinality());
-		for (int i = support.nextSetBit(0); i >= 0; i = support
+    public static List<MfiRecord> getRecords(BitSet support) {
+        List<MfiRecord> retVal = new ArrayList<MfiRecord>(support.cardinality());
+        for (int i = support.nextSetBit(0); i >= 0; i = support
 				.nextSetBit(i + 1)) {
 			retVal.add(RecordSet.values.get(i));
 		}
@@ -879,15 +879,15 @@ public class Utilities {
 	 *            - from which to generate pairs
 	 * @return
 	 */
-	public static Set<Pair> getPairs(Collection<Record> group) {
-		Set<Pair> pairs = new HashSet<>();
-		List<Record> temp = new ArrayList<>(group.size());
-		temp.addAll(group);
+    public static Set<Pair> getPairs(Collection<MfiRecord> group) {
+        Set<Pair> pairs = new HashSet<>();
+        List<MfiRecord> temp = new ArrayList<>(group.size());
+        temp.addAll(group);
 		for (int i = 0; i < temp.size(); i++) {
 			for (int j = i + 1; j < temp.size(); j++) {
-				Record S = temp.get(i);
-				Record T = temp.get(j);
-				Pair pair = new Pair(S.getId(), T.getId());
+                MfiRecord S = temp.get(i);
+                MfiRecord T = temp.get(j);
+                Pair pair = new Pair(S.getId(), T.getId());
 				pairs.add(pair);
 			}
 		}
@@ -904,16 +904,16 @@ public class Utilities {
 	}
 
 	private static String printRecordCluster(Pair pair,
-			Map<Integer, Record> records) {
-		double score = StringSimTools.softTFIDF(records.get(pair.r1), records
+                                             Map<Integer, MfiRecord> records) {
+        double score = StringSimTools.softTFIDF(records.get(pair.r1), records
 				.get(pair.r2));
 		return pair.toString() + " score: " + score;
 	}
 
 	public static double[] evaluateResolution(Set<Pair> trueDupPairs,
                                               Map<Integer, Set<Pair>> actualDupPairs, String experimentTitle,
-                                              Map<Integer, Record> records) {
-		System.out.println(experimentTitle);
+                                              Map<Integer, MfiRecord> records) {
+        System.out.println(experimentTitle);
 		float TP = 0, TN = 0, FN = 0, FP = 0;
 		System.out.println("False Positives:");
 		Set<Pair> actualPairs = new HashSet<Pair>(); // for later use

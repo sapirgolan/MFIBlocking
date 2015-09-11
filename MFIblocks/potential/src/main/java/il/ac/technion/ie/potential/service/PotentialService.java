@@ -1,6 +1,6 @@
 package il.ac.technion.ie.potential.service;
 
-import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.potential.logic.PotentialLogic;
 import il.ac.technion.ie.potential.logic.iPotentialLogic;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
@@ -23,19 +23,19 @@ public class PotentialService implements iPotentialService {
     }
 
     @Override
-    public AdjustedMatrix getAdjustedMatrix(List<Block> blocks) {
+    public AdjustedMatrix getAdjustedMatrix(List<? extends AbstractBlock> blocks) {
         logger.info("calculating an Adjusted Matrix");
         return potentialLogic.calculateAdjustedMatrix(blocks);
     }
 
     @Override
-    public List<BlockPotential> getLocalPotential(List<Block> blocks) {
+    public List<BlockPotential> getLocalPotential(List<? extends AbstractBlock> blocks) {
         logger.info("getting local potential of blocks");
         return potentialLogic.getLocalPotential(blocks);
     }
 
     @Override
-    public List<SharedMatrix> getSharedMatrices(List<Block> blocks) {
+    public List<SharedMatrix> getSharedMatrices(List<? extends AbstractBlock> blocks) {
         return potentialLogic.getSharedMatrices(blocks);
     }
 }

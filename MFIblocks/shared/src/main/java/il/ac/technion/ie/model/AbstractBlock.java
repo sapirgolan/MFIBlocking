@@ -14,6 +14,7 @@ public abstract class AbstractBlock<T> {
     protected Map<T, Float> membersScores;
     protected Map<T, Float> membersProbability;
     protected Map<T, Float> blockRepresentatives;
+    protected int id;
 
     public AbstractBlock(List<T> members) {
         this.members = members;
@@ -93,6 +94,10 @@ public abstract class AbstractBlock<T> {
         }
         Block.logger.debug("Didn't found " + recordId + " in Block" + this.toString());
         return false;
+    }
+
+    public int getId() {
+        return this.id;
     }
 
     public abstract int getTrueRepresentativePosition();

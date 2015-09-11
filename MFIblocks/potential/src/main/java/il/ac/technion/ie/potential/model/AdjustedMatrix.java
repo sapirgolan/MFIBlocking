@@ -2,7 +2,7 @@ package il.ac.technion.ie.potential.model;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.AbstractBlock;
 
 import java.util.List;
 
@@ -13,15 +13,15 @@ public class AdjustedMatrix extends AbstractPotentialMatrix {
 
     protected BiMap<Integer, Integer> blockIdToMatPosMap;
 
-    public AdjustedMatrix(List<Block> filteredBlocks) {
+    public AdjustedMatrix(List<? extends AbstractBlock> filteredBlocks) {
         blockIdToMatPosMap = HashBiMap.create();
         createMatrixBlockMappping(filteredBlocks);
         this.matrix2D = matrixFactory(filteredBlocks.size(), filteredBlocks.size());
     }
 
-    private void createMatrixBlockMappping(List<Block> filteredBlocks) {
+    private void createMatrixBlockMappping(List<? extends AbstractBlock> filteredBlocks) {
         int matrixIndex = 0;
-        for (Block block : filteredBlocks) {
+        for (AbstractBlock block : filteredBlocks) {
             blockIdToMatPosMap.put(block.getId(), matrixIndex);
             matrixIndex++;
         }

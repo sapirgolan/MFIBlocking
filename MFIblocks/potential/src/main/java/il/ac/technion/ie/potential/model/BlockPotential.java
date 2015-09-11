@@ -1,5 +1,7 @@
 package il.ac.technion.ie.potential.model;
 
+import il.ac.technion.ie.exception.NotImplementedYetException;
+import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Block;
 
 import java.util.ArrayList;
@@ -15,12 +17,17 @@ public class BlockPotential {
     private Map<Integer, Double> potential;
     private int blockID;
 
-    public BlockPotential(Block block) {
+    public BlockPotential(AbstractBlock abstractBlock) {
         this.potential = new HashMap<>();
-        this.blockID = block.getId();
-        for (Integer recordId : block.getMembers()) {
-            double memberScore = (double)block.getMemberProbability(recordId);
-            potential.put(recordId, Math.log(memberScore));
+        this.blockID = abstractBlock.getId();
+        if (abstractBlock instanceof Block) {
+            Block block = (Block) abstractBlock;
+            for (Integer recordId : block.getMembers()) {
+                double memberScore = (double) abstractBlock.getMemberProbability(recordId);
+                potential.put(recordId, Math.log(memberScore));
+            }
+        } else {
+            throw new NotImplementedYetException("The method doesn't support any type that is not 'Block'");
         }
     }
 

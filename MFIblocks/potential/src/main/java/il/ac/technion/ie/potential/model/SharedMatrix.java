@@ -2,7 +2,7 @@ package il.ac.technion.ie.potential.model;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.AbstractBlock;
 
 import java.util.List;
 import java.util.Map;
@@ -16,24 +16,24 @@ public class SharedMatrix extends AbstractPotentialMatrix{
     protected BiMap<Integer, Integer> recordToColumnsPosMap;
     private BlockPair<Integer, Integer> representsBlocks;
 
-    public SharedMatrix(Block rowsBlock, Block columnsBlock) {
+    public SharedMatrix(AbstractBlock rowsBlock, AbstractBlock columnsBlock) {
         this.matrix2D = matrixFactory(rowsBlock.size(), columnsBlock.size());
         this.mapRows(rowsBlock);
         this.mapColumns(columnsBlock);
         this.representsBlocks = new BlockPair<>(rowsBlock.getId(), columnsBlock.getId());
     }
 
-    private void mapColumns(Block columnsBlock) {
+    private void mapColumns(AbstractBlock columnsBlock) {
         recordToColumnsPosMap = HashBiMap.create();
         mapRecordToMatrix(columnsBlock, recordToColumnsPosMap);
     }
 
-    private void mapRows(Block rowsBlock) {
+    private void mapRows(AbstractBlock rowsBlock) {
         recordToRowsPosMap = HashBiMap.create();
         mapRecordToMatrix(rowsBlock, recordToRowsPosMap);
     }
 
-    private void mapRecordToMatrix(Block rowsBlock, Map<Integer, Integer> map) {
+    private void mapRecordToMatrix(AbstractBlock rowsBlock, Map<Integer, Integer> map) {
         List<Integer> members = rowsBlock.getMembers();
         for (int index = 0; index < members.size(); index++) {
             Integer recordId =  members.get(index);

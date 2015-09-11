@@ -1,7 +1,7 @@
 package il.ac.technion.ie.potential.logic;
 
 import com.google.common.collect.Sets;
-import il.ac.technion.ie.model.Block;
+import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPair;
 import il.ac.technion.ie.potential.model.BlockPotential;
@@ -18,9 +18,9 @@ public class PotentialLogic implements iPotentialLogic {
     static final Logger logger = Logger.getLogger(PotentialLogic.class);
 
     @Override
-    public List<BlockPotential> getLocalPotential(List<Block> blocks) {
+    public List<BlockPotential> getLocalPotential(List<? extends AbstractBlock> blocks) {
         List<BlockPotential> result = new ArrayList<>(blocks.size());
-        for (Block block : blocks) {
+        for (AbstractBlock block : blocks) {
             if (block.size() > 1) {
                 logger.debug("calculating local potential of Block: " + block.toString());
                 result.add( new BlockPotential(block));
@@ -31,8 +31,8 @@ public class PotentialLogic implements iPotentialLogic {
     }
 
     @Override
-    public AdjustedMatrix calculateAdjustedMatrix(List<Block> blocks) {
-        List<Block> filteredBlocks = filterBlockBySize(blocks, 2);
+    public AdjustedMatrix calculateAdjustedMatrix(List<? extends AbstractBlock> blocks) {
+        List<AbstractBlock> filteredBlocks = filterBlockBySize(blocks, 2);
 
         //A mapping for each recordID. For each record we store a Set with all
         //blocks is appears in.
@@ -43,8 +43,8 @@ public class PotentialLogic implements iPotentialLogic {
     }
 
     @Override
-    public List<SharedMatrix> getSharedMatrices(List<Block> blocks) {
-        List<Block> filteredBlocks = filterBlockBySize(blocks, 2);
+    public List<SharedMatrix> getSharedMatrices(List<? extends AbstractBlock> blocks) {
+        List<AbstractBlock> filteredBlocks = filterBlockBySize(blocks, 2);
 
         //A mapping for each recordID. For each record we store a Set with all
         //blocks is appears in.
@@ -54,8 +54,8 @@ public class PotentialLogic implements iPotentialLogic {
     }
 
     private List<SharedMatrix> buildSharedMatrices(Map<Integer, Set<Integer>> recordBlockMap,
-                                                   List<Block> filteredBlocks) {
-        Map<Integer,Block> blockMap = blockMapping(filteredBlocks);
+                                                   List<? extends AbstractBlock> filteredBlocks) {
+        Map<Integer, AbstractBlock> blockMap = blockMapping(filteredBlocks);
         Map<Pair<Integer, Integer>, SharedMatrix> map = new HashMap<>();
         for (Map.Entry<Integer, Set<Integer>> entry : recordBlockMap.entrySet()) {
             Set<Integer> blocksRecordAppearIn = entry.getValue();
@@ -74,9 +74,9 @@ public class PotentialLogic implements iPotentialLogic {
         return new ArrayList<>(map.values());
     }
 
-    private Map<Integer, Block> blockMapping(List<Block> filteredBlocks) {
-        Map<Integer, Block> blockMap = new HashMap<>();
-        for (Block block : filteredBlocks) {
+    private Map<Integer, AbstractBlock> blockMapping(List<? extends AbstractBlock> filteredBlocks) {
+        Map<Integer, AbstractBlock> blockMap = new HashMap<>();
+        for (AbstractBlock block : filteredBlocks) {
             blockMap.put(block.getId(), block);
         }
         return blockMap;
@@ -84,13 +84,13 @@ public class PotentialLogic implements iPotentialLogic {
 
     private SharedMatrix getSharedMatix(BlockPair<Integer, Integer> pair,
                                         Map<Pair<Integer, Integer>, SharedMatrix> map,
-                                        Map<Integer, Block> blockMap) {
+                                        Map<Integer, AbstractBlock> blockMap) {
         SharedMatrix matrix;
         if (map.containsKey(pair)) {
             matrix = map.get(pair);
         } else {
-            Block blockOfRows = blockMap.get(pair.getLeft());
-            Block blockOfColumns = blockMap.get(pair.getRight());
+            AbstractBlock blockOfRows = blockMap.get(pair.getLeft());
+            AbstractBlock blockOfColumns = blockMap.get(pair.getRight());
             matrix = new SharedMatrix(blockOfRows, blockOfColumns);
             map.put(pair, matrix);
             return matrix;
@@ -108,7 +108,7 @@ public class PotentialLogic implements iPotentialLogic {
      * @return AdjustedMatrix
      */
     private AdjustedMatrix buildAdjustedMatrixFromMap(Map<Integer, Set<Integer>> recordBlockMap,
-                                                      List<Block> filteredBlocks) {
+                                                      List<? extends AbstractBlock> filteredBlocks) {
         AdjustedMatrix adjustedMatrix = new AdjustedMatrix(filteredBlocks);
         for (Map.Entry<Integer, Set<Integer>> entry : recordBlockMap.entrySet()) {
             Set<Integer> blocksRecordAppearIn = entry.getValue();
@@ -126,9 +126,9 @@ public class PotentialLogic implements iPotentialLogic {
         return adjustedMatrix;
     }
 
-    private Map<Integer, Set<Integer>> buildMapBlock(List<Block> filteredBlocks) {
+    private Map<Integer, Set<Integer>> buildMapBlock(List<? extends AbstractBlock> filteredBlocks) {
         Map<Integer, Set<Integer>> recordBlockMap = new HashMap<>();
-        for (Block block : filteredBlocks) {
+        for (AbstractBlock block : filteredBlocks) {
             int blockId = block.getId();
             List<Integer> blockMembers = block.getMembers();
             for (Integer memberId : blockMembers) {
@@ -142,9 +142,9 @@ public class PotentialLogic implements iPotentialLogic {
         return recordBlockMap;
     }
 
-    private List<Block> filterBlockBySize(List<Block> blocks, int filterSize) {
-        final List<Block> filtered = new ArrayList<>();
-        for (Block block : blocks) {
+    private List<AbstractBlock> filterBlockBySize(List<? extends AbstractBlock> blocks, int filterSize) {
+        final List<AbstractBlock> filtered = new ArrayList<>();
+        for (AbstractBlock block : blocks) {
             if (block.size() >= filterSize) {
                 filtered.add(block);
             }

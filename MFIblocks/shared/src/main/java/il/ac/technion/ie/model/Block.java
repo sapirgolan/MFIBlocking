@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 public class Block extends AbstractBlock<Integer> {
     static final Logger logger = Logger.getLogger(Block.class);
     public static int RANDOM_ID = -1;
-    private int id;
 
     public Block(List<Integer> members, int blockId) {
         super(members);
@@ -88,10 +87,6 @@ public class Block extends AbstractBlock<Integer> {
 
     private void addCharSeparator(StringBuilder builder) {
         builder.append(",");
-    }
-
-    public int getId() {
-        return this.id;
     }
 
     @Override

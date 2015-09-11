@@ -61,7 +61,7 @@ public class SharedMatrix extends AbstractPotentialMatrix{
     }
 
     @Override
-    protected Integer valueInMatirxRowIfValueExists() {
+    protected Integer valueInMatrixRowIfValueExists() {
         return -10;
     }
 

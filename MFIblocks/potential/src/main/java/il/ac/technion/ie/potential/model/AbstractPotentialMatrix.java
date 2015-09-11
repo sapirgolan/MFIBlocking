@@ -61,7 +61,7 @@ public abstract class AbstractPotentialMatrix {
 
         for (int index = 0; index < numberOfCellsInARow; index++) {
             if (intArrayList.contains(index)) {
-                list.add(this.valueInMatirxRowIfValueExists());
+                list.add(this.valueInMatrixRowIfValueExists());
             } else {
                 list.add(this.valueInMatrixRowIfValueMissing());
             }
@@ -69,7 +69,7 @@ public abstract class AbstractPotentialMatrix {
         return list;
     }
 
-    protected abstract Integer valueInMatirxRowIfValueExists();
+    protected abstract Integer valueInMatrixRowIfValueExists();
 
     protected abstract int getRecordIDRepresentsRowIndex(int rowIndex);
     protected abstract int getRecordIDRepresentsColumnIndex(int columnIndex);

@@ -14,12 +14,12 @@ public class AdjustedMatrix extends AbstractPotentialMatrix {
     protected BiMap<Integer, Integer> blockIdToMatPosMap;
 
     public AdjustedMatrix(List<? extends AbstractBlock> filteredBlocks) {
-        blockIdToMatPosMap = HashBiMap.create();
-        createMatrixBlockMappping(filteredBlocks);
+        createMatrixBlockMapping(filteredBlocks);
         this.matrix2D = matrixFactory(filteredBlocks.size(), filteredBlocks.size());
     }
 
-    private void createMatrixBlockMappping(List<? extends AbstractBlock> filteredBlocks) {
+    private void createMatrixBlockMapping(List<? extends AbstractBlock> filteredBlocks) {
+        blockIdToMatPosMap = HashBiMap.create();
         int matrixIndex = 0;
         for (AbstractBlock block : filteredBlocks) {
             blockIdToMatPosMap.put(block.getId(), matrixIndex);
@@ -41,7 +41,7 @@ public class AdjustedMatrix extends AbstractPotentialMatrix {
     }
 
     @Override
-    protected Integer valueInMatirxRowIfValueExists() {
+    protected Integer valueInMatrixRowIfValueExists() {
         return 1;
     }
 

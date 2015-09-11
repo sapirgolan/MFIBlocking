@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.apiAccess;
 
+import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.service.ExprimentsService;
 import il.ac.technion.ie.experiments.service.ParsingService;
@@ -7,7 +8,6 @@ import il.ac.technion.ie.experiments.service.ProbabilityService;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -44,22 +44,14 @@ public class ExperimentRunner {
         double mrr = measurService.calcMRR(blockWithDatas);
         System.out.println("The RankedValue is: " + rankedValue);
         System.out.println("The MRR score is: " + mrr);
-        String allBlocksFilePath = getOutputFilePath("AllBlocks");
+        String allBlocksFilePath = ExpFileUtils.getOutputFilePath("AllBlocks", ".csv");
         parsingService.writeBlocks(blockWithDatas, allBlocksFilePath);
         if (rankedValue > 0 || mrr < 1) {
             List<BlockWithData> filteredBlocks = exprimentsService.filterBlocksWhoseTrueRepIsNotFirst(blockWithDatas);
-            String outputFilePath = getOutputFilePath("BlocksWhereMillerWasWrong");
+            String outputFilePath = ExpFileUtils.getOutputFilePath("BlocksWhereMillerWasWrong", ".csv");
             parsingService.writeBlocks(filteredBlocks, outputFilePath);
             System.out.print("Total of " + filteredBlocks.size() + " blocks representative is wrong. ");
             System.out.println("output file can be found at: " + outputFilePath);
         }
     }
-
-    private String getOutputFilePath(String fileName) {
-        File runningDir = new File(System.getProperty("user.dir"));
-        File parentFile = runningDir.getParentFile();
-        return parentFile.getAbsolutePath() + File.separator + fileName + ".csv";
-    }
-
-
 }

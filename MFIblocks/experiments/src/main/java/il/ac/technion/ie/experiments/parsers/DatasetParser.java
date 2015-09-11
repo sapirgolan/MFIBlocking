@@ -4,6 +4,7 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -41,7 +42,7 @@ public class DatasetParser {
     public CsvWriter preparOutputFile(String pathToFile) {
         CsvWriter writer = null;
 
-        File file = createFile(pathToFile);
+        File file = ExpFileUtils.createFile(pathToFile);
         if (!file.exists() || !file.canWrite()) {
             logger.warn("Can't write output to file. Either it doesn't exists or nothing can be written");
             return null;
@@ -57,22 +58,4 @@ public class DatasetParser {
         }
         return writer;
     }
-
-    private File createFile(String pathToFile) {
-        File outputFile = new File(pathToFile);
-        if (outputFile.exists()) {
-            logger.info("Output file exists. Deleting " + pathToFile);
-            if (!outputFile.delete()) {
-                logger.warn("Failed to delete output file");
-            }
-        }
-        try {
-            logger.info("Creating the output file");
-            outputFile.createNewFile();
-        } catch (IOException e) {
-            logger.error("Failed to create output file", e);
-        }
-        return outputFile;
-    }
-
 }

@@ -21,6 +21,7 @@ public class BlockWithData extends AbstractBlock<Record>{
                 break;
             }
         }
+        this.id = this.hashCode();
     }
 
     private boolean checkAndSetRepresentative(Record record) {

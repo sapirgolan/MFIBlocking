@@ -5,6 +5,7 @@ import il.ac.technion.ie.potential.logic.PotentialLogic;
 import il.ac.technion.ie.potential.logic.iPotentialLogic;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.MatrixContext;
 import il.ac.technion.ie.potential.model.SharedMatrix;
 import org.apache.log4j.Logger;
 
@@ -37,5 +38,10 @@ public class PotentialService implements iPotentialService {
     @Override
     public List<SharedMatrix> getSharedMatrices(List<? extends AbstractBlock> blocks) {
         return potentialLogic.getSharedMatrices(blocks);
+    }
+
+    @Override
+    public List<MatrixContext<SharedMatrix>> getSharedMatricesWithContext(List<? extends AbstractBlock> blocks) {
+        return potentialLogic.getSharedMatricesWithContext(blocks);
     }
 }

@@ -3,6 +3,7 @@ package il.ac.technion.ie.potential.logic;
 import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPotential;
+import il.ac.technion.ie.potential.model.MatrixContext;
 import il.ac.technion.ie.potential.model.SharedMatrix;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface iPotentialLogic {
     AdjustedMatrix calculateAdjustedMatrix(List<? extends AbstractBlock> blocks);
 
     List<SharedMatrix> getSharedMatrices(List<? extends AbstractBlock> blocks);
+
+    List<MatrixContext<SharedMatrix>> getSharedMatricesWithContext(List<? extends AbstractBlock> blocks);
 }

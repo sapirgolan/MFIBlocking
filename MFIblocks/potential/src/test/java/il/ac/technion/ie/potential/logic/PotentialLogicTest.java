@@ -122,27 +122,27 @@ public class PotentialLogicTest {
                         .build()
         );
 
-        List<SharedMatrix> sharedMatrices = Whitebox.invokeMethod(classUnderTest, "buildSharedMatrices",
+        List<MatrixContext<SharedMatrix>> sharedMatrices = Whitebox.invokeMethod(classUnderTest, "buildSharedMatrices",
                                                                 recordBlockMap, filteredBlocks);
 
         MatcherAssert.assertThat(sharedMatrices, Matchers.hasSize(3));
 
         //the representing matrix of Block1 && Block2
-        SharedMatrix sharedMatrix = sharedMatrices.get(0);
+        SharedMatrix sharedMatrix = sharedMatrices.get(0).getMatrix();
         List<MatrixCell<Double>> cells = sharedMatrix.getCellsCongaingNonZeroValue();
         MatcherAssert.assertThat(cells, Matchers.hasSize(1));
         MatcherAssert.assertThat(cells, Matchers.containsInAnyOrder(
                 new MatrixCell<Double>(1, 1, -10.0)
         ));
         //the representing matrix of Block2 && Block3
-        sharedMatrix = sharedMatrices.get(2);
+        sharedMatrix = sharedMatrices.get(2).getMatrix();
         cells = sharedMatrix.getCellsCongaingNonZeroValue();
         MatcherAssert.assertThat(cells, Matchers.hasSize(1));
         MatcherAssert.assertThat(cells, Matchers.containsInAnyOrder(
                 new MatrixCell<Double>(1, 1, -10.0)
         ));
         //the representing matrix of Block1 && Block3
-        sharedMatrix = sharedMatrices.get(1);
+        sharedMatrix = sharedMatrices.get(1).getMatrix();
         cells = sharedMatrix.getCellsCongaingNonZeroValue();
         MatcherAssert.assertThat(cells, Matchers.hasSize(2));
         MatcherAssert.assertThat(cells, Matchers.containsInAnyOrder(

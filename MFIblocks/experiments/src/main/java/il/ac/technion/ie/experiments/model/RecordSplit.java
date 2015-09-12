@@ -16,8 +16,8 @@ public class RecordSplit extends Record {
     private final UniformRealDistribution uniformRealDistribution;
     private Map<Field, Double> splitProbability;
 
-    private RecordSplit(List<String> fieldsName, List<String> values) {
-        super(fieldsName, values);
+    private RecordSplit(List<String> fieldsName, List<String> values, int id) {
+        super(fieldsName, values, id);
         uniformRealDistribution = new UniformRealDistribution();
         splitProbability = new HashMap<>();
         sampleProbabilities();
@@ -34,6 +34,8 @@ public class RecordSplit extends Record {
     private void copyFromOrigRecord(Record origRecord) {
         fields = origRecord.getFields();
         recordID = origRecord.getRecordID();
+        recordID = origRecord.getRecordID();
+
     }
 
     private void sampleProbabilities() {

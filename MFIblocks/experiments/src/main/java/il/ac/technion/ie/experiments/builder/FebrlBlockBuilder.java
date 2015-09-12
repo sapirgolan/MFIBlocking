@@ -15,6 +15,8 @@ import java.util.List;
 public class FebrlBlockBuilder implements iBlockBuilder {
 
     private static final String EMPTY_STRING = "";
+    private static final int FIRST_RECORD_ID = 1;
+    private static final int STARTING_RECORD_INDEX = 2;
     private List<String> fieldsNames;
     @Override
     public List<BlockWithData> build(CsvParser parser, List<String> fieldsNames) {
@@ -27,8 +29,10 @@ public class FebrlBlockBuilder implements iBlockBuilder {
         //while there are more rows in dataset
         currentBlockId = initForFirstRecordOnly(row, recordsForBlock);
         row = parser.parseNext();
+        // we have already initialized the first record, therefore the index starts at 2
+        int recordIndex = STARTING_RECORD_INDEX;
         while (row != null && currentBlockId != null) {
-            Record record = this.createRecord(row);
+            Record record = this.createRecord(row, recordIndex);
 
             String blockId = getBlockIdFromRecord(record);
             if (blockId.equals(currentBlockId)) {
@@ -40,6 +44,7 @@ public class FebrlBlockBuilder implements iBlockBuilder {
                 currentBlockId = blockId;
             }
             row = parser.parseNext();
+            recordIndex++;
         }
         if (!recordsForBlock.isEmpty()) {
             createBlockFromRecords(blocksWithData, recordsForBlock);
@@ -55,7 +60,7 @@ public class FebrlBlockBuilder implements iBlockBuilder {
     private String initForFirstRecordOnly(String[] row, List<Record> recordsForBlock) {
         String blockId = null;
         if (row != null) {
-            Record record = this.createRecord(row);
+            Record record = this.createRecord(row, FIRST_RECORD_ID);
             blockId = getBlockIdFromRecord(record);
             recordsForBlock.add(record);
         }
@@ -63,10 +68,10 @@ public class FebrlBlockBuilder implements iBlockBuilder {
     }
 
     private String getBlockIdFromRecord(Record record) {
-        return StringUtils.substringBetween(record.getRecordID(), "rec-", "-");
+        return StringUtils.substringBetween(record.getRecordName(), "rec-", "-");
     }
 
-    private Record createRecord(String[] row) {
+    private Record createRecord(String[] row, int id) {
         List<String> values = new ArrayList<>(Arrays.asList(row));
         for (int i = 0; i < values.size(); i++) {
             String val = values.get(i);
@@ -74,6 +79,6 @@ public class FebrlBlockBuilder implements iBlockBuilder {
                 values.set(i, EMPTY_STRING);
             }
         }
-        return new Record(fieldsNames, values);
+        return new Record(fieldsNames, values, id);
     }
 }

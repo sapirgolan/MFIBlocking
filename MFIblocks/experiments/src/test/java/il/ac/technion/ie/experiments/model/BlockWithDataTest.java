@@ -2,7 +2,6 @@ package il.ac.technion.ie.experiments.model;
 
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.model.Record;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +18,10 @@ import org.powermock.reflect.Whitebox;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.not;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BlockWithData.class)
@@ -54,9 +57,12 @@ public class BlockWithDataTest {
         //create Existing members
         List<Record> existingMembers = createMockRecords(6, Record.class);
         Record oldRepresentative = PowerMockito.mock(Record.class);
-        PowerMockito.when(oldRepresentative.getRecordID()).thenReturn("org");
+        PowerMockito.when(oldRepresentative.getRecordID()).thenReturn(77);
+        PowerMockito.when(oldRepresentative.getRecordName()).thenReturn("org");
         existingMembers.add(oldRepresentative);
         List<Record> copyOfExistingMembers = new ArrayList<>(existingMembers);
+
+        //set internal members
         Whitebox.setInternalState(classUnderTest, "members", existingMembers);
         //set one member as representative
         Whitebox.setInternalState(classUnderTest, "trueRepresentative", oldRepresentative);
@@ -64,14 +70,15 @@ public class BlockWithDataTest {
         //create new members
         List<RecordSplit> newMembers = createMockRecords(6, RecordSplit.class);
         RecordSplit newRepresentative = PowerMockito.mock(RecordSplit.class);
-        PowerMockito.when(newRepresentative.getRecordID()).thenReturn("org");
+        PowerMockito.when(newRepresentative.getRecordID()).thenReturn(77);
+        PowerMockito.when(newRepresentative.getRecordName()).thenReturn("org");
         newMembers.add(newRepresentative);
         Collections.shuffle(newMembers);
 
         classUnderTest.replaceMembers(newMembers);
 
-        MatcherAssert.assertThat(Collections.disjoint(classUnderTest.getMembers(), copyOfExistingMembers), Matchers.is(true));
-        MatcherAssert.assertThat(classUnderTest.getTrueRepresentative(), Matchers.isIn(classUnderTest.getMembers()));
+        assertThat(classUnderTest.getMembers(), not(containsInAnyOrder(copyOfExistingMembers.toArray(new Record[copyOfExistingMembers.size()]))));
+        assertThat(classUnderTest.getTrueRepresentative(), Matchers.isIn(classUnderTest.getMembers()));
 
     }
 
@@ -80,7 +87,7 @@ public class BlockWithDataTest {
         List<T> records = new ArrayList<>();
         for (int i = 0; i < numberOfMembers; i++) {
             T record = (T) PowerMockito.mock(aClass);
-            PowerMockito.when(record.getRecordID()).thenReturn(String.valueOf(i));
+            PowerMockito.when(record.getRecordID()).thenReturn(i);
             records.add(record);
         }
         return records;

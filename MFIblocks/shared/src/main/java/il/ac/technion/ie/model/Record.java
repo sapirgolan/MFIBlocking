@@ -9,12 +9,14 @@ import java.util.*;
  */
 public class Record {
     protected Map<String, Field> fields;
-    protected String recordID;
+    protected Integer recordID;
+    protected String RecordName;
 
     static final Logger logger = Logger.getLogger(Record.class);
 
-    public Record(List<String> fieldsName, List<String> values) {
+    public Record(List<String> fieldsName, List<String> values, int id) {
         fields = new TreeMap<>();
+        recordID = id;
 
         if (fieldsName.size() != values.size()) {
             String message = String.format("Number of fields and values doesn't match! There are %d and %d values",
@@ -26,12 +28,11 @@ public class Record {
         for (int i = 0; i < fieldsName.size(); i++) {
             String fieldName =  fieldsName.get(i);
             if (isFieldRecordID(fieldName)) {
-                this.recordID = values.get(i);
+                this.RecordName = values.get(i);
             }
             fields.put(fieldName, new Field(fieldName, values.get(i)));
         }
     }
-
 
     /**
      * DO NOT USE THIS CONSTRUCTOR
@@ -44,8 +45,12 @@ public class Record {
         return FieldTypes.RECORD_ID.toString().equalsIgnoreCase(fieldName);
     }
 
-    public String getRecordID() {
+    public Integer getRecordID() {
         return recordID;
+    }
+
+    public String getRecordName() {
+        return RecordName;
     }
 
     /**

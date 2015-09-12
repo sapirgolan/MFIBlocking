@@ -3,6 +3,7 @@ package il.ac.technion.ie.experiments.model;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Record;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -23,9 +24,11 @@ public class BlockWithData extends AbstractBlock<Record>{
     }
 
     private boolean checkAndSetRepresentative(Record record) {
-        if (record.getRecordID().endsWith("org")) {
-            trueRepresentative = record;
-            return true;
+        if (record != null && !StringUtils.isEmpty(record.getRecordName())) {
+            if (record.getRecordName().endsWith("org")) {
+                trueRepresentative = record;
+                return true;
+            }
         }
         return false;
     }
@@ -34,8 +37,8 @@ public class BlockWithData extends AbstractBlock<Record>{
     public boolean equals(Object obj) {
         if (obj instanceof BlockWithData) {
             BlockWithData other = (BlockWithData) obj;
-            List<String> thisRecordIds = this.getRecordIds();
-            List<String> otherRecordIds = other.getRecordIds();
+            List<Integer> thisRecordIds = this.getRecordIds();
+            List<Integer> otherRecordIds = other.getRecordIds();
             if (thisRecordIds.size() == otherRecordIds.size() && thisRecordIds.containsAll(otherRecordIds)) {
                 return true;
             }
@@ -43,8 +46,8 @@ public class BlockWithData extends AbstractBlock<Record>{
         return false;
     }
 
-    private List<String> getRecordIds() {
-        List<String> recordIds = new ArrayList<>();
+    private List<Integer> getRecordIds() {
+        List<Integer> recordIds = new ArrayList<>();
         for (Record member : members) {
             recordIds.add(member.getRecordID());
         }
@@ -103,13 +106,13 @@ public class BlockWithData extends AbstractBlock<Record>{
             String message = "Cannot replace records in Blocks Since size of new Records is not as equal to existing records";
             throw new SizeNotEqualException(message);
         }
-        HashMap<String, Record> stringRecordHashMap = new HashMap<>();
+        Map<Integer, Record> recordIdToRecordMap = new HashMap<>();
         for (Record record : members) {
-            stringRecordHashMap.put(record.getRecordID(), record);
+            recordIdToRecordMap.put(record.getRecordID(), record);
         }
 
         for (RecordSplit newRecord : newRecords) {
-            Record recordToReplace = stringRecordHashMap.get(newRecord.getRecordID());
+            Record recordToReplace = recordIdToRecordMap.get(newRecord.getRecordID());
             Collections.replaceAll(members, recordToReplace, newRecord);
             checkAndSetRepresentative(newRecord);
         }

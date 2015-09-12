@@ -44,7 +44,7 @@ public class AdjustedMatrixTest {
                 );
 
         //execute
-        Whitebox.invokeMethod(classUnderTest, "createMatrixBlockMappping", blocks);
+        Whitebox.invokeMethod(classUnderTest, "createMatrixBlockMapping", blocks);
 
         //assertion - assert the mapping between each blockId and the corespondent matrix cell
         Map<Integer, Integer> blockIdToMatPosMap = Whitebox.getInternalState(classUnderTest, "blockIdToMatPosMap");

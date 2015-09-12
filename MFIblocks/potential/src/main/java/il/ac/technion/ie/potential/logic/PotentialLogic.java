@@ -1,7 +1,9 @@
 package il.ac.technion.ie.potential.logic;
 
 import com.google.common.collect.Sets;
+import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.model.AbstractBlock;
+import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.potential.model.AdjustedMatrix;
 import il.ac.technion.ie.potential.model.BlockPair;
 import il.ac.technion.ie.potential.model.BlockPotential;
@@ -130,8 +132,9 @@ public class PotentialLogic implements iPotentialLogic {
         Map<Integer, Set<Integer>> recordBlockMap = new HashMap<>();
         for (AbstractBlock block : filteredBlocks) {
             int blockId = block.getId();
-            List<Integer> blockMembers = block.getMembers();
-            for (Integer memberId : blockMembers) {
+            List<Object> blockMembers = block.getMembers();
+            for (Object member : blockMembers) {
+                Integer memberId = convertToId(member);
                 if (recordBlockMap.containsKey(memberId)) {
                     recordBlockMap.get(memberId).add(blockId);
                 } else {
@@ -140,6 +143,24 @@ public class PotentialLogic implements iPotentialLogic {
             }
         }
         return recordBlockMap;
+    }
+
+    /**
+     * @param member
+     * @return
+     */
+    private Integer convertToId(Object member) {
+        Integer memberId;
+        if (member instanceof Integer) {
+            memberId = (Integer) member;
+        } else if (member instanceof Record) {
+            Record record = (Record) member;
+            memberId = record.getRecordID();
+        } else {
+            throw new NotImplementedYetException(String.format("Retrieving recordId from type %s is not supported yet",
+                    member.getClass().getSimpleName()));
+        }
+        return memberId;
     }
 
     private List<AbstractBlock> filterBlockBySize(List<? extends AbstractBlock> blocks, int filterSize) {

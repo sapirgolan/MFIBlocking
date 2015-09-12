@@ -62,15 +62,16 @@ public class BlockWithDataParametrizedTest {
 
     private void initRecords(List<String>... values) {
         records = new ArrayList<>();
-        for (List<String> fieldsValues : values) {
-            records.add(new Record(fieldNames, fieldsValues));
+        for (int i = 0; i < values.length; i++) {
+            List<String> fieldsValues = values[i];
+            records.add(new Record(fieldNames, fieldsValues, i));
         }
     }
 
     private void createBlock(Map<String, Double> map) {
         classUnderTest = new BlockWithData(records);
         for (Record record : records) {
-            Double score = map.get(record.getRecordID());
+            Double score = map.get(record.getRecordName());
             classUnderTest.setMemberProbability(record, score.floatValue());
         }
     }

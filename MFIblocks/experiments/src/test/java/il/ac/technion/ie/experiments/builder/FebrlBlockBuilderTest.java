@@ -30,7 +30,7 @@ public class FebrlBlockBuilderTest {
     @Test
     public void testGetBlockIdFromRecord() throws Exception {
         Record record = PowerMockito.mock(Record.class);
-        PowerMockito.when(record.getRecordID()).thenReturn("rec-101-dup-0").thenReturn("rec-104-org").thenReturn("very bad record");
+        PowerMockito.when(record.getRecordName()).thenReturn("rec-101-dup-0").thenReturn("rec-104-org").thenReturn("very bad record");
 
         String blockId = Whitebox.invokeMethod(classUnderTest, "getBlockIdFromRecord", record);
         MatcherAssert.assertThat(blockId, Matchers.is("101"));

@@ -5,6 +5,7 @@ import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.potential.model.MatrixCell;
+import il.ac.technion.ie.potential.model.SharedMatrix;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({UaiBuilder.class, UaiVariableContext.class})
+@PrepareForTest({UaiBuilder.class, UaiVariableContext.class, SharedMatrix.class})
 public class UaiBuilderTest {
 
     private UaiBuilder classUnderTest;
@@ -182,5 +183,59 @@ public class UaiBuilderTest {
                 "2\n" +
                 " 0.6 0.4";
         MatcherAssert.assertThat(stringOfBlocksAndProbabilities, Matchers.equalToIgnoringWhiteSpace(expected));
+    }
+
+    @Test
+    public void testBuildCliquesAndSharedMatrix() throws Exception {
+        //Mocking
+        UaiVariableContext variableContext = PowerMockito.mock(UaiVariableContext.class);
+        PowerMockito.when(variableContext.getVariablesIdsSorted()).thenReturn(Lists.newArrayList(7, 8, 9));
+        PowerMockito.when(variableContext.getSharedMatrixSizeByVariableId(Mockito.anyInt())).thenReturn(16, 9, 4);
+
+        //mocking 4x4 matrix
+        SharedMatrix matrix_4x4 = PowerMockito.mock(SharedMatrix.class);
+        PowerMockito.when(matrix_4x4.numberOfRows()).thenReturn(4);
+        PowerMockito.when(matrix_4x4.viewRow(Mockito.eq(0))).thenReturn(Lists.newArrayList(0, 0, 0, 0));
+        PowerMockito.when(matrix_4x4.viewRow(Mockito.eq(1))).thenReturn(Lists.newArrayList(0, 0, 0, -10));
+        PowerMockito.when(matrix_4x4.viewRow(Mockito.eq(2))).thenReturn(Lists.newArrayList(0, 0, 0, 0));
+        PowerMockito.when(matrix_4x4.viewRow(Mockito.eq(3))).thenReturn(Lists.newArrayList(0, 0, 0, 0));
+
+        //mocking 3x3 matrix
+        SharedMatrix matrix_3x3 = PowerMockito.mock(SharedMatrix.class);
+        PowerMockito.when(matrix_3x3.numberOfRows()).thenReturn(3);
+        PowerMockito.when(matrix_3x3.viewRow(Mockito.eq(0))).thenReturn(Lists.newArrayList(0, -10, 0));
+        PowerMockito.when(matrix_3x3.viewRow(Mockito.eq(1))).thenReturn(Lists.newArrayList(0, 0, 0));
+        PowerMockito.when(matrix_3x3.viewRow(Mockito.eq(2))).thenReturn(Lists.newArrayList(-10, 0, 0));
+
+        //mocking 2x2 matrix
+        SharedMatrix matrix_2x2 = PowerMockito.mock(SharedMatrix.class);
+        PowerMockito.when(matrix_2x2.numberOfRows()).thenReturn(2);
+        PowerMockito.when(matrix_2x2.viewRow(Mockito.eq(0))).thenReturn(Lists.newArrayList(0, 0));
+        PowerMockito.when(matrix_2x2.viewRow(Mockito.eq(1))).thenReturn(Lists.newArrayList(-10, 0));
+
+        PowerMockito.when(variableContext.getSharedMatrixByVariableId(Mockito.anyInt()))
+                .thenReturn(matrix_4x4, matrix_3x3, matrix_2x2);
+
+        //execution
+        String cliquesAndSharedMatrix = Whitebox.invokeMethod(classUnderTest, "buildCliquesAndSharedMatrix", variableContext);
+
+        //assertion
+        String expected = "16\n" +
+                " 0 0 0 0\n" +
+                " 0 0 0 -10\n" +
+                " 0 0 0 0\n" +
+                " 0 0 0 0\n" +
+                " \n" +
+                "9\n" +
+                " 0 -10 0\n" +
+                " 0 0 0\n" +
+                " -10 0 0\n" +
+                " \n" +
+                "4\n" +
+                " 0 0\n" +
+                " -10 0";
+        MatcherAssert.assertThat(cliquesAndSharedMatrix, Matchers.equalToIgnoringWhiteSpace(expected));
+
+
     }
 }

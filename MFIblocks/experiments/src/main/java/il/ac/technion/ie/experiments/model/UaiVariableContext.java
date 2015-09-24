@@ -2,6 +2,7 @@ package il.ac.technion.ie.experiments.model;
 
 import com.google.common.collect.*;
 import il.ac.technion.ie.experiments.exception.KeyNotExistException;
+import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.potential.model.BlockPair;
 import il.ac.technion.ie.potential.model.MatrixContext;
@@ -20,10 +21,13 @@ public class UaiVariableContext {
     private List<BlockWithData> blocks;
     private List<MatrixContext<SharedMatrix>> matricesWithContext;
 
+    private Map<Integer, BlockWithData> blockIdToBlockMap;
+    private Map<Integer, SharedMatrix> variableIdToSharedMatrixMap;
+
     private TreeMultimap<Integer, Integer> variableIdToBlocksMultimap;
     private TreeMap<Integer, Integer> variableIdToSizeMap;
     private BiMap<Integer, Integer> variableIdToBlockId;
-    private Map<Integer, BlockWithData> blockIdToBlockMap;
+
 
     private UaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext) {
         this.blocks = blocks;
@@ -41,6 +45,7 @@ public class UaiVariableContext {
         variableIdToBlocksMultimap = TreeMultimap.create();
         variableIdToBlockId = HashBiMap.create(blocks.size());
         blockIdToBlockMap = new HashMap<>();
+        variableIdToSharedMatrixMap = new HashMap<>();
 
         int variableIndex = 0;
         for (BlockWithData block : blocks) {
@@ -53,6 +58,7 @@ public class UaiVariableContext {
 
         for (MatrixContext<SharedMatrix> sharedMatrixContext : matricesWithContext) {
             variableIdToSizeMap.put(variableIndex, sharedMatrixContext.getMatrix().size());
+            variableIdToSharedMatrixMap.put(variableIndex, sharedMatrixContext.getMatrix());
             BlockPair<Integer, Integer> pair = sharedMatrixContext.getPair();
             variableIdToBlocksMultimap.putAll(variableIndex, Lists.newArrayList(pair.getLeft(), pair.getRight()));
             variableIndex++;
@@ -134,5 +140,20 @@ public class UaiVariableContext {
 
     public final List<Integer> getVariablesIdsSorted() {
         return new ArrayList<>(variableIdToSizeMap.keySet());
+    }
+
+    public int getSharedMatrixSizeByVariableId(Integer variablesId) throws SizeNotEqualException {
+        int sharedMatrixSize = variableIdToSharedMatrixMap.get(variablesId).size();
+        Integer variableSize = variableIdToSizeMap.get(variablesId);
+
+        if (sharedMatrixSize != variableSize) {
+            throw new SizeNotEqualException(String.format("size of variableID '%d' is: %d and not :%d",
+                    variablesId, sharedMatrixSize, variableSize));
+        }
+        return sharedMatrixSize;
+    }
+
+    public SharedMatrix getSharedMatrixByVariableId(Integer variableId) {
+        return variableIdToSharedMatrixMap.get(variableId);
     }
 }

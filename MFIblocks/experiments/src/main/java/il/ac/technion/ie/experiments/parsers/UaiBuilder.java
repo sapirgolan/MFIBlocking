@@ -65,11 +65,42 @@ public class UaiBuilder {
             writeNumberOfVariables(numberOfVariables);
             writeVariableSizeAndIndecies(variableContext.getSizeAndIndexOfVariables());
             writeBlocksProbabilities(variableContext);
+            wtireCliquesSharedMatrix(variableContext);
 
         } catch (IOException | KeyNotExistException | SizeNotEqualException | NoValueExistsException e) {
             logger.error("Failed to create UAI File", e);
         }
 
+    }
+
+    private void wtireCliquesSharedMatrix(UaiVariableContext variableContext) throws IOException, SizeNotEqualException, NoValueExistsException {
+        String cliquesSharedMatrix = buildCliquesAndSharedMatrix(variableContext);
+        this.appendStringToFile(cliquesSharedMatrix);
+    }
+
+    private String buildCliquesAndSharedMatrix(UaiVariableContext variableContext) throws SizeNotEqualException, NoValueExistsException {
+        StringBuilder builder = new StringBuilder();
+        builder.append(NEW_LINE);
+        List<Integer> variablesIdsSorted = variableContext.getVariablesIdsSorted();
+        for (Integer variableId : variablesIdsSorted) {
+            int variableSize = variableContext.getSharedMatrixSizeByVariableId(variableId);
+            builder.append(variableSize);
+            builder.append(NEW_LINE);
+            SharedMatrix sharedMatrix = variableContext.getSharedMatrixByVariableId(variableId);
+            if (sharedMatrix == null) {
+                throw new NoValueExistsException(String.format("Variable with ID: '%d'doesn't have a variableId", variableId));
+            }
+            addProbsOfMatrix(builder, sharedMatrix);
+        }
+        return builder.toString();
+    }
+
+    private void addProbsOfMatrix(StringBuilder builder, SharedMatrix sharedMatrix) {
+        int numberOfRows = sharedMatrix.numberOfRows();
+        for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++) {
+            List<Integer> rowValues = sharedMatrix.viewRow(rowIndex);
+            this.addProbsOfBlock(builder, rowValues);
+        }
     }
 
     private void writeBlocksProbabilities(UaiVariableContext variableContext) throws KeyNotExistException, IOException, SizeNotEqualException {
@@ -79,6 +110,7 @@ public class UaiBuilder {
 
     private String buildStringOfBlocksAndProbabilities(UaiVariableContext variableContext) throws KeyNotExistException, SizeNotEqualException {
         StringBuilder builder = new StringBuilder();
+        builder.append(NEW_LINE);
         BiMap<Integer, Integer> variableIdToBlockId = variableContext.getVariableIdToBlockId();
         List<Integer> variablesIds = variableContext.getVariablesIdsSorted();
 
@@ -92,14 +124,18 @@ public class UaiBuilder {
                 }
                 builder.append(probsOfBlockByID.size());
                 builder.append(NEW_LINE);
-                for (Double probability : probsOfBlockByID) {
-                    builder.append(SPACE);
-                    builder.append(probability);
-                }
-                builder.append(NEW_LINE);
+                addProbsOfBlock(builder, probsOfBlockByID);
             }
         }
         return builder.toString();
+    }
+
+    private <T> void addProbsOfBlock(StringBuilder builder, List<T> list) {
+        for (T probability : list) {
+            builder.append(SPACE);
+            builder.append(probability);
+        }
+        builder.append(NEW_LINE);
     }
 
     private boolean isCliqueABlock(BiMap<Integer, Integer> variableIdToBlockId, Integer cliqueID) {

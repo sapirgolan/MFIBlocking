@@ -1,9 +1,8 @@
 package il.ac.technion.ie.experiments.parsers;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.potential.model.MatrixCell;
 import org.hamcrest.MatcherAssert;
@@ -11,15 +10,17 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import java.util.List;
+import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({UaiBuilder.class})
+@PrepareForTest({UaiBuilder.class, UaiVariableContext.class})
 public class UaiBuilderTest {
 
     private UaiBuilder classUnderTest;
@@ -130,5 +131,56 @@ public class UaiBuilderTest {
                 "2 2 3";
         String sizeAndIndecies = Whitebox.invokeMethod(classUnderTest, "buildStringOfVariableSizeAndIndecies", multimap);
         MatcherAssert.assertThat(sizeAndIndecies, Matchers.equalToIgnoringWhiteSpace(expected));
+    }
+
+    @Test
+    public void testBuildStringOfBlocksAndProbabilities() throws Exception {
+        //mocking
+        UaiVariableContext variableContext = PowerMockito.mock(UaiVariableContext.class);
+        TreeMultimap<Integer, Integer> variableIdToBlocksMultimap = TreeMultimap.create();
+        variableIdToBlocksMultimap.put(1, 11);
+        variableIdToBlocksMultimap.put(0, 10);
+        variableIdToBlocksMultimap.put(3, 13);
+        variableIdToBlocksMultimap.put(2, 12);
+        variableIdToBlocksMultimap.put(4, 14);
+        Map<Integer, Integer> map = Maps.newHashMap(ImmutableMap.of(0, 10, 1, 11, 2, 12, 4, 14));
+        BiMap<Integer, Integer> variableIdToBlockId = HashBiMap.create(map);
+
+        PowerMockito.when(variableContext.getVariablesIdsSorted()).thenReturn(Lists.newArrayList(0, 1, 2, 3, 4));
+        PowerMockito.when(variableContext.getVariableIdToBlockId()).thenReturn(variableIdToBlockId);
+
+        PowerMockito.when(variableContext.getProbsOfBlockByID(Mockito.eq(10)))
+                .thenReturn(Lists.newArrayList(0.1, 0.2, 0.3, 0.4));
+        PowerMockito.when(variableContext.getSizeOfBlockById(Mockito.eq(10))).thenReturn(4);
+
+
+        PowerMockito.when(variableContext.getProbsOfBlockByID(Mockito.eq(11)))
+                .thenReturn(Lists.newArrayList(0.2, 0.3, 0.5));
+        PowerMockito.when(variableContext.getSizeOfBlockById(Mockito.eq(11))).thenReturn(3);
+
+        PowerMockito.when(variableContext.getProbsOfBlockByID(Mockito.eq(12)))
+                .thenReturn(Lists.newArrayList(0.7, 0.2, 0.1));
+        PowerMockito.when(variableContext.getSizeOfBlockById(Mockito.eq(12))).thenReturn(3);
+
+        PowerMockito.when(variableContext.getProbsOfBlockByID(Mockito.eq(14)))
+                .thenReturn(Lists.newArrayList(0.6, 0.4));
+        PowerMockito.when(variableContext.getSizeOfBlockById(Mockito.eq(14))).thenReturn(2);
+
+        //execution
+        String stringOfBlocksAndProbabilities = Whitebox.invokeMethod(classUnderTest, "buildStringOfBlocksAndProbabilities", variableContext);
+
+        //assertion
+        String expected = "4\n" +
+                " 0.1 0.2 0.3 0.4\n" +
+                "\n" +
+                "3\n" +
+                " 0.2 0.3 0.5\n" +
+                "\n" +
+                "3\n" +
+                " 0.7 0.2 0.1\n" +
+                "\n" +
+                "2\n" +
+                " 0.6 0.4";
+        MatcherAssert.assertThat(stringOfBlocksAndProbabilities, Matchers.equalToIgnoringWhiteSpace(expected));
     }
 }

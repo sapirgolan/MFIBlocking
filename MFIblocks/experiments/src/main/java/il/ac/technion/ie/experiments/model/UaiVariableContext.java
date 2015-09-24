@@ -1,6 +1,8 @@
 package il.ac.technion.ie.experiments.model;
 
 import com.google.common.collect.*;
+import il.ac.technion.ie.experiments.exception.KeyNotExistException;
+import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.potential.model.BlockPair;
 import il.ac.technion.ie.potential.model.MatrixContext;
 import il.ac.technion.ie.potential.model.SharedMatrix;
@@ -21,6 +23,7 @@ public class UaiVariableContext {
     private TreeMultimap<Integer, Integer> variableIdToBlocksMultimap;
     private TreeMap<Integer, Integer> variableIdToSizeMap;
     private BiMap<Integer, Integer> variableIdToBlockId;
+    private Map<Integer, BlockWithData> blockIdToBlockMap;
 
     private UaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext) {
         this.blocks = blocks;
@@ -37,12 +40,14 @@ public class UaiVariableContext {
         variableIdToSizeMap = new TreeMap<>();
         variableIdToBlocksMultimap = TreeMultimap.create();
         variableIdToBlockId = HashBiMap.create(blocks.size());
+        blockIdToBlockMap = new HashMap<>();
 
         int variableIndex = 0;
         for (BlockWithData block : blocks) {
             variableIdToBlockId.put(variableIndex, block.getId());
             variableIdToSizeMap.put(variableIndex, block.size());
             variableIdToBlocksMultimap.put(variableIndex, block.getId());
+            blockIdToBlockMap.put(block.getId(), block);
             variableIndex++;
         }
 
@@ -76,7 +81,7 @@ public class UaiVariableContext {
             } else {
                 List<Integer> variableBlockIDs = getVariableBlockIDs(variableId);
                 multimap.putAll(variableBlockIDs.size(), variableBlockIDs);
-                logger.debug(String.format("Adding (%d, %d)", variableBlockIDs.size(), variableBlockIDs));
+                logger.debug(String.format("Adding (%d, %s)", variableBlockIDs.size(), variableBlockIDs));
             }
         }
         return multimap;
@@ -101,5 +106,33 @@ public class UaiVariableContext {
      */
     private boolean isVariableAblock(Integer variableId) {
         return variableIdToBlocksMultimap.get(variableId).size() == 1;
+    }
+
+    public final BiMap<Integer, Integer> getVariableIdToBlockId() {
+        return variableIdToBlockId;
+    }
+
+    public List<Double> getProbsOfBlockByID(Integer blockID) throws KeyNotExistException {
+        List<Double> probabilities = new ArrayList<>();
+        BlockWithData blockWithData = blockIdToBlockMap.get(blockID);
+        if (blockWithData == null) {
+            logger.error(String.format("Tried to obtain block with ID '%d' that doesn't exist", blockID));
+            throw new KeyNotExistException("Key " + blockID + " doesn't exists in blockIdToBlockMap");
+        }
+        List<Record> members = blockWithData.getMembers();
+        for (Record record : members) {
+            float recordProbability = blockWithData.getMemberProbability(record);
+            probabilities.add((double) recordProbability);
+        }
+        return probabilities;
+    }
+
+    public int getSizeOfBlockById(Integer cliqueID) {
+        Integer blockID = variableIdToBlockId.inverse().get(cliqueID);
+        return variableIdToSizeMap.get(blockID);
+    }
+
+    public final List<Integer> getVariablesIdsSorted() {
+        return new ArrayList<>(variableIdToSizeMap.keySet());
     }
 }

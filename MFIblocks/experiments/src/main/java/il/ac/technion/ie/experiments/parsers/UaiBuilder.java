@@ -1,8 +1,11 @@
 package il.ac.technion.ie.experiments.parsers;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
+import il.ac.technion.ie.experiments.exception.KeyNotExistException;
+import il.ac.technion.ie.experiments.exception.NoValueExistsException;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
@@ -18,10 +21,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by I062070 on 10/09/2015.
@@ -64,11 +64,46 @@ public class UaiBuilder {
             writeSizeOfEachVariable(variableContext.getSizeOfVariables());
             writeNumberOfVariables(numberOfVariables);
             writeVariableSizeAndIndecies(variableContext.getSizeAndIndexOfVariables());
+            writeBlocksProbabilities(variableContext);
 
-        } catch (IOException e) {
+        } catch (IOException | KeyNotExistException | SizeNotEqualException | NoValueExistsException e) {
             logger.error("Failed to create UAI File", e);
         }
 
+    }
+
+    private void writeBlocksProbabilities(UaiVariableContext variableContext) throws KeyNotExistException, IOException, SizeNotEqualException {
+        String stringOfBlocksAndProbabilities = buildStringOfBlocksAndProbabilities(variableContext);
+        this.appendStringToFile(stringOfBlocksAndProbabilities.toString());
+    }
+
+    private String buildStringOfBlocksAndProbabilities(UaiVariableContext variableContext) throws KeyNotExistException, SizeNotEqualException {
+        StringBuilder builder = new StringBuilder();
+        BiMap<Integer, Integer> variableIdToBlockId = variableContext.getVariableIdToBlockId();
+        List<Integer> variablesIds = variableContext.getVariablesIdsSorted();
+
+        for (Integer variablesId : variablesIds) {
+            Integer cliqueID = variableIdToBlockId.get(variablesId);
+            if (isCliqueABlock(variableIdToBlockId, cliqueID)) {
+                List<Double> probsOfBlockByID = variableContext.getProbsOfBlockByID(cliqueID);
+                if (probsOfBlockByID.size() != variableContext.getSizeOfBlockById(cliqueID)) {
+                    throw new SizeNotEqualException(String.format("size of variableID '%d' is: %d and not :%d",
+                            cliqueID, probsOfBlockByID.size(), variableContext.getSizeOfBlockById(cliqueID)));
+                }
+                builder.append(probsOfBlockByID.size());
+                builder.append(NEW_LINE);
+                for (Double probability : probsOfBlockByID) {
+                    builder.append(SPACE);
+                    builder.append(probability);
+                }
+                builder.append(NEW_LINE);
+            }
+        }
+        return builder.toString();
+    }
+
+    private boolean isCliqueABlock(BiMap<Integer, Integer> variableIdToBlockId, Integer cliqueID) {
+        return variableIdToBlockId.containsValue(cliqueID);
     }
 
     private File createOutputFile() {
@@ -134,12 +169,12 @@ public class UaiBuilder {
         appendStringToFile(builder.toString());
     }
 
-    private void writeVariableSizeAndIndecies(Multimap<Integer, Integer> sizeAndIndexOfVariables) throws IOException {
+    private void writeVariableSizeAndIndecies(Multimap<Integer, Integer> sizeAndIndexOfVariables) throws IOException, NoValueExistsException {
         String sizeAndIndecies = buildStringOfVariableSizeAndIndecies(sizeAndIndexOfVariables);
         appendStringToFile(sizeAndIndecies);
     }
 
-    private String buildStringOfVariableSizeAndIndecies(Multimap<Integer, Integer> sizeAndIndexOfVariables) {
+    private String buildStringOfVariableSizeAndIndecies(Multimap<Integer, Integer> sizeAndIndexOfVariables) throws NoValueExistsException {
         Map<Integer, Collection<Integer>> map = sizeAndIndexOfVariables.asMap();
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<Integer, Collection<Integer>> entry : map.entrySet()) {
@@ -149,6 +184,7 @@ public class UaiBuilder {
             addVariableSizeEntries(builder, variableSize, variableIDsIterator);
         }
         builder.deleteCharAt(builder.length() - 1);
+        builder.append(NEW_LINE);
         return builder.toString();
     }
 
@@ -160,13 +196,13 @@ public class UaiBuilder {
      * @param variableSize
      * @param variableIDsIterator
      */
-    private void addVariableSizeEntries(StringBuilder builder, Integer variableSize, Iterator<Integer> variableIDsIterator) {
+    private void addVariableSizeEntries(StringBuilder builder, Integer variableSize, Iterator<Integer> variableIDsIterator) throws NoValueExistsException {
         while (variableIDsIterator.hasNext()) {
             builder.append(variableSize);
             builder.append(SPACE);
             for (int i = 0; i < variableSize; i++) {
                 if (!variableIDsIterator.hasNext()) {
-                    //todo: throw an exception
+                    throw new NoValueExistsException("A variable doesn't have any blocks\\cliques");
                 }
                 Integer variableID = variableIDsIterator.next();
                 builder.append(variableID);

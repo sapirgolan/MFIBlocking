@@ -156,4 +156,12 @@ public class UaiVariableContext {
     public SharedMatrix getSharedMatrixByVariableId(Integer variableId) {
         return variableIdToSharedMatrixMap.get(variableId);
     }
+
+    public List<Integer> getVariablesIdsWithSharedMatricesSorted() {
+        final Set<Integer> variablesWithSharedMatrices = variableIdToSharedMatrixMap.keySet();
+        final Set<Integer> allVariables = variableIdToSizeMap.keySet();
+        Set<Integer> result = new HashSet<>(allVariables);
+        result.retainAll(variablesWithSharedMatrices);
+        return new ArrayList<>(result);
+    }
 }

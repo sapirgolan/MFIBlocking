@@ -44,7 +44,7 @@ public class UaiBuilder {
         this.blocks = blocks;
     }
 
-    public void createUaiFile() throws SizeNotEqualException {
+    public File createUaiFile() throws SizeNotEqualException {
         file = createOutputFile();
         matricesWithContext = createSharedMatrices();
 
@@ -70,7 +70,7 @@ public class UaiBuilder {
         } catch (IOException | KeyNotExistException | SizeNotEqualException | NoValueExistsException e) {
             logger.error("Failed to create UAI File", e);
         }
-
+        return file;
     }
 
     private void wtireCliquesSharedMatrix(UaiVariableContext variableContext) throws IOException, SizeNotEqualException, NoValueExistsException {
@@ -81,7 +81,7 @@ public class UaiBuilder {
     private String buildCliquesAndSharedMatrix(UaiVariableContext variableContext) throws SizeNotEqualException, NoValueExistsException {
         StringBuilder builder = new StringBuilder();
         builder.append(NEW_LINE);
-        List<Integer> variablesIdsSorted = variableContext.getVariablesIdsSorted();
+        List<Integer> variablesIdsSorted = variableContext.getVariablesIdsWithSharedMatricesSorted();
         for (Integer variableId : variablesIdsSorted) {
             int variableSize = variableContext.getSharedMatrixSizeByVariableId(variableId);
             builder.append(variableSize);

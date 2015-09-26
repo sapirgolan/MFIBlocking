@@ -29,7 +29,6 @@ public class UaiBuilderTest {
     @Before
     public void setUp() throws Exception {
         classUnderTest = new UaiBuilder(PowerMockito.mock(List.class));
-
     }
 
     @Test
@@ -42,31 +41,6 @@ public class UaiBuilderTest {
         int numberOfCliques = Whitebox.invokeMethod(classUnderTest, "countCliques", cells);
         MatcherAssert.assertThat(numberOfCliques, Matchers.is(cells.size() / 2));
     }
-
-    /*@Test
-    public void testCountNumberOfVariables() throws Exception {
-        //prepare data for test
-        Record record_1 = PowerMockito.mock(Record.class);
-        Record record_2 = PowerMockito.mock(Record.class);
-        Record record_3 = PowerMockito.mock(Record.class);
-        Record record_4 = PowerMockito.mock(Record.class);
-        Record record_5 = PowerMockito.mock(Record.class);
-
-        BlockWithData block_1 = new BlockWithData(Lists.newArrayList(record_1, record_5));
-        BlockWithData block_2 = new BlockWithData(Lists.newArrayList(record_1, record_2));
-        BlockWithData block_3 = new BlockWithData(Lists.newArrayList(record_1, record_2, record_3));
-        BlockWithData block_4 = new BlockWithData(Lists.newArrayList(record_4));
-        BlockWithData block_5 = new BlockWithData(Lists.newArrayList(record_1, record_3));
-
-        List<BlockWithData> blocks = Lists.newArrayList(block_1, block_2, block_3, block_4, block_5);
-
-        //execute tested method
-        int numberOfVariables = Whitebox.invokeMethod(classUnderTest, "countNumberOfVariables", blocks);
-
-        //there are 5 blocks and 5 cliques
-        MatcherAssert.assertThat(numberOfVariables, Matchers.is(10));
-
-    }*/
 
     @Test
     public void testCountNumberOfVariables() throws Exception {
@@ -103,7 +77,6 @@ public class UaiBuilderTest {
 
         //there are 4 blocks and 2 cliques
         MatcherAssert.assertThat(numberOfVariables, Matchers.is(6));
-
     }
 
     @Test
@@ -189,7 +162,7 @@ public class UaiBuilderTest {
     public void testBuildCliquesAndSharedMatrix() throws Exception {
         //Mocking
         UaiVariableContext variableContext = PowerMockito.mock(UaiVariableContext.class);
-        PowerMockito.when(variableContext.getVariablesIdsSorted()).thenReturn(Lists.newArrayList(7, 8, 9));
+        PowerMockito.when(variableContext.getVariablesIdsWithSharedMatricesSorted()).thenReturn(Lists.newArrayList(7, 8, 9));
         PowerMockito.when(variableContext.getSharedMatrixSizeByVariableId(Mockito.anyInt())).thenReturn(16, 9, 4);
 
         //mocking 4x4 matrix
@@ -235,7 +208,5 @@ public class UaiBuilderTest {
                 " 0 0\n" +
                 " -10 0";
         MatcherAssert.assertThat(cliquesAndSharedMatrix, Matchers.equalToIgnoringWhiteSpace(expected));
-
-
     }
 }

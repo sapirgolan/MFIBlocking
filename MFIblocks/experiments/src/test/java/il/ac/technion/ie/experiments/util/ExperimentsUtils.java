@@ -22,7 +22,17 @@ public class ExperimentsUtils {
 
     public static String getPathToRecordsFile() throws URISyntaxException {
         String pathToFile = "/20Records.csv";
+        File file = getFileFromResourceDir(pathToFile);
+        return file.getAbsolutePath();
+    }
+
+    public static File getUaiFile() throws URISyntaxException {
+        String pathToFile = "/uaiFile.uai";
+        return getFileFromResourceDir(pathToFile);
+    }
+
+    private static File getFileFromResourceDir(String pathToFile) throws URISyntaxException {
         URL resourceUrl = ExperimentsUtils.class.getResource(pathToFile);
-        return new File(resourceUrl.toURI()).getAbsolutePath();
+        return new File(resourceUrl.toURI());
     }
 }

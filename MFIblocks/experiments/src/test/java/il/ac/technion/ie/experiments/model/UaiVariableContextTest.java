@@ -85,7 +85,6 @@ public class UaiVariableContextTest {
         Collection<Integer> variablesIDsOfBlocks = sizeAndIndexOfVariables.asMap().get(1);
         Collection<Integer> variablesIDsOfCliques = sizeAndIndexOfVariables.asMap().get(2);
 
-//        assertThat(variablesIDsOfBlocks, not(containsInAnyOrder(variablesIDsOfCliques.toArray(new Integer[variablesIDsOfCliques.size()]))));
         assertThat(variablesIDsOfBlocks, contains(0, 1, 2, 3, 4, 5));
         assertThat(variablesIDsOfCliques, contains(4, 5, 0, 1));
 

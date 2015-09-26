@@ -80,10 +80,10 @@ public class UaiBuilder {
 
     private String buildCliquesAndSharedMatrix(UaiVariableContext variableContext) throws SizeNotEqualException, NoValueExistsException {
         StringBuilder builder = new StringBuilder();
-        builder.append(NEW_LINE);
         List<Integer> variablesIdsSorted = variableContext.getVariablesIdsWithSharedMatricesSorted();
         for (Integer variableId : variablesIdsSorted) {
             int variableSize = variableContext.getSharedMatrixSizeByVariableId(variableId);
+            builder.append(NEW_LINE);
             builder.append(variableSize);
             builder.append(NEW_LINE);
             SharedMatrix sharedMatrix = variableContext.getSharedMatrixByVariableId(variableId);
@@ -110,7 +110,6 @@ public class UaiBuilder {
 
     private String buildStringOfBlocksAndProbabilities(UaiVariableContext variableContext) throws KeyNotExistException, SizeNotEqualException {
         StringBuilder builder = new StringBuilder();
-        builder.append(NEW_LINE);
         BiMap<Integer, Integer> variableIdToBlockId = variableContext.getVariableIdToBlockId();
         List<Integer> variablesIds = variableContext.getVariablesIdsSorted();
 

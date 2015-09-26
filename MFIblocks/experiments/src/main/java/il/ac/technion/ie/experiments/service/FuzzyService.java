@@ -27,6 +27,10 @@ public class FuzzyService {
 
     /**
      * The method split blocks in half if the block inner threshold is lower than the given threshold.
+     * For each block it randomly sample a split probability from the Uniform distribution~[0,1].
+     * If the sampled probability is smaller than the threshold {@code sampledProbability < threshold }then the block is split into two blocks.
+     * The records of the block are randomly placed into the new blocks.
+     * The True representative of the original block is placed in the two new blocks.
      *
      * @param originalBlocks
      * @param threshold

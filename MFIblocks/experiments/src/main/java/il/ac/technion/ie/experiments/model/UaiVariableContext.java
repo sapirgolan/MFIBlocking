@@ -79,11 +79,12 @@ public class UaiVariableContext {
         Multimap<Integer, Integer> multimap = ArrayListMultimap.create(expectedSize, expectedSize);
         int index = 0;
         logger.info("Adding #variables in blocks\\clique AND the variableID of that blocks\\clique");
-        for (Map.Entry<Integer, Integer> entry : variableIdToBlocksMultimap.entries()) {
-            Integer variableId = entry.getKey();
+        for (Integer key : variableIdToBlocksMultimap.keySet()) {
+            Integer variableId = key;
             if (isVariableAblock(variableId)) {
                 multimap.put(1, index);
                 logger.debug(String.format("Adding (1, %d)", index));
+                index++;
             } else {
                 List<Integer> variableBlockIDs = getVariableBlockIDs(variableId);
                 multimap.putAll(variableBlockIDs.size(), variableBlockIDs);
@@ -93,6 +94,15 @@ public class UaiVariableContext {
         return multimap;
     }
 
+    /**
+     * Returned a sorted {@link java.util.List - List} of variablesIDs that corresponds to a given {@code CliqueID}.
+     * If the {@code CliqueID} is of a single block then the variablesID who matches that block is returned.
+     * else, If the {@code CliqueID} is of a Clique, then the
+     * variablesIDs who match those blocks who are part of that clique are returned.
+     *
+     * @param variableIdOfClique
+     * @return a Sorted List of variablesIDs
+     */
     private List<Integer> getVariableBlockIDs(Integer variableIdOfClique) {
         ArrayList<Integer> list = new ArrayList<>();
         NavigableSet<Integer> blocksIDs = variableIdToBlocksMultimap.get(variableIdOfClique);
@@ -100,6 +110,7 @@ public class UaiVariableContext {
             Integer variableID = variableIdToBlockId.inverse().get(blocksID);
             list.add(variableID);
         }
+        Collections.sort(list);
         return list;
     }
 

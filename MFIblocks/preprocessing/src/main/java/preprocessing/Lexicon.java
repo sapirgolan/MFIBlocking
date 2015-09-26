@@ -1,22 +1,11 @@
 package preprocessing;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Map.Entry;
-
-import fimEntityResolution.FrequentItem;
 import fimEntityResolution.bitsets.SBS_BitSet_Factory;
+import il.ac.technion.ie.model.FrequentItem;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class Lexicon {
 
@@ -137,9 +126,10 @@ public class Lexicon {
 	
 	/**
 	 * Removes top 10% most frequent items
-	 * and also items whose support is exactly 1 
-	 * @param maxSupport
-	 */
+     * and also items whose support is exactly 1
+     * @param DBSize
+     * @param thresh
+     */
 	public void removeFrequentItems(double DBSize, double thresh){
 		System.out.println("Entered removeFrequentItems: DBSize=" + DBSize + " thresh=" + thresh);
 		

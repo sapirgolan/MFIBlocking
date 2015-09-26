@@ -1,16 +1,16 @@
 package preprocessing;
 
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.ngram.NGramTokenFilter;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.util.Version;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.analysis.ngram.NGramTokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.util.Version;
 
 
 public class WordProcessor {
@@ -41,9 +41,9 @@ public class WordProcessor {
 			StringReader sr_short = new StringReader(value);
 			TokenStream ts = analyzer.tokenStream(value, sr);
 			ts_shortWords = analyzer.tokenStream(value, sr_short);
-			
-			NGramTokenFilter ngtf = new NGramTokenFilter(Version.LUCENE_48, ts, min_ngram_size, max_ngram_size);
-			ts_shortWords.reset();
+
+            NGramTokenFilter ngtf = new NGramTokenFilter(ts, min_ngram_size, max_ngram_size);
+            ts_shortWords.reset();
 			while(ts_shortWords.incrementToken()){
 				ts_shortWords.getAttribute(CharTermAttribute.class);
 				String term = convertTokenStreamToString(ts_shortWords);

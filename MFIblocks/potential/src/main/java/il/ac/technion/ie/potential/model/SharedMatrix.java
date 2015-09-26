@@ -3,6 +3,7 @@ package il.ac.technion.ie.potential.model;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import il.ac.technion.ie.model.AbstractBlock;
+import il.ac.technion.ie.potential.utils.PotentialUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +35,10 @@ public class SharedMatrix extends AbstractPotentialMatrix{
     }
 
     private void mapRecordToMatrix(AbstractBlock rowsBlock, Map<Integer, Integer> map) {
-        List<Integer> members = rowsBlock.getMembers();
+        List<Object> members = rowsBlock.getMembers();
         for (int index = 0; index < members.size(); index++) {
-            Integer recordId =  members.get(index);
+            Object member = members.get(index);
+            Integer recordId = PotentialUtil.convertToId(member);
             map.put(recordId, index);
         }
     }

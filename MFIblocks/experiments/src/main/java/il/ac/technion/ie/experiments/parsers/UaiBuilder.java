@@ -187,7 +187,7 @@ public class UaiBuilder {
     }
 
     private void writeMarkov() throws IOException {
-        FileUtils.writeStringToFile(file, "markov" + "\n", Charset.defaultCharset());
+        FileUtils.writeStringToFile(file, "MARKOV" + "\n", Charset.defaultCharset());
     }
 
     private void writeNumberOfVariables(int numberOfVariables) throws IOException {

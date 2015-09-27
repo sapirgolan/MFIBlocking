@@ -31,6 +31,11 @@ public class ExperimentsUtils {
         return getFileFromResourceDir(pathToFile);
     }
 
+    public static File getBinaryFile() throws URISyntaxException {
+        String pathToFile = "/uaiBinaryFormat.txt";
+        return getFileFromResourceDir(pathToFile);
+    }
+
     private static File getFileFromResourceDir(String pathToFile) throws URISyntaxException {
         URL resourceUrl = ExperimentsUtils.class.getResource(pathToFile);
         return new File(resourceUrl.toURI());

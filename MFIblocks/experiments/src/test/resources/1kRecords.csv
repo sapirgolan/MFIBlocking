@@ -1,0 +1,1001 @@
+rec_id, culture, sex, age, date_of_birth, title, given_name, surname, state, suburb, postcode, street_number, address_1, address_2, phone_number, soc_sec_id, blocking_number, family_role
+rec-0-dup-0, unk, f,22,19930508, , dylan, jtraw, kwld, movatal,2026,11, euroka strit, alantale apartmentst, 03 36305042,2066160,9, NoRole
+rec-0-org,   unk, f,22,19930508, , dylan, straw, qld, moffatdale,2026,11, euroka street, alandale apartments, 03 36305042,2066160,9, NoRole
+rec-100-dup-0, usa, m, 3l, , m s, ch|o  , washin ton, q , harrat ta, 21 1 8,5, marr a k a  s reet, , 613 42023921, 490 9 0,6, NoRole
+rec-100-dup-1, usa, r,3, , ms, ch   e, washington, ql  , barr atta, 2|1 &,5, marraka i   reet, , 613 42023921, 49039 0,6, NoRole
+rec-100-org,   usa, m,31, , ms, chloe, washington, qld, barratta,2118,5, marrakai street, , 613 42023921,4903940,6, NoRole
+rec-101-dup-0, usa, f,30,19850422, , zami, eliod, nsw, esd wyalonkk,2230,10, xadaway crejsent, , 2 93916649,4706992,1, NoRole
+rec-101-dup-1, usa, v,30,19850422, , jtamy, elliodt, ntsw, wezd wyalong,2230,10, chataay crezkent, , 2 93916649,4706992,1, NoRole
+rec-101-dup-2, usa, f,30,19850422, , jamy, eliot, nsdw, wejd wyalong,2230,10, chadaay crezstent, , 2 93916649,4706992,1, NoRole
+rec-101-dup-3, usa, f,30,19850422, , samy, eliot, nsw, wejt wialonk,2230,10, cadaway crezsend, , 2 93916649,4706992,1, NoRole
+rec-101-org,   usa, f,30,19850422, , jamie, elliott, nsw, west wyalong,2230,10, chataway crescent, , 2 93916649,4706992,1, NoRole
+rec-102-dup-0, usa, , , 1931 o 22, , da m i, campbell,  ic, stonebaven, 31 & ,26, cresweJ  street, , 8 1969 6206, 8726 537,6, NoRole
+rec-102-dup-1, usa, , ,19310822, , da m i, campbell, vic, ston    en,318,2, creswel l  treet, , 8 196 9 6 206, 87z 65 7,6, NoRole
+rec-102-dup-2, usa, , , 193 08 Z2, , dami  , camp beIl, vj , stoneh ven, 3|82,2, creswe l   s treet, , 8 19696206, 8726 37,6, NoRole
+rec-102-org,   usa, , ,19310822, , damien, campbell, vic, stonehaven,3182,26, creswell street, , 8 19696206,8726537,6, NoRole
+rec-103-org,   unk, f,25, , , holly, aballon, nsw, henley,3155,86, onians place, rivonia, 08 51022922,4964425,2, NoRole
+rec-104-dup-0, eng, f,2, 1989 0 08, ms, ja c k, dan:  lson, y c, arde er,3216,9, west0n  t eet, , 08 59954948, 88591 5,6, NoRole
+rec-104-dup-1, eng, f,2, l989 1008, ms, ja , danie  son, v c, ardeer,3216,9, westo n s reet, , 08 59 95 948, 88S 6 5,6, NoRole
+rec-104-dup-2, eng, f,2, 19891 08, m , j a k, dan' le son, v ic, arde r,321, 9 6, westons reet, , 08 59954948, 885  65,6, NoRole
+rec-104-dup-3, eng, f,2, 19891 008, ms, jac , danielson, v 'l, ardeer,321,9, west0n   treet, , 08 59954948, 885 1 65,6, NoRole
+rec-104-org,   eng, f,26,19891008, ms, jack, danielson, vic, ardeer,3216,96, weston street, , 08 59954948,8859165,6, NoRole
+rec-105-dup-0, usa, f,28,19871109, , paikk, erikon, nstdw, dayloaj aahm,2770,131, , , 2 77583387,6111502,5, NoRole
+rec-105-dup-1, usa, f,28,19871109, , paik, erikkzon, njt, tayloahstt arm,2770,131, , , 2 77583387,6111502,5, NoRole
+rec-105-dup-2, usa, v,28,19871109, , paiccke, erikdon, nzd, tayloahst aahm,2770,131, , , 2 77583387,6111502,5, NoRole
+rec-105-org,   usa, f,28,19871109, , paige, erickson, nsw, taylors arm,2770,131, , , 2 77583387,6111502,5, NoRole
+rec-106-dup-0, eng, , ,19830226, ms, jasmyn, isaacson, , kyabam,4810,18, galwaytpdlace, phillip lodge, 02 95522769,2953406,5, NoRole
+rec-106-dup-1, eng, ,32,19830256, ms, jaydb, isaaxo, , kyabram,2759,19, galway place, , ,2953406,5, NoRole
+rec-106-dup-2, eng, ,32,19822026, ms, jasmyn, isaacson, , kyabram,2759,95, galwapykace, , 03 85659269,2953406,5, NoRole
+rec-106-org,   eng, ,32,19830226, ms, jasmyn, isaacson, , kyabram,2759,82, galway place, phillip lodge, 02 95522769,2953406,5, NoRole
+rec-107-dup-0, usa, f, 2 8, , dr, ale x is, v vo  d, n5w, bex h ll,5042, | , ferrv pJace, ,202038205,20723,4, NoRole
+rec-107-dup-1, usa, f,2, , dr, a le x, wood, ns vv, bexh  l,504, | , ferry p a ce, , 2 02038 205,2072396,4, NoRole
+rec-107-org,   usa, f,28, , dr, alexis, wood, nsw, bexhill,5042,16, ferry place, , 2 02038205,2072396,4, NoRole
+rec-108-dup-0, eng, f, , 19 340z, , etb n, qu'lncy,  n w, rock ale, 369 0, 1 8, dacombovrt, , , 7 0063 7,2, NoRole
+rec-108-org,   eng, f, ,19340204, , ethan, quincy, nsw, rockdale,3690,188, dacomb court, , ,7500637,2, NoRole
+rec-109-dup-0, usa, f,27,19880801, , alizia, roy, qld, pila pila, ,3, sancka plak, , 613 10234820,7615874,2, NoRole
+rec-109-dup-1, usa, v,27,19880801, , alikia, roy, qlt, pila pila, ,3, stanka plak, , 613 10234820,7615874,2, NoRole
+rec-109-org,   usa, f,27,19880801, , alicia, roy, qld, billa billa, ,3, janga place, , 613 10234820,7615874,2, NoRole
+rec-10-dup-0, ind, f, ,19420625, , j   , manmet, ns , dele ate,2135,1, tanks t reet, tarl arn, 612 02379501,6258773,5, NoRole
+rec-10-dup-1, ind, f, , 19420 6 25, , jack, manmet, ns , delegat , 2|3 5,  J5, tank5tre t, tarl rn, 612 0237 501,6258773,5, NoRole
+rec-10-dup-2, ind, f, , 194206 5, , j c lc, manmeet, nsw, deleg a te,21,1, tank 5 tr eet, tarId rn, 612 02379 501,6258773,5, NoRole
+rec-10-org,   ind, f, ,19420625, , jack, manmeet, nsw, delegate,2135,15, tank street, tarldarn, 612 02379501,6258773,5, NoRole
+rec-110-dup-0, unk, f,26, 1989 1 23, mr, kyl  , scottj ackson, v  , tullam  rine,3521, S65 7, swant o  s treet, medical ntre, 8 140 29 32,7741967,5, NoRole
+rec-110-dup-1, unk, f,26, 198  1 23, mr, k  l, 5cottja kson, vic, tullarn a rjne,352,565, 5wanton street, medica l  entre, 8 14082932,7741967,5, NoRole
+rec-110-org,   unk, f,26,19891123, mr, kyle, scottjackson, vic, tullamarine,3521,5657, swanton street, medical centre, 8 14082932,7741967,5, NoRole
+rec-111-dup-0, unk, f,29, 1986 209, , em a, , n5 w, louc asa,2560,6, brazels   eet, , 2570 577, 635 6 27,9, NoRole
+rec-111-org,   unk, f,29,19860209, , emma, , nsw, bucasia,2560,6, brazel street, , 2 57045377,6356627,9, NoRole
+rec-112-org,   ser, f,24,19910510, mr, tristan, scherr, sa, north moonta,2770,41, mcnicoll place, somerton park, 07 47147281,9095669,9, NoRole
+rec-113-dup-0, eng, f,30,19850827, , klauxia, young, ackt, noosa parklands,4557,10, makkgregor sdreed, dunmofen, 612 61132089,8197920,5, NoRole
+rec-113-dup-1, eng, f,30,19850827, , klaudia, youncck, akd, nusa parhklandst,4557,10, makgahegor street, dunmofen, 612 61132089,8197920,5, NoRole
+rec-113-dup-2, eng, v,30,19850827, , klodia, yonke, act, noosa parklands,4557,10, mackahegor ztrit, dunmoven, 612 61132089,8197920,5, NoRole
+rec-113-org,   eng, f,30,19850827, , claudia, younge, act, noosa parklands,4557,10, macgregor street, dunmoven, 612 61132089,8197920,5, NoRole
+rec-114-dup-0, eng, f,25,19901116, mr, liam, patkok, vick, rutheahklen,4210,9, bywaterj plac, pallymanin, 618 35493158,1406198,8, NoRole
+rec-114-dup-1, eng, f,25,19901116, mr, lyam, padkkocke, vic, ruteacklen,4210,9, byaters plac, balymannin, 618 35493158,1406198,8, NoRole
+rec-114-dup-2, eng, f,25,19901116, mr, liam, patckoke, vic, rudeahklen,4210,9, bywaterstt plac, ballymanin, 618 35493158,1406198,8, NoRole
+rec-114-org,   eng, f,25,19901116, mr, liam, badcoke, vic, rutherglen,4210,9, bywaters place, ballymannin, 618 35493158,1406198,8, NoRole
+rec-115-dup-0, usa, f,21,19400811, ms, eloksw, vance, v, tabilk,4215,8, olivet strdet, , 02 83114774,8175095,1, NoRole
+rec-115-dup-1, usa, ,36,19840801, , elokise, vabem, vic, tabiko,4215,8, oliverhstreet, , ,8170974,1, NoRole
+rec-115-dup-2, usa, i,36,19790711, ms, elose, vab, vic, tabilk,4215,8, stteetpokiver, , 02 83114774,1929423,1, NoRole
+rec-115-org,   usa, f,36,19790711, ms, eloise, vance, vic, tabilk,4215,8, oliver street, , 02 83114774,8170974,1, NoRole
+rec-116-dup-0, eng, f, , 19850 2 4, , zachary, adamson, v ic, eastme| b ourne,306, z, phill i p  v enue, , 8 259   835, 479  72,7, NoRole
+rec-116-dup-1, eng, f, , 198 5  2 , , 2ach ry, ada m son, uic, east melb urne,306,  2 &, phillipa v nue, , 8 259 69835, 479 472,7, NoRole
+rec-116-dup-2, eng, f, , 1985 7 24, , zac   r y, adamso , v i, eastme|bourne,306, 2&, ph:llip avenue, , 8 2596 835, 479 472,7, NoRole
+rec-116-dup-3, eng, f, ,19850724, , zacar , aam   , vic, east meJ ourne,3066,28, philli p  venue, , 8 259 6 9835, 479 47 z,7, NoRole
+rec-116-org,   eng, f, ,19850724, , zachary, adamson, vic, east melbourne,3066,28, phillip avenue, , 8 25969835,4796472,7, NoRole
+rec-117-dup-0, unk, f,30,19810499, , jack, aani, , ton ling,3031,25, osburntdrive, , 02 85628147,3000330,2, NoRole
+rec-117-dup-1, unk, g,34,19810009, , klf, aani, , lavington,3013,3, wilga, osburn drive, 02 82921847,3009772,2, NoRole
+rec-117-dup-2, unk, r,29,19206005, , jack, aabs, , lavinton,3031,71, , , 02 82921847,3008603,2, NoRole
+rec-117-dup-3, unk, f,34,19810409, , jack, aan y, , lavoggton,3031,2, osburn drive, wikpa, 08 59186271,3006830,2, NoRole
+rec-117-org,   unk, f,34,19810409, , jack, aani, , lavington,3031,3, osburn drive, wilga, 02 82921847,3008603,2, NoRole
+rec-118-org,   ger, f, ,19750908, , joseph, falck, qld, spring creek,5495,15, southwell street, , 3 21672834,3849626,0, NoRole
+rec-119-org,   wel, f, ,19520503, ms, hannah, bedward, qld, terrica,2528,12, spence place, rivonia, 03 72122150,1917430,0, NoRole
+rec-11-dup-0, usa, ,3, 198 5 302, dr, matt hw, goodwin,  n s, macks  Jle, 203 6,4, carlilestreet, , 612 9 217894, 172 665,2, NoRole
+rec-11-dup-1, usa, ,30, |g850 02, dr, mat t ew, goodi n, ns , macksvi  le,203, 4 6, carlile s reet, , 612962 7894, 172  6 6,2, NoRole
+rec-11-dup-2, usa, ,30, 1985  02, dr, matt w, goo w in, n w, mack s  i l le,2036,  4 G, carlile s reet, , 612 96217894, 172 26 5,2, NoRole
+rec-11-dup-3, usa, , 3 0, 1g850302, dr, mathew, good  n, nsw, macksville, 203 6, q, carlile   reet, , 612 962 1 7894, 17 26 5,2, NoRole
+rec-11-org,   usa, ,30,19850302, dr, matthew, goodwin, nsw, macksville,2036,46, carlile street, , 612 96217894,1722665,2, NoRole
+rec-120-dup-0, eng, f,25,19900804, , el z, trave5, qld, town  i w,653, G , , , 3 07 1 6 66, 3904   0,3, NoRole
+rec-120-org,   eng, f,25,19900804, , eliza, traves, qld, townview,6530,65, , , 3 07136866,3904040,3, NoRole
+rec-121-org,   ser, f,30,19850919, ms, emiily, boskovic, vic, meerlieu,3068,97, kiewa street, , 8 15951219,6830265,7, NoRole
+rec-122-org,   , m,24,19910908, ms, charlotte, green, sa, sutherlands,6110,8, handasyde street, , 617 17239100,5323919,4, NoRole
+rec-123-dup-0, fin, f, , 1951 16, ms, , kotir anta, qld, 1ower cr e sshrook,5606,5, wiJsonc scent, fl t   0, 3 1838 779,7160396,1, NoRole
+rec-123-dup-1, fin, f, ,19521116, ms, , kotirnta, qld, lower cres sbrook, 56o ,5, wilsonc   scent, fl , 3 183 82 779, 7160 3 96,1, NoRole
+rec-123-dup-2, fin, f, ,19521116, ms, , kotir a ta, q l, lowercr es brook,560,5, wilsonce scent, flt10, 3 18382779, 716 39 ,1, NoRole
+rec-123-org,   fin, f, ,19521116, ms, , kotiranta, qld, lower cressbrook,5606,59, wilson crescent, flt 10, 3 18382779,7160396,1, NoRole
+rec-124-dup-0, usa, r,12,20030709, , petrfde, clarkd, qld, fisher, ,22, hobartuace, , 3 62693749,5290966,6, NoRole
+rec-124-org,   usa, m,12,20030709, , petreece, salas, qld, fisher, ,59, hobart place, , 3 62693749,5290966,6, NoRole
+rec-125-dup-0, fin, f,24,19911115, ms, pianga, panula, njw, orancke grov,3199,4, bajkerville street, rozeyne, 612 57766912,3727014,7, NoRole
+rec-125-dup-1, fin, v,24,19911115, ms, pyanka, panula, ns, orange ckrove,3199,4, basckeahvile sdrit, rojewynn, 612 57766912,3727014,7, NoRole
+rec-125-org,   fin, f,24,19911115, ms, bianca, panula, nsw, orange grove,3199,4, baskerville street, rosewynne, 612 57766912,3727014,7, NoRole
+rec-126-dup-0, usa, f,8, , , ebony, west, , thornitgnds,2913,76, maccallam bircuit, , 03 44305885,6152192,2, NoRole
+rec-126-org,   usa, f,8,20070128, , ebony, west, , thornlands,2913,33, maccallum circuit, , 03 44305885,6151952,2, NoRole
+rec-127-dup-0, fin, ,30,19841208, , jack, aalhnn, , co sfio,4132,8, fink crescent, , 03 87797254,5530561,9, NoRole
+rec-127-dup-1, fin, ,10,19842308, , jack, aaltomen, , cr o,4123,331, fink crescent, , 04 43190510,4526482,9, NoRole
+rec-127-dup-2, fin, d,31,19841208, , lachlan, jaz, , coifo,4129,30, , brest hill, 04 43190510,4526482,9, NoRole
+rec-127-dup-3, fin, n,31,19841208, , jack, , , coro,4132, , fink crecent, pontrdsna, 04 43190510,4526428,9, NoRole
+rec-127-org,   fin, m,31,19841208, , jack, aaltonen, , corio,4123,30, fink crescent, brest hill, 04 43190510,4526482,9, NoRole
+rec-128-dup-0, unk, f, , , dr, jock, zkollaad, , nedlandstt,3029,2, tempeahley jtrit, , 07 04207153,6705867,0, NoRole
+rec-128-dup-1, unk, v, , , dr, stock, stkolard, , nedlandzt,3029,2, tempeahly ztreet, , 07 04207153,6705867,0, NoRole
+rec-128-dup-2, unk, f, , , dr, zock, jkolard, , nedlandst,3029,2, dempealey zdreet, , 07 04207153,6705867,0, NoRole
+rec-128-dup-3, unk, f, , , dr, jok, zcolaahd, , netlandj,3029,2, temperley stttrit, , 07 04207153,6705867,0, NoRole
+rec-128-org,   unk, f, , , dr, jock, scollard, , nedlands,3029,2, temperley street, , 07 04207153,6705867,0, NoRole
+rec-129-dup-0, , m,2, , , cla u dia, morri on, vv , westona,290, S, h0ustea c rcuit, , 618 44  56246, 830 3774,5, NoRole
+rec-129-org,   , m,26, , , claudia, morrison, wa, westonia,2905,5, boustead circuit, , 618 44856246,8303774,5, NoRole
+rec-12-dup-0, unk, f,27,19880531, , repecka, zcwanke, fik, ericka,4178,30, zantalum sttrit, ocean jtar villas, 8 95695367,5711832,9, NoRole
+rec-12-dup-1, unk, f,27,19880531, , repecka, sthanke, fic, erika,4178,30, zantalum tztrit, ocean jtaah villas, 8 95695367,5711832,9, NoRole
+rec-12-dup-2, unk, f,27,19880531, , rebekka, jkanke, vic, erikka,4178,30, stantalum strit, osean jtarh fillas, 8 95695367,5711832,9, NoRole
+rec-12-dup-3, unk, v,27,19880531, , repeccka, zkank, vik, erica,4178,30, sdandalum street, osean jtttar villaj, 8 95695367,5711832,9, NoRole
+rec-12-org,   unk, f,27,19880531, , rebecca, schwanke, vic, erica,4178,30, santalum street, ocean star villas, 8 95695367,5711832,9, NoRole
+rec-130-dup-0, usa, f,30,19850617, dr, drijttan, kkckuk, qld, ckamp mountain,5290, , mccki plac, , 04 25980317,3117119,7, NoRole
+rec-130-org,   usa, f,30,19850617, dr, tristan, cook, qld, camp mountain,5290, , mcgee place, , 04 25980317,3117119,7, NoRole
+rec-131-dup-0, unk, ,25, , ms, danjel, varcoe, vkcu, gippsland mc,5290,1, , , 08 52997712,2307698,9, NoRole
+rec-131-dup-1, unk, ,26, , ms, daniel, abadi, w, regenspark,2539,9, barbermcrscent, , 08 52997712,2379986,9, NoRole
+rec-131-dup-2, unk, , , , ms, danisbal, abald, , gippslagn mc,5299,8, barber cfescent, , 07 18658796,4485624,9, NoRole
+rec-131-dup-3, unk, ,31, , ms, daniwjl, kromwyk, vic, gippslsbd mc,5906,8, barber cmescent, , 08 52997712,2379986,9, NoRole
+rec-131-org,   unk, ,25, , ms, daniel, abadi, vic, gippsland mc,5290,8, barber crescent, , 08 52997712,2379986,9, NoRole
+rec-132-dup-0, eng, m,24,19910207, , carly, lukeztton, nstw, baringdon,2480,46, mkklean plac, , 02 98318152,8399298,6, NoRole
+rec-132-dup-1, eng, m,24,19910207, , kkarhly, lukeson, njw, barinckton,2480,46, mkklean plak, , 02 98318152,8399298,6, NoRole
+rec-132-dup-2, eng, m,24,19910207, , kaahli, lukkejon, nstw, paahrinkton,2480,46, mclean plaztte, , 02 98318152,8399298,6, NoRole
+rec-132-dup-3, eng, m,24,19910207, , cckaahly, lukejon, ns, parington,2480,46, mcklean plak, , 02 98318152,8399298,6, NoRole
+rec-132-org,   eng, m,24,19910207, , carly, lukeson, nsw, barrington,2480,46, mclean place, , 02 98318152,8399298,6, NoRole
+rec-133-org,   usa, , ,19680401, dr, ethan, walker, vic, black rock,3021,20, kerrigan street, westminster place, 08 95634157,3651931,1, NoRole
+rec-134-dup-0, usa, f,27,19880702, , mickayla, joto, qlt, larraz li,2640,18, redkliffe ztreet, , 613 93012863,1392501,1, NoRole
+rec-134-dup-1, usa, f,27,19880702, , mikkayla, joto, cckwld, larrast ly,2640,18, redklivve jtrit, , 613 93012863,1392501,1, NoRole
+rec-134-org,   usa, f,27,19880702, , mikhayla, soto, qld, larras lee,2640,18, redcliffe street, , 613 93012863,1392501,1, NoRole
+rec-135-dup-0, unk, j,25,19909013, , beneit, sckle, nsw, urunga,5271,4, barracloughsrescent, , 612 18797368,5849786,2, NoRole
+rec-135-org,   unk, f,25,19900913, , jayden, sckel, nsw, urunga,5271,4, barraclough crescent, , 612 18797368,5849786,2, NoRole
+rec-136-dup-0, unk, f, , 1969 808, , tuscan v, scjrr:,  l , glenhaughton,417,9, dix0n   r ive, ,61386560172, |92  44,3, NoRole
+rec-136-dup-1, unk, f, ,19690808, , tusca y, sc rr i, qld, g1enhau ghton, 41 7 3,3, dixo d rive, , 613 86 5 60172, 192 7 4,3, NoRole
+rec-136-dup-2, unk, f, ,19690808, , tus c a y, sc'l ri, q d, glenhagt n,4173,3, dixon  rive, , 613 86   60172, 19237 44,3, NoRole
+rec-136-dup-3, unk, f, , 19690 08, , tusc  , scir r , qld, glenh u h ton, 417 3,3, dixon  rive, , 613 8656o172, 1923 744,3, NoRole
+rec-136-org,   unk, f, ,19690808, , tuscany, scirri, qld, glenhaughton,4173,393, dixon drive, , 613 86560172,1923744,3, NoRole
+rec-137-dup-0, gre, f, ,19830114, , yten, markopoloz, klt, kkarara,2088,18, tantankkara sttrit, hmas, 03 86270708,8153643,9, NoRole
+rec-137-dup-1, gre, f, ,19830114, , ayden, marckopoulos, kld, cckarara,2088,18, dantankara street, hmaz, 03 86270708,8153643,9, NoRole
+rec-137-dup-2, gre, v, ,19830114, , hden, markopolost, qlt, karara,2088,18, tantankara stttreet, mas, 03 86270708,8153643,9, NoRole
+rec-137-org,   gre, f, ,19830114, , hayden, markopoulos, qld, karara,2088,18, tantangara street, hmas, 03 86270708,8153643,9, NoRole
+rec-138-dup-0, , m,26, , ms, gabrooe, hewdyn, nsw, labrakdpr,2122,19, henry street, , ,5592501,0, NoRole
+rec-138-org,   , f,29,19861224, ms, gabrielle, hewson, nsw, south tamworth,2122,10, henry street, , ,5592501,0, NoRole
+rec-139-dup-0, eng, r,29, , mr, joeo, hodson, vic, bungeet,3040,5, williamsdstreet, , 08 82179609,9779613,8, NoRole
+rec-139-dup-1, eng, ,29,19860829, mr, joek, hodsoh, vix, bungeet,304,3, notting court, , 07 42758154,9777463,8, NoRole
+rec-139-dup-2, eng, m,31,19860829, mr, joe dl, hodson, vkc, bunfewt,3040,4, nottin court, , 03 43235467,9779163,8, NoRole
+rec-139-org,   eng, m,29,19860829, mr, joel, hodson, vic, bungeet,3040,5, notting court, , 08 82179609,9779613,8, NoRole
+rec-13-dup-0, unk, ,31,19840913, , jakkk, apondantola, njw, drumoyn,2325,27, cossington smit cresent, delmaa, 2 66687176,3865140,3, NoRole
+rec-13-org,   unk, ,31,19840913, , jack, abbondandola, nsw, drummoyne,2325,27, cossington smith crescent, delmar, 2 66687176,3865140,3, NoRole
+rec-140-dup-0, usa, f, , 198607 7, , ad:e, farr  ll, vi , sorrento,291, l, clive steel e avenue, glen-mo ria,61840797410, 7254 4 7,3, NoRole
+rec-140-dup-1, usa, f, ,19860727, , and , far r eJl, v  c, sor r eto, Z913, |, clive st eel  avenue, glen mria, 618 40797410, 725 447,3, NoRole
+rec-140-dup-2, usa, f, , 19860 27, , and i e, fa  ell, vi , sorr e t o, 2 91,1, clivestee e avenve, glen-  ria, 618 40 7 97410, 7254  47,3, NoRole
+rec-140-org,   usa, f, ,19860727, , andie, farrell, vic, sorrento,2913,1, clive steele avenue, glen-moria, 618 40797410,7254447,3, NoRole
+rec-141-dup-0, rom, f,3, 19810 z2, , ben j a i n, vasil, nsw, william sdale,3141,4, dumasstreet, the gu s, 0Z 816Z3536,3650605,1, NoRole
+rec-141-dup-1, rom, f,34, 198 0522, , benja mn, vasil e, ns , william d ale, 314 1,4, duma5  treet, theu s, 02 81 23536,3650605,1, NoRole
+rec-141-dup-2, rom, f,3, 1981 0 522, , benj a in, vasil,  n vv, william dale, 34 1,42, dumas    eet, the gu ms, 028162 3536,3650605,1, NoRole
+rec-141-dup-3, rom, f,3,19810522, , benjamin, vas  e, nsw, wi|lia msdale,314,4, dumas st eet, theg r s, 02 81623536, 3650 05,1, NoRole
+rec-141-org,   rom, f,34,19810522, , benjamin, vasile, nsw, williamsdale,3141,42, dumas street, the gums, 02 81623536,3650605,1, NoRole
+rec-142-dup-0, unk, f, , |92 9  211, , th o a, strei  h, qld, kirr ma,4556,8, sha p  c , fm 627, 3508   689, 7804 43,2, NoRole
+rec-142-org,   unk, f, ,19291211, , thomas, streich, qld, kirrama,4556,8, shaw place, fm 627, 3 50898689,7804843,2, NoRole
+rec-143-dup-0, , f,2, |98 60131, ms, gabri l, 5carce, q| , southme l  ourne,333,  2 6, , , 3 65464070, 1551 99,4, NoRole
+rec-143-dup-1, , f, Z ,19860131, ms, gab e l, scar e, qId, southme lb urne,333, 2 6, , , 3 6546  70,1551099,4, NoRole
+rec-143-org,   , f,29,19860131, ms, gabriel, scarce, qld, south melbourne,3338,26, , , 3 65464070,1551099,4, NoRole
+rec-144-dup-0, eng, , ,19241113, , luki, oliferekson, nsw, varley,2250,45, tristanya ztreet, , 612 71301584,5604670,4, NoRole
+rec-144-org,   eng, , ,19241113, , lucy, oliverson, nsw, farley,2250,45, tristania street, , 612 71301584,5604670,4, NoRole
+rec-145-org,   unk, f,35,19801028, , macy, abbatista, nsw, kialla,6280,147, williams street, , 612 77102061,1847189,2, NoRole
+rec-146-org,   unk, f,35,19800822, pfc, destynii, abadi, wa, mount pleasant,2125,3, araluen street, sunny glen, 8 28305184,9311985,1, NoRole
+rec-147-dup-0, eng, f,27, 1988 1111, ms, chri s   p her, mar , ql , bracalba,24,8, mcge   lace, parlclands estate, 04 4693 5939, 777  38,7, NoRole
+rec-147-dup-1, eng, f,2,19881111, ms, christ pher, nark, q , bra c  ba,2446,8, mcgeep Jace, parklands estate, 04 46935939, 7775  8,7, NoRole
+rec-147-dup-2, eng, f,27, 1g881 111, ms, christ pher, mar , qld, braca ba, 2 4,81, ncgeep  a ce, parklad estate, 04 469 5939, 7775 5 38,7, NoRole
+rec-147-dup-3, eng, f,2, l988111, ms, christ     r, ma r,  q d, brac lba,2446,8, mcgeep ace, parklands estate,446935939,7775538,7, NoRole
+rec-147-org,   eng, f,27,19881111, ms, christopher, mark, qld, bracalba,2446,81, mcgee place, parklands estate, 04 46935939,7775538,7, NoRole
+rec-148-dup-0, unk, f, l ,20020520, , roy, stramph r, n s w, cuda ,32,   , gaunson re scent, , 20912 890, 60583 1 8,8, NoRole
+rec-148-dup-1, unk, f,13, 2002 520, ,  r  , stra pher, nsw, cud l,32,15, gavnson c rescent, , 2 0912 890,605831,8, NoRole
+rec-148-dup-2, unk, f,13, 200205 0, , r oy, stramp er, nsw, cu d l,3254, | 5, 9aunsonc   scent, , 2 091 8 890,605818,8, NoRole
+rec-148-org,   unk, f,13,20020520, , roy, strampher, nsw, cudal,3254,15, gaunson crescent, , 2 09128890,6058318,8, NoRole
+rec-149-org,   eng, f,31,19841108, , benjamin, georgeson, nt, anula,2027,74, gunn street, , 613 51715589,7067405,0, NoRole
+rec-14-dup-0, eng, ,26,19870112, , gemfla, , qld, sadliers crossing,2224,69, franklinstreet, , ,4577289,6, NoRole
+rec-14-dup-1, eng, f,36, , , gemma, bonhr, qld, sadliers crossing,2250,7, franklixu street, , ,5314124,6, NoRole
+rec-14-org,   eng, f,28,19870112, , gemma, bonher, qld, sadliers crossing,2250,60, franklin street, , ,5355124,6, NoRole
+rec-150-dup-0, ind, m,23,19920510, ms, , kallichuran, vic, knox city centre,2436,38, dawes nreet, , 618 34552924,1290898,3, NoRole
+rec-150-dup-1, ind, p,23,19920590, ms, , kallichmuran, okd, knox city xentre,5081,1, young street, homevale, 618 34552924,1290898,3, NoRole
+rec-150-dup-2, ind, ,23,19920510, ms, , kallzcuutran, vie, mulgrav east,5081,8, younglreet, glencot, 618 34542924,1290898,3, NoRole
+rec-150-dup-3, ind, r, , , ms, , kallichuran, , knox city centre,5081,8, young atreet, rsl connie fall, 618 34552924,1290898,3, NoRole
+rec-150-org,   ind, f,23,19920510, ms, , kallichuran, vic, knox city centre,5081,1, young street, glencot, 618 34552924,1290898,3, NoRole
+rec-151-dup-0, usa, v,29,19860630, , leo, adccckinjon, , palarad,2830,30, dizny ckort, , 07 93737341,9640558,6, NoRole
+rec-151-dup-1, usa, v,29,19860630, , leo, adckinson, , palarad,2830,30, disny ckourt, , 07 93737341,9640558,6, NoRole
+rec-151-dup-2, usa, v,29,19860630, , leo, atkinston, , palarad,2830,30, distney ckouat, , 07 93737341,9640558,6, NoRole
+rec-151-org,   usa, f,29,19860630, , leo, atkinson, , ballarat,2830,30, disney court, , 07 93737341,9640558,6, NoRole
+rec-152-dup-0, tha, f,3,19840606, ms, a l na, 'lnch reon, ns  , hickey s reek,2064,240, laser0n lace, essexsud, 08 899 9 7333,1916859,4, NoRole
+rec-152-org,   tha, f,31,19840606, ms, alana, inchareon, nsw, hickeys creek,2064,240, laseron place, essex stud, 08 89997333,1916859,4, NoRole
+rec-153-dup-0, unk, f,21,19940910, , madelin, sttrato, njw, ckuduka,3590,16, ellwood crescent, , 612 36638431,2931633,7, NoRole
+rec-153-dup-1, unk, v,21,19940910, , matelin, sdratou, nzw, kudooka,3590,16, elwud ckressent, , 612 36638431,2931633,7, NoRole
+rec-153-dup-2, unk, v,21,19940910, , madelin, jddratou, nsw, gutuga,3590,16, ellwood crejtsent, , 612 36638431,2931633,7, NoRole
+rec-153-dup-3, unk, v,21,19940910, , madelin, jtrato, ns, kootooga,3590,16, elwood crescent, , 612 36638431,2931633,7, NoRole
+rec-153-org,   unk, f,21,19940910, , madeleine, stratou, nsw, goodooga,3590,16, ellwood crescent, , 612 36638431,2931633,7, NoRole
+rec-154-dup-0, usa, m, , , ms, isabelrla, wynj, vic, world trade centre,5007,26, davis street, catweef, 618 69797429,8047282,2, NoRole
+rec-154-dup-1, usa, f,33,19820510, ms, jye, wynn, vic, world trade centre,5007,245, davivwcreet, , 618 69797429,8047802,2, NoRole
+rec-154-org,   usa, f,33,19820510, ms, jye, wynn, vic, world trade centre,5008,26, davis street, narraburra lodge, 618 69797429,8047802,2, NoRole
+rec-155-dup-0, eng, f,34, 19810 24, , et h n, qu gl y, ta , mar g  te,277, 1q , gormanc r  scent, broadbridg  manor, 617 9100 078,6315630,0, NoRole
+rec-155-org,   eng, f,34,19810524, , ethan, quigley, tas, margate,2774,149, gorman crescent, broadbridge manor, 617 91002078,6315630,0, NoRole
+rec-156-org,   unk, f,23,19921112, , jacob, scopel, sa, parafield gardens,2131,138, bruxner close, north hill medical centre, 617 64637770,5502659,0, NoRole
+rec-157-org,   ger, ,32,19830102, , talia, , qld, the limits,3630,272, tytherleigh street, , 3 14337943,1668537,1, NoRole
+rec-158-org,   eng, f, ,19860705, , isabelle, winchester, vic, cabarita,3931,11, shirlow place, , 08 01171570,2757695,8, NoRole
+rec-159-dup-0, fin, , ,19880710, , , mÄkilÄ, wa, taltwt,6420,5, gibbes oce, cooroora, 08 22990619,3019453,7, NoRole
+rec-159-dup-1, fin, f,32,19880710, , emma, mÄkijlÄ, wa, tabkly,6420,5, tipiloura street, , 03 42094203,3019453,7, NoRole
+rec-159-org,   fin, f,27,19880710, , emma, mÄkilÄ, wa, talbot,6420,5, gibbes place, bendigo retirement village, 08 22990619,3019453,7, NoRole
+rec-15-dup-0, eng, m,25,19900112, , zac, steed, , broadbeqcvwaters,4069, , wirrawayckorscent, , 03 03875238,5282654,6, NoRole
+rec-15-org,   eng, m,25,19900112, , zac, steed, , broadbeach waters,4069, , wirraway crescent, garaweh, 03 03875238,5232245,6, NoRole
+rec-160-dup-0, fre, ,2, 1990 612, , :sabe a, valenod, ns, caloar'lt  beach,2582,6, newrnanmorr'lscircuit, earlh ven, 612 738 38318,9451843,7, NoRole
+rec-160-org,   fre, ,25,19900612, , isabella, valenod, nsw, cabarita beach,2582,6, newman morris circuit, earl haven, 612 73838318,9451843,7, NoRole
+rec-161-dup-0, fre, v,34,19810911, , domas, marnd, , ,6151,67, stuahkeon strit, , 02 65086789,6546200,3, NoRole
+rec-161-dup-1, fre, v,34,19810911, , domas, maant, , ,6151,67, zttturjyon jtrit, , 02 65086789,6546200,3, NoRole
+rec-161-org,   fre, f,34,19810911, , thomas, marnet, , ,6151,67, sturgeon street, , 02 65086789,6546200,3, NoRole
+rec-162-dup-0, eng, ,23,19921203, , velikiti, akkink, kwlt, cckama,5108,21, parkin sdreet, tranquility kdnj, 613 96875979,9082092,8, NoRole
+rec-162-dup-1, eng, ,23,19921203, , velikidy, hawkkink, qld, kama,5108,21, parkin ztrit, dranquility kkdnz, 613 96875979,9082092,8, NoRole
+rec-162-org,   eng, ,23,19921203, , felicity, hawking, qld, kamma,5108,21, parkin street, tranquility gdns, 613 96875979,9082092,8, NoRole
+rec-163-dup-0, usa, f,34, 19810  5, , co n  r, ash e , t a 5, wam b 0 n, 4|61,3, rene 5 treet, , 07 817 3775,2319561,9, NoRole
+rec-163-org,   usa, f,34,19810915, , connor, ashley, tas, wamboin,4161,36, rene street, , 07 81763775,2319561,9, NoRole
+rec-164-dup-0, eng, d, , , , , , wwh, tamala park,5024, , , , 08 88275041,5576125,6, NoRole
+rec-164-org,   eng, f, ,19431023, , kylee, ethanson, wa, tamala park,5024,10, mcdermott street, , 08 88275041,5576125,6, NoRole
+rec-165-org,   , f, ,19910403, ms, james, kammermann, vic, bairnsdale,5022,5, jondol place, flr 5 john flynn medical centre, 8 85281791,6543532,2, NoRole
+rec-166-dup-0, cze, f,29, 1986 0829, , bret , petruyak, ns , tena mb t, 2 06,5, gardiner s treet, ,235122656, 1830 92,0, NoRole
+rec-166-dup-1, cze, f,  2 9, 1986 0 829, , bret, petru yak, nsw, tena ' t,2060,5, gardiner s treet, , z35122656, 1830 92,0, NoRole
+rec-166-dup-2, cze, f,2, 1986  8 29, , b r  t, petru yak, n s, tena hit,2060,5, gardiner s treet, , 2 35122656, 18308 92,0, NoRole
+rec-166-org,   cze, f,29,19860829, , brett, petrulyak, nsw, tenambit,2060,5, gardiner street, , 2 35122656,1830892,0, NoRole
+rec-167-dup-0, unk, , ,19990129, , , , nj, tuliyua,3199,17, proti plak, , 2 79567207,2018528,5, NoRole
+rec-167-dup-1, unk, , ,19990129, , , , nstd, tulisua,3199,17, prodi plake, , 2 79567207,2018528,5, NoRole
+rec-167-org,   unk, , ,19990129, , , , nsw, toolijooa,3199,17, brodie place, , 2 79567207,2018528,5, NoRole
+rec-168-dup-0, usa, v,27,19881020, ms, celstea, haahd, vic, pelmont,2035,317, hallstrom circuit, , 618 21342747,4210619,0, NoRole
+rec-168-org,   usa, f,27,19881020, ms, chelsea, hart, vic, belmont,2035,317, hallstrom circuit, , 618 21342747,4210619,0, NoRole
+rec-169-dup-0, fin, f,24,19910716, , emiili, hanzkkki, kld, opaldon,2299,47, burdeckin strit, , 03 85442575,4142493,2, NoRole
+rec-169-dup-1, fin, v,24,19910716, , emiili, hanski, qlt, opaldon,2299,47, burdekin zdreet, , 03 85442575,4142493,2, NoRole
+rec-169-dup-2, fin, f,24,19910716, , emiily, njcky, qld, opaldon,2299,47, burdekin street, , 03 85442575,4142493,2, NoRole
+rec-169-org,   fin, f,24,19910716, , emiily, hanski, qld, opalton,2299,47, burdekin street, , 03 85442575,4142493,2, NoRole
+rec-16-dup-0, eng, ,33,19821229, ms, payly, kkuik, nsw, dilpa,4111,12, peaurepaire cressent, , 02 58968147,5661869,8, NoRole
+rec-16-org,   eng, ,33,19821229, ms, bayley, quick, nsw, tilpa,4111,12, beaurepaire crescent, , 02 58968147,5661869,8, NoRole
+rec-170-dup-0, , , ,19600905, , tyIer, whi t,  n s, kingsford,265, l8 , beaumontclose, , 07 50 04 9127, g775 2 08,6, NoRole
+rec-170-dup-1, , , , lq6009 5, , t y  e, wh i, nsw, kings ford,265, 1 0, beaumo  t close, ,750049127,9775208,6, NoRole
+rec-170-dup-2, , , , 19600 05, , ty1 r, wh t e, ns , kingsford,265,10, beaumotclose, , 07 50 4 9127,9775208,6, NoRole
+rec-170-dup-3, , , , 1960   05, ,  tyler, wh t , n s w, kings ord,2650,18, beaumont c lose, , O7500 4 9127,9775208,6, NoRole
+rec-170-org,   , , ,19600905, , tyler, white, nsw, kingsford,2650,180, beaumont close, , 07 50049127,9775208,6, NoRole
+rec-171-dup-0, eng, f,29, , , salvwge, james, nsw, majors creek,2656,10, beazley cyrescent, , 02 64512403,6307187,0, NoRole
+rec-171-dup-1, eng, f,29,19804605, , amalia, , nsw, majorx creek,4753,41, , , ,6307187,0, NoRole
+rec-171-org,   eng, f,29,19860605, , james, salvage, nsw, majors creek,2575,19, sanderson close, , 02 64512403,6307187,0, NoRole
+rec-172-dup-0, eng, f,30,19850219, , timfhy, bonher, vic, lake wenouree,2111,37, bond crgscent, , ,2827900,4, NoRole
+rec-172-dup-1, eng, ,30, , , barkeky, bonher, qld, lake wenduree,2218,3, bond crwdkdent, calala farm, ,2827900,4, NoRole
+rec-172-dup-2, eng, f,30,19850219, , baro, bonhea, vic, lake wendluree,2112,30, bond crwcent, amble side garden, ,2857900,4, NoRole
+rec-172-org,   eng, f,30,19850219, , barkly, bonher, vic, lake wendouree,2112,30, bond crescent, calala farm, ,2827900,4, NoRole
+rec-173-org,   cze, f,25,19900301, , matthew, marcincsinova, wa, hopeland,3011,19, goessling place, shopping centre, 8 98100158,9600160,5, NoRole
+rec-174-dup-0, eng, m,2, 1g901111, , seba  a n, ruperton, nsw, cardiffheights,290,2, musgravestreet, , 612 50 3 4 441,9333233,1, NoRole
+rec-174-dup-1, eng, m,25,1990111, , sebas  an, rup ert on, n s w, cardjff h  ights,290,2, musgrav s reet, , 612 50343441, 9333Z33,1, NoRole
+rec-174-dup-2, eng, m,2, 1990111 1, , seb asjan, rupert on, nsw, cardif f   i9hts,29,26, musgravestreet, , 6l25034344|, 933 z33,1, NoRole
+rec-174-dup-3, eng, m,  Z5,19901111, , sebas t ian, rupe tson, ns , cardiff e ights,20, 2G, musgrave street, ,61250343441,93333,1, NoRole
+rec-174-org,   eng, m,25,19901111, , sebastian, rupertson, nsw, cardiff heights,2902,26, musgrave street, , 612 50343441,9333233,1, NoRole
+rec-175-dup-0, usa, f,32, , mr, sea, lb, wa, cygjt,2380,96, wheatley street, , 08 90498778,4012129,5, NoRole
+rec-175-dup-1, usa, f,32,19831225, , sean, levy, vic, cosak,2380,14, wheatlsrtctreet, , 02 91170654,4012129,5, NoRole
+rec-175-dup-2, usa, f,33, , mr, seah, levby, wa, cossakc,2380, , wheatlejsrvreet, , 08 90498778,4012129,5, NoRole
+rec-175-org,   usa, f,32,19831225, mr, sean, levy, wa, cossack,2380,14, wheatley street, , 08 90498778,4012129,5, NoRole
+rec-176-dup-0, unk, f,28,19870712, ms, chrisylpher, abcd, , wannamsl,6569,325, towers place, , 07 54912332,3502882,1, NoRole
+rec-176-dup-1, unk, g,28,19793093, , sara, abgjyi, , wannamal,5606,329, towersfvlace, , 07 54912332,3500742,1, NoRole
+rec-176-dup-2, unk, f, ,19870712, , chriztopher, abadb, , wannaml,5606,331, towersczplace, , 07 54912332,3509742,1, NoRole
+rec-176-org,   unk, f,28,19870712, ms, christopher, abadi, , wannamal,5606,320, towers place, the lakes retirement village, 07 54912332,3500742,1, NoRole
+rec-177-dup-0, , f,30,19850625, , bro o ce, fe n e, vic, eur eka,2234, 1q, cathca r t close, sunur v, 08 823 11934, 64 5 22,3, NoRole
+rec-177-dup-1, , f,3, 1q85 62 , , br oo ke, feneley, v c, eurek , z234,4, cathcart close, sunb u y, 08 8231 934,6415422,3, NoRole
+rec-177-org,   , f,30,19850625, , brooke, feneley, vic, eureka,2234,14, cathcart close, sunbury, 08 82311934,6415422,3, NoRole
+rec-178-dup-0, ger, m,7,20081224, , tynan, fromel, vick, balwyn noaht,6225,6, o'konor circuid, , 618 75613591,2808329,5, NoRole
+rec-178-org,   ger, m,7,20081224, , tynan, frommel, vic, balwyn north,6225,6, o'connor circuit, , 618 75613591,2808329,5, NoRole
+rec-179-dup-0, fin, , , , ms, danieoe, siltala, qld, nako,6537,257, burns cdrcuit, , 02 50141490,2057262,4, NoRole
+rec-179-dup-1, fin, f, ,19413022, ms, danie, siltala, qld, ,6537,2, batcheloe street, , 03 82199226,2067622,4, NoRole
+rec-179-dup-2, fin, f, ,19405022, ms, dani, siltala, nsw, narko,6537,257, batchelrsrreet, , 03 82919226,2054252,4, NoRole
+rec-179-dup-3, fin, m, ,19410522, ms, slioa, daniel, qld, narko,6537,26, batchelor street, , 03 82921926,2057462,4, NoRole
+rec-179-org,   fin, f, ,19410522, ms, daniel, siltala, qld, narko,6537,257, batchelor street, , 03 82919226,2057262,4, NoRole
+rec-17-dup-0, usa, f,28,19870727, mr, eponi, dodzon, nsw, jummeahlant poind,3125,19, pelfielt crezend, , 2 62305286,1913301,3, NoRole
+rec-17-dup-1, usa, f,28,19870727, mr, eboni, totzon, nsw, sttumealand point,3125,19, belfield crestkkend, , 2 62305286,1913301,3, NoRole
+rec-17-org,   usa, f,28,19870727, mr, ebony, dotson, nsw, summerland point,3125,19, belfield crescent, , 2 62305286,1913301,3, NoRole
+rec-180-dup-0, ser, f, ,19540301, , alobe , milin vic, vi, bridqewater  n loddon, 6 011,5, epenar    lose, berke l ey vlge,61854494521, 6130 97,3, NoRole
+rec-180-dup-1, ser, f, ,19540301, , ab b, milinkovic, v c, bridgewate r  n loddon, 60 11, S, epenarr  close, berkele y  lge, 618 544 94521, 613O597,3, NoRole
+rec-180-dup-2, ser, f, , 195  3 01, , ab ey, milink  ic, v ic, bridgewat e   n loddon,6011,5, epenarr a close, berke1   vlge, 618 54 94521,6130597,3, NoRole
+rec-180-org,   ser, f, ,19540301, , abbey, milinkovic, vic, bridgewater on loddon,6011,5, epenarra close, berkeley vlge, 618 54494521,6130597,3, NoRole
+rec-181-dup-0, pol, f,24,19910606, cpt, midecztell, dikojky, vic, noradzua,3192,489, movlin jtrit, , 618 67404553,9712591,7, NoRole
+rec-181-dup-1, pol, v,24,19910606, cpt, mitkel, dikowski, fik, noradjtua,3192,489, moflin sttreet, , 618 67404553,9712591,7, NoRole
+rec-181-org,   pol, f,24,19910606, cpt, mitchell, dikowski, vic, noradjuha,3192,489, mofflin street, , 618 67404553,9712591,7, NoRole
+rec-182-dup-0, eng, f,38, 19771 4, , j a  d, summer fi eld, nsvv, bazelbook,7052,48, federal h ighway, , 02 92091413, 3155 086,8, NoRole
+rec-182-dup-1, eng, f,38, 1977 1004, , j a r o d, summe f e ld, n , haz elb o k, 7 0,48, federa  highway, , 02 920 1 13,3155086,8, NoRole
+rec-182-dup-2, eng, f, 3 8,19771004, , jaro , summerf i ld, nsw, hazelb ook,705,4, federalhi ghway, , 029209 1413, 31S508 6,8, NoRole
+rec-182-org,   eng, f,38,19771004, , jarod, summerfield, nsw, hazelbrook,7052,48, federal highway, , 02 92091413,3155086,8, NoRole
+rec-183-dup-0, eng, m, 2 5, , , michael, scriven, ql , ma y d o w 5,2232,26, beasl e s reet, marsbanti arabians, 0393 6 8218, 584590 8,8, NoRole
+rec-183-dup-1, eng, m,25, , , michaJ, scr'lv n, ql d, maydo ns,2232,2, bea51eys treet, marshant  rabians, 03 93638218, 584 5908,8, NoRole
+rec-183-dup-2, eng, m,   , , , michael, scri  n, qld, may d0wn5,22,2, beasle v street, marshant  rabians, 03 936 3 8218,5845908,8, NoRole
+rec-183-dup-3, eng, m,2, , , mic hael, scr i  en, qld, maydow s,2, , beasley street, marshanti ar abians, 03 9  38218, 58 5 08,8, NoRole
+rec-183-org,   eng, m,25, , , michael, scriven, qld, may downs,2232,26, beasley street, marshanti arabians, 03 93638218,5845908,8, NoRole
+rec-184-dup-0, chi, f,42,19730514, ms, danil, u, klt, yuleba soth,3144,3, plumental plastte, errytel, 03 94593042,6110407,4, NoRole
+rec-184-dup-1, chi, v,42,19730514, ms, danil, , klt, yuleba soudh,3144,3, blumendal plac, xeahrietell, 03 94593042,6110407,4, NoRole
+rec-184-org,   chi, f,42,19730514, ms, daniel, hu, qld, yuleba south,3144,3, blumenthal place, cherrydell, 03 94593042,6110407,4, NoRole
+rec-185-dup-0, chi, f, ,19150927, , amekua, poon, nsw, baghut,4350,690, oceant rwer way, , 612 22190457,2921421,4, NoRole
+rec-185-dup-1, chi, , ,19195027, , amky, , naw, bathuzst,4360,69, ocean rover way, , 612 21890457,9774477,4, NoRole
+rec-185-org,   chi, f, ,19150927, , amelia, poon, nsw, bathurst,4350,69, ocean rover way, , 612 21890457,9773347,4, NoRole
+rec-186-dup-0, unk, f, 3 1, 1q8 01 28, dr, la i, aarc, vic, some r et,451,3, percy c r    cent, , 08 27576693, 70 59462,9, NoRole
+rec-186-org,   unk, f,31,19840128, dr, lani, aarcy, vic, somerset,4515,32, percy crescent, , 08 27576693,7059462,9, NoRole
+rec-187-dup-0, dut, f,3,19850926, ms, , uanbl  com, a c t, fa    , 35 0 0,7, abrahamsc r scent, , 08 5710 153, 82430 05,0, NoRole
+rec-187-dup-1, dut, f,3,19850926, ms, , vanb |e rcom, a c, farr  , 3 s 00,7, alorahams rescent, , 08 571 0 3153, 82430 5,0, NoRole
+rec-187-dup-2, dut, f,3,19850926, m , , vanble r om, act, farr  , 35O0,7, abraham5c escent, , 08 57103153, &2 4 0  5,0, NoRole
+rec-187-dup-3, dut, f,3, 19850 26, m , , vanbercom, a c, fa r ,350,7, abrahamscrescent, , 0857l 03153, 824 3 05,0, NoRole
+rec-187-org,   dut, f,30,19850926, ms, , vanblercom, act, farrer,3500,7, abrahams crescent, , 08 57103153,8243005,0, NoRole
+rec-188-dup-0, usa, f,1,20041217, pfc, a  e r, ke y, , mona v a e, 4&71, , cox   r e e t, , 03 4877 82q3, 21989 0,0, NoRole
+rec-188-dup-1, usa, f,1, 2004 217, pfc, amb r, ke , , moa v a le, 48 71, , cox 5   r eet, , 03 48 78293, 21q   09,0, NoRole
+rec-188-org,   usa, f,11,20041217, pfc, amber, key, , mona vale,4871, , cox street, , 03 48778293,2198909,0, NoRole
+rec-189-dup-0, eng, m,33,19821031, , tennnon, tala, , garland,2065,3, rscent cootlibah, , 02 40900445,5623601,9, NoRole
+rec-189-org,   eng, f,33,19821031, , taylah, tennyson, nsw, garland,2065,3, coolibah crescent, killarney cottage, 612 76367881,5623601,9, NoRole
+rec-18-dup-0, eng, f,25, , sgt, fIyn , hi lton, n  , eug wra,46,93, burttcrescent, st franc is  illage, 612 1441 7067, 99787 1,1, NoRole
+rec-18-dup-1, eng, f, 2S, , sgt, fl  n n, hiJton, nsw, eug ow  a, 46 5 ,9, burtt cre scent, stfrancis  illage, 612 144 17067,9978771,1, NoRole
+rec-18-dup-2, eng, f,25, , 5gt, flv nn, hil o n, nsw, eugow ra, 46 5 0,9, hurttcres ent, st franc  s village, 612  44 7067, 9978 71,1, NoRole
+rec-18-dup-3, eng, f,25, , sqt, flvnn, hi l on, n  , euq w a, 46 0, q  , burtt c   scent, st franci  v llage, 612 144 7067,9978771,1, NoRole
+rec-18-org,   eng, f,25, , sgt, flynn, hilton, nsw, eugowra,4650,93, burtt crescent, st francis village, 612 14417067,9978771,1, NoRole
+rec-190-dup-0, usa, t, ,19850626, , cantrell, alannnh, nsw, doube bay,4575,8, jardine psfreet, , ,8762182,2, NoRole
+rec-190-dup-1, usa, f, ,19850626, , alanj, cangrelo, nsbu, double bay,4509,5, reet jardinets, , 02 32975604,8726182,2, NoRole
+rec-190-dup-2, usa, f, ,19580426, , alanny, cantrxsl, qld, doublepbay,4575,7, , , ,8726822,2, NoRole
+rec-190-org,   usa, f, ,19850626, , alannah, cantrell, nsw, double bay,4575,5, jardine street, , 02 32975604,8726182,2, NoRole
+rec-191-dup-0, eng, ,24,19910604, dr, tylan, newpoahd, , eackleawkk,3088,24, jefvkott plac, fila 2, 03 69540372,5291638,9, NoRole
+rec-191-org,   eng, ,24,19910604, dr, dylan, newport, , eaglehawk,3088,24, jeffcott place, villa 2, 03 69540372,5291638,9, NoRole
+rec-192-org,   chi, ,31,19840604, , simon, shr, nsw, woodville,3163,33, armstrong crescent, , 612 99453149,1670205,1, NoRole
+rec-193-dup-0, tur, f,3, 1982 1 03, , patr'l k, tay f u r, nsw, creswood,6062,123, fleggcre scent, , 0z 22039740, 5q93581,3, NoRole
+rec-193-dup-1, tur, f,33,19821003, , patr ck, tayfu r, n sw, crestwood,606,  1 3, f1eggcre scent, ,222039740, 5493 &1,3, NoRole
+rec-193-dup-2, tur, f,3,19821003, , patick, tayfur, nw, cres ood,60, | 2, fleggcr cent, , 02220 9740,5493581,3, NoRole
+rec-193-org,   tur, f,33,19821003, , patrick, tayfur, nsw, crestwood,6062,123, flegg crescent, , 02 22039740,5493581,3, NoRole
+rec-194-dup-0, chi, m,3,19850101, mr, a , lc  , n  , victoriar  e  downs,261,2, 1ord street, pia  lace, 613 65050179,8438573,9, NoRole
+rec-194-dup-1, chi, m,30,19850101, m , ada m, k u, nt, victoria ri ver downs, 2 6, 2 8, lord s t r eet, piaplace, 613 650 0179, 8438s73,9, NoRole
+rec-194-dup-2, chi, m,0, 1985  101, mr, ad, ku , n , victoriar i er downs,2614,2, lord street, piap Iace, 613 65050179,843857,9, NoRole
+rec-194-dup-3, chi, m,   ,19850101, mr,  da , ku o,  n t, victoria river downs,2614, 2 8, lord st eet, piap    , 613 65 50179, &438 7 3,9, NoRole
+rec-194-org,   chi, m,30,19850101, mr, adam, kuo, nt, victoria river downs,2614,28, lord street, pia place, 613 65050179,8438573,9, NoRole
+rec-195-dup-0, usa, f,13,20021112, , mer, cherrh, via, rangeview,4157,90, fingleton crescent, wybelanah, 04 81819187,3214655,9, NoRole
+rec-195-dup-1, usa, m, ,20021112, , h em, cherry, vicj, rangeview,5034,16, fingletonaerescent, , 04 81819187,3214655,9, NoRole
+rec-195-dup-2, usa, t,13,20021112, , mwd, cherry, cirll, rangeview,5034,16, fingletonlceescent, wybelanah, ,2765593,9, NoRole
+rec-195-dup-3, usa, m,13,20021112, , megz, cherry, vcu, rangeview,5034,2, fingletocscent, wybelanah, 04 81819187,3214655,9, NoRole
+rec-195-org,   usa, m,13,20021112, , meg, cherry, vic, rangeview,5034,16, fingleton crescent, wybelanah, 04 81819187,3214655,9, NoRole
+rec-196-dup-0, ger, v,8,20071023, ms, lyam, zdiler, vic, easd sale rarv,3728,3, , kyima, ,1611308,7, NoRole
+rec-196-dup-1, ger, f,8,20071023, ms, liam, seileah, vic, eazt stale rarf,3728,3, , ckyima, ,1611308,7, NoRole
+rec-196-dup-2, ger, v,8,20071023, ms, lyam, zileah, vic, eazt sale aharf,3728,3, , kyima, ,1611308,7, NoRole
+rec-196-org,   ger, f,8,20071023, ms, liam, seiler, vic, east sale raaf,3728,3, , kyeema, ,1611308,7, NoRole
+rec-197-dup-0, chi, f,27, 198804 06,  r, made ie, , qJ  , carole  ark, 4 15z,1, violet gr o  er place, avonleapa k rmb 4045, 613 83203s11,6343339,2, NoRole
+rec-197-dup-1, chi, f,2, 198804 06, dr, made I ne, ,  q d, carol  ark,4152, | 5, vio1etqro erplace, avonlea park rmb 4045, 613 83  3511,6343339,2, NoRole
+rec-197-org,   chi, f,27,19880406, dr, madeline, , qld, carole park,4152,15, violet grover place, avonlea park rmb 4045, 613 83203511,6343339,2, NoRole
+rec-198-dup-0, usa, f, ,19140126, ms, zojdhua, onil, nsw, jt upeahts islant,2502,59, trokhton ztrit, dudley spesialist medical centre, 02 72525734,5771313,6, NoRole
+rec-198-org,   usa, f, ,19140126, ms, joshua, oneil, nsw, st huberts island,2502,59, troughton street, dudley specialist medical centre, 02 72525734,5771313,6, NoRole
+rec-199-dup-0, eng, ,32,19830104, , mikkayla, zepson, nsw, ckendhurjt,2165,135, arabana jtreet, , 2 74864320,9887417,2, NoRole
+rec-199-dup-1, eng, ,32,19830104, , mikayla, jefjdon, nj, cckenthurst,2165,135, arapana sttreet, , 2 74864320,9887417,2, NoRole
+rec-199-org,   eng, ,32,19830104, , mikayla, jephson, nsw, kenthurst,2165,135, arabana street, , 2 74864320,9887417,2, NoRole
+rec-19-org,   usa, f, ,19990610, dr, lachlan, donaldson, , cooks hill,3804,41, madigan street, , 03 41751315,1670264,1, NoRole
+rec-1-dup-0, chi, f,62,19850405, , caitlyn, zhang, nse, grenwih,6005,18, cowper wfkpeet, , 02 70705639,8129172,3, NoRole
+rec-1-dup-1, chi, m, ,19850405, , alessandro, zhang, nsw, greenwfh,6005,2268, cowpervrreet, , 02 70705639,8129120,3, NoRole
+rec-1-dup-2, chi, ,35,19850405, , caitlyn, mattgews, si, greenwich,692,16, , sec 231, 02 70705639,8129172,3, NoRole
+rec-1-org,   chi, m,30,19850405, , caitlyn, zhang, nsw, greenwich,6005,12, cowper street, sec 231, 02 70705639,8129172,3, NoRole
+rec-200-dup-0, unk, m,11, , ms, ztara, jckokin, qld, paahckinzdon,3085,86, ialgan plak, brinjarry, 03 18737829,1141537,6, NoRole
+rec-200-org,   unk, m,11, , ms, sarah, scogin, qld, parkinson,3085,86, yalgan place, brinjarry, 03 18737829,1141537,6, NoRole
+rec-201-org,   eng, ,30,19850621, ms, jazz, clausson, vic, yarra glen,3055,24, conlon crescent, the shanty, 8 22403862,8531034,1, NoRole
+rec-202-dup-0, nor, f, ,19401221, , el l a, 1ojÖr n on, t  , turner  beach,4165,   q, rninter   ace, , 7 6J363O11, 263 317,9, NoRole
+rec-202-dup-1, nor, f, ,19401221, , eIla, bjÖ r  on, ta s, turnersb each, 4 1 6, 6 9, ninter p l ace, , 7 6136 011, 2631 3 17,9, NoRole
+rec-202-dup-2, nor, f, , 1g40 12 1, , e l a, bjÖrnson, ta s, turner   each,416,   , minte r p lace, , 7 61363 11, 2G31317,9, NoRole
+rec-202-org,   nor, f, ,19401221, , ella, bjÖrnson, tas, turners beach,4165,69, minter place, , 7 61363011,2631317,9, NoRole
+rec-203-dup-0, ind, n,2,19920313, mr, jac   , su d  a, , balwyn north,4878,7, k:ewa  reet, normanhurst,213731629, 577z 49,9, NoRole
+rec-203-dup-1, ind, m, 2 3, 199 0 13, mr, jaco b, sud ua, , balwyn n orth, 487 8,7, kiewa st reet, normanh ust, 02 l 731 29,5772049,9, NoRole
+rec-203-dup-2, ind, m,23, 19920 13, mr, jaco b, sudea, , balwvnnorth,487,7, kjewa st reet, norma   rst, 02 137 1629, 57720 9,9, NoRole
+rec-203-org,   ind, m,23,19920313, mr, jacob, sudeva, , balwyn north,4878,7, kiewa street, normanhurst, 02 13731629,5772049,9, NoRole
+rec-204-dup-0, eng, f, ,19741128, ms, stoel, hbston, nsw, kkolly plu,6430,173, mullan zdtreet, iron jhoe loke, 02 84078036,4768731,0, NoRole
+rec-204-dup-1, eng, f, ,19741128, ms, soel, opzon, nsw, kolly plue,6430,173, mullan tstttrit, iron xoe loye, 02 84078036,4768731,0, NoRole
+rec-204-org,   eng, f, ,19741128, ms, joel, hobson, nsw, colly blue,6430,173, mullan street, iron shoe lodge, 02 84078036,4768731,0, NoRole
+rec-205-dup-0, usa, f,3, 198107 2, , schk  r a, vi nc t, n sw, moob ll,5087,1, lawrenc e  lose, , 04 43 09026,2369776,6, NoRole
+rec-205-dup-1, usa, f,34, 19810 712, , sch k   r a, v'ln n t, n  , mooba l, 5 0 8 7, l , lawrence close, , 04 43509026, Z369776,6, NoRole
+rec-205-dup-2, usa, f,34, 1981 0712, , schk r r a, vincent, n  , moob a l,508,1, lawrenceclose, ,443509026, 23697 76,6, NoRole
+rec-205-org,   usa, f,34,19810712, , schkirra, vincent, nsw, mooball,5087,18, lawrence close, , 04 43509026,2369776,6, NoRole
+rec-206-dup-0, usa, ,12,20030503, , jami, woakkman, qlt, uruma dam,2233,7, nelson plaz, , 3 60336311,2618023,8, NoRole
+rec-206-dup-1, usa, ,12,20030503, , jtamy, oackkman, qld, uruma tam,2233,7, nelson plac, , 3 60336311,2618023,8, NoRole
+rec-206-dup-2, usa, ,12,20030503, , zami, oackman, qld, uruma dam,2233,7, neljon plak, , 3 60336311,2618023,8, NoRole
+rec-206-org,   usa, ,12,20030503, , jamie, workman, qld, wuruma dam,2233,7, nelson place, , 3 60336311,2618023,8, NoRole
+rec-207-dup-0, fin, f,28,19870314, ms, , kauri�vk�ki, , mergle,4133,22, mctaggart rescent, , 08 58582021,6091643,8, NoRole
+rec-207-dup-1, fin, f,28,19870414, ms, , kaurisnÄki, wa, merivdle,4133,24, , , 08 58582021,6039543,8, NoRole
+rec-207-dup-2, fin, f,78,19879314, ms, , kaurisjgqÄki, wq, meribake,1433,22, tcescent mcttaggar, , 08 58582021,6091643,8, NoRole
+rec-207-dup-3, fin, m, ,19870314, ms, , kaurinÄki, nsa, merible,4139,22, mctaggart crescent, , 02 79453471,6043463,8, NoRole
+rec-207-org,   fin, f,28,19870314, ms, , kaurismÄki, wa, merivale,4133,22, mctaggart crescent, , 08 58582021,6091643,8, NoRole
+rec-208-dup-0, unk, f,3, 19840 12, , nic o l as, aarts, qld, p'lt rie, 320 6,10, magrathcr scent, capehawkehosp tl medcl centre, 613 35624368, 6363| 02,6, NoRole
+rec-208-org,   unk, f,31,19840212, , nicholas, aarts, qld, piturie,3206,106, magrath crescent, cape hawke hosptl medcl centre, 613 35624368,6363102,6, NoRole
+rec-209-dup-0, usa, f,35, , hon, loclan, hin ton,   , kensingt  park,3139,14, marcusclarke street, 5outh e   n cross,705755758,939856,7, NoRole
+rec-209-dup-1, usa, f,3, , hon, lochln, bint n,5, kensin9topark,3139,  l 4, marcus dar e street, southerncross, 07 057 5758, 9398 56,7, NoRole
+rec-209-org,   usa, f,35, , hon, lochlan, hinton, sa, kensington park,3139,14, marcus clarke street, southern cross, 07 05755758,9398656,7, NoRole
+rec-20-org,   ind, m,28, , hon, charlotte, sarma, tas, newnham,2133,55, yates garden, aha house, 617 81069706,4145388,3, NoRole
+rec-210-dup-0, eng, ,26,19890723, , matijon, luzk, fic, instlo,2528,10, buli ztreet, westminster plak, 08 09760646,2032209,6, NoRole
+rec-210-dup-1, eng, ,26,19890723, , madijdtton, lusk, vik, windslow,2528,10, pulee sdtreet, eztminzter place, 08 09760646,2032209,6, NoRole
+rec-210-dup-2, eng, ,26,19890723, , madiyon, luzck, fic, instlo,2528,10, boolee ztreet, estminstea place, 08 09760646,2032209,6, NoRole
+rec-210-dup-3, eng, ,26,19890723, , madijtton, lusdtk, vick, insttlow,2528,10, bulee jtreet, wesdminster plake, 08 09760646,2032209,6, NoRole
+rec-210-org,   eng, ,26,19890723, , madison, lusk, vic, winslow,2528,10, boolee street, westminster place, 08 09760646,2032209,6, NoRole
+rec-211-dup-0, eng, f,10, , ms, jakariah, rrelzon, nstw, roz mill,3108,8, makkfarland crejsent, , 02 82665238,5736895,4, NoRole
+rec-211-dup-1, eng, v,10, , ms, jkarya, arhrelson, nsw, ros mill,3108,8, macfarland crestcent, , 02 82665238,5736895,4, NoRole
+rec-211-dup-2, eng, v,10, , ms, ztaxaryah, rrelston, nsttw, roj mill,3108,8, makfarland crejtsend, , 02 82665238,5736895,4, NoRole
+rec-211-dup-3, eng, v,10, , ms, saxariah, haahreltson, nstw, ros mil,3108,8, makfarland cresend, , 02 82665238,5736895,4, NoRole
+rec-211-org,   eng, f,10, , ms, zachariah, harrelson, nsw, rous mill,3108,8, macfarland crescent, , 02 82665238,5736895,4, NoRole
+rec-212-dup-0, eng, f, 3s,19800822, m , hayd e, 5nyders, nsw, lakei l l  arra,3350,1, learrnon h driue, , O2 39  8917,2871547,7, NoRole
+rec-212-dup-1, eng, f,35,19800822, ms, hayde, snyde r s, nsw, lake il awarra,3350,6, learmonthdrive, , 0z3905  n,287154,7, NoRole
+rec-212-org,   eng, f,35,19800822, ms, hayden, snyders, nsw, lake illawarra,3350,166, learmonth drive, , 02 39058917,2871547,7, NoRole
+rec-213-dup-0, eng, f, ,19491122, , baylen, mccqrtvy, qkd, boralmbil,2700,29, dalyell street, , 612 74840650,9860001,8, NoRole
+rec-213-dup-1, eng, , ,19491122, , bayley, batesown, nsw, coobepedy,4708,2, officerdcrescent, , 612 74804750,9860001,8, NoRole
+rec-213-org,   eng, f, ,19491122, , bayley, bateson, nsw, borambil,2700,26, dalyell street, location 6656, 612 74804750,9860001,8, NoRole
+rec-214-dup-0, unk, , , , mr, , aaron, vic, south kibngsville,3806,5, kempthjsoe, , ,5780788,6, NoRole
+rec-214-dup-1, unk, , ,19880410, mr, adam, aaln, ss, kingvil kesouth,3806, , kemp cilose, , 8 23375663,5780788,6, NoRole
+rec-214-dup-2, unk, ,27,19880417, mr, ars, friedman, vocg, south kingsville,3868,20, kemp lsoe, , 08 05706780,5780788,6, NoRole
+rec-214-org,   unk, ,27,19880417, mr, adam, aaron, vic, south kingsville,3806,20, kemp close, , 8 23375663,5780788,6, NoRole
+rec-215-org,   eng, m,32,19830517, mr, christian, joiner, vic, blampied,2533,7, salomons place, somerset cottage, 618 27743794,2106339,0, NoRole
+rec-216-dup-0, eng, ,24, 1991 1zz2, ns, oliv ia, l:nw ood, s a, marionbay, 2 q , s, heardst eet, , , 780 2300,5, NoRole
+rec-216-dup-1, eng, , z 4, 199 1  22, ms,  o l i  a, linw od, 5a, rnar i   n bay, 214 1,3, heard st eet, , ,7802300,5, NoRole
+rec-216-dup-2, eng, ,24, 19911 222, ms, oli  , linwo , sa, mario nlo ay,214,3, hear 5treet, , ,7802300,5, NoRole
+rec-216-org,   eng, ,24,19911222, ms, olivia, linwood, sa, marion bay,2141,35, heard street, , ,7802300,5, NoRole
+rec-217-dup-0, eng, f,34,19810317, dr, olivia, awking, nsw, haymarhket,2197,7, melba zttreet, , 04 45449979,9597159,9, NoRole
+rec-217-dup-1, eng, f,34,19810317, dr, olifya, kkink, nsw, aymaahked,2197,7, melpa street, , 04 45449979,9597159,9, NoRole
+rec-217-org,   eng, f,34,19810317, dr, olivia, hawking, nsw, haymarket,2197,7, melba street, , 04 45449979,9597159,9, NoRole
+rec-218-dup-0, eng, f,32, 19831o03, dr, j0na, dau5 n, , dek i n, 45 05,3, duruillecrescent, , 02 89788385, 3463 13,2, NoRole
+rec-218-dup-1, eng, f,3, |9831  3, d , jonah, davison, , deakin,4505, 3 5, durvill e  e scent, , 02 89 8   385, 34 3213,2, NoRole
+rec-218-dup-2, eng, f,32,19831003, dr, jona , davi o n, , deakin, 45 0,3, durviJ l e c escent, , 02 897 8385, 346 3 z |3,2, NoRole
+rec-218-org,   eng, f,32,19831003, dr, jonah, davison, , deakin,4505,35, durville crescent, , 02 89788385,3463213,2, NoRole
+rec-219-dup-0, usa, f, ,19800323, , qeor e, pachec0, sa, Iittle  mpton, 5 9 ,1, jaege rc  cuit, , 07 3013   58,1027814,8, NoRole
+rec-219-dup-1, usa, f, ,19800323, , georg, pachec o, 5 a, little   mpton, 5 290, l , jaeger circuit, , 0730B858, 102 814,8, NoRole
+rec-219-org,   usa, f, ,19800323, , george, pacheco, sa, littlehampton,5290,18, jaeger circuit, , 07 30139858,1027814,8, NoRole
+rec-21-dup-0, eng, f,1, , , luc y, rye ly, nsw, culburra  each,2074, 7 0, arahana  t reet, , 02 2l   937,513488,9, NoRole
+rec-21-dup-1, eng, f, l2, , ,  J u, ryl y, ns , culbur r    ach,207,  7 0, arabana s treet, , 02 2 202937, 5134 68,9, NoRole
+rec-21-org,   eng, f,12, , , lucy, ryely, nsw, culburra beach,2074,70, arabana street, , 02 21202937,5134868,9, NoRole
+rec-220-dup-0, unk, f,10,20050316, , ckiran, zckel, stta, pine poind,5085,19, jkott strit, , 617 69620874,8678255,0, NoRole
+rec-220-org,   unk, f,10,20050316, , kieran, sckel, sa, pine point,5085,19, scott street, , 617 69620874,8678255,0, NoRole
+rec-221-dup-0, ger, ,3,19771204, , holl y, w a, q ld, peek a-doo, 421 0, |5 , wattI   treet, , 08 61 11673, 137  24,6, NoRole
+rec-221-org,   ger, ,38,19771204, , holly, waltz, qld, peek-a-doo,4210,154, wattle street, , 08 61911673,1379524,6, NoRole
+rec-222-dup-0, jap, s,27,19880720, , zack, yoshizqsa, , mountsfs,2218,128, bizanth wryeet, sunbu ry, 04 12052774,9012596,4, NoRole
+rec-222-dup-1, jap, f,27,19680116, , zack, masnn, , mounjsa, ,128, bizant dtreet, villa 147, 04 12051774,9012596,4, NoRole
+rec-222-dup-2, jap, f, ,19880720, , zsei, yoshisaea, , musxer,2218,128, bizantsfheet, , 04 43499416,9012596,4, NoRole
+rec-222-org,   jap, f,27,19880720, , zack, yoshizawa, , mount isa,2218,128, bizant street, villa 147, 04 12051774,9012596,4, NoRole
+rec-223-dup-0, usa, m,9,19860512, , pho e h, land ry,5, risd0 n park,3221,137, roJlst on st eet, , 08 63 8 598, 5391 602,8, NoRole
+rec-223-dup-1, usa, m,  z  ,19860512, , pho|oe, land , s a, risd o ark, 322 1,137, rollston street, , 08 63581598, 539 6 2,8, NoRole
+rec-223-dup-2, usa, m,2, 19860 1Z, , phoe b, lan   , sa, risdonark,322, 13 7, rollst o n street, , 08 63581598,531602,8, NoRole
+rec-223-dup-3, usa, m,   ,19860512, , phoeloe, landry, s , risdo p ark,322,3, rollston  treet, , 08 63 8 5q8, 539160 2,8, NoRole
+rec-223-org,   usa, m,29,19860512, , phoebe, landry, sa, risdon park,3221,137, rollston street, , 08 63581598,5391602,8, NoRole
+rec-224-dup-0, usa, f, 3z,19830405, hon, na mi, stricl nd, ns, kangarooyalley,487,  1 0, nishpla ce, ,267462039, 6116 68,3, NoRole
+rec-224-dup-1, usa, f,2, 198 30 05, hon, nao , strick and, n5 w, lcangaro  valley,4870, 1 0, nish p  ce, , 267462 39, 611 6683,3, NoRole
+rec-224-dup-2, usa, f,32, 198304 5, hon, nao mi, strick Jand, nsv v, kangarooalley, 4 87,0, nish  l ace, , 2 674 2039, 61 6683,3, NoRole
+rec-224-dup-3, usa, f,32,19830405, hon, naomi, stnckland, n s , kangaro    alley, 4 8, 1o, n'lsh place, , 2 67462039, 611    3,3, NoRole
+rec-224-org,   usa, f,32,19830405, hon, naomi, strickland, nsw, kangaroo valley,4870,10, nish place, , 2 67462039,6116683,3, NoRole
+rec-225-dup-0, eng, f, ,19490822, , jayden, traoaqy, , cardiff,3618,7, namatjztdrive, , 04 56981676,2951438,0, NoRole
+rec-225-org,   eng, f, ,19490822, , jayden, tracy, , cardiff,3187,5, namatjira drive, , 04 56981676,2957318,0, NoRole
+rec-226-org,   unk, f,17,19980421, mr, carla, streich, nsw, bardwell valley,2205,14, bradley crescent, surfers hawaiian, 02 11030506,1224846,4, NoRole
+rec-227-dup-0, ara, , ,19685004, , jaykob, borgrlt, gic, ,4105,778, bonwick place, , 3 71038093,7732083,9, NoRole
+rec-227-dup-1, ara, , , , , jakuob, inayah, qld, ,4105, , bonwiflxdppace, , 3 71038093,7732803,9, NoRole
+rec-227-dup-2, ara, s, ,19300417, , , , qld, ,4105,41, deacontqolse, , 02 99985432,7174901,9, NoRole
+rec-227-dup-3, ara, f, ,19300417, , jaykob, inysgj, ml, ,4105,1, bonwick place, , 3 71038093,7738296,9, NoRole
+rec-227-org,   ara, f, ,19300417, , jaykob, inayah, qld, ,4105,47, bonwick place, , 3 71038093,7732803,9, NoRole
+rec-228-dup-0, ira, f,30,19851108, ms, pet, vademe, vik, victoria valley,2113,8, kerrigan ztreet, vernbancck, 08 36168017,3983915,7, NoRole
+rec-228-dup-1, ira, f,30,19851108, ms, ped, fademe, vik, fiktoria valey,2113,8, kerrigan jdrid, fernbanck, 08 36168017,3983915,7, NoRole
+rec-228-dup-2, ira, f,30,19851108, ms, ped, fatem, fic, vicdorya valy,2113,8, kerigan sdreet, vernbanck, 08 36168017,3983915,7, NoRole
+rec-228-org,   ira, f,30,19851108, ms, beth, fatemeh, vic, victoria valley,2113,8, kerrigan street, fernbank, 08 36168017,3983915,7, NoRole
+rec-229-dup-0, cze, f,34, 1q8110 5, , i  , r , v  c, ,2148,5, baJ|arat street, , 851 5856, 5836 35,8, NoRole
+rec-229-dup-1, cze, f,3,19811025, , ir e n e, rab, vi c, ,214, S , ballarat   treet, , 8 516 5 56, 5836 935,8, NoRole
+rec-229-dup-2, cze, f,34, 198110 25, , jr n ,  r b, vi c, ,2148,5, ballarat  t reet, , 8 S1 63 856, s8369 5,8, NoRole
+rec-229-dup-3, cze, f,  3 4, 19811 25, , iren, r , vi, , 2 1 8,5, ballarat  treet, , 8 516  856, 583G935,8, NoRole
+rec-229-org,   cze, f,34,19811025, , irene, rab, vic, ,2148,53, ballarat street, , 8 51635856,5836935,8, NoRole
+rec-22-dup-0, por, f,9,20061015, , cail in, cov  o, nsw, denha m c ourt,61,4, canberra a enue, , 0z 205  295, 935 0554,0, NoRole
+rec-22-dup-1, por, f,9, 2o0 1015, , cait|   ,  c o t, ns  , denba court,6103, q , canberra avenue, , 022052 295, 9350 54,0, NoRole
+rec-22-dup-2, por, f,9, 200610 5, , cai   in, c o  o, n s, denharn   urt, 61 0 3, g , canberr  avenue, , 0220s27295,9350554,0, NoRole
+rec-22-dup-3, por, f,4, z0061 15, , cai l in, cou  , n w, denham  ourt, 610 3,4, canberraa enue, , 02 20527295, q35 0 54,0, NoRole
+rec-22-org,   por, f,9,20061015, , caitlin, couto, nsw, denham court,6103,43, canberra avenue, , 02 20527295,9350554,0, NoRole
+rec-230-dup-0, chi, m, 2 2, 1990 8 05, , danie l e, o q, sa, par una,2285, 2 1, portjacks   circuit, moo    se, 7 6347 6595,2346032,4, NoRole
+rec-230-dup-1, chi, m,22,19930805, , danielle, o n  , sa, paruna,285,2, portjacko n c:rcuit, moor  u5e, 7 63476595, 236O32,4, NoRole
+rec-230-dup-2, chi, m,22,19930805, , dani l e, on , s , parv , 22 8 5, z  , port jacks  n circuit, m0orho us e, 7 63476595,2346032,4, NoRole
+rec-230-org,   chi, m,22,19930805, , danielle, ong, sa, paruna,2285,21, port jackson circuit, moorhouse, 7 63476595,2346032,4, NoRole
+rec-231-dup-0, unk, , ,19530914, dr, ooiav, samios, , maidenfjlly,2043,25, muellersucstreet, , 02 42899948,8026864,7, NoRole
+rec-231-dup-1, unk, v, ,19539014, dr, olivia, , , maidenguxilly,2303,21, mueller sreet, , ,8022949,7, NoRole
+rec-231-dup-2, unk, f, ,19530914, dr, olivia, strapp, , maidenguy,244,4, yaldwynplace, , 02 42899948,8066246,7, NoRole
+rec-231-org,   unk, f, ,19530914, dr, olivia, strapp, , maiden gully,2043,25, mueller street, , 02 42899948,8026964,7, NoRole
+rec-232-dup-0, eng, f,33,19780822, , lucb, tracy, nsw, uki,832,19, archibald street, , 02 27149796,2391359,7, NoRole
+rec-232-dup-1, eng, f,10,19797822, , lude, tracy, nsw, uki,832,12, o'hallorajmeircuit, erina gaardns, 2 38565076,2391140,7, NoRole
+rec-232-dup-2, eng, f,25,19780822, , lucille, tracy, , uo,382,12, , , 2 38565076,2391140,7, NoRole
+rec-232-org,   eng, f,37,19780822, , lucy, tracy, nsw, uki,832,12, o'halloran circuit, skilbister, 2 38565076,2391140,7, NoRole
+rec-233-dup-0, usa, f,4, 1g73 82 , , joshva, va l   z, vjc, st kilda ro d central,4157,4, morro   t eet, , 8197 3462,6845227,8, NoRole
+rec-233-dup-1, usa, f,42,19730827, , josb a, vaJd  z, vic, stkilda roa  central,41,4, morros  eet, , 8 19733462, 68452 7,8, NoRole
+rec-233-org,   usa, f,42,19730827, , joshua, valdez, vic, st kilda road central,4157,4, morrow street, , 8 19733462,6845227,8, NoRole
+rec-234-dup-0, unk, f, 3 3, 19821 7, , ja   z, stran way, ta , mori   ty,3810,3, preddeyvvay, loxleyhse  dcl centre, 617 8325 915,6668949,7, NoRole
+rec-234-org,   unk, f,33,19821107, , jazz, strangway, tas, moriarty,3810,32, preddey way, loxley hse mdcl centre, 617 83259915,6668949,7, NoRole
+rec-235-dup-0, ind, ,9, 20060 29, , fai   h, ma u r, ns , ulladulla,380,1, o'loghl e n street, , 2595 60611, 530q2 3,0, NoRole
+rec-235-dup-1, ind, ,9, 200  1 29, , fa ith, ma vvr, nsw, ulla dulla,380,  1 9, ologhlenstreet, , 2595 0611,534273,0, NoRole
+rec-235-dup-2, ind, ,9, 200 0  29, , fa  lth, mayur, n sw, ulladu lla, 3 &,19, o'|oghlen street, , 2 59560 611, 53042 3,0, NoRole
+rec-235-dup-3, ind, ,9, 20061 29, , fait , mavu r, ns , ullad l la, 3 8, | , o'loghlen street, , 2 59 5 0 1 1, 530 2 73,0, NoRole
+rec-235-org,   ind, ,9,20060129, , faith, mayur, nsw, ulladulla,3805,19, o'loghlen street, , 2 59560611,5304273,0, NoRole
+rec-236-dup-0, eng, v,24,19910601, , emiili, hahmanson, , eakleawk,3084,77, aaht close, vairfilt aters, 02 10670214,3452803,7, NoRole
+rec-236-org,   eng, f,24,19910601, , emiily, hermanson, , eaglehawk,3084,77, hart close, fairfield waters, 02 10670214,3452803,7, NoRole
+rec-237-org,   unk, f,25,19900330, , eleni, sclafani, vic, ringwood,3085,102, pickworth street, , 618 02733696,7124767,7, NoRole
+rec-238-dup-0, usa, f,2, , pfc, ja'ldn, townse d, nsw, tasc tt, Z 06, |, barden   ace, st fra nc   vlge, 02 53914060, 5313 892,4, NoRole
+rec-238-org,   usa, f,25, , pfc, jaiden, townsend, nsw, tascott,2068,1, barden place, st francis vlge, 02 53914060,5313892,4, NoRole
+rec-239-org,   fin, f,12,20030517, ms, jasmyn, pulkkinen, wa, bellevue,3194,29, mcbride place, , 07 34864606,7581176,4, NoRole
+rec-23-dup-0, unk, f, ,19961204, , cathevine, aaternir, nsw, ay bonneqt,2726,15, , , 02 46012742,9254492,9, NoRole
+rec-23-dup-1, unk, m,19,19961204, , katk, aaternir, , bonnet bay,6727, , , , 02 46012742,2557277,9, NoRole
+rec-23-dup-2, unk, d,19,19916604, , catheodne, milex, nsw, bonnet bay,2305,2, , , 02 46101842,9245402,9, NoRole
+rec-23-org,   unk, f,19,19961204, , catherine, aaternir, nsw, bonnet bay,2760,2, , , 02 46012742,9245402,9, NoRole
+rec-240-org,   usa, ,32,19830212, , timothy, rodriguez, nsw, south albury,4737,51, foxall street, , 02 43097549,8599583,3, NoRole
+rec-241-dup-0, ger, , , 19411 15, , bran  n, b e, , wi l t on, 26 12, 3g, buvelo  street, , 0824 897214, 5617 05,2, NoRole
+rec-241-dup-1, ger, , , 19 411 115, , br an on, he  , , wilso , z612, 3 9, buvelotstreet, ,824897214, 5617 05,2, NoRole
+rec-241-dup-2, ger, , , 194 11 115, , br n d n, h e l, , wil on, 2 1 2,34, buvelo t s t reet, , 08 24897214,5617805,2, NoRole
+rec-241-org,   ger, , ,19411115, , brandon, heil, , wilston,2612,349, buvelot street, , 08 24897214,5617805,2, NoRole
+rec-242-dup-0, ara, v,30,19850824, , ekjani, cckuayla, ntsw, alfoads point,2549,32, tackgerty strit, , 02 07342670,7216666,3, NoRole
+rec-242-dup-1, ara, f,30,19850824, , stany, kuayla, nsw, alfoahdz poind,2549,32, tagjyrty jtrit, , 02 07342670,7216666,3, NoRole
+rec-242-org,   ara, f,30,19850824, , xani, khuwaylah, nsw, alfords point,2549,32, taggerty street, , 02 07342670,7216666,3, NoRole
+rec-243-org,   unk, f,45, , ms, finn, strapp, nsw, cobbitty,4209,138, badgery street, , 02 86652263,9171680,7, NoRole
+rec-244-dup-0, usa, f, ,19950409, , rojda, puahris, sta, don,4068, , elimada street, silverland roadose, 07 25489042,4095265,0, NoRole
+rec-244-dup-1, usa, f, ,19950409, , roia, puahrij, sta, houghdon,4068, , elimatta ztrit, silferland roadhouse, 07 25489042,4095265,0, NoRole
+rec-244-dup-2, usa, f, ,19950409, , rosta, puahrij, sa, hukkton,4068, , elimata jdreet, silverland roadouse, 07 25489042,4095265,0, NoRole
+rec-244-org,   usa, f, ,19950409, , rosa, burris, sa, houghton,4068, , elimatta street, silverland roadhouse, 07 25489042,4095265,0, NoRole
+rec-245-dup-0, jew, ,24,19731066, , korz, mazwr, vic, scarb roigh,3148,28, street skinner, mount tongbong, 618 75177823,5398384,7, NoRole
+rec-245-dup-1, jew, ,27, , , amelia, mazk, vir, scarborough,3148,219, skinnretfeet, , 618 75177823,5398384,7, NoRole
+rec-245-dup-2, jew, ,24,19910609, , madelyn, mazwr, vib, scarblrdough,9311,219, skinnetwhreet, , 03 61337204,5398384,7, NoRole
+rec-245-dup-3, jew, ,24,19170118, , madelyn, mazar, viq, scarb orough,4740,271, skinner street, , 04 94570850,5398384,7, NoRole
+rec-245-org,   jew, ,24,19910609, , madelyn, mazar, vic, scarborough,3148,219, skinner street, mount tongbong, 618 75177823,5398384,7, NoRole
+rec-246-dup-0, , f,30,19853013, mr, emiily, mariager, nsw, tyapum,4409, , halfonicent, , 2 39806180,8016964,6, NoRole
+rec-246-dup-1, , e,26,19850903, mr, emiily, , nsw, tya slgum,3079,12, halford crescent, , 2 39866180,8012964,6, NoRole
+rec-246-dup-2, , f,30,19859003, mr, emiily, marizhrr, ns, tyalgum,3040,29, halford fctescent, , 08 72120956,9185028,6, NoRole
+rec-246-dup-3, , f,29,19850903, mr, emiioy, mariager, nsw, tyalgum,3004,2, monaro crescent, , 2 39806180,8016964,6, NoRole
+rec-246-org,   , f,30,19850903, mr, emiily, mariager, nsw, tyalgum,3040,12, halford crescent, , 2 39806180,8016964,6, NoRole
+rec-247-dup-0, eng, f,2, 19860 01, ms, jami, |usk, vic, hanpt n ark, 317 2, | , bayin  t eet, , 08191 2312, 386 482,1, NoRole
+rec-247-org,   eng, f,29,19860501, ms, jamie, lusk, vic, hampton park,3172,134, bavin street, , 08 19142312,3867482,1, NoRole
+rec-248-dup-0, jap, f,21,19940220, , rour e, toyo   ima, ql , carindle,355,9, hedland  rcuit, kubin    lage, 03 06371916,2857188,8, NoRole
+rec-248-dup-1, jap, f,21, 199 40 20, , roure, toyos ima, 4   d, carin daIe,355,9, hedland ircuit, kubinvi lage, 03 06 371916, 2857 88,8, NoRole
+rec-248-dup-2, jap, f,2, 19940 220, , rou ke, tovos ima, qld, cari na|e, 355 6, g, hed1and c ircuit, kubin   l lage,306371916, 28571 8,8, NoRole
+rec-248-org,   jap, f,21,19940220, , rourke, toyoshima, qld, carindale,3556,9, hedland circuit, kubin village, 03 06371916,2857188,8, NoRole
+rec-249-dup-0, afg, v, ,19180421, , joua, oraai, kld, rostewut,4740,86, mimoza kloze, , 3 64865236,1288894,2, NoRole
+rec-249-dup-1, afg, f, ,19180421, , joecstdttua, oraktztai, qld, rojewud,4740,86, mimosa klos, , 3 64865236,1288894,2, NoRole
+rec-249-org,   afg, f, ,19180421, , joshua, orakzai, qld, rosewood,4740,86, mimosa close, , 3 64865236,1288894,2, NoRole
+rec-24-dup-0, dan, v, ,19660925, ms, mad, bahanthorzt, qld, pelifa,3106,9, dgson cresent, yello dam, 03 48794159,3818799,0, NoRole
+rec-24-dup-1, dan, f, ,19660925, ms, mat, bahanthorst, qld, peliva,3106,9, odgson crescent, yelo dam, 03 48794159,3818799,0, NoRole
+rec-24-org,   dan, f, ,19660925, ms, matthew, brandhorst, qld, belivah,3106,9, hodgson crescent, yellow dam, 03 48794159,3818799,0, NoRole
+rec-250-dup-0, eng, ,29, , ms, step h  ie, martin on, ac t, australian nationa l university,4215,27, kambalda rescent, , 612 84 83 868, 30   6 3,6, NoRole
+rec-250-dup-1, eng, ,29, , ms, stephnie, martison, ac , austra1ian natio al university,  4  5,2, kambald acr scent, , 612 8  830868,3081653,6, NoRole
+rec-250-dup-2, eng, ,2, , ms, ste p a ie, martinson, act, australian national university, 42 1,2, kanbald a c escent, , 612 84  0868, 3081 653,6, NoRole
+rec-250-dup-3, eng, , 2 9, , ms, stephnie, martin  on, ac t, australian nat i n al university,4215,27, kambal d  c   escent, , 612 8483 868, 3081 6 53,6, NoRole
+rec-250-org,   eng, ,29, , ms, stephanie, martinson, act, australian national university,4215,27, kambalda crescent, , 612 84830868,3081653,6, NoRole
+rec-251-dup-0, unk, f,40, , , bronte, scogin, nsw, urana,6076,2, freda benwwrc ircuit, , ,8695874,6, NoRole
+rec-251-dup-1, unk, f,40,19750116, , broen, sogi, nsw, rwns,2036,11, freda benneyt circuit, , 612 77789562,8695874,6, NoRole
+rec-251-org,   unk, f,40,19750116, , bronte, scogin, nsw, urana,6076,35, freda bennett circuit, , 612 77879562,8695874,6, NoRole
+rec-252-dup-0, eng, ,25,19900923, ms, danell, angus, sd, bolivar,2502,1, fredabenneyet circuit, , 04 84094832,4780036,6, NoRole
+rec-252-org,   eng, ,25,19900923, ms, angus, danell, sa, bolivar,2502,18, freda bennett circuit, , 7 55433411,4780036,6, NoRole
+rec-253-dup-0, usa, f,11,20040227, , edart, roperdzt, a, east auckujta,4416,50, pinkeahton kircuit, , 08 80644664,1741208,8, NoRole
+rec-253-dup-1, usa, f,11,20040227, , edard, ropeahtjt, wa, easd aukuztta,4416,50, pingeahton cirkuit, , 08 80644664,1741208,8, NoRole
+rec-253-dup-2, usa, v,11,20040227, , etarht, roberts, a, eajt auckusta,4416,50, pingeahdon ckircuit, , 08 80644664,1741208,8, NoRole
+rec-253-dup-3, usa, f,11,20040227, , edaad, ropeahtstt, wa, eazd aukuzta,4416,50, pingeahdon ciahcuit, , 08 80644664,1741208,8, NoRole
+rec-253-org,   usa, f,11,20040227, , edward, roberts, wa, east augusta,4416,50, pinkerton circuit, , 08 80644664,1741208,8, NoRole
+rec-254-org,   usa, f, ,19110603, , amy, harrington, nsw, lurnea,3166,18, newland street, aminya vlge, 2 79433281,7815582,5, NoRole
+rec-255-dup-0, eng, f, , 194507 1, m , e l , mi lbvrn, qld, k'l cora,4012,1, were s   reet, ma  e, 3 57327585,2338507,5, NoRole
+rec-255-dup-1, eng, f, ,19450711, ms, ell , milburn,  q l, kin  ra,4, l 1, were  treet, mac ee, 3 5732 585, 23380 7,5, NoRole
+rec-255-dup-2, eng, f, ,1945011, ms,  Jl a, milburn, ql , kinc ra, 40 l 2,1, were s treet, mac l  e, 3 573 27585, 233  0 ,5, NoRole
+rec-255-dup-3, eng, f, , 194507 11, ms, e l , mil r n, qld, kincora, 401 2,11, were street, made, 3 57327585, 2338 07,5, NoRole
+rec-255-org,   eng, f, ,19450711, ms, ella, milburn, qld, kincora,4012,119, were street, maclee, 3 57327585,2338507,5, NoRole
+rec-256-dup-0, unk, f, ,19901022, , shelny, stranter, viv, wllpa,4114,8, wollaston place, , 618 80024729,2271859,0, NoRole
+rec-256-org,   unk, f,25,19901022, , shelby, stranger, vic, walpa,4114,7, wollaston place, , 618 80024729,2046195,0, NoRole
+rec-257-dup-0, unk, , ,19412119, , jarvis, morrixon, vic, detleh,6100,2, dreverma myqt street, , ,1547359,9, NoRole
+rec-257-dup-1, unk, , , , , jarvis, matthfwks, vic, delqyp,6100,13, aspinall street, , ,1547351,9, NoRole
+rec-257-org,   unk, , ,19411228, , jarvis, scolastique, vic, delahey,6100,23, drevermann street, , ,1547359,9, NoRole
+rec-258-org,   eng, f,29,19860627, pfc, jessica, nathanson, vic, collins street east,2257,81, mofflin street, palestine, 618 96124274,4047821,9, NoRole
+rec-259-dup-0, usa, g, ,19931203, , kf, quillkam, , blair sthol,4118,6, dowthwaite street, , 618 26155015,1466638,0, NoRole
+rec-259-org,   usa, f, ,19931203, , kai, mckay, vic, blair athol,3165,8, dowthwaite street, australia fair medical west centre, 618 26155015,7586905,0, NoRole
+rec-25-org,   ger, f,35,19800323, , riley, klaeber, nsw, quandialla,3976,1, marungal avenue, aremar, 612 36337574,7125000,4, NoRole
+rec-260-dup-0, unk, f,63,19811202, , , aaron, , foralse,2161,488, srquarevmagenta, , ,2017400,2, NoRole
+rec-260-org,   unk, f,34,19811202, , , aaron, , forbes,2161,84, burn street, , ,2017400,2, NoRole
+rec-261-dup-0, usa, ,11,20040408, , madtson, solis, q, lockear,4287,52, macrossanx criescent, wytaliba, 04 13313672,2836914,5, NoRole
+rec-261-dup-1, usa, ,11,20040408, , madison, somis, wa, ,2466,261, macrossann jfsrzscent, , 8 34771795,2836081,5, NoRole
+rec-261-org,   usa, ,11,20040408, , madison, solis, wa, lockyer,4287,16, macrossan crescent, wytaliba, 8 34771795,2836014,5, NoRole
+rec-262-dup-0, eng, a,26,19890104, dr, lachian, ryely, wz, hoddyc well,4280,8, numbat xolace, , 08 23287050,1209033,1, NoRole
+rec-262-org,   eng, f,26,19890104, dr, lachlan, ryely, wa, hoddys well,4000,38, numbat place, , 08 23287050,1209083,1, NoRole
+rec-263-dup-0, ger, f,   , , , , hunsbe rger, n  , acaciag a den5, 73| ,9, newman mor rj  circuit, ,267983983, 86 0 49,6, NoRole
+rec-263-dup-1, ger, f,26, , , , hun5e  ger, nsw, acaciag a dens, 73 0,9, newmanmor ris circuit, , 26798 983, 8660 5 49,6, NoRole
+rec-263-dup-2, ger, f,2, , , , hunserger, nsw, acacia   dens,731,99, newmanmor iscircuit, , 2 67 98   83, 866 o549,6, NoRole
+rec-263-org,   ger, f,26, , , , hunsberger, nsw, acacia gardens,7310,99, newman morris circuit, , 2 67983983,8660549,6, NoRole
+rec-264-dup-0, cze, v,28,19870420, hon, emiili, jankjo, fic, bell posdt ill,4521,65, turnbull place, denny donz, 618 95679605,3367005,3, NoRole
+rec-264-dup-1, cze, v,28,19870420, hon, emiily, jancso, vic, bell postt hill,4521,65, durnpull plak, deny donstt, 618 95679605,3367005,3, NoRole
+rec-264-dup-2, cze, f,28,19870420, hon, emiili, janksto, vic, bell posd ill,4521,65, tuanpul place, deny downjd, 618 95679605,3367005,3, NoRole
+rec-264-org,   cze, f,28,19870420, hon, emiily, jancso, vic, bell post hill,4521,65, turnbull place, denny downs, 618 95679605,3367005,3, NoRole
+rec-265-dup-0, , f, , 197 60821, ms, e t a n, neq ri, s , linden p ark, 302 2,2, f0xaIl  treet, ,419429324,1610006,6, NoRole
+rec-265-org,   , f, ,19760821, ms, ethan, negri, sa, linden park,3022,21, foxall street, , 04 19429324,1610006,6, NoRole
+rec-266-org,   ser, f,20,19950503, ms, isabella, anicic, vic, hotham hill,3483,14, barr place, kendle green, 8 47717846,3870993,7, NoRole
+rec-267-dup-0, fin, ,29,19861108, , alana, piipy, vic, ilow ckrov,4034,33, coxen dstreet, , 08 98566663,9529164,0, NoRole
+rec-267-dup-1, fin, ,29,19861108, , alana, piipi, vic, ilow krof,4034,33, ckoektsen strit, , 08 98566663,9529164,0, NoRole
+rec-267-dup-2, fin, ,29,19861108, , alana, piipi, vik, wilow krov,4034,33, coxen jtreet, , 08 98566663,9529164,0, NoRole
+rec-267-org,   fin, ,29,19861108, , alannah, piipi, vic, willow grove,4034,33, coxen street, , 08 98566663,9529164,0, NoRole
+rec-268-dup-0, chi, d,24, , , kai, buzo, nsw, syedpham,6155,2, marlocl wbreet, , 2 44844570,1344365,8, NoRole
+rec-268-dup-1, chi, f,24, , , alexadbra, buo, nsw, sydenham,6155, , marlokuiijreet, , 2 44844570,1344365,8, NoRole
+rec-268-org,   chi, f,24, , , catherine, buo, nsw, sydenham,6155,1, marlock street, karlea, 2 44844570,1344365,8, NoRole
+rec-269-org,   eng, f,28,19871111, , crystal, , vic, caramut,3113,9, dookie street, wirraway, 618 66622346,9889361,5, NoRole
+rec-26-dup-0, eng, f,38,19771007, ms, kaidlin, nood, sa, oen,3498,1, puekston strit, ckaalindi, 617 96157883,6689402,0, NoRole
+rec-26-dup-1, eng, f,38,19771007, ms, ckaitlin, noawut, stta, oen,3498,1, puton street, kkarlinty, 617 96157883,6689402,0, NoRole
+rec-26-dup-2, eng, f,38,19771007, ms, cckaidlin, noaut, sa, oen,3498,1, buecsdon sdrid, kkarlindi, 617 96157883,6689402,0, NoRole
+rec-26-org,   eng, f,38,19771007, ms, kaitlin, norwood, sa, owen,3498,1, buxton street, karlindi, 617 96157883,6689402,0, NoRole
+rec-270-dup-0, usa, v,37, , mr, sovi, pakheco, nzw, cckrukel,4507,277, atell plak, pinelea, 02 01363876,9606957,8, NoRole
+rec-270-dup-1, usa, f,37, , mr, zofy, pasteco, nsw, kkrookel,4507,277, addel plase, pinelea, 02 01363876,9606957,8, NoRole
+rec-270-dup-2, usa, f,37, , mr, zofy, pakeko, nstw, cruckwell,4507,277, atdell plas, pinelea, 02 01363876,9606957,8, NoRole
+rec-270-org,   usa, f,37, , mr, sophie, pacheco, nsw, crookwell,4507,277, waddell place, pinelea, 02 01363876,9606957,8, NoRole
+rec-271-dup-0, usa, f, 3 4, , , isaia, ferguson, s , northw rd, 3 | 0, |, fawkner treet, kittifo d,61779031005, 4276 8 26,3, NoRole
+rec-271-dup-1, usa, f,3, , , isaiah, feru n,5, nortbard,319,1, fawkner street, kittisfo rd, 617 79o3 00s,4276826,3, NoRole
+rec-271-dup-2, usa, f,3, , , isa   h, ferg u on, sa, nort h ward,319,1, fawkn r street, kitt isord, 617 790  1005, 427 6  26,3, NoRole
+rec-271-org,   usa, f,34, , , isaiah, ferguson, sa, north ward,3190,16, fawkner street, kittisford, 617 79031005,4276826,3, NoRole
+rec-272-dup-0, ara, f,35,19801208, hon, kckiera, asttan, nsw, kkonaahhgo,6210,20, kith jtreet, , 04 04157071,1362031,8, NoRole
+rec-272-org,   ara, f,35,19801208, hon, kierra, hasan, nsw, conargo,6210,20, keith street, , 04 04157071,1362031,8, NoRole
+rec-273-dup-0, ina, f,3, 19850 21, , jes  ca, wija a, w , fra k  ton,4074,1, jindabyn  treet, , 887 21 759, 709q126,3, NoRole
+rec-273-dup-1, ina, f,3, 198  321, , jesica, wjja a, wa, fra kst0n,4074,15, jindaby n e s treet, ,88721759, 7094 16,3, NoRole
+rec-273-dup-2, ina, f,30,19850321, , je s i a, wij  a, w, frankston,407, l , jindabyn  5 treet, , 887219 759, 709412G,3, NoRole
+rec-273-dup-3, ina, f, 3o, 1g8503 1, , je s s i a, wijaya, w, frankston,407,1, jindabnestreet, , 8872 9759, 7094 26,3, NoRole
+rec-273-org,   ina, f,30,19850321, , jessica, wijaya, wa, frankston,4074,15, jindabyne street, , 8 87219759,7094126,3, NoRole
+rec-274-dup-0, eng, f,33,19820802, dr, emiiay, milford, sa, parilla,2472,10, nullaginesreet, , 7 28965528,9469962,5, NoRole
+rec-274-dup-1, eng, ,33,19820802, dr, , milford, , parilkpa,2472,195, heagney cegscent, , 7 28935558,9464726,5, NoRole
+rec-274-org,   eng, f,33,19820802, dr, emiily, milford, sa, parilla,2472,10, heagney crescent, , 7 28935558,9464726,5, NoRole
+rec-275-dup-0, chi, f,3,19810718, , kad , , w , karran a dgin, 23 24,3, bell s t  eet, brentwood  illage, 8 36240936, Z5  10,6, NoRole
+rec-275-dup-1, chi, f,3, 1981 7 18, , kad , , w, karra  dgin,232,3, bells   eet, brentwoodv illage, 8 3624  36, 2547 10,6, NoRole
+rec-275-org,   chi, f,34,19810718, , kade, , wa, karranadgin,2324,3, bell street, brentwood village, 8 36240936,2547110,6, NoRole
+rec-276-dup-0, usa, f,33,19820212, , anapel, monro, a, molerin,6006,3, wideman sttreet, , 618 91945613,8824384,6, NoRole
+rec-276-dup-1, usa, f,33,19820212, , anapel, monro, a, molerin,6006,3, hiteman jttreet, , 618 91945613,8824384,6, NoRole
+rec-276-org,   usa, f,33,19820212, , annabel, monroe, wa, mollerin,6006,3, whiteman street, , 618 91945613,8824384,6, NoRole
+rec-277-dup-0, ger, f,24,19910704, ms, erin, wimmeahs, ntsw, parhmedman,2620,10, purnie street, jdoutern woot, 2 21783161,8478312,2, NoRole
+rec-277-org,   ger, f,24,19910704, ms, erin, wimmers, nsw, barmedman,2620,10, burnie street, southern wood, 2 21783161,8478312,2, NoRole
+rec-278-dup-0, usa, f, ,19890528, , wilson, mcxot, vic, w tree,2047,1, , banora, 618 46635073,4239474,9, NoRole
+rec-278-dup-1, usa, f,28,19890528, , wilson, mccoy, vic, w k,2602,2, howchin place, , 618 46535073,4245974,9, NoRole
+rec-278-org,   usa, f,26,19890528, , wilson, mccoy, vic, w tree,2047,27, howchin place, banora, 618 46535073,4249574,9, NoRole
+rec-279-dup-0, chi, m, ,19670625, hon, pryana, ingk, sa, ckudood,3185,81, duffy street, , 7 43766314,8994452,6, NoRole
+rec-279-dup-1, chi, m, ,19670625, hon, pryana, ing, sa, gudut,3185,81, tuvvy street, , 7 43766314,8994452,6, NoRole
+rec-279-dup-2, chi, m, ,19670625, hon, priana, inkk, sa, kutood,3185,81, dufy stdreet, , 7 43766314,8994452,6, NoRole
+rec-279-dup-3, chi, m, ,19670625, hon, pryana, winck, sa, kckutood,3185,81, tuvvy sttreet, , 7 43766314,8994452,6, NoRole
+rec-279-org,   chi, m, ,19670625, hon, brianna, wing, sa, goodwood,3185,81, duffy street, , 7 43766314,8994452,6, NoRole
+rec-27-dup-0, usa, f, , , ms, emiliy, scgdt, qld, dalecgt,6163,4, vonguerarbd crescent, , ,1477479,0, NoRole
+rec-27-dup-1, usa, f,25,19900427, , emiigam, schmidt, qld, dalbeg,6163,4, von guerard crescent, , 03 73285172,4504893,0, NoRole
+rec-27-dup-2, usa, ,25,19900427, ms, hary, schmit, qlh, beaumnot,3532,98, von guerard crescent, , 03 73895172,1477479,0, NoRole
+rec-27-org,   usa, f,25,19900427, ms, emiily, schmidt, qld, dalbeg,6163,4, von guerard crescent, , 03 73895172,1477479,0, NoRole
+rec-280-dup-0, unk, f, ,19460512, , tanil, araki, a, gori,2750,31, neiljon sdreet, rosehill, 08 52240162,3293079,2, NoRole
+rec-280-dup-1, unk, v, ,19460512, , danil, aarjy, wa, ckory,2750,31, neilson street, royill, 08 52240162,3293079,2, NoRole
+rec-280-org,   unk, f, ,19460512, , danielle, aarcy, wa, gowrie,2750,31, neilson street, rosehill, 08 52240162,3293079,2, NoRole
+rec-281-dup-0, usa, m,2, 199 36 2, , , th0rnton, vi c, yarra   n tion,5081,  1 6, neales s t reet, frankieffr ey hostel,61888667205, 9409 25 3,3, NoRole
+rec-281-dup-1, usa, m,22,19930612, , , tbornto n, vic, yarraj   c tion,508,1, neales   reet, frankjeff  y hostel, 6188 6 7 205, 9409 53,3, NoRole
+rec-281-dup-2, usa, r  ,2,19930612, , , thorn on, vi c, yarrajun tion,508,1, neales s treet, frank jeffr  y hostel, 6188866 7205, 940 2 53,3, NoRole
+rec-281-dup-3, usa, m, 2 2, 199306 2, , , thornton, vc, yarra jvn ction,508,1, neales   reet, frank jeffr ey hostel, 618 886 6 7 2O5, 940 92 53,3, NoRole
+rec-281-org,   usa, m,22,19930612, , , thornton, vic, yarra junction,5081,16, neales street, frank jeffrey hostel, 618 88667205,9409253,3, NoRole
+rec-282-dup-0, usa, ,25,19909045, ms, henr, galwoway, nsw, kenth urt,4562,155, foxplace, , 02 61069288,6187551,3, NoRole
+rec-282-dup-1, usa, d,25,19900405, ms, henf, , , kenthrsbt,4256,53, archdall street, , 02 79444964,6188261,3, NoRole
+rec-282-dup-2, usa, f,28,19904095, ms, henry, , nzs, kenthurst,4562,1555, wtreet archdall, wiangaree, ,6187551,3, NoRole
+rec-282-org,   usa, f,25,19900405, ms, henry, galloway, nsw, kenthurst,4562,155, archdall street, wiangaree, 02 79444964,6187551,3, NoRole
+rec-283-dup-0, usa, f,9,20060916, ms, loren, , vick, apolo pai,4350,12, broadztmith jtreet, myri, 8 79948771,1720538,3, NoRole
+rec-283-org,   usa, f,9,20060916, ms, lauren, , vic, apollo bay,4350,12, broadsmith street, myrrhee, 8 79948771,1720538,3, NoRole
+rec-284-org,   eng, f, ,19470408, , lara, andrewson, nsw, keilor lodge,2153,26, mountain circuit, , 02 07057678,4888471,4, NoRole
+rec-285-org,   eng, f,29,19860721, , scott, cookson, qld, bungunya,2500,7, hinchcliffe place, , 03 75891274,8442626,6, NoRole
+rec-286-dup-0, usa, ,30, 1985 819, pfc, taliah, stephe  s, q1, kullg um,349,1, williamhuds  n crescent, , 613 44618 97, 9642 492,0, NoRole
+rec-286-dup-1, usa, ,0,1985089, pfc, tal  ah, step hn , qld, kull gum, 349 1,   , william h ds n crescent, ,61344618497,9642492,0, NoRole
+rec-286-org,   usa, ,30,19850819, pfc, taliah, stephens, qld, kullogum,3491,11, william hudson crescent, , 613 44618497,9642492,0, NoRole
+rec-287-dup-0, ind, ,9, 20060 814, , aa o, mur ty, v  , , 2q 6,1, disney court, , 0& 8 | 4 081, 7775 51,5, NoRole
+rec-287-org,   ind, ,9,20060814, , aaron, murty, vic, ,2486,1, disney court, , 08 81240081,7775751,5, NoRole
+rec-288-dup-0, usa, f, , , , keelei, nickhos, , cunnamulla,550,168, mcglinn pnace, , 02 97850327,7993938,3, NoRole
+rec-288-dup-1, usa, f,29, , , keeley, nichols, , cunnamlla,5014, , mcglinn place, , 04 12062882,2962593,3, NoRole
+rec-288-org,   usa, f,29, , , keeley, nichols, , cunnamulla,5014,35, mcglinn place, towrie cottage, 04 12062882,7993938,3, NoRole
+rec-289-dup-0, eng, ,21,19880525, , patrifk, , qld, keilort east,2772,46, walga place, , 3 39164929,5480061,2, NoRole
+rec-289-dup-1, eng, m,27,19419129, , x, samuels, qld, nankin,4873,25, walga place, , 02 31846282,5732679,2, NoRole
+rec-289-org,   eng, m,27,19880525, , patrick, samuels, qld, nankin,4870,25, walga place, , 3 39164929,5480061,2, NoRole
+rec-28-dup-0, ger, , , 1932  19, , jordan, be   , ql, 9oodg  ,5098, |7, tyther|eig hstreet, ,258630221,164831,8, NoRole
+rec-28-org,   ger, , ,19320719, , jordan, beer, qld, goodger,5098,177, tytherleigh street, , 02 58630221,1648314,8, NoRole
+rec-290-org,   usa, ,32,19831122, ms, michael, thompson, nsw, yetman,4163,12, beirne street, wallaces ck, 612 55233743,5310911,6, NoRole
+rec-291-dup-0, ina, f,25, 19900 06, , a|a  , kurn   wan, ql , steiglitz,3071,9, slessorc escent, bidgeepark, 6137 029725, 3 G72 01,4, NoRole
+rec-291-org,   ina, f,25,19900906, , alana, kurniawan, qld, steiglitz,3071,9, slessor crescent, bidgee park, 613 78029725,3672401,4, NoRole
+rec-292-dup-0, eng, f,26, 1989 0826, , vic ori, ry  , , ,256, 2 q, macpherso  street, sec   , 072g900966, 349O3 90,3, NoRole
+rec-292-dup-1, eng, f,2, 1 8908 6, , yict  r ia, ry1 ey, , , 25 5,9, macpherso n street, secG4, 07 29 00966,349090,3, NoRole
+rec-292-dup-2, eng, f,2, 19890 26, , v:ctoria, rv1 ey, , ,25,2, macpheron s reet, se  4, 07 2 9 0 966, 349 390,3, NoRole
+rec-292-org,   eng, f,26,19890826, , victoria, ryley, , ,2565,29, macpherson street, sec 64, 07 29900966,3490390,3, NoRole
+rec-293-dup-0, usa, f,2,19950920, ms, josh v a, re , vi c, nortonsummit, 219 9, z, gawler c  scent, , 08 08528 48, 21 4 692,5, NoRole
+rec-293-org,   usa, f,20,19950920, ms, joshua, reid, vic, norton summit,2199,24, gawler crescent, , 08 08528748,2144692,5, NoRole
+rec-294-dup-0, ind, r , , 193210 14, , tro, vinee t, v i c, clu s,203,3, yurani     court, , 8 47815733,790305,7, NoRole
+rec-294-org,   ind, m, ,19321014, , troy, vineet, vic, clunes,2030,38, yuranigh court, , 8 47815733,7904305,7, NoRole
+rec-295-dup-0, eng, f, Z7, , , con o , 5crivener, s, ,606,3, moroney5 eet, , 7295 9364, 39307 0,4, NoRole
+rec-295-dup-1, eng, f,2, , , c0nn r, scri vner, sa, , 60 6, 3|, norone   reet, , 72956 364,3930730,4, NoRole
+rec-295-dup-2, eng, f, Z7, , , c0 n   r, scrivener, s  , , 60 6,3, moron y  t reet, , 7295 9364, 393 730,4, NoRole
+rec-295-org,   eng, f,27, , , connor, scrivener, sa, ,6069,31, moroney street, , 7 29569364,3930730,4, NoRole
+rec-296-dup-0, eng, m, 2 g, 1986 615, , jasmi  e, ab r m, nsw, south  e 1more,503,1, heagneyc escent, , 2 8O55 0252, 71   26,8, NoRole
+rec-296-dup-1, eng, r ,29,19860615, , jasni ne, abr  m, nsw, south be lmore, 5  39,1, heagney c rescent, , 2 805 0252, 718 4   2 6,8, NoRole
+rec-296-dup-2, eng, m,29, 198   0615, , ja 5n   ne, abrm, nsw, south belmore, s03q,1, heagney crescent, , 2 805 0 252, 71848 6,8, NoRole
+rec-296-org,   eng, m,29,19860615, , jasmine, abram, nsw, south belmore,5039,15, heagney crescent, , 2 80550252,7184826,8, NoRole
+rec-297-dup-0, ara, f,31,19840428, dr, eccckjlo, iajminah, qld, sttprinksur,2408,269, iampina cressent, apt pc, 3 46715866,7577040,7, NoRole
+rec-297-org,   ara, f,31,19840428, dr, chloe, yasmeenah, qld, springsure,2408,269, yambina crescent, apt pc, 3 46715866,7577040,7, NoRole
+rec-298-dup-0, gre, f, ,19182151, mr, ebony, cadman, , isle of capri,2670,7, smart place, flr 5 john flynn medical centre, 02 06906325,4519438,8, NoRole
+rec-298-org,   gre, f, ,19191221, mr, ebony, danezis, , isle of capri,2640,13, smart place, golden oaks village, 02 06906325,4519438,8, NoRole
+rec-299-dup-0, spa, f, ,19680114, , ckan, alveaahh, qld, kckooroy,2800,24, john clelant crejcent, sewells medical cendre, 3 50457142,5637445,1, NoRole
+rec-299-dup-1, spa, f, ,19680114, , kane, alvear, kwld, cckuroy,2800,24, john cleland crejcent, jeells medikal centr, 3 50457142,5637445,1, NoRole
+rec-299-org,   spa, f, ,19680114, , kane, alvear, qld, cooroy,2800,24, john cleland crescent, jewells medical centre, 3 50457142,5637445,1, NoRole
+rec-29-dup-0, unk, g, , , , alicia, schwane, nsw, wollobfrng,2701,46, cavanaug hstreet, , 612 26345539,6693653,1, NoRole
+rec-29-org,   unk, f, ,19090302, ms, alicia, schwanke, nsw, wollongong,2071,44, cavanaugh street, , 612 26345539,6693653,1, NoRole
+rec-2-dup-0, unk, f,32,19830310, , dalya, jjindo, kld, din ckan pai,2603,6, tipink plak, , 613 12040266,7572911,0, NoRole
+rec-2-dup-1, unk, f,32,19830310, , dalya, jckinto, kld, tin kan pay,2603,6, tippink plaje, , 613 12040266,7572911,0, NoRole
+rec-2-dup-2, unk, v,32,19830310, , dalya, sdttsinto, qlt, tin ckan pay,2603,6, tipink plake, , 613 12040266,7572911,0, NoRole
+rec-2-org,   unk, f,32,19830310, , taliah, scinto, qld, tin can bay,2603,6, tipping place, , 613 12040266,7572911,0, NoRole
+rec-300-dup-0, dan, f, 3&,19771022, , harri on, werl u f,  n 5, e| t a,3672,4, greenho  d place, ,374284423, 73 1489,0, NoRole
+rec-300-dup-1, dan, f,3,19771022, , harr'son, werl vff, nsw, elth m,3672,4, greenho o d place, , 037q284423,7361489,0, NoRole
+rec-300-org,   dan, f,38,19771022, , harrison, werlauff, nsw, eltham,3672,41, greenhood place, , 03 74284423,7361489,0, NoRole
+rec-301-dup-0, unk, f,32,19831024, , zoel, zdrazzari, , sandy pai,3175,12, vidal jdreet, oacktale, 04 70380760,1167911,2, NoRole
+rec-301-dup-1, unk, f,32,19831024, , ztoel, straszari, , zandy bay,3175,12, fidal sttrit, oacktal, 04 70380760,1167911,2, NoRole
+rec-301-dup-2, unk, f,32,19831024, , soel, ztrasari, , sddandy pay,3175,12, vital ztrit, oakdal, 04 70380760,1167911,2, NoRole
+rec-301-org,   unk, f,32,19831024, , joel, strazzari, , sandy bay,3175,12, vidal street, oakdale, 04 70380760,1167911,2, NoRole
+rec-302-dup-0, eng, , ,19701030, , samanta, budecsea, nsdw, palmoral,2680,7, morand jtirkuit, , 02 68350818,9123643,8, NoRole
+rec-302-dup-1, eng, , ,19701030, , jamanta, putckea, nsw, palmoral,2680,7, morant ztirkuit, , 02 68350818,9123643,8, NoRole
+rec-302-org,   eng, , ,19701030, , samantha, butcher, nsw, balmoral,2680,7, morant circuit, , 02 68350818,9123643,8, NoRole
+rec-303-dup-0, eng, ,27, , ms, lucck, abramtst, nsw, zeal roks,3375,145, klary crestent, , 02 04859747,7834822,2, NoRole
+rec-303-dup-1, eng, ,27, , ms, lukk, apramj, nz, stteal rocks,3375,145, clarey cresdcent, , 02 04859747,7834822,2, NoRole
+rec-303-org,   eng, ,27, , ms, luke, abrams, nsw, seal rocks,3375,145, clarey crescent, , 02 04859747,7834822,2, NoRole
+rec-304-dup-0, eng, ,25,19900225, , alikkia, kookson, nsw, kkantler,2232,3, john russell circuit, morris arkad, 2 99359750,3713718,2, NoRole
+rec-304-org,   eng, ,25,19900225, , alicia, cookson, nsw, chandler,2232,3, john russell circuit, morris arcade, 2 99359750,3713718,2, NoRole
+rec-305-org,   eng, f,35,19800427, ms, caitlin, jeffries, nsw, kirwan,3858,34, mccormack street, , 612 07012759,8895601,2, NoRole
+rec-306-dup-0, ira, , 4O, 1g750 818, , bannah, , w a, ka l an,3856, lG, aIla n s t r eet, , 07 035  8508,9871944,0, NoRole
+rec-306-dup-1, ira, ,40, l9750818, , banna h, ,  v , kalg  ,3856,  1 4, allanstreet, , 07 03  8508, 987194 4,0, NoRole
+rec-306-dup-2, ira, ,40,1975018, , ha n h, , w a, kalgn,3856, 6 q, allan street, , 070356 8 508,987194,0, NoRole
+rec-306-dup-3, ira, , q0, 1975o818, , ha    h, ,  a, kalga n,385,16, allan   eet, , 07 03568508, 987| 44,0, NoRole
+rec-306-org,   ira, ,40,19750818, , hannah, , wa, kalgan,3856,164, allan street, , 07 03568508,9871944,0, NoRole
+rec-307-org,   unk, f,8,20070512, ms, emiily, abadi, nsw, hilldale,4670,25, chappell street, mayo specialist medical centre cnr comme, 2 81038774,7570880,0, NoRole
+rec-308-dup-0, ger, f,31,19310329, pfc, trey, klinsmann, vcm, bucklle,4850,18, de graafwfstreet, , 08 00241756,8929679,7, NoRole
+rec-308-org,   ger, f,31,19840805, pfc, trey, klinsmann, vic, buckley,4850,18, de graaff street, brentwood village, 08 00241576,8920607,7, NoRole
+rec-309-dup-0, usa, m,34,19810116, , lucss, cobb, vic, jam eerup,2027,4, de gillern place, , 02 79703645,2398525,4, NoRole
+rec-309-org,   usa, f,34,19810116, ms, lucas, cobb, vic, jam jerrup,2027,111, de gillern place, , 08 25215184,2398255,4, NoRole
+rec-30-dup-0, ser, f, ,19101129, , b    , pete ca, s w, jiIl  by,2541,2, murphystreet, , 612 11 8 7469, 9625  40,7, NoRole
+rec-30-org,   ser, f, ,19101129, , bryce, peterca, nsw, jilliby,2541,28, murphy street, , 612 11587469,9625940,7, NoRole
+rec-310-dup-0, chi, , , 19400 523, mr, isa e lle, lo, nsw, orien  p oint, 45 4,1, hawkesbur    r escent, brent w   vlge,246163462,6050645,7, NoRole
+rec-310-dup-1, chi, , , 194 0523, mr, jsab   e, loo, nsw, orien    nt,451,1, hawkesbur  crescent, brentw od vlge, Z 461 3462, 605  645,7, NoRole
+rec-310-org,   chi, , ,19400523, mr, isabelle, loo, nsw, orient point,4514,14, hawkesbury crescent, brentwood vlge, 2 46163462,6050645,7, NoRole
+rec-311-dup-0, ind, m,24,19910812, ms, alysdja, manafi, act, roekjetale south,3494,1, pordus plackke, , 02 61282743,1488877,7, NoRole
+rec-311-dup-1, ind, m,24,19910812, ms, alyzdsta, manavy, acd, roxedale sout,3494,1, portus plak, , 02 61282743,1488877,7, NoRole
+rec-311-org,   ind, m,24,19910812, ms, alyssa, manavi, act, rochedale south,3494,1, portus place, , 02 61282743,1488877,7, NoRole
+rec-312-dup-0, eng, f,29,19860529, , kopi, judherland, qld, toanlants,3032,55, gregzon plake, , 3 46520985,2047862,2, NoRole
+rec-312-dup-1, eng, f,29,19860529, , kkopi, zdtutherlant, ckld, tornlants,3032,55, gregson plak, , 3 46520985,2047862,2, NoRole
+rec-312-org,   eng, f,29,19860529, , coby, sutherland, qld, thornlands,3032,55, gregson place, , 3 46520985,2047862,2, NoRole
+rec-313-dup-0, ind, f,28,19871122, , ccklo, , stta, milicckent,2090,16, maclakan tstreet, , 7 47450219,6345566,6, NoRole
+rec-313-dup-1, ind, v,28,19871122, , kklo, , za, milikend,2090,16, maklagan sdrit, , 7 47450219,6345566,6, NoRole
+rec-313-org,   ind, f,28,19871122, , chloe, , sa, millicent,2090,16, maclagan street, , 7 47450219,6345566,6, NoRole
+rec-314-dup-0, usa, ,33, , dr, samuel, carey, nsw, runrd,4228,4, , turon park, 03 82724350,1867562,1, NoRole
+rec-314-dup-1, usa, ,36, , dr, samelt, carry, nsw, runnyford,4254,21, , turon park, 04 21915255,1865726,1, NoRole
+rec-314-org,   usa, ,33, , dr, samuel, carey, nsw, runnyford,4225,36, , turon park, 612 50661047,1865726,1, NoRole
+rec-315-dup-0, usa, ,38, , , danil, endriksdt, njw, poahdlant,2617,18, drickett ztreet, , 612 56317366,9705739,0, NoRole
+rec-315-dup-1, usa, ,38, , , tanil, ndrikks, nzt, poatlant,2617,18, trikket jtreet, , 612 56317366,9705739,0, NoRole
+rec-315-org,   usa, ,38, , , daniel, hendricks, nsw, portland,2617,18, trickett street, , 612 56317366,9705739,0, NoRole
+rec-316-dup-0, cze, ,24,19910130, dr, johh, maczik, w, alfreudcove,4305,5, , , 618 46856199,1770709,3, NoRole
+rec-316-org,   cze, ,24,19910130, dr, john, maczik, wa, alfred cove,6158,9, mackennal street, , 618 46856199,1770709,3, NoRole
+rec-317-dup-0, ita, ,32,19820425, ms, , eini, , vallarbe ach,4170,34, stephensilace, , 02 83684024,7046812,6, NoRole
+rec-317-dup-1, ita, f, ,19820425, ms, harold, esbj, nxs, valla beach,4130,33, stephens place, , ,7046812,6, NoRole
+rec-317-dup-2, ita, f,33,19820425, ms, corey, esini, , valla weach,4170,547, stephens cplace, , 02 83684024,6040383,6, NoRole
+rec-317-dup-3, ita, f,35,19820425, ms, henry, esini, nsaw, valla beach,4107,105, stephensqlace, , 02 83684024,7049712,6, NoRole
+rec-317-org,   ita, f,33,19820425, ms, henry, esini, nsw, valla beach,4170,39, stephens place, , 02 83684024,7046812,6, NoRole
+rec-318-dup-0, ger, f,23, , mr, , jamfes, qld, wallavlle,4556, , sainsbury street, , 613 63138554,9407307,3, NoRole
+rec-318-org,   ger, f,23, , mr, james, raab, qld, wallaville,4556,21, sainsbury street, , 613 63138554,9407307,3, NoRole
+rec-319-dup-0, nor, f,22,19930706, , teakkin, mitun, nsw, pownink,4221,31, armstronck cresent, , 2 39767991,2917025,3, NoRole
+rec-319-dup-1, nor, f,22,19930706, , teackkin, mitdun, njw, poninck,4221,31, aahmsdrong krescent, , 2 39767991,2917025,3, NoRole
+rec-319-dup-2, nor, f,22,19930706, , deackkin, midun, nzw, ponink,4221,31, armztrong kreskent, , 2 39767991,2917025,3, NoRole
+rec-319-org,   nor, f,22,19930706, , deakin, midttun, nsw, bowning,4221,31, armstrong crescent, , 2 39767991,2917025,3, NoRole
+rec-31-dup-0, usa, ,23,19920903, , adam, graham, nsw, erins,3144,3, throssell otreet, , 02 76606324,1021066,6, NoRole
+rec-31-dup-1, usa, f,23,19920993, , adam, groaham, nsw, noarlungs downs,3142, , street throessele, , 02 76560324,3908522,6, NoRole
+rec-31-org,   usa, f,23,19920903, , adam, graham, nsw, erina,3144,19, throssell street, , 02 76560324,3908522,6, NoRole
+rec-320-dup-0, chi, , ,19221217, ms, , sdu, dajd, karanza,2146,149, hukh mkkay crejcend, , 7 90681030,9278454,9, NoRole
+rec-320-org,   chi, , ,19221217, ms, , shu, tas, karanja,2146,149, hugh mckay crescent, , 7 90681030,9278454,9, NoRole
+rec-321-dup-0, unk, f,3, 1980 0 408, , j  , aba , , blaclctwn,4151,10, archibal  street, kilvinton village, 02 8 16  7589, 84 5854,7, NoRole
+rec-321-org,   unk, f,35,19800408, , jack, abadi, , blacktown,4151,10, archibald street, kilvinton village, 02 81657589,8445854,7, NoRole
+rec-322-dup-0, unk, f,3,19780626, dr, c h  e, aarcy, nsw, ban or,242,1, mcinnes st reet, , 02 73 17 9214, 7398 35,5, NoRole
+rec-322-dup-1, unk, f,3,19780626, dr, c b, aar  , nsw, ban g r, 2q 3, 1 S, mc'lnne s  t reet, , 02 73179214,7398835,5, NoRole
+rec-322-org,   unk, f,37,19780626, dr, chloe, aarcy, nsw, bangor,2423,15, mcinnes street, , 02 73179214,7398835,5, NoRole
+rec-323-dup-0, ger, ,38,19780225, ms, lism, mohrhaus, tas, voyagervoint,3153, , pentonolace, , 612 51943822,6799898,5, NoRole
+rec-323-dup-1, ger, ,37,19780225, ms, lidnj, mohrhaus, nsw, voyager point,3163,917, malindoi place, , 612 51943822,6979688,5, NoRole
+rec-323-org,   ger, f,37,19780225, ms, liam, mohrhaus, nsw, voyager point,3153,12, malindi place, kiloran, 612 51943822,6799898,5, NoRole
+rec-324-dup-0, chi, f, z, 1988   3, , kathe ne, xue, nsw, dartb r o olc,5125,1, carroll  t eet, , 2 604 2 8099,9139822,8, NoRole
+rec-324-dup-1, chi, f,2, 198809 23, , kath r ine, x  , n5w, dartb o k, 5l25,1, carroll  t reet, , 2604 8099,9139822,8, NoRole
+rec-324-dup-2, chi, f, 2 7, 198809 23, , katherine,  x   , ns w, dartbrook,5,12, carrollsreet, , 2 6042 8099,9139822,8, NoRole
+rec-324-org,   chi, f,27,19880923, , katherine, xue, nsw, dartbrook,5125,12, carroll street, , 2 60428099,9139822,8, NoRole
+rec-325-dup-0, rus, m,25,19900819, , jac, dalitstin, , wejd lackes shor,3146,8, oolner stircuit, , 04 17473208,4096928,9, NoRole
+rec-325-org,   rus, m,25,19900819, , zac, talietzin, , west lakes shore,3146,8, woolner circuit, , 04 17473208,4096928,9, NoRole
+rec-326-org,   por, f,24, , , brianna, musrri, vic, patterson lakes,4816,16, kalgoorlie crescent, palm lake resort, 08 36737148,1989828,0, NoRole
+rec-327-dup-0, usa, ,30,19850805, , ma, vri, qlt, kckarara,4165,62, holden ckrescent, , 613 67668986,1439069,6, NoRole
+rec-327-dup-1, usa, ,30,19850805, , ma, fri, qlt, ckarara,4165,62, lden crezttcend, , 613 67668986,1439069,6, NoRole
+rec-327-org,   usa, ,30,19850805, , max, frye, qld, karara,4165,62, holden crescent, , 613 67668986,1439069,6, NoRole
+rec-328-dup-0, eng, f,27, , , , eri cwadon, qod, kobblewgreek,7250,39, maitlandtuztreet, , 613 60291410,2822918,3, NoRole
+rec-328-org,   eng, f,27, , , , ericson, qld, kobble creek,7250,90, maitland street, , 613 60291410,2822918,3, NoRole
+rec-329-dup-0, unk, f, ,19890325, dr, ebony, stratou, ns, wattle grpve,2528,8, stieglitz circuit, , 02 64672070,2148110,3, NoRole
+rec-329-org,   unk, f, ,19890325, dr, ebony, stratou, nsw, wattle grove,2062,2, stieglitz circuit, , 02 68632070,2141010,3, NoRole
+rec-32-org,   fre, ,21,19940419, ms, aimee, guizot, wa, beenleigh,6281,6, condamine street, , 618 96794271,2020503,6, NoRole
+rec-330-org,   unk, f,23,19921212, mr, zali, sclater, qld, blackstone,3046,10, coles place, allunga, 3 46476251,3304155,5, NoRole
+rec-331-org,   eng, f,34,19810808, mr, lauren, abbey, vic, gowanbrae,3056,47, gidabal street, salmaldo caravan park, 08 95468151,4768262,7, NoRole
+rec-332-dup-0, , , 3S, 1980 001, ms, josh a, laun d y, v c, stonevjlle, 4 8 5, &, thomhill crescent, st j0hn s terrace,842722105, 6409  5,6, NoRole
+rec-332-dup-1, , , 3s, 1980 1001, ms, jos h ua, lau y, v  , stonevlle,4815,8, thornhill c rescent, st jobns terrace, 84272 2 105,6409935,6, NoRole
+rec-332-dup-2, , ,35, 198010 1, m , ios h a, |aundy, vi c, stonev  le,4815,8, thornhillcrescent, stjohnst rrace, 8427 2 105, G409935,6, NoRole
+rec-332-dup-3, , ,3, 19801 0 01, ms, josh a, laund y, vi , stone   le, 48 1 ,8, thornhi Il c rescent, st jobns terrace, 8 42 7 2 105,6409935,6, NoRole
+rec-332-org,   , ,35,19801001, ms, joshua, laundy, vic, stoneville,4815,8, thornhill crescent, st johns terrace, 8 42722105,6409935,6, NoRole
+rec-33-dup-0, usa, f, ,19760, , rv y, wa r n r, vic, for e st, q165,2, sharmanplace, , 8S05095  , 648 9764,7, NoRole
+rec-33-dup-1, usa, f, , 197 6007, , ru b, wam  r, vi , fo    t,4165,2, sharma n place, ,850509567, 648q7  4,7, NoRole
+rec-33-org,   usa, f, ,19760207, , ruby, warner, vic, forrest,4165,25, sharman place, , 8 50509567,6489764,7, NoRole
+rec-34-dup-0, usa, ,25,19900209, ms, luke, lawre ce, wa, cJove rd le, 33s0,8, loasedo  s treet, inalingac  v an park, 045660|627,1507469,1, NoRole
+rec-34-dup-1, usa, ,25,19900209, ms, lulce, |aw r nc, wa, clovr   le,3350, &, ba5edow street, inalinga c van park, 04 56601627, 1507 469,1, NoRole
+rec-34-dup-2, usa, ,2,19900209, ms, luk , Javvre ce, w , cloverdle,335,8, basedow treet, inalinga c/van park, 04 56601627, 150 4  9,1, NoRole
+rec-34-dup-3, usa, ,2,19900209, m , l uk, lawr ence, wa, clover ale, 33 5 0,8, basedow  treet, inalinga  / van park, o456601 27, 15074 9,1, NoRole
+rec-34-org,   usa, ,25,19900209, ms, luke, lawrence, wa, cloverdale,3350,8, basedow street, inalinga c/van park, 04 56601627,1507469,1, NoRole
+rec-35-dup-0, eng, f,33, , , aleantra, sodheahs, , boultea,2611,27, limestone afenu, , 07 77358099,4383316,0, NoRole
+rec-35-dup-1, eng, f,33, , , aleeksantra, zoutheahz, , polteah,2611,27, limesdone afenu, , 07 77358099,4383316,0, NoRole
+rec-35-dup-2, eng, f,33, , , aleandra, jodheahs, , pouldeah,2611,27, limestddone afenue, , 07 77358099,4383316,0, NoRole
+rec-35-dup-3, eng, f,33, , , aleantra, zoterz, , poldea,2611,27, limejtttone afenu, , 07 77358099,4383316,0, NoRole
+rec-35-org,   eng, f,33, , , alexandra, southers, , boulder,2611,27, limestone avenue, , 07 77358099,4383316,0, NoRole
+rec-36-dup-0, usa, m,11,20041014, , mickkael, sdtokks, nsw, porafil,2170,65, gallagheah jdttreet, , 02 65591139,7515663,4, NoRole
+rec-36-dup-1, usa, m,11,20041014, , myael, zdockst, nsttw, poravill,2170,65, gallajyr sttreet, , 02 65591139,7515663,4, NoRole
+rec-36-org,   usa, m,11,20041014, , michael, stokes, nsw, bowraville,2170,65, gallagher street, , 02 65591139,7515663,4, NoRole
+rec-37-org,   eng, m,30,19851220, , claudia, ness, nsw, mylestom,2145,42, wrenfordsley place, , 2 22533212,7771495,1, NoRole
+rec-38-dup-0, unk, f, ,19530104, , hafley, aballon, , glenhvaen,6167,2, lyttleton crescent, , 03 09229363,6540066,1, NoRole
+rec-38-dup-1, unk, , ,19980410, , harlyc, abaljtn, ns, glenhaven,4507, , lyttletonqcrescent, , 612 17448545,6566076,1, NoRole
+rec-38-dup-2, unk, f, ,19980410, , harley, ablalon, nsw, glenggrnw,4535,8, lyttleton crescent, , 07 62527573,6540066,1, NoRole
+rec-38-org,   unk, f, ,19980410, , harley, aballon, nsw, glenhaven,4355,8, lyttleton crescent, , 612 17448545,6540066,1, NoRole
+rec-39-org,   ger, f,22,19930504, , izaac, jost, nsw, mumbil,2790,20, lacey place, , 612 63015511,4607749,5, NoRole
+rec-3-dup-0, eng, f, , , , aali y ah, bate on, v , fitzr  y,319,2, saJomon   place, , 8 69725 84, 425 650,0, NoRole
+rec-3-dup-1, eng, f, , , , aaliy h, bate o n, yic, fitz  oy,3195,28, salomo n   lace, , 8 6g7    84, 4z56   50,0, NoRole
+rec-3-dup-2, eng, f, , , , aalia h, bate son, vi , f'lt roy, 31 9,2, salomo splace, , 869 725 84, 4z5 G650,0, NoRole
+rec-3-dup-3, eng, f, , , , aaljy h, bateson, vic, fit 2 oy,  3 1 5,28, salono s p lace, ,869725284, 425G650,0, NoRole
+rec-3-org,   eng, f, , , , aaliyah, bateson, vic, fitzroy,3195,28, salomons place, , 8 69725284,4256650,0, NoRole
+rec-40-dup-0, unk, , 4 1, 197403 22, ms,  j a   s, abb  t, vi , gapsted, 29o4,9, goldstein   escent, , 08 89 986 005, 526   86,1, NoRole
+rec-40-dup-1, unk, ,4, 197403 2, m , jam s, abbit, vic, gapst e,290,9, 9oldstein c escent, , 08 899 6 005, 5269 86,1, NoRole
+rec-40-org,   unk, ,41,19740322, ms, james, abbitt, vic, gapsted,2904,9, goldstein crescent, , 08 89986005,5269986,1, NoRole
+rec-41-dup-0, usa, v,39,19760914, ms, maeckj, icckman, klt, manuem,7249,39, husttsey cove, dyrone hitj, 613 75746134,7630582,7, NoRole
+rec-41-dup-1, usa, f,39,19760914, ms, ma, ickckman, qlt, manuem,7249,39, hussy cof, dyrone hitstt, 613 75746134,7630582,7, NoRole
+rec-41-org,   usa, f,39,19760914, ms, max, hickman, qld, mannuem,7249,39, hussey cove, tyrone heights, 613 75746134,7630582,7, NoRole
+rec-42-org,   eng, m,31,19841129, dr, zoe, hext, vic, box hill south,6014,120, copland drive, , 08 93233302,8401837,6, NoRole
+rec-43-dup-0, ser, ,30,19850522, ms, domi, greif, vic, plackkkpurn,3732,5, carneyie crescend, , 08 80781319,3837067,9, NoRole
+rec-43-dup-1, ser, ,30,19850522, ms, domi, kreiv, vic, plackbuan,3732,5, carnejie crezcent, , 08 80781319,3837067,9, NoRole
+rec-43-org,   ser, ,30,19850522, ms, tommy, greif, vic, blackburn,3732,5, carnegie crescent, , 08 80781319,3837067,9, NoRole
+rec-44-org,   ind, f,29,19860115, , georgia, rajabhushan, qld, sefton park,5034,1, togo place, morago, 613 48381830,6329776,3, NoRole
+rec-45-dup-0, usa, f,2, 198604 4, , br:   v, rollins, ns , brewon |e,4065,5, wentworth venue, , , 1483  7,9, NoRole
+rec-45-dup-1, usa, f,9,19860404, , bron y, rollns, n5, bre ongle,406,8, wentworth  venue, , ,1483757,9, NoRole
+rec-45-org,   usa, f,29,19860404, , briony, rollins, nsw, brewongle,4065,85, wentworth avenue, , ,1483757,9, NoRole
+rec-46-org,   unk, ,24, , ms, ethan, streckfuss, qld, donnybrook,2615,57, ahern place, parklands village, 3 27997422,5629475,3, NoRole
+rec-47-dup-0, ind, f,33, 1982 0 225, ms, jak e, lekh w ni, q d, mi1lp ark,606, l 9 2, haclceplace, moor il a, 08 712 4304,1721738,2, NoRole
+rec-47-dup-1, ind, f,   , 1g820 25, ms, jak e, lekh  ni, ql , millpark,606,192, hac ke place, moo i l la, 08 71264304, 17 2 738,2, NoRole
+rec-47-dup-2, ind, f,33, 19 820225, ms, ja    , lekhwani, 9d, mill p   k, 6 060,19, hacke place, moo   la, 08 712 6q304, 17217 8,2, NoRole
+rec-47-dup-3, ind, f,33, 1982 0225, ms, 'Jak , lekh vani, q d, mill p  rk,6060, 1 9 2, hacke   lace, moo  i ll, 087126 304,1721738,2, NoRole
+rec-47-org,   ind, f,33,19820225, ms, jake, lekhwani, qld, mill park,6060,192, hacke place, moorilla, 08 71264304,1721738,2, NoRole
+rec-48-dup-0, afg, v, ,19920523, , anckuj, zayet, qld, mond pedeah,6069,6, clem hil dsdreet, , 3 93385824,6947761,9, NoRole
+rec-48-dup-1, afg, v, ,19920523, , ankuj, sayet, kld, mond petea,6069,6, klem ill zdrit, , 3 93385824,6947761,9, NoRole
+rec-48-dup-2, afg, v, ,19920523, , anguztt, jayet, ckwlt, mond pedea,6069,6, klem hil street, , 3 93385824,6947761,9, NoRole
+rec-48-org,   afg, f, ,19920523, , angus, sayed, qld, mount peter,6069,6, clem hill street, , 3 93385824,6947761,9, NoRole
+rec-49-dup-0, unk, f, ,19871222, , stepganie, straw, nsw, condong,4124,72, , , 612 56444669,8035820,0, NoRole
+rec-49-dup-1, unk, f,28,19771222, , jasmine, st rzw, nsw, cohong,4124,2, ellerstojrvaenue, , 612 56444669,8035820,0, NoRole
+rec-49-dup-2, unk, f,28, , , jasmine, srtz, nsw,4124, cn6dnog,3, ellerstibnvenue, , 612 56444669,8031803,0, NoRole
+rec-49-dup-3, unk, f,72,19872182, , jasimne, strae, qld, condong,4124,6, ellerston avenue, , 612 56444669,8035820,0, NoRole
+rec-49-org,   unk, f,28,19871222, , jasmine, straw, nsw, condong,4124,2, ellerston avenue, , 612 56444669,8035820,0, NoRole
+rec-4-dup-0, sri, m,24,19911102, , joel, kaluantharana, nss, erigooia,1509,9, , , 612 66841218,4886909,1, NoRole
+rec-4-dup-1, sri, n,22,19911172, , kaluanthbrana, rmlr, nwo, erigolva,5039,23, fihelly street, , 612 66841218,4887009,1, NoRole
+rec-4-dup-2, sri, m, ,19911102, , joel, kaluanttzana, nsq, erihpia,5073,0, fihellystreet, , 612 66481218,4887009,1, NoRole
+rec-4-org,   sri, m,24,19911102, , joel, kaluantharana, nsw, erigolia,5091,23, fihelly street, , 612 66841218,4887009,1, NoRole
+rec-50-dup-0, usa, f, ,19870506, , reega, borh, , pinencale,7315,6, shumack pcreet, somerset house, 03 39164642,2023345,1, NoRole
+rec-50-dup-1, usa, f,32,19808506, , reeqg, booth, qld, pinevale,7315,3, shumaczjdstreet, , 03 39164642,2023564,1, NoRole
+rec-50-dup-2, usa, f, ,19870506, , reegan, booth, qld, pinevale,7315,7, shumaclxsteet, somerset house, 03 39164642,2027345,1, NoRole
+rec-50-dup-3, usa, ,82,19870506, , reegyn, bookby, qld, pinevle,2400,6, shumaclwhrfeet, , 03 39164642,2027395,1, NoRole
+rec-50-org,   usa, f,28,19870506, , reegan, booth, qld, pinevale,7315,6, shumack street, somerset house, 03 39164642,2027345,1, NoRole
+rec-51-org,   unk, f, ,19850305, ms, ethan, sciacca, vic, wingham,2795,14, quiros street, , 618 78985238,5231579,9, NoRole
+rec-52-dup-0, eng, f, 1 9, 1996 0629, , por   , snide rs, vic, pearce  aIe, 5O5,8, , henry kendall hostel, 618 895 44977,2087287,5, NoRole
+rec-52-dup-1, eng, f,19, 1996  629, , por   , sni ers, v i, pearcedale, 50 51,87, , henrykenda   hostel, 618 8 9 5 44977,2087287,5, NoRole
+rec-52-dup-2, eng, f,1, 199606 9, , portia, sni    s, vic, pearce  Je, 50  1,87, , henrykend all hostel, 618 89 5 4 977, Z0 7287,5, NoRole
+rec-52-dup-3, eng, f, 1 9, 199606z9, , portia, sniders, vi , pearced le, 50 1, & , , henryken all ostel, 61889 544977, 2087   7,5, NoRole
+rec-52-org,   eng, f,19,19960629, , portia, sniders, vic, pearcedale,5051,87, , henry kendall hostel, 618 89544977,2087287,5, NoRole
+rec-53-dup-0, unk, f, ,19830318, ms, jak , a bal lon, vic, crystal br0ok,3072, l , bedley s treet, ,852848977, 26 2909,8, NoRole
+rec-53-dup-1, unk, f, ,19830318, ms, j a , ah a l lon, yic, crysta l  rook,307,10, hedle y  t reet, , 08 528 8977, 266 9 0 9,8, NoRole
+rec-53-dup-2, unk, f, ,19830318, ms,  i a e, abal   n, v c, crystal  rook, 30 72,  , hedlev s treet, , 08 5284 8g77, 266 909,8, NoRole
+rec-53-dup-3, unk, f, , 1983 0 318, ms, jake, alo l on, uic, crysta|brook,307,10, hedJe y s reet, ,852848977,2662909,8, NoRole
+rec-53-org,   unk, f, ,19830318, ms, jake, aballon, vic, crystal brook,3072,10, hedley street, , 08 52848977,2662909,8, NoRole
+rec-54-dup-0, ser, ,19,19960920, , matelyn, dades, , inkham,6122,24, alckot plak, sodhold, 03 15633816,7999740,3, NoRole
+rec-54-org,   ser, ,19,19960920, , madelyn, tadej, , wingham,6122,24, allcott place, southwold, 03 15633816,7999740,3, NoRole
+rec-55-dup-0, tur, f,30,19850630, , madelin, okkun, nzw, murlant,4680,721, nofaa sttrit, , 2 70831873,2739161,7, NoRole
+rec-55-dup-1, tur, f,30,19850630, , madelin, ockun, njw, mualand,4680,721, novar strit, , 2 70831873,2739161,7, NoRole
+rec-55-dup-2, tur, f,30,19850630, , madelin, okkun, nsw, mualand,4680,721, novaah sdreet, , 2 70831873,2739161,7, NoRole
+rec-55-dup-3, tur, f,30,19850630, , matelin, ockun, nsw, mualand,4680,721, nofar jdrit, , 2 70831873,2739161,7, NoRole
+rec-55-org,   tur, f,30,19850630, , madeline, ogun, nsw, moorland,4680,721, novar street, , 2 70831873,2739161,7, NoRole
+rec-56-dup-0, ser, ,29,19860628, ms, zdofi, peteahka, nstw, zdanmor,2207,36, hodkson crescent, kkranpruk, 02 23728258,2056945,4, NoRole
+rec-56-dup-1, ser, ,29,19860628, ms, jtofi, peteahcka, nsw, ztanmoah,2207,36, hotgson crescent, kranprook, 02 23728258,2056945,4, NoRole
+rec-56-org,   ser, ,29,19860628, ms, sophie, peterca, nsw, stanmore,2207,36, hodgson crescent, cranbrook, 02 23728258,2056945,4, NoRole
+rec-57-org,   usa, f,8,20070827, , stirling, simpson, nsw, denhams beach,6018,61, sid barnes crescent, clonturkle, 2 91095077,1660330,7, NoRole
+rec-58-dup-0, unk, , ,19070619, , se, scorsone, vic, melbournelnersity,7172,33, dexter sfreet, , 07 32373020,5728749,2, NoRole
+rec-58-org,   unk, , ,19070619, , aiden, scorsone, vic, melbourne university,7173,32, dexter street, , 07 32373020,3466840,2, NoRole
+rec-59-dup-0, chi, f, ,19425009, , timusra, la y, msw, devon park,4573,9, chinnerfcescent, , ,2099766,3, NoRole
+rec-59-dup-1, chi, , ,19443799, , timafa, , qld, devonoark,4573,3, chinner crescent, , 02 53309782,2099766,3, NoRole
+rec-59-org,   chi, f, ,19420409, , timara, lan, qld, devon park,4573,9, chinner crescent, , 02 53309782,2099766,3, NoRole
+rec-5-dup-0, usa, m,29,19860313, , sa mle, calhpuuon, , lowerlking,2359,12, ferguso ncircuit, , 618 14107407,1911466,4, NoRole
+rec-5-org,   usa, m,29,19860313, , samuel, calhoun, wa, lower king,2359,158, ferguson circuit, low glen dairy, 618 14107407,1914196,4, NoRole
+rec-60-dup-0, por, f, ,19040128, , madilda, ckudiliro, vic, greenzborog,2641,3, tolan kkloze, , 618 18131223,3900952,5, NoRole
+rec-60-dup-1, por, f, ,19040128, , madilta, cudiliro, vic, greenjboroue,2641,3, tolan clos, , 618 18131223,3900952,5, NoRole
+rec-60-org,   por, f, ,19040128, , matilda, cuthiliero, vic, greensborough,2641,3, dolan close, , 618 18131223,3900952,5, NoRole
+rec-61-dup-0, ind, m, 2 4, , , a m e r, nee1akant achar, , meltonsouth,220, Z  , boolee  treet, , 07 147 16957, 208 86,0, NoRole
+rec-61-dup-1, ind, rn,2, , , am b  r, neelakatachar, , melton   outb,220,2, boolee street, , 071 4 7   57,2008786,0, NoRole
+rec-61-org,   ind, m,24, , , amber, neelakantachar, , melton south,2204,26, boolee street, , 07 14716957,2008786,0, NoRole
+rec-62-dup-0, , ,2,19930707, mr, ni k i, sbep erd, l d, ter r i a, 4 6 , 1 0, macrossancrescent, , 3 078577 32, 51 97169,6, NoRole
+rec-62-dup-1, , ,22,19930707, mr, n  kk, she he  d, ql, terica, 45 69, | 05, macrossa c escent, , 3 078 5 7732,5197169,6, NoRole
+rec-62-dup-2, , ,22, 1993 07, mr, nikk, sbephe rd, 9ld, ter r  ca, 45 69,10, macrossan crescent, , 3 078 5 7 732, 519716 9,6, NoRole
+rec-62-dup-3, , ,22, 1993 07, mr, nilc, she  rd, q ld, te rr   , 456 9,105, rnacrossancrescent, , 3 07857732,5197169,6, NoRole
+rec-62-org,   , ,22,19930707, mr, nikki, shepherd, qld, terrica,4569,105, macrossan crescent, , 3 07857732,5197169,6, NoRole
+rec-63-dup-0, usa, v,34, , mr, penedict, carlson, nsw, ckampewarra,3400,33, mina wylie krejsent, ckuaradale, 2 01788732,4219287,7, NoRole
+rec-63-dup-1, usa, v,34, , mr, benedickkd, carlsdton, ns, kambeara,3400,33, mina yli cressent, ckurratale, 2 01788732,4219287,7, NoRole
+rec-63-org,   usa, f,34, , mr, benedict, carlson, nsw, cambewarra,3400,33, mina wylie crescent, kurradale, 2 01788732,4219287,7, NoRole
+rec-64-dup-0, dan, n,32, , ms, emiily, , vic,2025, axedale,8, grounds crrcent, , 08 43966362,3693252,7, NoRole
+rec-64-org,   dan, f,32,19830407, ms, emiily, krogh, vic, axedale,2025,8, grounds crescent, billamein, 08 43966362,3693252,7, NoRole
+rec-65-dup-0, chi, m,24,19910815, mr, zosdua, ckhiau, nstw, geuri,3556,2, groom ztreet, klenmoaah, 02 34345262,7041865,7, NoRole
+rec-65-dup-1, chi, m,24,19910815, mr, sozhua, xiau, ns, ckeury,3556,2, kroom jdrid, klenmoa, 02 34345262,7041865,7, NoRole
+rec-65-dup-2, chi, m,24,19910815, mr, zosdhua, yo, nsw, ckeuri,3556,2, ckrum ztreet, ckklenmoar, 02 34345262,7041865,7, NoRole
+rec-65-org,   chi, m,24,19910815, mr, joshua, chyau, nsw, geurie,3556,2, groom street, glenmore, 02 34345262,7041865,7, NoRole
+rec-66-org,   spa, ,32, , , aliza, , vic, apollo bay,2250,18, garsia street, , 618 36838061,1028883,2, NoRole
+rec-67-dup-0, unk, f, z6, l9890213, ms, hann ah, sc m, v:c, meadow  ig hts,4053, Z9, bywaters p lace, , 618 612 92 0,3223955,2, NoRole
+rec-67-dup-1, unk, f,26,19890213, ms, hannah, sc i  e, vi, mead0vv h e ights,4053,29, bywater  lace, , 618612 9 270, 3z2 39 5,2, NoRole
+rec-67-org,   unk, f,26,19890213, ms, hannah, scime, vic, meadow heights,4053,29, bywaters place, , 618 61269270,3223955,2, NoRole
+rec-68-dup-0, cze, ,11, 2004 4 7, mr, d a n e, jerd ek, n    , lidcomhe,32,3, hyndescrescent, , 02 78258185, ZS4 917,4, NoRole
+rec-68-dup-1, cze, ,1, 200 007, mr, dante, ier oek, ns, lidc m be, 32 0 ,3, hyndescr escent, , 02 78   185, 254 917,4, NoRole
+rec-68-dup-2, cze, ,11, 200q 0 07, mr, date, jerd nek, n s, lid  me,320,3, hyndesc e cent, , 02 782  185, 25 9917,4, NoRole
+rec-68-org,   cze, ,11,20040407, mr, dante, jerdonek, nsw, lidcombe,3205,3, hyndes crescent, , 02 78258185,2549917,4, NoRole
+rec-69-dup-0, eng, v,28,19870607, , louis, etarhdzdon, kwld, yalangua,2466,8, gilmore crestcent, wuahtulla xoppink vlg, 613 75561283,8892938,5, NoRole
+rec-69-dup-1, eng, v,28,19870607, , loistt, edaahdstdon, klt, ialankur,2466,8, kilmore crescent, wurtula shopinck vlge, 613 75561283,8892938,5, NoRole
+rec-69-dup-2, eng, f,28,19870607, , loist, edwarhdzon, kld, ialanguah,2466,8, gilmore creztcent, wurtula jtopping vlge, 613 75561283,8892938,5, NoRole
+rec-69-org,   eng, f,28,19870607, , louis, edwardson, qld, yalangur,2466,8, gilmore crescent, wurtulla shopping vlge, 613 75561283,8892938,5, NoRole
+rec-6-org,   unk, f, ,19750707, , kadin, stranger, qld, river ranch,3324,6, , , 3 49243383,7588878,6, NoRole
+rec-70-dup-0, unk, ,2,19900410, , mattew, scola stique, , yenda, 602 5,  l 4, gile ss  eet, , 08 33 1  2 85, 18o6 15,3, NoRole
+rec-70-dup-1, unk, ,25,19900410, , matth evv, scolas i  ue, , ynda, 60 5,1, giles treet, , 08 33186285, 180 4 5,3, NoRole
+rec-70-org,   unk, ,25,19900410, , matthew, scolastique, , yenda,6025,14, giles street, , 08 33186285,1806415,3, NoRole
+rec-71-dup-0, usa, ,33,19820220, , julia, eaveah, nstw, kckalala,3730,33, , sttaah kourt arcate, 02 94034864,4650391,9, NoRole
+rec-71-dup-1, usa, ,33,19820220, , julya, eavea, nsw, ckalala,3730,33, , ztar kort arkate, 02 94034864,4650391,9, NoRole
+rec-71-dup-2, usa, ,33,19820220, , julia, eafer, nst, kalala,3730,33, , staah kort arcade, 02 94034864,4650391,9, NoRole
+rec-71-org,   usa, ,33,19820220, , julia, weaver, nsw, calala,3730,33, , star court arcade, 02 94034864,4650391,9, NoRole
+rec-72-dup-0, ser, ,34,19810814, , liz, dzturik, njtw, reidz vlat,4311,14, , , 612 13003298,6906661,7, NoRole
+rec-72-dup-1, ser, ,34,19810814, , lij, dztduric, nz, ridsd flat,4311,14, , , 612 13003298,6906661,7, NoRole
+rec-72-dup-2, ser, ,34,19810814, , leist, ttstturic, njw, rits vlat,4311,14, , , 612 13003298,6906661,7, NoRole
+rec-72-org,   ser, ,34,19810814, , lewis, djuric, nsw, reids flat,4311,14, , , 612 13003298,6906661,7, NoRole
+rec-73-dup-0, usa, ,22,19930217, hon, , bishop, ns, ,4171,217, foxallstreet, , 02 49428927,1453764,9, NoRole
+rec-73-dup-1, usa, ,22,19930217, hon, runy, bihxc, nsg, bethungra,4171,130, foxall nsreet, , 02 50423571,1459664,9, NoRole
+rec-73-org,   usa, f,22,19930217, hon, ruby, bishop, nsw, bethungra,4171,130, foxall street, , 02 50323751,1453764,9, NoRole
+rec-74-dup-0, eng, v,25,19900306, , ela, pabcocccck, vicck, tinckley filage,2263,239, badenoecst kressent, , 618 32706832,9017706,9, NoRole
+rec-74-dup-1, eng, f,25,19900306, , ela, papkokk, vic, tinckly vilag,2263,239, padenoch crestkend, , 618 32706832,9017706,9, NoRole
+rec-74-org,   eng, f,25,19900306, , ella, babcocke, vic, dingley village,2263,239, badenoch crescent, , 618 32706832,9017706,9, NoRole
+rec-75-org,   eng, f,31,19840721, ms, , kevinson, qld, whetstone,3934,6, cerutty crescent, , 3 24203456,7656396,4, NoRole
+rec-76-org,   usa, f,32,19831027, ms, renee, russell, qld, burnie,2479,11, ferrett circuit, , 3 23816666,8467907,5, NoRole
+rec-77-dup-0, ser, ,40, , dr, jackson, revdkh, vic, wanal a,4811,3, hart jplzce, , 08 45530500,2320425,5, NoRole
+rec-77-dup-1, ser, ,40,19759569, dr, jacqson, revuip, vic, wanalta,4811,38, hartpblsce, , 08 45530500,2302745,5, NoRole
+rec-77-dup-2, ser, f,40,19752049, dr, jackson, rebic, vic, wanakya,4810,48, palce hart, , 08 45530500,2302745,5, NoRole
+rec-77-dup-3, ser, m,40,19750509, dr, jackon, rendc, ss, wanalta,4819,3, hartpcwme, , 08 45530500,2302745,5, NoRole
+rec-77-org,   ser, m,40,19750509, dr, jackson, revic, vic, wanalta,4811,32, hart place, , 08 45530500,2302745,5, NoRole
+rec-78-dup-0, por, v,35,19800104, , ami, veitoa, nsdw, ckoonenkerri,6169,190, perry drive, , 612 22038099,8738777,6, NoRole
+rec-78-dup-1, por, v,35,19800104, , ami, veitor, njw, gunengerri,6169,190, peri triv, , 612 22038099,8738777,6, NoRole
+rec-78-dup-2, por, v,35,19800104, , ami, vitoah, ns, ckunenkerri,6169,190, perry driv, , 612 22038099,8738777,6, NoRole
+rec-78-org,   por, f,35,19800104, , amy, feitor, nsw, goonengerry,6169,190, perry drive, , 612 22038099,8738777,6, NoRole
+rec-79-org,   unk, m,27,19880506, , rosie, aballon, sa, dulwich,3036,18, , , 7 30260444,4292021,9, NoRole
+rec-7-dup-0, chi, f,3, , mr, jessica, chu , ql , want i ma,2251,14, chappells reet, fjv e a , 613 47012236,752057,3, NoRole
+rec-7-org,   chi, f,33, , mr, jessica, chueh, qld, wantirna,2251,141, chappell street, fiveways, 613 47012236,7525057,3, NoRole
+rec-80-dup-0, eng, f,32,19830712, ms, indya, cocccck, fic, mardshal,2090,41, noatborne flatj, , 618 37328046,1568765,2, NoRole
+rec-80-dup-1, eng, f,32,19830712, ms, intya, kok, vic, marzal,2090,41, nordhbourne flatz, , 618 37328046,1568765,2, NoRole
+rec-80-org,   eng, f,32,19830712, ms, india, coke, vic, marshall,2090,41, northbourne flats, , 618 37328046,1568765,2, NoRole
+rec-81-org,   ind, f,31,19840616, mr, samantha, jhangiani, qld, gatton,3206,8, charterisville avenue, ditone arabians, 3 57715671,7874899,6, NoRole
+rec-82-org,   rus, m, ,19660724, , nathan, stelmakh, nt, wulagi,7270,8, dempster place, , 613 57245413,5583762,9, NoRole
+rec-83-dup-0, ger, f,33,19820730, , jenn ifer, we'l l e, n5w, crem o e, 24& 0,1, ca55i ydose, , 612 97078283, 838  436,5, NoRole
+rec-83-org,   ger, f,33,19820730, , jennifer, weigle, nsw, cremorne,2480,1, cassidy close, , 612 97078283,8385436,5, NoRole
+rec-84-dup-0, unk, f, ,19480522, , jack, white, , northmayd,4601,27, wagga skyveet, , 03 97004597,8707593,5, NoRole
+rec-84-dup-1, unk, d, ,19480722, , jack, dixon, , norbmead,4691,217, waggap geet, , 03 97004597,8706039,5, NoRole
+rec-84-org,   unk, m, ,19480522, , jack, sclafani, , northmead,4610,217, wagga street, , 03 97004597,8706039,5, NoRole
+rec-85-dup-0, ser, f, 3|,19840124, , ti mo hy, kre s,    , wallenbeen, 22 04,8, mcnico   p|ace, , 2 75447096, 1809 853,5, NoRole
+rec-85-org,   ser, f,31,19840124, , timothy, kreso, nsw, wallendbeen,2204,82, mcnicoll place, , 2 75447096,1809853,5, NoRole
+rec-86-dup-0, ger, f,28,19870718, mr, topy, wastsenaeah, kwlt, willoz jymfieldstt,3214,26, aahmstronck crezcent, , 613 39586188,8972776,4, NoRole
+rec-86-dup-1, ger, f,28,19870718, mr, dopi, azjenaeah, kld, willowzt jymfildz,3214,26, armztrong crezcent, , 613 39586188,8972776,4, NoRole
+rec-86-dup-2, ger, f,28,19870718, mr, dopi, wasjenaer, ckwld, wilowdst gemfields,3214,26, armztrong kresent, , 613 39586188,8972776,4, NoRole
+rec-86-dup-3, ger, f,28,19870718, mr, topi, ajjenaea, klt, wilows gemfields,3214,26, armstronk creskent, , 613 39586188,8972776,4, NoRole
+rec-86-org,   ger, f,28,19870718, mr, toby, wassenaer, qld, willows gemfields,3214,26, armstrong crescent, , 613 39586188,8972776,4, NoRole
+rec-87-dup-0, usa, f, ,19190717, mr, alana, rixardz, vic, yarraville esttdt,5277,64, kinsella sdreet, locckn 8774, 04 27061030,3333202,6, NoRole
+rec-87-org,   usa, f, ,19190717, mr, alannah, richards, vic, yarraville west,5277,64, kinsella street, locn 8774, 04 27061030,3333202,6, NoRole
+rec-88-dup-0, fre, f,3,19830517, hon, chevon ne, dov e , vi , herne   ill, 612 1, Z  , leahycose, ,838721346, 95z2 457,2, NoRole
+rec-88-dup-1, fre, f, 3 2,19830517, hon, che v  ne, dou c t, v , hern e h ll,6121,2, leah y c  o se, , 8 387 21 34,9522457,2, NoRole
+rec-88-dup-2, fre, f,32, 1983o5 7, hon, chevo  , doucet, vi c, herne   ill,6121,2, leaby   ose, , 8 3872|346, 95224 57,2, NoRole
+rec-88-org,   fre, f,32,19830517, hon, chevonne, doucet, vic, herne hill,6121,24, leahy close, , 8 38721346,9522457,2, NoRole
+rec-89-dup-0, chi, f,35,19800415, , tomas, din, act, teotoar,3350,65, lupuma placcck, jarra, 2 76503112,6851526,4, NoRole
+rec-89-dup-1, chi, f,35,19800415, , domas, din, act, deodoar,3350,65, lupuma plak, ztarah, 2 76503112,6851526,4, NoRole
+rec-89-org,   chi, f,35,19800415, , thomas, tin, act, theodore,3350,65, lubuma place, jarrah, 2 76503112,6851526,4, NoRole
+rec-8-dup-0, ger, ,96, , , jaslyn, bamyavh, vic, inverloch,3163,6561, bennelong crescent, , 8 92615044,4643123,5, NoRole
+rec-8-dup-1, ger, f,20, , , jadlyn, bambach, , invelfoch,3163,60, bennelongprnibfescent, , 8 92615044,2492122,5, NoRole
+rec-8-dup-2, ger, g, , , , jasyln, bambdah, vio, inverloch,3136,600, bennelong crescent, , 02 28337311,2492122,5, NoRole
+rec-8-dup-3, ger, f,31, , , jaslyn, bambach, nsa, invveprich,3163,114, bennelong crescent, , 08 28281364,2492122,5, NoRole
+rec-8-org,   ger, f,19, , , jaslyn, bambach, vic, inverloch,3163,60, bennelong crescent, fernbank, 8 92615044,2492122,5, NoRole
+rec-90-dup-0, ser, ,29,19860425, , ckobi, randjeiovick, qld, laccke klarendon,3104,11, iziz closte, , 613 07711207,6638174,8, NoRole
+rec-90-dup-1, ser, ,29,19860425, , cckopi, randjeiovik, qld, lacke klarendon,3104,11, iyist klose, , 613 07711207,6638174,8, NoRole
+rec-90-dup-2, ser, ,29,19860425, , ckopy, rantstiofik, qlt, lacke clarendon,3104,11, iztiz close, , 613 07711207,6638174,8, NoRole
+rec-90-org,   ser, ,29,19860425, , coby, randjeiovic, qld, lake clarendon,3104,11, isis close, , 613 07711207,6638174,8, NoRole
+rec-91-dup-0, unk, m,39,19760130, , timoty, jcotzakson, , smidhton,2145,25, guthriye crejcent, malaof, 07 47124426,4452745,6, NoRole
+rec-91-org,   unk, m,39,19760130, , timothy, scottjackson, , smithtown,2145,25, guthridge crescent, malahoff, 07 47124426,4452745,6, NoRole
+rec-92-dup-0, afr, f, , 197 70 30, , yas m in, edo , nsw, baera m   r eek, 22g5,3, dumass treet, woodber     vlge,221878929, 39983 2,0, NoRole
+rec-92-dup-1, afr, f, ,19770530, , yas   n, e d o h, nsw, baeram i c reek, 22 95,3, dumas s t reet, woodber r  vlge, 02 21878929, 399839 2,0, NoRole
+rec-92-dup-2, afr, f, , 1977 o53, , yasm n, edo h,  ns, baeram   c  eelc,229,3, dumasst reet, woodberryvlge, 0221878 929, 39 839Z,0, NoRole
+rec-92-org,   afr, f, ,19770530, , yasmin, edoh, nsw, baerami creek,2295,3, dumas street, woodberry vlge, 02 21878929,3998392,0, NoRole
+rec-93-dup-0, eng, d,7,19870104, , caiylih, melville, sa, robe,2257,29, s 477, , 617 44462128,3281597,6, NoRole
+rec-93-dup-1, eng, ,28,19870104, , caotfih, melviole, sa, robe,2257,29, sturdee c rescent, ni oka, 04 82548356,3280879,6, NoRole
+rec-93-dup-2, eng, f,28, , , caimtn, , sa, roxe,2257,335, sturdee crescent, clanville, 617 44462128,3280879,6, NoRole
+rec-93-dup-3, eng, j, ,19870104, , caitqin, melville, sa, rbj,2257,29, sturdee hpwscent, s 477, 617 44462128,3280878,6, NoRole
+rec-93-org,   eng, f,28,19870104, , caitlin, melville, sa, robe,2257,29, sturdee crescent, s 477, 617 44462128,3280879,6, NoRole
+rec-94-dup-0, ind, d, ,19070803, , , kittrh, nsw, emerton,4414,1140, zadow pace, , 2 50794987,9231331,9, NoRole
+rec-94-org,   ind, f, ,19070803, , william, kittur, nsw, emerton,4343,11, thorn place, , 2 50794987,9231331,9, NoRole
+rec-95-dup-0, usa, f,2,19931209, , i a   ee, andrews, ns , rose b y, 7 0 , |92, khullc   s cent, , 02 2725 278, 410 305,9, NoRole
+rec-95-dup-1, usa, f,22, 1g 9 1 09, , jaimee, andrews, ns , ro s e  y,7301, 1 9, khullcrescent, , 02 27 5 278, 410530 5,9, NoRole
+rec-95-dup-2, usa, f,22, 199312 09, , jaim e e, andews, nsw, r0seb y,730, 19 2, khullc escent, , 02 2 25 278,410505,9, NoRole
+rec-95-org,   usa, f,22,19931209, , jaimee, andrews, nsw, rose bay,7301,192, khull crescent, , 02 27253278,4105305,9, NoRole
+rec-96-dup-0, afg, f,9,19860902, dr, ewan, prhangi, v , jancourteast, 2 9, |, diggles street, brentwood village, 618448 1066, 31 7502q,3, NoRole
+rec-96-org,   afg, f,29,19860902, dr, ewan, prhangi, vic, jancourt east,2096,16, diggles street, brentwood village, 618 44851066,3175024,3, NoRole
+rec-97-org,   ind, ,34,19810418, , jack, tanu, sa, hoppers crossing,2077,373, mcguiness place, , 07 74390804,8923998,3, NoRole
+rec-98-org,   eng, f, ,19240904, , chelsie, acker, , angaston,3129,20, gilmore crescent, , 02 70424439,6581122,7, NoRole
+rec-99-dup-0, eng, f,25,19900111, , skye, fairclough, s , edithbrgh, 220 4, 3 5, dun5tan   reet, rid g p o nt, 61781205g67,4197461,0, NoRole
+rec-99-dup-1, eng, f, 2 5, |990 111, , s k e, fair lo gh, sa, edith b u gh,2204,3, dunstan  treet, ridgepoint, 6178120 967, 41974 1,0, NoRole
+rec-99-dup-2, eng, f, 2 5, 199001 1, , skye, faircl ugh, s a, edithurgh,220,1, dvnst a n   reet, ridgep int, 617 812 5967, 4197 461,0, NoRole
+rec-99-dup-3, eng, f, 2 5, 199 01 1, , skye, fairc  ugh, sa, edithb   gh,2204,31, dunsta n street, ridge oi nt, 6178 R5967,4197461,0, NoRole
+rec-99-org,   eng, f,25,19900111, , skye, fairclough, sa, edithburgh,2204,315, dunstan street, ridgepoint, 617 81205967,4197461,0, NoRole
+rec-9-dup-0, ind, f,25,19901207, , iajmin, nilima, wa, dumbeahnink,2518,10, ntest cresend, , 08 84305034,8883180,1, NoRole
+rec-9-dup-1, ind, f,25,19901207, , iazdmin, nilima, a, dumperninkk,2518,10, hyndez crejkent, , 08 84305034,8883180,1, NoRole
+rec-9-dup-2, ind, f,25,19901207, , yaztmin, nilima, wa, dumberning,2518,10, yndej cresttsent, , 08 84305034,8883180,1, NoRole
+rec-9-org,   ind, f,25,19901207, , yasmin, nilima, wa, dumberning,2518,10, hyndes crescent, , 08 84305034,8883180,1, NoRole

@@ -1,68 +1,48 @@
 package il.ac.technion.ie.experiments.service;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.experiments.threads.CalcProbabilityAction;
 import il.ac.technion.ie.lprobability.SimilarityCalculator;
+import org.apache.log4j.Logger;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by I062070 on 26/08/2015.
  */
 public class ProbabilityService {
 
+    static final Logger logger = Logger.getLogger(ProbabilityService.class);
+    private final ForkJoinPool pool;
+
+    public ProbabilityService() {
+        pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+    }
+
     public void calcProbabilitiesOfRecords(List<BlockWithData> blocks) {
-        SimilarityCalculator similarityCalculator = new SimilarityCalculator(new JaroWinkler());
         //iterate on each block
+        long startTime = System.nanoTime();
+        SimilarityCalculator calculator = new SimilarityCalculator(new JaroWinkler());
         for (BlockWithData block : blocks) {
-            calcBlockSimilarity(similarityCalculator, block);
-            calcRecordsProbabilityInBlock(block);
+            logger.trace("adding a new job to pool");
+            pool.invoke(new CalcProbabilityAction(block, calculator));
         }
-    }
+        try {
+            logger.debug("Executing shutdown command on pool");
+            long waitForJobsToFinish = System.nanoTime();
+            pool.shutdown();
+            boolean termination = pool.awaitTermination(10, TimeUnit.SECONDS);
+            long endTime = System.nanoTime();
+            logger.debug(String.format("Total executing time is: %d Millis", TimeUnit.NANOSECONDS.toMillis(endTime - startTime)));
+            logger.debug(String.format("Waited %d Millis till all jobs finished", TimeUnit.NANOSECONDS.toMillis(endTime - waitForJobsToFinish)));
+            String result = termination ? "successful" : "unsuccessful";
+            logger.info("Calculating probabilities on blocks was " + result);
 
-    private void calcBlockSimilarity(SimilarityCalculator similarityCalculator, BlockWithData block) {
-        List<Record> blockRecords = block.getMembers();
-        //retrieve block Text attributes
-        for (Record currentRecord : blockRecords) {
-
-            float currentRecordSimilarity = calcRecordSimilarityInBlock(currentRecord, blockRecords, similarityCalculator);
-            block.setMemberSimScore(currentRecord, currentRecordSimilarity);
+        } catch (InterruptedException e) {
+            logger.error("Failed to wait till termination of jobs pool", e);
         }
-    }
-
-    private void calcRecordsProbabilityInBlock(BlockWithData block) {
-        float allScores = 0;
-        for (Record record : block.getMembers()) {
-            allScores += block.getMemberScore(record);
-        }
-
-        for (Record record : block.getMembers()) {
-            block.setMemberProbability(record, block.getMemberScore(record) / allScores);
-        }
-    }
-
-    /**
-     * The method sumup the similarity of a record (currentRecordId) to all other records in a block.
-     * It doesn't calculate the similarity of a record to itself.
-     *
-     * @param currentRecord        - the record whose similarity with other we want to measure.
-     * @param blockRecords         - All records in the block
-     * @param similarityCalculator - a calculator to calc similarity by.
-     * @return
-     */
-    private float calcRecordSimilarityInBlock(Record currentRecord, final List<Record> blockRecords,
-                                              SimilarityCalculator similarityCalculator) {
-        float recordsSim = 0;
-        //case block contains a single record
-        if (blockRecords.size() == 1) {
-            return 1;
-        }
-        for (Record next : blockRecords) {
-            if (next != currentRecord) {
-                recordsSim += similarityCalculator.calcRecordsSim(next.getEntries(), currentRecord.getEntries());
-            }
-        }
-        return recordsSim;
     }
 }

@@ -40,4 +40,10 @@ public class ExperimentsUtils {
         URL resourceUrl = ExperimentsUtils.class.getResource(pathToFile);
         return new File(resourceUrl.toURI());
     }
+
+    public static String getPathToBigRecordsFile() throws URISyntaxException {
+        String pathToFile = "/1kRecords.csv";
+        File file = getFileFromResourceDir(pathToFile);
+        return file.getAbsolutePath();
+    }
 }

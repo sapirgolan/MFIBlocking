@@ -16,13 +16,24 @@ import java.util.concurrent.TimeUnit;
 public class ProbabilityService {
 
     static final Logger logger = Logger.getLogger(ProbabilityService.class);
-    private final ForkJoinPool pool;
+    private ForkJoinPool pool;
 
     public ProbabilityService() {
-        pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+        initPool();
+    }
+
+    private void initPool() {
+        if (pool != null) {
+            if (pool.isShutdown()) {
+                pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+            }
+        } else {
+            pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+        }
     }
 
     public void calcProbabilitiesOfRecords(List<BlockWithData> blocks) {
+        this.initPool();
         //iterate on each block
         long startTime = System.nanoTime();
         SimilarityCalculator calculator = new SimilarityCalculator(new JaroWinkler());

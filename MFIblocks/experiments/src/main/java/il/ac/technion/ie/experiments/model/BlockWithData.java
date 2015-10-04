@@ -21,6 +21,7 @@ public class BlockWithData extends AbstractBlock<Record>{
                 break;
             }
         }
+        Collections.sort(this.members, new RecordComparator());
         this.id = this.hashCode();
     }
 

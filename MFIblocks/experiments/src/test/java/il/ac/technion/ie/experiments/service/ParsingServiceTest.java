@@ -20,7 +20,7 @@ public class ParsingServiceTest {
 
     @Test
     public void testParseDataset() throws Exception {
-        String recordsFile = ExperimentsUtils.getPathToRecordsFile();
+        String recordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
         List<BlockWithData> blockWithDatas = classUnderTest.parseDataset(recordsFile);
         MatcherAssert.assertThat(blockWithDatas, Matchers.hasSize(4));
     }

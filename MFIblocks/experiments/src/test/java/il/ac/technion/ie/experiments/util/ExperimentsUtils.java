@@ -1,5 +1,13 @@
 package il.ac.technion.ie.experiments.util;
 
+import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.service.FuzzyService;
+import il.ac.technion.ie.experiments.service.ParsingService;
+import il.ac.technion.ie.experiments.service.ProbabilityService;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.reflect.Whitebox;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -20,7 +28,7 @@ public class ExperimentsUtils {
         return huge.split(",");
     }
 
-    public static String getPathToRecordsFile() throws URISyntaxException {
+    public static String getPathToSmallRecordsFile() throws URISyntaxException {
         String pathToFile = "/20Records.csv";
         File file = getFileFromResourceDir(pathToFile);
         return file.getAbsolutePath();
@@ -45,5 +53,30 @@ public class ExperimentsUtils {
         String pathToFile = "/1kRecords.csv";
         File file = getFileFromResourceDir(pathToFile);
         return file.getAbsolutePath();
+    }
+
+    public static List<BlockWithData> createFuzzyBlocks() throws URISyntaxException {
+        String recordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
+
+        ParsingService parsingService = new ParsingService();
+        ProbabilityService probabilityService = new ProbabilityService();
+        FuzzyService fuzzyService = initFuzzyService();
+
+        List<BlockWithData> originalBlocks = parsingService.parseDataset(recordsFile);
+        probabilityService.calcProbabilitiesOfRecords(originalBlocks);
+
+        List<BlockWithData> copyOfOriginalBlocks = new ArrayList<>(originalBlocks);
+        List<BlockWithData> fuzzyBlocks = fuzzyService.splitBlocks(copyOfOriginalBlocks, 0.6);
+        probabilityService.calcProbabilitiesOfRecords(fuzzyBlocks);
+
+        return fuzzyBlocks;
+    }
+
+    private static FuzzyService initFuzzyService() {
+        FuzzyService fuzzyService = new FuzzyService();
+        UniformRealDistribution uniformRealDistribution = PowerMockito.mock(UniformRealDistribution.class);
+        PowerMockito.when(uniformRealDistribution.sample()).thenReturn(0.3, 0.7, 0.6, 0.4);
+        Whitebox.setInternalState(fuzzyService, "splitBlockProbThresh", uniformRealDistribution);
+        return fuzzyService;
     }
 }

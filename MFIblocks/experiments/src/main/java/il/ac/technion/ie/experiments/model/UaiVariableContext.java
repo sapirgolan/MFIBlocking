@@ -9,6 +9,7 @@ import il.ac.technion.ie.potential.model.MatrixContext;
 import il.ac.technion.ie.potential.model.SharedMatrix;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -18,6 +19,7 @@ public class UaiVariableContext {
 
     private static final Logger logger = Logger.getLogger(UaiVariableContext.class);
 
+    private final File file;
     private List<BlockWithData> blocks;
     private List<MatrixContext<SharedMatrix>> matricesWithContext;
 
@@ -29,13 +31,14 @@ public class UaiVariableContext {
     private BiMap<Integer, Integer> variableIdToBlockId;
 
 
-    private UaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext) {
+    private UaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext, File file) {
         this.blocks = blocks;
         this.matricesWithContext = matricesWithContext;
+        this.file = file;
     }
 
-    public static UaiVariableContext createUaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext) {
-        UaiVariableContext context = new UaiVariableContext(blocks, matricesWithContext);
+    public static UaiVariableContext createUaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext, File file) {
+        UaiVariableContext context = new UaiVariableContext(blocks, matricesWithContext, file);
         context.init();
         return context;
     }
@@ -174,5 +177,9 @@ public class UaiVariableContext {
         Set<Integer> result = new HashSet<>(allVariables);
         result.retainAll(variablesWithSharedMatrices);
         return new ArrayList<>(result);
+    }
+
+    public File getFile() {
+        return file;
     }
 }

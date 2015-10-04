@@ -44,7 +44,7 @@ public class UaiBuilder {
         this.blocks = blocks;
     }
 
-    public File createUaiFile() throws SizeNotEqualException {
+    public UaiVariableContext createUaiFile() throws SizeNotEqualException {
         file = createOutputFile();
         matricesWithContext = createSharedMatrices();
 
@@ -56,7 +56,7 @@ public class UaiBuilder {
             throw new SizeNotEqualException("#Variables is not equal to the sum of (#Blocks + #SharedMatrices)");
         }
 
-        UaiVariableContext variableContext = UaiVariableContext.createUaiVariableContext(blocks, matricesWithContext);
+        UaiVariableContext variableContext = UaiVariableContext.createUaiVariableContext(blocks, matricesWithContext, file);
 
         try {
             writeMarkov();
@@ -65,15 +65,15 @@ public class UaiBuilder {
             writeNumberOfVariables(numberOfVariables);
             writeVariableSizeAndIndecies(variableContext.getSizeAndIndexOfVariables());
             writeBlocksProbabilities(variableContext);
-            wtireCliquesSharedMatrix(variableContext);
+            writeCliquesSharedMatrix(variableContext);
 
         } catch (IOException | KeyNotExistException | SizeNotEqualException | NoValueExistsException e) {
             logger.error("Failed to create UAI File", e);
         }
-        return file;
+        return variableContext;
     }
 
-    private void wtireCliquesSharedMatrix(UaiVariableContext variableContext) throws IOException, SizeNotEqualException, NoValueExistsException {
+    private void writeCliquesSharedMatrix(UaiVariableContext variableContext) throws IOException, SizeNotEqualException, NoValueExistsException {
         String cliquesSharedMatrix = buildCliquesAndSharedMatrix(variableContext);
         this.appendStringToFile(cliquesSharedMatrix);
     }

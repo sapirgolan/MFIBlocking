@@ -1,14 +1,11 @@
 package il.ac.technion.ie.experiments.threads;
 
-import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
 import il.ac.technion.ie.experiments.model.ConvexBPContext;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +17,6 @@ public class CommandExacter {
     static final Logger logger = Logger.getLogger(CommandExacter.class);
 
     public void execute(ConvexBPContext context) throws IOException, OSNotSupportedException, InterruptedException {
-        FileOutputStream fileOutputStream = new FileOutputStream(createFileForOutput());
         checkOS();
 
         Runtime runtime = Runtime.getRuntime();
@@ -35,9 +31,9 @@ public class CommandExacter {
         thread.start();
 
         // any error message?
-        StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "ERROR");
+        StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), StreamGobbler.ChanelType.ERROR);
         // any output?
-        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT", fileOutputStream);
+        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), StreamGobbler.ChanelType.OUTPUT);
 
         // kick them off
         errorGobbler.start();
@@ -52,26 +48,10 @@ public class CommandExacter {
         logger.info("Total execution time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime));
         logger.info("Total wait time time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - waitTime));
         logger.debug("ExitValue: " + exitVal);
-
-        fileOutputStream.flush();
-        fileOutputStream.close();
-
     }
 
     private String createCommand(ConvexBPContext context) {
         return context.getCommand();
-    }
-
-    private File createFileForOutput() throws IOException {
-        String outputFilePath = ExpFileUtils.getOutputFilePath("executeCBP", ".txt");
-        File file = new File(outputFilePath);
-        if (file.exists()) {
-            logger.info(String.format("output file of convexBP exists '%s', deleting it", file.getAbsolutePath()));
-            FileUtils.forceDelete(file);
-        }
-        boolean wasFileCreated = file.createNewFile();
-        logger.info("Was output file of convexBP created: " + wasFileCreated);
-        return file;
     }
 
     private void checkOS() throws OSNotSupportedException {

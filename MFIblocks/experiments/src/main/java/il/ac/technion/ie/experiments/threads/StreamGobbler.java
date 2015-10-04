@@ -10,44 +10,43 @@ import java.io.*;
 public class StreamGobbler extends Thread {
 
     static final Logger logger = Logger.getLogger(StreamGobbler.class);
+    private final static String NEW_LINE = System.getProperty("line.separator");
 
     private InputStream is;
-    private String type;
-    private OutputStream outputStream;
+    private ChanelType type;
 
-    StreamGobbler(InputStream is, String type) {
-        this(is, type, null);
-    }
-
-    StreamGobbler(InputStream is, String type, OutputStream redirect) {
+    StreamGobbler(InputStream is, ChanelType type) {
         this.is = is;
         this.type = type;
-        this.outputStream = redirect;
     }
 
     public void run() {
         try {
+            StringBuilder log = new StringBuilder();
             StringBuilder builder = new StringBuilder();
-            PrintWriter printWriter = null;
-            if (outputStream != null) {
-                printWriter = new PrintWriter(outputStream);
-            }
 
             InputStreamReader inputStreamReader = new InputStreamReader(is);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                if (printWriter != null) {
-                    printWriter.println(line);
-                }
+                log.append(line);
+                log.append(NEW_LINE);
                 builder.append(line);
+            }
+            if (ChanelType.ERROR.equals(type)) {
+                logger.error(log.toString());
+            } else {
+                logger.info(log.toString());
             }
             logger.info(type + ">" + builder.toString());
 
-            if (printWriter != null)
-                printWriter.flush();
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            logger.error("Failed to run Stream Gobbler", ioe);
         }
+    }
+
+    public enum ChanelType {
+        ERROR,
+        OUTPUT
     }
 }

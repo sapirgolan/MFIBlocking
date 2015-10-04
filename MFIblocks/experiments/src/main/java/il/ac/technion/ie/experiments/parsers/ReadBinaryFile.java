@@ -1,4 +1,4 @@
-package il.ac.technion.ie.experiments.apiAccess;
+package il.ac.technion.ie.experiments.parsers;
 
 import org.apache.commons.io.EndianUtils;
 import org.apache.log4j.Logger;

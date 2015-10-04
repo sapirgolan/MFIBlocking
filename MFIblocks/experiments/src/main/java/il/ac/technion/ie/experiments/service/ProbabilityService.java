@@ -28,7 +28,7 @@ public class ProbabilityService {
         SimilarityCalculator calculator = new SimilarityCalculator(new JaroWinkler());
         for (BlockWithData block : blocks) {
             logger.trace("adding a new job to pool");
-            pool.invoke(new CalcProbabilityAction(block, calculator));
+            pool.execute(new CalcProbabilityAction(block, calculator));
         }
         try {
             logger.debug("Executing shutdown command on pool");

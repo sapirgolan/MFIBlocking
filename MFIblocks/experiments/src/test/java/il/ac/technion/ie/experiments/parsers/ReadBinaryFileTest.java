@@ -1,4 +1,4 @@
-package il.ac.technion.ie.experiments.apiAccess;
+package il.ac.technion.ie.experiments.parsers;
 
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
@@ -14,9 +14,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class ReadBinaryFileTest {
     private ReadBinaryFile classUnderTest;

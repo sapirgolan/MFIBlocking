@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import il.ac.technion.ie.experiments.parsers.ReadBinaryFile;
+import il.ac.technion.ie.model.Record;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,11 +22,14 @@ import org.powermock.reflect.Whitebox;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.powermock.api.mockito.PowerMockito.*;
 import static org.powermock.api.support.membermodification.MemberMatcher.constructor;
 import static org.powermock.api.support.membermodification.MemberModifier.suppress;
@@ -57,7 +62,6 @@ public class UaiConsumerTest {
 
     @Test
     public void testConsumePotentials() throws Exception {
-
         //mocking
         Map<Integer, Double> lineToProbabilityMap = Maps.newHashMap(new ImmutableMap.Builder<Integer, Double>()
                 .put(1, 0.0).put(2, 0.0).put(3, 1.0)
@@ -82,8 +86,33 @@ public class UaiConsumerTest {
         assertThat(classUnderTest.isPotentialConsumed(), is(true));
 
         //verify
-        verifyPrivate(classUnderTest, Mockito.times(3)).invoke("fillProbsForVariable", Mockito.any(Iterator.class), Mockito.anyInt());
-        verifyPrivate(classUnderTest, Mockito.times(11)).invoke("assertIterator", Mockito.any(Iterator.class));
+        verifyPrivate(classUnderTest, times(3)).invoke("fillProbsForVariable", Mockito.any(Iterator.class), Mockito.anyInt());
+        verifyPrivate(classUnderTest, times(11)).invoke("assertIterator", Mockito.any(Iterator.class));
+    }
 
+    @Test
+    public void testApplyNewProbabilities_potentialNotConsumed() throws Exception {
+        //mocking
+        List blocks = mock(List.class);
+        when(blocks.iterator()).thenReturn(mock(Iterator.class)); //mocks the iterator for the foreach loop
+        doNothing().when(classUnderTest).consumePotentials();
+
+        //execute
+        classUnderTest.applyNewProbabilities(blocks);
+
+        //verify
+        Mockito.verify(classUnderTest, times(1));
+    }
+
+    @Test(expected = SizeNotEqualException.class)
+    public void testAssertBlockSize() throws Exception {
+        //mocking
+        List<Double> newProbabilities = mock(List.class);
+        when(newProbabilities.size()).thenReturn(7);
+        List<Record> sortedMembers = mock(List.class);
+        when(sortedMembers.size()).thenReturn(5);
+
+        //execute
+        Whitebox.invokeMethod(classUnderTest, "assertBlockSize", newProbabilities, sortedMembers);
     }
 }

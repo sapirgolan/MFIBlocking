@@ -141,4 +141,9 @@ public class BlockWithData extends AbstractBlock<Record>{
     public List<String> getFieldNames() {
         return trueRepresentative.getFieldNames();
     }
+
+    public List<Record> getSortedMembers() {
+        Collections.sort(members, new RecordComparator());
+        return members;
+    }
 }

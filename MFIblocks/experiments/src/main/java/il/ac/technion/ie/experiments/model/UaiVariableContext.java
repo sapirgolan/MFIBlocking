@@ -66,7 +66,7 @@ public class UaiVariableContext {
             variableIdToBlocksMultimap.putAll(variableIndex, Lists.newArrayList(pair.getLeft(), pair.getRight()));
             variableIndex++;
         }
-        logger.debug("There are total of '" + (variableIndex + 1) + "' variables");
+        logger.debug("There are total of '" + variableIndex + "' variables");
     }
 
     public List<Integer> getSizeOfVariables() {
@@ -139,7 +139,7 @@ public class UaiVariableContext {
             logger.error(String.format("Tried to obtain block with ID '%d' that doesn't exist", blockID));
             throw new KeyNotExistException("Key " + blockID + " doesn't exists in blockIdToBlockMap");
         }
-        List<Record> members = blockWithData.getMembers();
+        List<Record> members = blockWithData.getSortedMembers();
         for (Record record : members) {
             float recordProbability = blockWithData.getMemberProbability(record);
             probabilities.add((double) recordProbability);

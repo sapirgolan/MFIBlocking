@@ -2,7 +2,6 @@ package il.ac.technion.ie.experiments.service;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
-import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import il.ac.technion.ie.experiments.parsers.UaiBuilder;
@@ -11,9 +10,11 @@ import il.ac.technion.ie.model.Record;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.times;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({FuzzyService.class})
 public class UaiConsumerIntegrationTest {
 
     private UaiConsumer classUnderTest;
@@ -30,7 +33,7 @@ public class UaiConsumerIntegrationTest {
     private static List<BlockWithData> fuzzyBlocks;
 
     @BeforeClass
-    public static void initClass() throws URISyntaxException, SizeNotEqualException {
+    public static void initClass() throws Exception {
         fuzzyBlocks = ExperimentsUtils.createFuzzyBlocks();
         UaiBuilder uaiBuilder = new UaiBuilder(fuzzyBlocks);
         variableContext = uaiBuilder.createUaiFile();

@@ -4,9 +4,9 @@ import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.service.FuzzyService;
 import il.ac.technion.ie.experiments.service.ParsingService;
 import il.ac.technion.ie.experiments.service.ProbabilityService;
-import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.easymock.EasyMock;
+import org.powermock.api.easymock.PowerMock;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.reflect.Whitebox;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by I062070 on 24/08/2015.
@@ -55,7 +56,7 @@ public class ExperimentsUtils {
         return file.getAbsolutePath();
     }
 
-    public static List<BlockWithData> createFuzzyBlocks() throws URISyntaxException {
+    public static List<BlockWithData> createFuzzyBlocks() throws Exception {
         String recordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
 
         ParsingService parsingService = new ParsingService();
@@ -66,17 +67,21 @@ public class ExperimentsUtils {
         probabilityService.calcProbabilitiesOfRecords(originalBlocks);
 
         List<BlockWithData> copyOfOriginalBlocks = new ArrayList<>(originalBlocks);
-        List<BlockWithData> fuzzyBlocks = fuzzyService.splitBlocks(copyOfOriginalBlocks, 0.6);
+        Map splitProbMap = PowerMockito.mock(Map.class);
+        PowerMockito.when(splitProbMap.size()).thenReturn(originalBlocks.size());
+        List<BlockWithData> fuzzyBlocks = fuzzyService.splitBlocks(copyOfOriginalBlocks, splitProbMap, 0.6);
         probabilityService.calcProbabilitiesOfRecords(fuzzyBlocks);
 
         return fuzzyBlocks;
     }
 
-    private static FuzzyService initFuzzyService() {
-        FuzzyService fuzzyService = new FuzzyService();
-        UniformRealDistribution uniformRealDistribution = PowerMockito.mock(UniformRealDistribution.class);
-        PowerMockito.when(uniformRealDistribution.sample()).thenReturn(0.3, 0.7, 0.6, 0.4);
-        Whitebox.setInternalState(fuzzyService, "splitBlockProbThresh", uniformRealDistribution);
+    private static FuzzyService initFuzzyService() throws Exception {
+        FuzzyService fuzzyService = PowerMock.createPartialMock(FuzzyService.class, "getSplitProbability");
+        PowerMock.expectPrivate(fuzzyService, "getSplitProbability", EasyMock.anyObject(Map.class), EasyMock.anyObject(BlockWithData.class))
+                .andReturn(0.3).andReturn(0.7).andReturn(0.6).andReturn(0.4);
+
+        PowerMock.replay(fuzzyService);
+
         return fuzzyService;
     }
 }

@@ -3,42 +3,40 @@ package il.ac.technion.ie.experiments.service;
 import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.experiments.model.RecordSplit;
-import org.apache.commons.math3.distribution.UniformRealDistribution;
+import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by I062070 on 09/09/2015.
  */
 public class FuzzyService {
 
-    private UniformRealDistribution splitBlockProbThresh;
     static final Logger logger = Logger.getLogger(FuzzyService.class);
 
-
     public FuzzyService() {
-        splitBlockProbThresh = new UniformRealDistribution();
     }
-
 
     /**
      * The method split blocks in half if the block inner threshold is lower than the given threshold.
-     * For each block it randomly sample a split probability from the Uniform distribution~[0,1].
-     * If the sampled probability is smaller than the threshold {@code sampledProbability < threshold }then the block is split into two blocks.
+     * For each block it obtain a split probability .
+     * If the split probability is smaller than the threshold {@code sampledProbability < threshold }then the block is split into two blocks.
      * The records of the block are randomly placed into the new blocks.
      * The True representative of the original block is placed in the two new blocks.
      *
      * @param originalBlocks
+     * @param splitProbs
      * @param threshold
      */
-    public List<BlockWithData> splitBlocks(List<BlockWithData> originalBlocks, double threshold) {
+    public List<BlockWithData> splitBlocks(List<BlockWithData> originalBlocks, Map<Integer, Double> splitProbs, double threshold) throws SizeNotEqualException {
+        assertSize(originalBlocks, splitProbs);
         List<BlockWithData> newBlocks = new ArrayList<>(originalBlocks.size());
         for (BlockWithData origBlock : originalBlocks) {
-            double splitProbability = splitBlockProbThresh.sample();
+            Double splitProbability = getSplitProbability(splitProbs, origBlock);
             if (splitProbability < threshold) {
                 List<Record> blockOneRecords = new ArrayList<>(originalBlocks.size() / 2);
                 List<Record> blockTwoRecords = new ArrayList<>(originalBlocks.size() / 2);
@@ -50,6 +48,24 @@ public class FuzzyService {
             }
         }
         return newBlocks;
+    }
+
+    private Double getSplitProbability(Map<Integer, Double> splitProbs, BlockWithData origBlock) {
+        Double splitProbability = splitProbs.get(origBlock.getId());
+        if (splitProbability == null) {
+            logger.info("Block with ID #" + origBlock.getId() + " has no split probability");
+            splitProbability = 1.0;
+        }
+        return splitProbability;
+    }
+
+    private void assertSize(List<BlockWithData> originalBlocks, Map<Integer, Double> splitProbs) throws SizeNotEqualException {
+        int splitSize = splitProbs.size();
+        int blocksSize = originalBlocks.size();
+        if (blocksSize != splitSize) {
+            throw new SizeNotEqualException(String.format("Size of blocks (%d) and their split probability (%d) not equal",
+                    blocksSize, splitSize));
+        }
     }
 
     public void splitRecords(List<BlockWithData> blocks) {

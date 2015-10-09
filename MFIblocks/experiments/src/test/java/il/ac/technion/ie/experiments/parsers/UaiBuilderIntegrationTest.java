@@ -1,6 +1,7 @@
 package il.ac.technion.ie.experiments.parsers;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.service.FuzzyService;
 import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
@@ -18,7 +19,7 @@ import java.io.File;
 import java.util.List;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({UaiBuilder.class})
+@PrepareForTest({UaiBuilder.class, FuzzyService.class})
 public class UaiBuilderIntegrationTest {
 
     private UaiBuilder classUnderTest;

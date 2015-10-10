@@ -57,11 +57,17 @@ public class CommandExacter {
     }
 
     private boolean keepJobRunning(File outputFile, int numberOfExecutions) {
-        if ((outputFile == null || !outputFile.exists()) && numberOfExecutions < 11) {
+        if (outputFileNotPrepared(outputFile) && numberOfExecutions < 11) {
+            if (numberOfExecutions == 10) {
+                logger.error("Failed to run convexBP for 10 times");
+            }
             return true;
         }
-        logger.error("Failed to run convexBP for 10 times");
         return false;
+    }
+
+    private boolean outputFileNotPrepared(File outputFile) {
+        return (outputFile == null || !outputFile.exists());
     }
 
     private String createCommand(ConvexBPContext context) {

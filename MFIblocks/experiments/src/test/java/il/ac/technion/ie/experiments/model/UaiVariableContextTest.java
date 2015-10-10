@@ -27,8 +27,6 @@ public class UaiVariableContextTest {
 
     private Map<Integer, SharedMatrix> variableIdToSharedMatrixMap;
 
-    private TreeMap<Integer, Integer> variableIdToSizeMap;
-
     @Before
     public void setUp() throws Exception {
         classUnderTest = Whitebox.newInstance(UaiVariableContext.class);
@@ -40,17 +38,7 @@ public class UaiVariableContextTest {
         SharedMatrix sharedMatrix = PowerMockito.mock(SharedMatrix.class);
         variableIdToSharedMatrixMap = Maps.newHashMap(
                 Collections.unmodifiableMap(ImmutableMap.of(4, sharedMatrix, 2, sharedMatrix, 1, sharedMatrix, 6, sharedMatrix)));
-        variableIdToSizeMap = Maps.newTreeMap(Collections.unmodifiableSortedMap(new TreeMap<Integer, Integer>() {{
-            put(4, 9);
-            put(1, 9);
-            put(2, 9);
-            put(3, 9);
-            put(5, 9);
-            put(6, 9);
-            put(7, 9);
-        }}));
         Whitebox.setInternalState(classUnderTest, "variableIdToSharedMatrixMap", variableIdToSharedMatrixMap);
-        Whitebox.setInternalState(classUnderTest, "variableIdToSizeMap", variableIdToSizeMap);
         List<Integer> idsWithSharedMatricesSorted = classUnderTest.getVariablesIdsWithSharedMatricesSorted();
 
         assertThat(idsWithSharedMatricesSorted, Matchers.contains(1, 2, 4, 6));

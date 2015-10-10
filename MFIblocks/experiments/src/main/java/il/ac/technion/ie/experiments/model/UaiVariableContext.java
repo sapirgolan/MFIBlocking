@@ -173,10 +173,10 @@ public class UaiVariableContext {
 
     public List<Integer> getVariablesIdsWithSharedMatricesSorted() {
         final Set<Integer> variablesWithSharedMatrices = variableIdToSharedMatrixMap.keySet();
-        final Set<Integer> allVariables = variableIdToSizeMap.keySet();
-        Set<Integer> result = new HashSet<>(allVariables);
-        result.retainAll(variablesWithSharedMatrices);
-        return new ArrayList<>(result);
+
+        List<Integer> result = new ArrayList<>(variablesWithSharedMatrices);
+        Collections.sort(result);
+        return result;
     }
 
     public File getUaiFile() {

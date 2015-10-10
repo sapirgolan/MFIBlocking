@@ -189,4 +189,11 @@ public class UaiVariableContext {
         }
         return null;
     }
+
+    public Integer getBlockIdByVariableId(int variableId) {
+        if (variableIdToBlockId.containsKey(variableId)) {
+            return variableIdToBlockId.get(variableId);
+        }
+        return null;
+    }
 }

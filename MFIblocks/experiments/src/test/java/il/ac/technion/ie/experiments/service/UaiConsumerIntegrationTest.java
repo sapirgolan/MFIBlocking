@@ -36,7 +36,7 @@ public class UaiConsumerIntegrationTest {
     public static void initClass() throws Exception {
         fuzzyBlocks = ExperimentsUtils.createFuzzyBlocks();
         UaiBuilder uaiBuilder = new UaiBuilder(fuzzyBlocks);
-        variableContext = uaiBuilder.createUaiFile();
+        variableContext = uaiBuilder.createUaiContext();
     }
 
     @Before

@@ -19,7 +19,7 @@ public class UaiVariableContext {
 
     private static final Logger logger = Logger.getLogger(UaiVariableContext.class);
 
-    private final File file;
+    private final File uaiFile;
     private List<BlockWithData> blocks;
     private List<MatrixContext<SharedMatrix>> matricesWithContext;
 
@@ -31,10 +31,10 @@ public class UaiVariableContext {
     private BiMap<Integer, Integer> variableIdToBlockId;
 
 
-    private UaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext, File file) {
+    private UaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext, File uaiFile) {
         this.blocks = blocks;
         this.matricesWithContext = matricesWithContext;
-        this.file = file;
+        this.uaiFile = uaiFile;
     }
 
     public static UaiVariableContext createUaiVariableContext(List<BlockWithData> blocks, List<MatrixContext<SharedMatrix>> matricesWithContext, File file) {
@@ -179,8 +179,8 @@ public class UaiVariableContext {
         return new ArrayList<>(result);
     }
 
-    public File getFile() {
-        return file;
+    public File getUaiFile() {
+        return uaiFile;
     }
 
     public Integer getBlockIdByVariableId(int variableId) {

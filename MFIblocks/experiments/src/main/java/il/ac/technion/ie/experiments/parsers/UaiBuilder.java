@@ -35,7 +35,7 @@ public class UaiBuilder {
     private static final char SPACE = ' ';
 
     private final iPotentialService potentialService;
-    private File file;
+    private File uaiFile;
     private List<BlockWithData> blocks;
     private List<MatrixContext<SharedMatrix>> matricesWithContext;
 
@@ -44,8 +44,8 @@ public class UaiBuilder {
         this.blocks = blocks;
     }
 
-    public UaiVariableContext createUaiFile() throws SizeNotEqualException {
-        file = createOutputFile();
+    public UaiVariableContext createUaiContext() throws SizeNotEqualException {
+        uaiFile = createOutputFile();
         matricesWithContext = createSharedMatrices();
 
         int numberOfVariables = countNumberOfVariables();
@@ -53,10 +53,11 @@ public class UaiBuilder {
         logger.info("Number of Blocks:" + blocks.size());
         logger.info("Number Of Shared Matrices: " + matricesWithContext.size());
         if (numberOfVariables != (blocks.size() + matricesWithContext.size())) {
-            throw new SizeNotEqualException("#Variables is not equal to the sum of (#Blocks + #SharedMatrices)");
+            throw new SizeNotEqualException("#Variables is not equal to the sum of (#Blocks + #SharedMatrices). " +
+                    "Perhaps records file contains singletons blocks that should be removed");
         }
 
-        UaiVariableContext variableContext = UaiVariableContext.createUaiVariableContext(blocks, matricesWithContext, file);
+        UaiVariableContext variableContext = UaiVariableContext.createUaiVariableContext(blocks, matricesWithContext, uaiFile);
 
         try {
             writeMarkov();
@@ -153,7 +154,6 @@ public class UaiBuilder {
         return potentialService.getSharedMatricesWithContext(blocks);
     }
 
-
     private int countNumberOfVariables() {
         AdjustedMatrix adjustedMatrix = potentialService.getAdjustedMatrix(blocks);
         List<MatrixCell<Double>> cellsCongaingNonZeroValue = adjustedMatrix.getCellsCongaingNonZeroValue();
@@ -187,7 +187,7 @@ public class UaiBuilder {
     }
 
     private void writeMarkov() throws IOException {
-        FileUtils.writeStringToFile(file, "MARKOV" + "\n", Charset.defaultCharset());
+        FileUtils.writeStringToFile(uaiFile, "MARKOV" + "\n", Charset.defaultCharset());
     }
 
     private void writeNumberOfVariables(int numberOfVariables) throws IOException {
@@ -249,6 +249,6 @@ public class UaiBuilder {
     }
 
     private void appendStringToFile(String str) throws IOException {
-        FileUtils.writeStringToFile(file, str + "\n", Charset.defaultCharset(), true);
+        FileUtils.writeStringToFile(uaiFile, str + "\n", Charset.defaultCharset(), true);
     }
 }

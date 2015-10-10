@@ -46,7 +46,7 @@ public class UaiBuilderIntegrationTest {
         PowerMockito.doReturn(outputFile).when(classUnderTest, "createOutputFile");
 
         //execution
-        classUnderTest.createUaiFile();
+        classUnderTest.createUaiContext();
 
         //assertion
         Assert.assertThat(FileUtils.sizeOf(outputFile), Matchers.greaterThan(100L));

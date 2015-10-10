@@ -37,7 +37,7 @@ public class FuzzyService {
         List<BlockWithData> newBlocks = new ArrayList<>(originalBlocks.size());
         for (BlockWithData origBlock : originalBlocks) {
             Double splitProbability = getSplitProbability(splitProbs, origBlock);
-            if (splitProbability < threshold) {
+            if (splitProbability < threshold && origBlock.size() > 2) {
                 List<Record> blockOneRecords = new ArrayList<>(originalBlocks.size() / 2);
                 List<Record> blockTwoRecords = new ArrayList<>(originalBlocks.size() / 2);
                 collectRecordsForSplitedBlocks(origBlock, blockOneRecords, blockTwoRecords);

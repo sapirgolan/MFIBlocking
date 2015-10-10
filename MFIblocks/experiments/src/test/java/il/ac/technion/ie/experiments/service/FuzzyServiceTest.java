@@ -1,6 +1,7 @@
 package il.ac.technion.ie.experiments.service;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.model.Record;
@@ -47,6 +48,7 @@ public class FuzzyServiceTest {
         for (int i = 0; i < 9; i++) {
             BlockWithData blockWithData = mock(BlockWithData.class);
             when(blockWithData.getId()).thenReturn(i);
+            when(blockWithData.size()).thenReturn(3);
             originalBlocks.add(blockWithData);
         }
 
@@ -64,6 +66,23 @@ public class FuzzyServiceTest {
 
         //assert
         assertThat(newBlocks, Matchers.hasSize(12));
+    }
+
+    @Test
+    public void testSplitBlocks_sizeTwo() throws Exception {
+        //mocking
+        BlockWithData blockWithData = mock(BlockWithData.class);
+        when(blockWithData.getId()).thenReturn(7);
+        List<BlockWithData> blockWithDatas = Lists.newArrayList(blockWithData);
+
+        Map<Integer, Double> splitProbs = Maps.newHashMap(ImmutableMap.of(7, 0.1));
+
+        //execute
+        List<BlockWithData> newBlocks = classUnderTest.splitBlocks(blockWithDatas, splitProbs, 0.323);
+
+        //assert
+        assertThat(newBlocks, Matchers.hasSize(1));
+
     }
 
     @Test

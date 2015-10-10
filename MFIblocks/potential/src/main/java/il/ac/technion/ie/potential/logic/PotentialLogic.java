@@ -2,6 +2,7 @@ package il.ac.technion.ie.potential.logic;
 
 import com.google.common.collect.Sets;
 import il.ac.technion.ie.model.AbstractBlock;
+import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.potential.model.*;
 import il.ac.technion.ie.potential.utils.PotentialUtil;
 import org.apache.log4j.Logger;
@@ -52,6 +53,19 @@ public class PotentialLogic implements iPotentialLogic {
 
     private List<MatrixContext<SharedMatrix>> getMatrixContexts(List<? extends AbstractBlock> blocks) {
         List<AbstractBlock> filteredBlocks = filterBlockBySize(blocks, 2);
+        int filteredBlockCount = blocks.size() - filteredBlocks.size();
+        if (filteredBlockCount > 0 && logger.isDebugEnabled()) {
+            logger.debug(String.format("Filtered out total of:%d blocks!", filteredBlockCount));
+            List<AbstractBlock> copyOfBlocks = new ArrayList<>(blocks);
+            copyOfBlocks.removeAll(filteredBlocks);
+            StringBuilder builder = new StringBuilder();
+            for (AbstractBlock copyOfBlock : copyOfBlocks) {
+                Record record = (Record) copyOfBlock.getMembers().get(0);
+                builder.append(record.getRecordName());
+                builder.append(',');
+            }
+            logger.debug("The filtered records are: " + builder.toString());
+        }
 
         //A mapping for each recordID. For each record we store a Set with all
         //blocks is appears in.

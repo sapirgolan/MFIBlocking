@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.threads;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -33,12 +34,19 @@ public class StreamGobbler extends Thread {
                 log.append(NEW_LINE);
                 builder.append(line);
             }
-            if (ChanelType.ERROR.equals(type)) {
-                logger.error(log.toString());
-            } else {
-                logger.info(log.toString());
+            String trimmedLog = log.toString().trim();
+            if (!StringUtils.isEmpty(trimmedLog)) {
+                if (ChanelType.ERROR.equals(type)) {
+                    logger.error(log.toString());
+                } else {
+                    logger.info(log.toString());
+                }
             }
-            logger.info(type + ">" + builder.toString());
+
+            String builderStr = builder.toString();
+            if (!StringUtils.isEmpty(builderStr)) {
+                logger.info(type + ">" + builderStr);
+            }
 
         } catch (IOException ioe) {
             logger.error("Failed to run Stream Gobbler", ioe);

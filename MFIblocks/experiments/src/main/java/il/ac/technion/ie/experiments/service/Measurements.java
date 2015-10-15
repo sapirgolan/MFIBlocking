@@ -5,9 +5,7 @@ import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by I062070 on 15/10/2015.
@@ -44,5 +42,22 @@ public class Measurements {
     public double getMRRByThreshold(double threshold) {
         Double rankedValue = mrrValueMap.get(threshold);
         return rankedValue != null ? rankedValue : VALUE_NOT_EXISTS;
+    }
+
+    public List<Double> getRankedValuesSortedByThreshold() {
+        return getMeasureSortedByThreshold(rankedValueMap);
+    }
+
+    public List<Double> getMrrValuesSortedByThreshold() {
+        return getMeasureSortedByThreshold(mrrValueMap);
+    }
+
+    private List<Double> getMeasureSortedByThreshold(Map<Double, Double> measureValue) {
+        TreeSet<Double> sortedKeys = new TreeSet<>(measureValue.keySet());
+        List<Double> rankedValuesSortedByThreshold = new ArrayList<>();
+        for (Double key : sortedKeys) {
+            rankedValuesSortedByThreshold.add(measureValue.get(key));
+        }
+        return rankedValuesSortedByThreshold;
     }
 }

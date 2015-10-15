@@ -1,16 +1,22 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
+import org.apache.commons.math3.distribution.UniformIntegerDistribution;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -90,5 +96,65 @@ public class MeasurementsTest {
         //assert
         assertThat(classUnderTest.getRankedValueByThreshold(0.8), closeTo(-1.0, 0.0001));
         assertThat(classUnderTest.getMRRByThreshold(0.8), closeTo(-1.0, 0.0001));
+    }
+
+    @Test
+    public void testGetAllRankedValues() throws Exception {
+        UniformRealDistribution realDistribution = new UniformRealDistribution(0.0, 1.0);
+        UniformIntegerDistribution uniformIntegerDistribution = new UniformIntegerDistribution(4, 14);
+
+        int sizeOfResults = uniformIntegerDistribution.sample();
+        Map<Double, Double> map = new HashMap<>();
+
+        for (int i = 0; i < sizeOfResults; i++) {
+            map.put(realDistribution.sample(), realDistribution.sample());
+        }
+
+        //mocking
+        final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
+        when(measurService.calcRankedValue(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+            @Override
+            public Double answer(InvocationOnMock invocation) throws Throwable {
+                return iterator.next().getValue();
+            }
+        });
+
+        //execution
+        for (Map.Entry<Double, Double> doubleDoubleEntry : map.entrySet()) {
+            classUnderTest.calculate(new ArrayList<BlockWithData>(), doubleDoubleEntry.getKey());
+        }
+
+        //assert
+        assertThat(classUnderTest.getRankedValuesSortedByThreshold(), hasSize(sizeOfResults));
+        TreeMap<Double, Double> doubleDoubleTreeMap = new TreeMap<>(map);
+        assertThat(classUnderTest.getRankedValuesSortedByThreshold(), contains(doubleDoubleTreeMap.values().toArray()));
+    }
+
+    @Test
+    public void testGetAllMRRValues() throws Exception {
+        //mocking
+        Map<Double, Double> map = Maps.newHashMap(ImmutableMap.<Double, Double>builder().
+                put(0.56, 0.17). //  <Threshold, value>
+                put(0.14, 0.8).
+                put(0.33, 0.15).
+                build());
+
+        final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
+        when(measurService.calcMRR(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+            @Override
+            public Double answer(InvocationOnMock invocation) throws Throwable {
+                return iterator.next().getValue();
+            }
+        });
+
+        //execution
+        for (Map.Entry<Double, Double> doubleDoubleEntry : map.entrySet()) {
+            classUnderTest.calculate(new ArrayList<BlockWithData>(), doubleDoubleEntry.getKey());
+        }
+
+        //assert
+        assertThat(classUnderTest.getMrrValuesSortedByThreshold(), hasSize(map.size()));
+        TreeMap<Double, Double> doubleDoubleTreeMap = new TreeMap<>(map);
+        assertThat(classUnderTest.getMrrValuesSortedByThreshold(), contains(doubleDoubleTreeMap.values().toArray()));
     }
 }

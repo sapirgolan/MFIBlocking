@@ -35,41 +35,42 @@ public class MeasurementsTest {
     public void testCalculate_valueExist() {
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
         assertThat(classUnderTest.getRankedValueByThreshold(0.213), notNullValue());
+        assertThat(classUnderTest.getMRRByThreshold(0.213), notNullValue());
     }
 
     @Test
     public void testCalculate_whenRankedValueThatIsCalculated() throws Exception {
         //mocking
         when(measurService.calcRankedValue(Mockito.anyList())).thenReturn(0.3);
+        when(measurService.calcMRR(Mockito.anyList())).thenReturn(0.7);
 
         //execute
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
         assertThat(classUnderTest.getRankedValueByThreshold(0.213), closeTo(0.3, 0.0001));
+        assertThat(classUnderTest.getMRRByThreshold(0.213), closeTo(0.7, 0.0001));
     }
 
     @Test
     public void testCalculate_calculateTwice() throws Exception {
         //mocking
         when(measurService.calcRankedValue(Mockito.anyList())).thenReturn(0.3, 0.5);
+        when(measurService.calcMRR(Mockito.anyList())).thenReturn(0.7, 0.6);
+
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
         assertThat(classUnderTest.getRankedValueByThreshold(0.213), closeTo(0.3, 0.0001));
+        assertThat(classUnderTest.getMRRByThreshold(0.213), closeTo(0.7, 0.0001));
+
 
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
         assertThat(classUnderTest.getRankedValueByThreshold(0.213), closeTo(0.5, 0.0001));
-    }
-
-    @Test
-    public void testGetRankedValueByThreshold() throws Exception {
-        when(measurService.calcRankedValue(Mockito.anyList())).thenReturn(0.3, 0.5);
-        classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
-
-        assertThat(classUnderTest.getRankedValueByThreshold(0.213), closeTo(0.3, 0.0001));
+        assertThat(classUnderTest.getMRRByThreshold(0.213), closeTo(0.6, 0.0001));
     }
 
     @Test
     public void testGetRankedValueByThresholdTwice() throws Exception {
         //mocking
         when(measurService.calcRankedValue(Mockito.anyList())).thenReturn(0.3, 0.5);
+        when(measurService.calcMRR(Mockito.anyList())).thenReturn(0.7, 0.6);
 
         //execution
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
@@ -78,6 +79,8 @@ public class MeasurementsTest {
         //assert
         assertThat(classUnderTest.getRankedValueByThreshold(0.323), closeTo(0.5, 0.0001));
         assertThat(classUnderTest.getRankedValueByThreshold(0.213), closeTo(0.3, 0.0001));
+        assertThat(classUnderTest.getMRRByThreshold(0.213), closeTo(0.7, 0.0001));
+        assertThat(classUnderTest.getMRRByThreshold(0.323), closeTo(0.6, 0.0001));
     }
 
     @Test
@@ -86,5 +89,6 @@ public class MeasurementsTest {
 
         //assert
         assertThat(classUnderTest.getRankedValueByThreshold(0.8), closeTo(-1.0, 0.0001));
+        assertThat(classUnderTest.getMRRByThreshold(0.8), closeTo(-1.0, 0.0001));
     }
 }

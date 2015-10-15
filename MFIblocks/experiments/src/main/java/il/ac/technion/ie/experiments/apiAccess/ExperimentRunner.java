@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.apiAccess;
 
+import com.google.common.base.Joiner;
 import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.exception.NoValueExistsException;
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
@@ -33,6 +34,7 @@ public class ExperimentRunner {
     private ProbabilityService probabilityService;
     private iMeasurService measurService;
     private ExprimentsService exprimentsService;
+    private Measurements measurements;
 
     public ExperimentRunner() {
         parsingService = new ParsingService();
@@ -40,6 +42,7 @@ public class ExperimentRunner {
         measurService = new MeasurService();
         exprimentsService = new ExprimentsService();
         fuzzyService = new FuzzyService();
+        measurements = new Measurements();
     }
 
     public static void main(String[] args) {
@@ -76,6 +79,7 @@ public class ExperimentRunner {
         final Map<Integer, Double> splitProbabilityForBlocks = exprimentsService.sampleSplitProbabilityForBlocks(blockWithDatas);
         List<Double> thresholds = exprimentsService.getThresholdSorted(splitProbabilityForBlocks.values());
 
+
         CommandExacter commandExacter = new CommandExacter();
         logger.info("Will execute experiments on following split thresholds: " + StringUtils.join(thresholds, ','));
         for (Double threshold : thresholds) {
@@ -99,6 +103,8 @@ public class ExperimentRunner {
                     FileUtils.forceDeleteOnExit(outputFile);
                     logger.debug("Applying new probabilities on blocks");
                     uaiConsumer.applyNewProbabilities(splitedBlocks);
+                    logger.debug("Calculating measurements");
+                    measurements.calculate(splitedBlocks, threshold);
                 }
             } catch (SizeNotEqualException e) {
                 logger.error("Failed to split blocks since #blocs<>#splitProbabilities", e);
@@ -114,5 +120,10 @@ public class ExperimentRunner {
             }
         }
 
+        System.out.println("Thresholds are: " + Joiner.on(",").join(thresholds));
+        System.out.println("Ranked Values are: " + Joiner.on(",").join(measurements.getRankedValuesSortedByThreshold()));
+        System.out.println("MRR are: " + Joiner.on(",").join(measurements.getMrrValuesSortedByThreshold()));
+
     }
+
 }

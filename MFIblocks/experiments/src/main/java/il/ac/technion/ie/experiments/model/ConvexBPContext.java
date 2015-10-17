@@ -12,6 +12,7 @@ public class ConvexBPContext {
     private String binaryOutputFile;
     private static final String COMMAND_TEMPLATE = "\"C:\\Program Files\\MPICH2\\bin\\mpiexec.exe\" -n 2 dcBP.exe -f %s -e 0.0 -c 10 -s 20 -o %s";
     private long waitInterval;
+    private Double threshold;
 
     public ConvexBPContext(String dir, String uaiFileName, String binaryOutputFile, long waitIntervalInSeconds) {
         this.dir = dir;
@@ -34,5 +35,17 @@ public class ConvexBPContext {
 
     public long getWaitInterval() {
         return waitInterval;
+    }
+
+    public String getUaiFileName() {
+        return uaiFileName;
+    }
+
+    public void setThreshold(Double threshold) {
+        this.threshold = threshold;
+    }
+
+    public Double getThreshold() {
+        return threshold;
     }
 }

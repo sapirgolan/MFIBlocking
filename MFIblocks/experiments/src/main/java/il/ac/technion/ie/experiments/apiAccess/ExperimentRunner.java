@@ -94,6 +94,7 @@ public class ExperimentRunner {
                 UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
                 logger.debug("UAI file was created at: " + uaiVariableContext.getUaiFile().getAbsoluteFile());
                 ConvexBPContext convexBPContext = exprimentsService.createConvexBPContext(uaiVariableContext);
+                convexBPContext.setThreshold(threshold);
                 //critical section - cannot be multi-thread
                 File outputFile = commandExacter.execute(convexBPContext);
                 if (outputFile.exists()) {

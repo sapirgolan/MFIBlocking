@@ -60,4 +60,10 @@ public class Measurements {
         }
         return rankedValuesSortedByThreshold;
     }
+
+    public List<Double> getThresholdSorted() {
+        List<Double> list = new ArrayList<>(rankedValueMap.keySet());
+        Collections.sort(list);
+        return list;
+    }
 }

@@ -157,4 +157,21 @@ public class MeasurementsTest {
         TreeMap<Double, Double> doubleDoubleTreeMap = new TreeMap<>(map);
         assertThat(classUnderTest.getMrrValuesSortedByThreshold(), contains(doubleDoubleTreeMap.values().toArray()));
     }
+
+    @Test
+    public void testGetThresholdsSorted() throws Exception {
+        //execute
+        UniformRealDistribution realDistribution = new UniformRealDistribution(0.0, 1.0);
+        List<Double> list = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            double threshold = realDistribution.sample();
+            classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
+            list.add(threshold);
+        }
+
+        //assert
+        Collections.sort(list);
+        assertThat(classUnderTest.getThresholdSorted(), contains(list.toArray()));
+
+    }
 }

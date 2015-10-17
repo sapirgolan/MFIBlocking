@@ -4,10 +4,12 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvWriter;
 import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
+import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.model.Record;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +19,11 @@ import java.util.List;
  */
 public class ParsingService {
 
+    public static final String RANKED_VALUE = "Ranked Value";
+    public static final String MRR = "MRR";
+    public static final String THRESHOLD = "Threshold";
+    public static final String NORM_RANKED_VALUE = "Norm Ranked Value";
+    public static final String NORM_MRR = "Norm MRR";
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
@@ -57,7 +64,6 @@ public class ParsingService {
             // Here we just tell the writer to write everything and close the given output Writer instance.
             csvWriter.close();
         }
-
     }
 
     private List<String> getBlockFieldsNames(List<BlockWithData> blocks) {
@@ -66,5 +72,24 @@ public class ParsingService {
             return blockWithData.getFieldNames();
         }
         return null;
+    }
+
+    public void writeExperimentsMeasurements(IMeasurements measurements, File tempFile) throws SizeNotEqualException {
+        CsvWriter csvWriter = dataParser.preparOutputFile(tempFile);
+        csvWriter.writeHeaders(RANKED_VALUE, MRR, THRESHOLD, NORM_RANKED_VALUE, NORM_MRR);
+
+        List<Double> mrrValues = measurements.getMrrValuesSortedByThreshold();
+        List<Double> rankedValues = measurements.getRankedValuesSortedByThreshold();
+        List<Double> thresholds = measurements.getThresholdSorted();
+        if ((mrrValues.size() != rankedValues.size()) || (thresholds.size() != mrrValues.size())) {
+            throw new SizeNotEqualException(String.format("The size of %s, %s and %s is not equal", RANKED_VALUE, MRR, THRESHOLD));
+        }
+        for (int i = 0; i < thresholds.size(); i++) {
+            csvWriter.writeValue(MRR, mrrValues.get(i));
+            csvWriter.writeValue(THRESHOLD, thresholds.get(i));
+            csvWriter.writeValue(RANKED_VALUE, rankedValues.get(i));
+            csvWriter.writeValuesToRow();
+        }
+        csvWriter.close();
     }
 }

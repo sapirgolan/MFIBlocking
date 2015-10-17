@@ -40,9 +40,13 @@ public class DatasetParser {
     }
 
     public CsvWriter preparOutputFile(String pathToFile) {
+        File file = ExpFileUtils.createFile(pathToFile);
+        return this.preparOutputFile(file);
+    }
+
+    public CsvWriter preparOutputFile(File file) {
         CsvWriter writer = null;
 
-        File file = ExpFileUtils.createFile(pathToFile);
         if (!file.exists() || !file.canWrite()) {
             logger.warn("Can't write output to file. Either it doesn't exists or nothing can be written");
             return null;

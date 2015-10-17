@@ -18,21 +18,40 @@ public class Measurements implements IMeasurements {
     private iMeasurService measurService;
     private Map<Double, Double> rankedValueMap;
     private Map<Double, Double> mrrValueMap;
+    private Map<Double, Double> normalizedMRRValues;
+    private int numberOfOriginalBlocks;
+    private Map<Double, Double> normalizedRankedValues;
 
 
-    public Measurements() {
+    public Measurements(int numOfOriginalBlocks) {
         measurService = new MeasurService();
         rankedValueMap = new HashMap<>();
         mrrValueMap = new HashMap<>();
+        normalizedMRRValues = new HashMap<>();
+        normalizedRankedValues = new HashMap<>();
+        this.numberOfOriginalBlocks = numOfOriginalBlocks;
     }
 
     @Override
     public void calculate(List<BlockWithData> blocks, double threshold) {
         if (blocks != null) {
             logger.trace("calculating RankedValue and MRR for threshold " + threshold);
-            rankedValueMap.put(threshold, measurService.calcRankedValue(blocks));
-            mrrValueMap.put(threshold, measurService.calcMRR(blocks));
+            double rankedValue = measurService.calcRankedValue(blocks);
+            rankedValueMap.put(threshold, rankedValue);
+            normalizedRankedValues.put(threshold, rankedValue / numberOfBlocks(blocks.size()));
+
+            double mRRValue = measurService.calcMRR(blocks);
+            mrrValueMap.put(threshold, mRRValue);
+            normalizedMRRValues.put(threshold, mRRValue / numberOfBlocks(blocks.size()));
         }
+    }
+
+    private int numberOfBlocks(int numberOfSpitedBlocks) {
+        int delta = numberOfSpitedBlocks - numberOfOriginalBlocks;
+        if (delta == 0) {
+            delta = 1;
+        }
+        return delta;
     }
 
     @Override
@@ -71,5 +90,20 @@ public class Measurements implements IMeasurements {
         List<Double> list = new ArrayList<>(rankedValueMap.keySet());
         Collections.sort(list);
         return list;
+    }
+
+    @Override
+    public void calculateMillerResults(List<BlockWithData> blockWithDatas) {
+        this.calculate(blockWithDatas, 0.0);
+    }
+
+    @Override
+    public List<Double> getNormalizedRankedValuesSortedByThreshold() {
+        return getMeasureSortedByThreshold(normalizedRankedValues);
+    }
+
+    @Override
+    public List<Double> getNormalizedMRRValuesSortedByThreshold() {
+        return getMeasureSortedByThreshold(normalizedMRRValues);
     }
 }

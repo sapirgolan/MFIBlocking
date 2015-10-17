@@ -1,6 +1,7 @@
 package il.ac.technion.ie.experiments.service;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.measurements.service.MeasurService;
@@ -15,12 +16,13 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.powermock.reflect.Whitebox;
 
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.*;
 
 public class MeasurementsTest {
 
@@ -33,7 +35,7 @@ public class MeasurementsTest {
 
     @Before
     public void setUp() throws Exception {
-        classUnderTest = new Measurements();
+        classUnderTest = new Measurements(0);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -172,6 +174,73 @@ public class MeasurementsTest {
         //assert
         Collections.sort(list);
         assertThat(classUnderTest.getThresholdSorted(), contains(list.toArray()));
+    }
 
+    @Test
+    public void testGetAllNormalizedMRRValues() throws Exception {
+        //mocking
+        Map<Double, Double> map = Maps.newHashMap(ImmutableMap.<Double, Double>builder().
+                put(0.56, 0.18). //  <Threshold, value>
+                put(0.14, 0.8).
+                put(0.33, 0.15).
+                put(0.17, 0.4).
+                build());
+
+        final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
+        when(measurService.calcMRR(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+            @Override
+            public Double answer(InvocationOnMock invocation) throws Throwable {
+                return iterator.next().getValue();
+            }
+        });
+
+        List blocksWithData = mock(List.class);
+        when(blocksWithData.size()).thenReturn(map.size());
+        when(blocksWithData.iterator()).thenReturn(mock(Iterator.class));
+
+        //execution
+        Whitebox.setInternalState(classUnderTest, "numberOfOriginalBlocks", 2);
+        for (Map.Entry<Double, Double> doubleDoubleEntry : map.entrySet()) {
+            classUnderTest.calculate(blocksWithData, doubleDoubleEntry.getKey());
+        }
+
+        //assert
+        assertThat(classUnderTest.getNormalizedMRRValuesSortedByThreshold(), hasSize(map.size()));
+        List<Double> expectedNormalizedMRRValues = Lists.newArrayList(0.4, 0.2, 0.075, 0.09);
+        assertThat(classUnderTest.getNormalizedMRRValuesSortedByThreshold(), contains(expectedNormalizedMRRValues.toArray()));
+    }
+
+    @Test
+    public void testGetAllNormalizedRankedValues() throws Exception {
+        //mocking
+        Map<Double, Double> map = Maps.newHashMap(ImmutableMap.<Double, Double>builder().
+                put(0.56, 0.18). //  <Threshold, value>
+                put(0.33, 0.15).
+                put(0.0, 0.8).
+                put(0.17, 0.4).
+                build());
+
+        final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
+        when(measurService.calcRankedValue(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+            @Override
+            public Double answer(InvocationOnMock invocation) throws Throwable {
+                return iterator.next().getValue();
+            }
+        });
+
+        List blocksWithData = mock(List.class);
+        when(blocksWithData.size()).thenReturn(map.size());
+        when(blocksWithData.iterator()).thenReturn(mock(Iterator.class));
+
+        //execution
+        Whitebox.setInternalState(classUnderTest, "numberOfOriginalBlocks", 2);
+        for (Map.Entry<Double, Double> doubleDoubleEntry : map.entrySet()) {
+            classUnderTest.calculate(blocksWithData, doubleDoubleEntry.getKey());
+        }
+
+        //assert
+        assertThat(classUnderTest.getNormalizedRankedValuesSortedByThreshold(), hasSize(map.size()));
+        List<Double> expectedNormalizedMRRValues = Lists.newArrayList(0.4, 0.2, 0.075, 0.09);
+        assertThat(classUnderTest.getNormalizedRankedValuesSortedByThreshold(), contains(expectedNormalizedMRRValues.toArray()));
     }
 }

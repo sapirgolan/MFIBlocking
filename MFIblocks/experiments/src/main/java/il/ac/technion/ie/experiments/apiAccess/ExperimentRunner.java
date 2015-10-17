@@ -41,7 +41,6 @@ public class ExperimentRunner {
         measurService = new MeasurService();
         exprimentsService = new ExprimentsService();
         fuzzyService = new FuzzyService();
-        measurements = new Measurements();
     }
 
     public static void main(String[] args) {
@@ -75,6 +74,7 @@ public class ExperimentRunner {
 
     public void runExperiments(String pathToDatasetFile) {
         final List<BlockWithData> blockWithDatas = parsingService.parseDataset(pathToDatasetFile);
+        measurements = new Measurements(blockWithDatas.size());
         final Map<Integer, Double> splitProbabilityForBlocks = exprimentsService.sampleSplitProbabilityForBlocks(blockWithDatas);
         List<Double> thresholds = exprimentsService.getThresholdSorted(splitProbabilityForBlocks.values());
 
@@ -112,13 +112,17 @@ public class ExperimentRunner {
                 logger.error("Cannot create context for ConvexBP algorithm", e);
             } catch (InterruptedException e) {
                 logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
-                e.printStackTrace();
             } catch (OSNotSupportedException e) {
                 logger.error("Cannot run ConvexBP algorithm on current machine", e);
             } catch (NoValueExistsException e) {
                 logger.error("Failed to consume new probabilities", e);
             }
         }
+        measurements.calculateMillerResults(blockWithDatas);
+        saveResultsToCsvFile();
+    }
+
+    private void saveResultsToCsvFile() {
         try {
             File expResults = new File("expResults.csv");
             boolean isNewFileCreated = expResults.createNewFile();

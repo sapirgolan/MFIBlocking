@@ -19,4 +19,10 @@ public interface IMeasurements {
     List<Double> getMrrValuesSortedByThreshold();
 
     List<Double> getThresholdSorted();
+
+    void calculateMillerResults(List<BlockWithData> blockWithDatas);
+
+    List<Double> getNormalizedMRRValuesSortedByThreshold();
+
+    List<Double> getNormalizedRankedValuesSortedByThreshold();
 }

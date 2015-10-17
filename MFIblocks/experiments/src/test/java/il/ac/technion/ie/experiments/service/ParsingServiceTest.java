@@ -53,6 +53,9 @@ public class ParsingServiceTest {
         when(measurements.getMrrValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.2, 0.3, 0.4));
         when(measurements.getThresholdSorted()).thenReturn(Lists.newArrayList(0.0, 0.0, 0.0));
         when(measurements.getRankedValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.0, 0.0, 0.0));
+        when(measurements.getNormalizedMRRValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.0, 0.0, 0.0));
+        when(measurements.getNormalizedRankedValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.0, 0.0, 0.0));
+
         File tempFile = File.createTempFile("tempMeasurementFile", ".csv");
 
         classUnderTest.writeExperimentsMeasurements(measurements, tempFile);
@@ -64,11 +67,13 @@ public class ParsingServiceTest {
     }
 
     @Test
-    public void testWriteExperimentsMeasurements_hasValuesInRow() throws Exception {
+    public void testWriteExperimentsMeasurements_hasThresholdMRRandRVInRow() throws Exception {
         IMeasurements measurements = PowerMockito.mock(IMeasurements.class);
         when(measurements.getMrrValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.2, 0.4));
         when(measurements.getRankedValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.9, 0.88));
         when(measurements.getThresholdSorted()).thenReturn(Lists.newArrayList(0.1634, 0.354));
+        when(measurements.getNormalizedMRRValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.0, 0.0));
+        when(measurements.getNormalizedRankedValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.0, 0.0));
 
         File tempFile = File.createTempFile("tempMeasurementFile", ".csv");
 
@@ -87,6 +92,23 @@ public class ParsingServiceTest {
         File tempFile = File.createTempFile("tempMeasurementFile", ".csv");
 
         classUnderTest.writeExperimentsMeasurements(measurements, tempFile);
+    }
 
+    @Test
+    public void testWriteExperimentsMeasurements_hasValuesInRow() throws Exception {
+        IMeasurements measurements = PowerMockito.mock(IMeasurements.class);
+        when(measurements.getMrrValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.2, 0.4));
+        when(measurements.getNormalizedMRRValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.1, 0.2));
+        when(measurements.getRankedValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.9, 0.88));
+        when(measurements.getNormalizedRankedValuesSortedByThreshold()).thenReturn(Lists.newArrayList(0.45, 0.44));
+        when(measurements.getThresholdSorted()).thenReturn(Lists.newArrayList(0.1634, 0.354));
+
+        File tempFile = File.createTempFile("tempMeasurementFile", ".csv");
+
+        classUnderTest.writeExperimentsMeasurements(measurements, tempFile);
+        List<String> lines = FileUtils.readLines(tempFile);
+        assertThat(lines, hasSize(3));
+        assertThat(lines.get(1), stringContainsInOrder(Lists.newArrayList("0.9", "0.2", "0.1634", "0.45", "0.1")));
+        assertThat(lines.get(2), stringContainsInOrder(Lists.newArrayList("0.88", "0.4", "0.354", "0.44", "0.2")));
     }
 }

@@ -81,15 +81,32 @@ public class ParsingService {
         List<Double> mrrValues = measurements.getMrrValuesSortedByThreshold();
         List<Double> rankedValues = measurements.getRankedValuesSortedByThreshold();
         List<Double> thresholds = measurements.getThresholdSorted();
-        if ((mrrValues.size() != rankedValues.size()) || (thresholds.size() != mrrValues.size())) {
-            throw new SizeNotEqualException(String.format("The size of %s, %s and %s is not equal", RANKED_VALUE, MRR, THRESHOLD));
-        }
+        List<Double> normalizedRankedValues = measurements.getNormalizedRankedValuesSortedByThreshold();
+        List<Double> normalizedMRRValues = measurements.getNormalizedMRRValuesSortedByThreshold();
+        assertSize(measurements);
         for (int i = 0; i < thresholds.size(); i++) {
             csvWriter.writeValue(MRR, mrrValues.get(i));
             csvWriter.writeValue(THRESHOLD, thresholds.get(i));
             csvWriter.writeValue(RANKED_VALUE, rankedValues.get(i));
+            csvWriter.writeValue(NORM_RANKED_VALUE, normalizedRankedValues.get(i));
+            csvWriter.writeValue(NORM_MRR, normalizedMRRValues.get(i));
             csvWriter.writeValuesToRow();
         }
         csvWriter.close();
+    }
+
+    private void assertSize(IMeasurements measurements) throws SizeNotEqualException {
+        List<Double> mrrValues = measurements.getMrrValuesSortedByThreshold();
+        List<Double> rankedValues = measurements.getRankedValuesSortedByThreshold();
+        List<Double> thresholds = measurements.getThresholdSorted();
+        List<Double> normalizedRankedValues = measurements.getNormalizedRankedValuesSortedByThreshold();
+        List<Double> normalizedMRRValues = measurements.getNormalizedMRRValuesSortedByThreshold();
+
+        if ((thresholds.size() != rankedValues.size()) ||
+                (thresholds.size() != mrrValues.size()) ||
+                (thresholds.size() != normalizedRankedValues.size()) ||
+                (thresholds.size() != normalizedMRRValues.size())) {
+            throw new SizeNotEqualException(String.format("The size of %s, %s and %s is not equal", RANKED_VALUE, MRR, THRESHOLD));
+        }
     }
 }

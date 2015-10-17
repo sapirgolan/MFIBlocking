@@ -1,6 +1,5 @@
 package il.ac.technion.ie.experiments.apiAccess;
 
-import com.google.common.base.Joiner;
 import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.exception.NoValueExistsException;
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
@@ -120,11 +119,19 @@ public class ExperimentRunner {
                 logger.error("Failed to consume new probabilities", e);
             }
         }
-
-        System.out.println("Thresholds are: " + Joiner.on(",").join(thresholds));
-        System.out.println("Ranked Values are: " + Joiner.on(",").join(measurements.getRankedValuesSortedByThreshold()));
-        System.out.println("MRR are: " + Joiner.on(",").join(measurements.getMrrValuesSortedByThreshold()));
-
+        try {
+            File expResults = new File("expResults.csv");
+            boolean isNewFileCreated = expResults.createNewFile();
+            if (isNewFileCreated) {
+                parsingService.writeExperimentsMeasurements(measurements, expResults);
+            } else {
+                logger.warn("Failed to create file for measurements therefore no results are results will be given");
+            }
+        } catch (SizeNotEqualException e) {
+            logger.error("Failed to write measurements of Experiment", e);
+        } catch (IOException e) {
+            logger.error("Failed to create file for measurements of Experiment", e);
+        }
     }
 
 }

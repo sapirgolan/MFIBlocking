@@ -34,7 +34,7 @@ public class ExperimentRunner {
     private ProbabilityService probabilityService;
     private iMeasurService measurService;
     private ExprimentsService exprimentsService;
-    private Measurements measurements;
+    private IMeasurements measurements;
 
     public ExperimentRunner() {
         parsingService = new ParsingService();

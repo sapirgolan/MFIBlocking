@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Created by I062070 on 15/10/2015.
  */
-public class Measurements {
+public class Measurements implements IMeasurements {
 
     static final Logger logger = Logger.getLogger(Measurements.class);
 
@@ -26,6 +26,7 @@ public class Measurements {
         mrrValueMap = new HashMap<>();
     }
 
+    @Override
     public void calculate(List<BlockWithData> blocks, double threshold) {
         if (blocks != null) {
             logger.trace("calculating RankedValue and MRR for threshold " + threshold);
@@ -34,20 +35,24 @@ public class Measurements {
         }
     }
 
+    @Override
     public double getRankedValueByThreshold(double threshold) {
         Double rankedValue = rankedValueMap.get(threshold);
         return rankedValue != null ? rankedValue : VALUE_NOT_EXISTS;
     }
 
+    @Override
     public double getMRRByThreshold(double threshold) {
         Double rankedValue = mrrValueMap.get(threshold);
         return rankedValue != null ? rankedValue : VALUE_NOT_EXISTS;
     }
 
+    @Override
     public List<Double> getRankedValuesSortedByThreshold() {
         return getMeasureSortedByThreshold(rankedValueMap);
     }
 
+    @Override
     public List<Double> getMrrValuesSortedByThreshold() {
         return getMeasureSortedByThreshold(mrrValueMap);
     }
@@ -61,6 +66,7 @@ public class Measurements {
         return rankedValuesSortedByThreshold;
     }
 
+    @Override
     public List<Double> getThresholdSorted() {
         List<Double> list = new ArrayList<>(rankedValueMap.keySet());
         Collections.sort(list);

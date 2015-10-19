@@ -93,11 +93,6 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public void calculateMillerResults(List<BlockWithData> blockWithDatas) {
-        this.calculate(blockWithDatas, 0.0);
-    }
-
-    @Override
     public List<Double> getNormalizedRankedValuesSortedByThreshold() {
         return getMeasureSortedByThreshold(normalizedRankedValues);
     }

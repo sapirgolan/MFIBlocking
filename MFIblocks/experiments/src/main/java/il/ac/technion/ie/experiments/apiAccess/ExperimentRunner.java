@@ -118,13 +118,21 @@ public class ExperimentRunner {
                 logger.error("Failed to consume new probabilities", e);
             }
         }
-        measurements.calculateMillerResults(blockWithDatas);
+        calculateMillerResults(blockWithDatas);
         saveResultsToCsvFile();
+    }
+
+    private void calculateMillerResults(List<BlockWithData> blockWithDatas) {
+        probabilityService.calcProbabilitiesOfRecords(blockWithDatas);
+        measurements.calculate(blockWithDatas, 0.0);
     }
 
     private void saveResultsToCsvFile() {
         try {
             File expResults = new File("expResults.csv");
+            if (expResults.exists()) {
+                FileUtils.forceDelete(expResults);
+            }
             boolean isNewFileCreated = expResults.createNewFile();
             if (isNewFileCreated) {
                 parsingService.writeExperimentsMeasurements(measurements, expResults);

@@ -24,6 +24,8 @@ public class ParsingService {
     public static final String THRESHOLD = "Threshold";
     public static final String NORM_RANKED_VALUE = "Norm Ranked Value";
     public static final String NORM_MRR = "Norm MRR";
+    private static final String MILLER_RANKED_VALUE = "Miller Ranked Value";
+    private static final String MILLER_MRR_VALUE = "Miller MRR Value";
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
@@ -76,7 +78,7 @@ public class ParsingService {
 
     public void writeExperimentsMeasurements(IMeasurements measurements, File tempFile) throws SizeNotEqualException {
         CsvWriter csvWriter = dataParser.preparOutputFile(tempFile);
-        csvWriter.writeHeaders(RANKED_VALUE, MRR, THRESHOLD, NORM_RANKED_VALUE, NORM_MRR);
+        csvWriter.writeHeaders(THRESHOLD, RANKED_VALUE, MRR, NORM_RANKED_VALUE, NORM_MRR, MILLER_RANKED_VALUE, MILLER_MRR_VALUE);
 
         List<Double> mrrValues = measurements.getMrrValuesSortedByThreshold();
         List<Double> rankedValues = measurements.getRankedValuesSortedByThreshold();
@@ -84,15 +86,37 @@ public class ParsingService {
         List<Double> normalizedRankedValues = measurements.getNormalizedRankedValuesSortedByThreshold();
         List<Double> normalizedMRRValues = measurements.getNormalizedMRRValuesSortedByThreshold();
         assertSize(measurements);
-        for (int i = 0; i < thresholds.size(); i++) {
+
+        Double millerRankedValue = getMillerRankedValue(rankedValues);
+        Double millerMRRValue = getMillerMRRValue(mrrValues);
+        for (int i = 1; i < thresholds.size(); i++) {
             csvWriter.writeValue(MRR, mrrValues.get(i));
             csvWriter.writeValue(THRESHOLD, thresholds.get(i));
             csvWriter.writeValue(RANKED_VALUE, rankedValues.get(i));
             csvWriter.writeValue(NORM_RANKED_VALUE, normalizedRankedValues.get(i));
             csvWriter.writeValue(NORM_MRR, normalizedMRRValues.get(i));
+            csvWriter.writeValue(MILLER_RANKED_VALUE, millerRankedValue);
+            csvWriter.writeValue(MILLER_MRR_VALUE, millerMRRValue);
+
             csvWriter.writeValuesToRow();
         }
         csvWriter.close();
+    }
+
+    private Double getMillerMRRValue(List<Double> mrrValues) {
+        if (!mrrValues.isEmpty()) {
+            return mrrValues.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    private Double getMillerRankedValue(List<Double> rankedValues) {
+        if (!rankedValues.isEmpty()) {
+            return rankedValues.get(0);
+        } else {
+            return null;
+        }
     }
 
     private void assertSize(IMeasurements measurements) throws SizeNotEqualException {

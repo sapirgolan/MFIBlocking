@@ -39,7 +39,7 @@ public class StreamGobbler extends Thread {
                 if (ChanelType.ERROR.equals(type)) {
                     logger.error(log.toString());
                 } else {
-                    logger.info(log.toString());
+                    logger.trace(log.toString());
                 }
             }
 

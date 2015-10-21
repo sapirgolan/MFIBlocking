@@ -4,6 +4,7 @@ import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Record;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -11,6 +12,8 @@ import java.util.*;
  * Created by I062070 on 21/08/2015.
  */
 public class BlockWithData extends AbstractBlock<Record>{
+
+    private static final Logger logger = Logger.getLogger(BlockWithData.class);
 
     private Record trueRepresentative;
 
@@ -59,6 +62,10 @@ public class BlockWithData extends AbstractBlock<Record>{
     @Override
     public int getTrueRepresentativePosition() {
         ArrayList<Pair> pairs = new ArrayList<>();
+        if (membersProbability.entrySet().isEmpty()) {
+            logger.error("Cannot execute method 'getTrueRepresentativePosition()'");
+            return 0;
+        }
         for (Map.Entry<Record, Float> entry : membersProbability.entrySet()) {
             pairs.add(new Pair(entry.getKey(), entry.getValue()));
         }

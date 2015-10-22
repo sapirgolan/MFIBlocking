@@ -79,4 +79,13 @@ public class ExprimentsService {
         logger.debug("Create ConvexBPContext with waitIntervalInSeconds of " + waitIntervalInSeconds);
         return new ConvexBPContext(DCBP_DIR, uaiFileName, outputFileName, waitIntervalInSeconds);
     }
+
+    public Collection<File> findDatasets(String pathToDir) {
+        Collection<File> files = null;
+        File sourceDir = new File(pathToDir);
+        if (sourceDir.isDirectory()) {
+            files = FileUtils.listFiles(sourceDir, new String[]{"csv"}, false);
+        }
+        return files;
+    }
 }

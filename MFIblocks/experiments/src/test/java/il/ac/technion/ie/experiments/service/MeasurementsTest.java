@@ -11,7 +11,6 @@ import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
@@ -22,6 +21,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.anyList;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 public class MeasurementsTest {
@@ -35,7 +35,7 @@ public class MeasurementsTest {
 
     @Before
     public void setUp() throws Exception {
-        classUnderTest = new Measurements(0);
+        classUnderTest = spy(new Measurements(0));
         MockitoAnnotations.initMocks(this);
     }
 
@@ -49,8 +49,8 @@ public class MeasurementsTest {
     @Test
     public void testCalculate_whenRankedValueThatIsCalculated() throws Exception {
         //mocking
-        when(measurService.calcRankedValue(Mockito.anyList())).thenReturn(0.3);
-        when(measurService.calcMRR(Mockito.anyList())).thenReturn(0.7);
+        when(measurService.calcRankedValue(anyList())).thenReturn(0.3);
+        when(measurService.calcMRR(anyList())).thenReturn(0.7);
 
         //execute
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
@@ -61,8 +61,8 @@ public class MeasurementsTest {
     @Test
     public void testCalculate_calculateTwice() throws Exception {
         //mocking
-        when(measurService.calcRankedValue(Mockito.anyList())).thenReturn(0.3, 0.5);
-        when(measurService.calcMRR(Mockito.anyList())).thenReturn(0.7, 0.6);
+        when(measurService.calcRankedValue(anyList())).thenReturn(0.3, 0.5);
+        when(measurService.calcMRR(anyList())).thenReturn(0.7, 0.6);
 
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
         assertThat(classUnderTest.getRankedValueByThreshold(0.213), closeTo(0.3, 0.0001));
@@ -77,8 +77,8 @@ public class MeasurementsTest {
     @Test
     public void testGetRankedValueByThresholdTwice() throws Exception {
         //mocking
-        when(measurService.calcRankedValue(Mockito.anyList())).thenReturn(0.3, 0.5);
-        when(measurService.calcMRR(Mockito.anyList())).thenReturn(0.7, 0.6);
+        when(measurService.calcRankedValue(anyList())).thenReturn(0.3, 0.5);
+        when(measurService.calcMRR(anyList())).thenReturn(0.7, 0.6);
 
         //execution
         classUnderTest.calculate(new ArrayList<BlockWithData>(), 0.213);
@@ -114,7 +114,7 @@ public class MeasurementsTest {
 
         //mocking
         final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
-        when(measurService.calcRankedValue(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+        when(measurService.calcRankedValue(anyList())).thenAnswer(new Answer<Double>() {
             @Override
             public Double answer(InvocationOnMock invocation) throws Throwable {
                 return iterator.next().getValue();
@@ -142,7 +142,7 @@ public class MeasurementsTest {
                 build());
 
         final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
-        when(measurService.calcMRR(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+        when(measurService.calcMRR(anyList())).thenAnswer(new Answer<Double>() {
             @Override
             public Double answer(InvocationOnMock invocation) throws Throwable {
                 return iterator.next().getValue();
@@ -187,7 +187,7 @@ public class MeasurementsTest {
                 build());
 
         final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
-        when(measurService.calcMRR(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+        when(measurService.calcMRR(anyList())).thenAnswer(new Answer<Double>() {
             @Override
             public Double answer(InvocationOnMock invocation) throws Throwable {
                 return iterator.next().getValue();
@@ -221,7 +221,7 @@ public class MeasurementsTest {
                 build());
 
         final Iterator<Map.Entry<Double, Double>> iterator = map.entrySet().iterator();
-        when(measurService.calcRankedValue(Mockito.anyList())).thenAnswer(new Answer<Double>() {
+        when(measurService.calcRankedValue(anyList())).thenAnswer(new Answer<Double>() {
             @Override
             public Double answer(InvocationOnMock invocation) throws Throwable {
                 return iterator.next().getValue();
@@ -243,4 +243,34 @@ public class MeasurementsTest {
         List<Double> expectedNormalizedMRRValues = Lists.newArrayList(0.4, 0.2, 0.075, 0.09);
         assertThat(classUnderTest.getNormalizedRankedValuesSortedByThreshold(), contains(expectedNormalizedMRRValues.toArray()));
     }
+
+    @Test
+    public void testGetAverageRankedValue_threeValues() throws Exception {
+        //mocking
+        doReturn(0.3).doReturn(0.6).doReturn(0.9).when(measurService).calcRankedValue(anyList());
+        suppress(methods(classUnderTest.getClass(), "calcMRR"));
+
+        double threshold = 0.4;
+        classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
+        classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
+        classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
+
+        assertThat(classUnderTest.getAverageRankedValue(threshold), closeTo(0.6, 0.00001));
+    }
+
+    @Test
+    public void testGetAverageMRR_randomValues() throws Exception {
+        //mocking
+        doReturn(0.2).doReturn(0.7).doReturn(0.3).when(measurService).calcMRR(anyList());
+        suppress(methods(classUnderTest.getClass(), "calcRankedValue"));
+
+        double threshold = 0.2;
+        classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
+        classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
+        classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
+
+        assertThat(classUnderTest.getAverageMRR(threshold), closeTo(0.4, 0.00001));
+    }
+
+
 }

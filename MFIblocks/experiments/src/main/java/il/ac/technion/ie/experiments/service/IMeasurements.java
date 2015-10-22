@@ -1,6 +1,7 @@
 package il.ac.technion.ie.experiments.service;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.MeasuresContext;
 
 import java.util.List;
 
@@ -23,4 +24,10 @@ public interface IMeasurements {
     List<Double> getNormalizedMRRValuesSortedByThreshold();
 
     List<Double> getNormalizedRankedValuesSortedByThreshold();
+
+    MeasuresContext getMeasuresContext(Double threshold);
+
+    double getAverageRankedValue(double threshold);
+
+    double getAverageMRR(double threshold);
 }

@@ -255,7 +255,8 @@ public class MeasurementsTest {
         classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
         classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
 
-        assertThat(classUnderTest.getAverageRankedValue(threshold), closeTo(0.6, 0.00001));
+        double averageRankedValue = Whitebox.invokeMethod(classUnderTest, "getAverageRankedValue", threshold);
+        assertThat(averageRankedValue, closeTo(0.6, 0.00001));
     }
 
     @Test
@@ -269,7 +270,8 @@ public class MeasurementsTest {
         classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
         classUnderTest.calculate(new ArrayList<BlockWithData>(), threshold);
 
-        assertThat(classUnderTest.getAverageMRR(threshold), closeTo(0.4, 0.00001));
+        double averageMRR = Whitebox.invokeMethod(classUnderTest, "getAverageMRR", threshold);
+        assertThat(averageMRR, closeTo(0.4, 0.00001));
     }
 
 

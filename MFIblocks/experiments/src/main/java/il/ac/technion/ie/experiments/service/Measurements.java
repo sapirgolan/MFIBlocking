@@ -117,17 +117,18 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public FebrlMeasuresContext getMeasuresContext(Double threshold) {
-        return null;
+    public FebrlMeasuresContext getFebrlMeasuresContext(Double threshold) {
+        double averageRankedValue = this.getAverageRankedValue(threshold);
+        double averageMRR = this.getAverageMRR(threshold);
+        FebrlMeasuresContext febrlMeasuresContext = new FebrlMeasuresContext(averageRankedValue, averageMRR);
+        return febrlMeasuresContext;
     }
 
-    @Override
-    public double getAverageRankedValue(double threshold) {
+    private double getAverageRankedValue(double threshold) {
         return getAverageMeasurement(threshold, rankedValueMap);
     }
 
-    @Override
-    public double getAverageMRR(double threshold) {
+    private double getAverageMRR(double threshold) {
         return getAverageMeasurement(threshold, mrrValueMap);
     }
 

@@ -25,9 +25,5 @@ public interface IMeasurements {
 
     List<Double> getNormalizedRankedValuesSortedByThreshold();
 
-    FebrlMeasuresContext getMeasuresContext(Double threshold);
-
-    double getAverageRankedValue(double threshold);
-
-    double getAverageMRR(double threshold);
+    FebrlMeasuresContext getFebrlMeasuresContext(Double threshold);
 }

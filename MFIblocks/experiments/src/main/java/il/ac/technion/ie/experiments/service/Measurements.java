@@ -3,7 +3,7 @@ package il.ac.technion.ie.experiments.service;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.MeasuresContext;
+import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
 import org.apache.commons.lang3.ArrayUtils;
@@ -117,7 +117,7 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public MeasuresContext getMeasuresContext(Double threshold) {
+    public FebrlMeasuresContext getMeasuresContext(Double threshold) {
         return null;
     }
 

@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.Utils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -32,5 +33,21 @@ public class ExpFileUtils {
         File runningDir = new File(System.getProperty("user.dir"));
         File parentFile = runningDir.getParentFile();
         return parentFile.getAbsolutePath() + File.separator + fileName + fileSuffix;
+    }
+
+    public static File createOutputFile(String filename) {
+        File expResults = null;
+        try {
+            expResults = new File(filename);
+            if (expResults.exists()) {
+                FileUtils.forceDelete(expResults);
+            }
+            if (!expResults.createNewFile()) {
+                expResults = null;
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create file for measurements of Experiment", e);
+        }
+        return expResults;
     }
 }

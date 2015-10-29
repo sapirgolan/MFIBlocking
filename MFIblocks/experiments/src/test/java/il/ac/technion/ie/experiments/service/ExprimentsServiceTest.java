@@ -39,4 +39,22 @@ public class ExprimentsServiceTest {
         assertThat(datasets, hasSize(2));
         assertThat(datasets, contains(file1, file2));
     }
+
+    @Test
+    public void testGetParameterValue() throws Exception {
+        File file = new File(FileUtils.getTempDirectory(), "someDataset_parameter=9.csv");
+        assertThat(classUnderTest.getParameterValue(file), is(9));
+    }
+
+    @Test
+    public void testGetParameterValue_noParamExists() throws Exception {
+        File file = new File(FileUtils.getTempDirectory(), "someDataset_parameter=VCS.csv");
+        assertThat(classUnderTest.getParameterValue(file), nullValue());
+    }
+
+    @Test
+    public void testGetParameterValue_fileNameNotInFormat() throws Exception {
+        File file = new File(FileUtils.getTempDirectory(), "someDataset_paramer_8.csv");
+        assertThat(classUnderTest.getParameterValue(file), nullValue());
+    }
 }

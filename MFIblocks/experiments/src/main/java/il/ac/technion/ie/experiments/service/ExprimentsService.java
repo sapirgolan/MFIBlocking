@@ -4,6 +4,7 @@ import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.ConvexBPContext;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.log4j.Logger;
 
@@ -18,6 +19,8 @@ import java.util.*;
 public class ExprimentsService {
 
     static final Logger logger = Logger.getLogger(ExprimentsService.class);
+    public static final String PARAMETER_NAME = "parameter=";
+    public static final String CLOSE = ".";
 
     /**
      * The method filters the blocks whose chosen representative is not the True Representative of the block.
@@ -87,5 +90,18 @@ public class ExprimentsService {
             files = FileUtils.listFiles(sourceDir, new String[]{"csv"}, false);
         }
         return files;
+    }
+
+    public Integer getParameterValue(File dataset) {
+        Integer numericParamValue = null;
+        String fileName = dataset.getName().toLowerCase();
+        String paramValue = StringUtils.substringBetween(fileName, PARAMETER_NAME, CLOSE);
+
+        try {
+            numericParamValue = Integer.valueOf(paramValue);
+        } catch (NumberFormatException e) {
+            logger.error("Didn't find Febrl parameter value in file name");
+        }
+        return numericParamValue;
     }
 }

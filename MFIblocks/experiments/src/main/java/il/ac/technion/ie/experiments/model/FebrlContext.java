@@ -4,32 +4,35 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import il.ac.technion.ie.experiments.service.IMeasurements;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by I062070 on 22/10/2015.
  */
 public class FebrlContext {
 
-    private Table<Double, List<BlockWithData>, FebrlMeasuresContext> resultsTable; //<Row,Column,Value>
+    private Table<Double, Integer, FebrlMeasuresContext> resultsTable; //<Row,Column,Value>
 
     public FebrlContext() {
         this.resultsTable = HashBasedTable.create();
     }
 
-    public void add(Double threshold, List<BlockWithData> dataset, IMeasurements measurements) {
+    public void add(Double threshold, Integer febrlParameter, IMeasurements measurements) {
         FebrlMeasuresContext febrlMeasuresContext = measurements.getFebrlMeasuresContext(threshold);
-        resultsTable.put(threshold, dataset, febrlMeasuresContext);
+        resultsTable.put(threshold, febrlParameter, febrlMeasuresContext);
     }
 
-    public Collection<List<BlockWithData>> getDataSet(double threshold) {
-        Map<List<BlockWithData>, FebrlMeasuresContext> row = resultsTable.row(threshold);
+    public Set<Integer> getDataSet(double threshold) {
+        Map<Integer, FebrlMeasuresContext> row = resultsTable.row(threshold);
         return row.keySet();
     }
 
-    public FebrlMeasuresContext getMeasurments(double threshold, List<BlockWithData> blocks) {
-        return resultsTable.get(threshold, blocks);
+    public FebrlMeasuresContext getMeasurments(double threshold, int febrlParameter) {
+        return resultsTable.get(threshold, febrlParameter);
+    }
+
+    public Map<Integer, FebrlMeasuresContext> getMeasurments(Double threshold) {
+        return resultsTable.row(threshold);
     }
 }

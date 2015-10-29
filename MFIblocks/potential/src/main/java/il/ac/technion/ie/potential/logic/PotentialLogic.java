@@ -64,7 +64,7 @@ public class PotentialLogic implements iPotentialLogic {
                 builder.append(record.getRecordName());
                 builder.append(',');
             }
-            logger.debug("The filtered records are: " + builder.toString());
+            logger.warn("The filtered records are: " + builder.toString());
         }
 
         //A mapping for each recordID. For each record we store a Set with all

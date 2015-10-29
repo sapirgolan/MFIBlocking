@@ -82,6 +82,12 @@
             <artifactId>commons-math3</artifactId>
             <version>3.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.13.0</version>
+            <scope>test</scope>
+        </dependency>
 
 
     </dependencies>

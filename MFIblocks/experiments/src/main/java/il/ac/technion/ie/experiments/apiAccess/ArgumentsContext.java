@@ -61,4 +61,11 @@ class ArgumentsContext {
     public List<Double> getThresholds() {
         return thresholds;
     }
+
+    public int size() {
+        if (thresholds.isEmpty()) {
+            return 1;
+        }
+        return 2;
+    }
 }

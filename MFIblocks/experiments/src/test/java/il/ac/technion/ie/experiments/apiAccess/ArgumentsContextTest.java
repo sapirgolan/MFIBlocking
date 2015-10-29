@@ -61,4 +61,16 @@ public class ArgumentsContextTest {
         assertThat(argumentsContext.getThreshold(), closeTo(0.2, 0.0001));
         assertThat(argumentsContext.getThresholds(), containsInAnyOrder(closeTo(0.2, 0.0001), closeTo(0.3, 0.0001)));
     }
+
+    @Test
+    public void testTwoArgumentsExist() throws Exception {
+        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath(), "0.2, 0.3").invoke();
+        assertThat(argumentsContext.size(), is(2));
+    }
+
+    @Test
+    public void testOneArgumentsExist() throws Exception {
+        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath()).invoke();
+        assertThat(argumentsContext.size(), is(1));
+    }
 }

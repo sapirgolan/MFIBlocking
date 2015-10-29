@@ -5,14 +5,16 @@ import com.univocity.parsers.csv.CsvWriter;
 import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
-import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
+import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.model.Record;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by I062070 on 22/08/2015.
@@ -26,6 +28,9 @@ public class ParsingService {
     public static final String NORM_MRR = "Norm MRR";
     private static final String MILLER_RANKED_VALUE = "Miller Ranked Value";
     private static final String MILLER_MRR_VALUE = "Miller MRR Value";
+    public static final String FEBERL_PARAMETER = "Feberl parameter";
+    public static final String AVERAGE_RANKED_VALUE = "Average Ranked Value";
+    public static final String AVERAGE_MRR = "Average MRR";
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
@@ -98,6 +103,18 @@ public class ParsingService {
             csvWriter.writeValue(MILLER_RANKED_VALUE, millerRankedValue);
             csvWriter.writeValue(MILLER_MRR_VALUE, millerMRRValue);
 
+            csvWriter.writeValuesToRow();
+        }
+        csvWriter.close();
+    }
+
+    public void writeExperimentsMeasurements(Map<Integer, FebrlMeasuresContext> measures, File tempFile) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(tempFile);
+        csvWriter.writeHeaders(FEBERL_PARAMETER, AVERAGE_RANKED_VALUE, AVERAGE_MRR);
+        for (Map.Entry<Integer, FebrlMeasuresContext> febrlMeasuresContextEntry : measures.entrySet()) {
+            csvWriter.writeValue(FEBERL_PARAMETER, febrlMeasuresContextEntry.getKey());
+            csvWriter.writeValue(AVERAGE_RANKED_VALUE, febrlMeasuresContextEntry.getValue().getAverageRankedValue());
+            csvWriter.writeValue(AVERAGE_MRR, febrlMeasuresContextEntry.getValue().getAverageMRR());
             csvWriter.writeValuesToRow();
         }
         csvWriter.close();

@@ -4,9 +4,7 @@ import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.exception.NoValueExistsException;
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
-import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.ConvexBPContext;
-import il.ac.technion.ie.experiments.model.UaiVariableContext;
+import il.ac.technion.ie.experiments.model.*;
 import il.ac.technion.ie.experiments.parsers.UaiBuilder;
 import il.ac.technion.ie.experiments.service.*;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
@@ -18,8 +16,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by I062070 on 27/08/2015.
@@ -27,6 +24,7 @@ import java.util.Map;
 public class ExperimentRunner {
 
     static final Logger logger = Logger.getLogger(ExperimentRunner.class);
+    public static final int NUMBER_OF_EXPERIMENTS = 2;
 
     private final FuzzyService fuzzyService;
     private ParsingService parsingService;
@@ -44,14 +42,14 @@ public class ExperimentRunner {
     }
 
     public static void main(String[] args) {
-        if (args == null || args.length == 0) {
-            System.err.println("There are no file arguments!");
-            System.exit(-1);
-        }
-        String datasetFile = args[0];
+        ArgumentsContext context = new ArgumentsContext(args).invoke();
         ExperimentRunner experimentRunner = new ExperimentRunner();
-//        experimentRunner.runSimpleExp(datasetFile);
-        experimentRunner.runExperiments(datasetFile);
+        if (context.size() == 1) {
+            //        experimentRunner.runSimpleExp(context.getPathToDataset());
+            experimentRunner.runExperiments(context.getPathToDataset());
+        } else {
+            experimentRunner.runFebrlExperiments(context.getPathToDataset(), context.getThresholds());
+        }
     }
 
     public void runSimpleExp(String datasetPath) {
@@ -83,43 +81,85 @@ public class ExperimentRunner {
         logger.info("Will execute experiments on following split thresholds: " + StringUtils.join(thresholds, ','));
         for (Double threshold : thresholds) {
             logger.info("Executing experiment with threshold " + threshold);
-            try {
-                logger.debug("splitting blocks");
-                List<BlockWithData> splitedBlocks = fuzzyService.splitBlocks(blockWithDatas, splitProbabilityForBlocks, threshold);
-                logger.debug("calculating probabilities on blocks after they were split");
-                probabilityService.calcProbabilitiesOfRecords(splitedBlocks);
-                UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
-                logger.debug("creating UAI file");
-                UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
-                logger.debug("UAI file was created at: " + uaiVariableContext.getUaiFile().getAbsoluteFile());
-                ConvexBPContext convexBPContext = exprimentsService.createConvexBPContext(uaiVariableContext);
-                convexBPContext.setThreshold(threshold);
-                //critical section - cannot be multi-thread
-                File outputFile = commandExacter.execute(convexBPContext);
-                if (outputFile.exists()) {
-                    logger.debug("Binary output of convexBP was created on: " + outputFile.getAbsolutePath());
-                    UaiConsumer uaiConsumer = new UaiConsumer(uaiVariableContext, outputFile);
-                    uaiConsumer.consumePotentials();
-                    FileUtils.forceDeleteOnExit(outputFile);
-                    logger.debug("Applying new probabilities on blocks");
-                    uaiConsumer.applyNewProbabilities(splitedBlocks);
-                    logger.debug("Calculating measurements");
-                    measurements.calculate(splitedBlocks, threshold);
-                }
-            } catch (SizeNotEqualException e) {
-                logger.error("Failed to split blocks since #blocs<>#splitProbabilities", e);
-            } catch (IOException e) {
-                logger.error("Cannot create context for ConvexBP algorithm", e);
-            } catch (InterruptedException e) {
-                logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
-            } catch (OSNotSupportedException e) {
-                logger.error("Cannot run ConvexBP algorithm on current machine", e);
-            } catch (NoValueExistsException e) {
-                logger.error("Failed to consume new probabilities", e);
-            }
+            executeExperimentWithThreshold(blockWithDatas, splitProbabilityForBlocks, commandExacter, threshold);
         }
         calculateMillerResults(blockWithDatas);
         saveResultsToCsvFile();
+    }
+
+    private void executeExperimentWithThreshold(List<BlockWithData> blockWithDatas, Map<Integer, Double> splitProbabilityForBlocks, CommandExacter commandExacter, Double threshold) {
+        try {
+            logger.debug("splitting blocks");
+            List<BlockWithData> splitedBlocks = fuzzyService.splitBlocks(blockWithDatas, splitProbabilityForBlocks, threshold);
+            logger.debug("calculating probabilities on blocks after they were split");
+            probabilityService.calcProbabilitiesOfRecords(splitedBlocks);
+            UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
+            logger.debug("creating UAI file");
+            UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
+            logger.debug("UAI file was created at: " + uaiVariableContext.getUaiFile().getAbsoluteFile());
+            ConvexBPContext convexBPContext = exprimentsService.createConvexBPContext(uaiVariableContext);
+            convexBPContext.setThreshold(threshold);
+            //critical section - cannot be multi-thread
+            File outputFile = commandExacter.execute(convexBPContext);
+            if (outputFile.exists()) {
+                logger.debug("Binary output of convexBP was created on: " + outputFile.getAbsolutePath());
+                UaiConsumer uaiConsumer = new UaiConsumer(uaiVariableContext, outputFile);
+                uaiConsumer.consumePotentials();
+                FileUtils.forceDeleteOnExit(outputFile);
+                logger.debug("Applying new probabilities on blocks");
+                uaiConsumer.applyNewProbabilities(splitedBlocks);
+                logger.debug("Calculating measurements");
+                measurements.calculate(splitedBlocks, threshold);
+            }
+        } catch (SizeNotEqualException e) {
+            logger.error("Failed to split blocks since #blocs<>#splitProbabilities", e);
+        } catch (IOException e) {
+            logger.error("Cannot create context for ConvexBP algorithm", e);
+        } catch (InterruptedException e) {
+            logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
+        } catch (OSNotSupportedException e) {
+            logger.error("Cannot run ConvexBP algorithm on current machine", e);
+        } catch (NoValueExistsException e) {
+            logger.error("Failed to consume new probabilities", e);
+        }
+    }
+
+    private void runFebrlExperiments(String pathToDir, List<Double> thresholds) {
+        Collection<File> datasets = exprimentsService.findDatasets(pathToDir);
+
+        Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = parseDatasetsToListsOfBlocks(datasets);
+
+        CommandExacter commandExacter = new CommandExacter();
+
+        FebrlContext febrlContext = new FebrlContext();
+        for (Double threshold : thresholds) {
+            for (List<BlockWithData> blocks : datasetToFebrlParamMap.keySet()) {
+                measurements = new Measurements(blocks.size());
+
+                for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) {
+                    logger.debug(String.format("Executing #%d out of %d experiments with threshold: %s", i, NUMBER_OF_EXPERIMENTS, threshold));
+                    final Map<Integer, Double> splitProbabilityForBlocks = exprimentsService.sampleSplitProbabilityForBlocks(blocks);
+                    this.executeExperimentWithThreshold(blocks, splitProbabilityForBlocks, commandExacter, threshold);
+                }
+                febrlContext.add(threshold, datasetToFebrlParamMap.get(blocks), measurements);
+            }
+            saveFebrlResultsToCsv(febrlContext, threshold);
+        }
+
+    }
+
+    private Map<List<BlockWithData>, Integer> parseDatasetsToListsOfBlocks(Collection<File> datasets) {
+        Map<List<BlockWithData>, Integer> listIntegerHashMap = new HashMap<>();
+        for (File dataset : datasets) {
+            Integer febrlParamValue = exprimentsService.getParameterValue(dataset);
+            if (febrlParamValue != null) {
+                List<BlockWithData> blocks = parsingService.parseDataset(dataset.getAbsolutePath());
+                listIntegerHashMap.put(blocks, febrlParamValue);
+            } else {
+                logger.error("Failed to determine febrlParamValue, therefore will not process file named " + dataset.getAbsolutePath());
+            }
+        }
+        return listIntegerHashMap;
     }
 
     private void calculateMillerResults(List<BlockWithData> blockWithDatas) {
@@ -129,20 +169,24 @@ public class ExperimentRunner {
 
     private void saveResultsToCsvFile() {
         try {
-            File expResults = new File("expResults.csv");
-            if (expResults.exists()) {
-                FileUtils.forceDelete(expResults);
-            }
-            boolean isNewFileCreated = expResults.createNewFile();
-            if (isNewFileCreated) {
+            File expResults = ExpFileUtils.createOutputFile("expResults.csv");
+            if (expResults != null) {
                 parsingService.writeExperimentsMeasurements(measurements, expResults);
             } else {
                 logger.warn("Failed to create file for measurements therefore no results are results will be given");
             }
         } catch (SizeNotEqualException e) {
             logger.error("Failed to write measurements of Experiment", e);
-        } catch (IOException e) {
-            logger.error("Failed to create file for measurements of Experiment", e);
+        }
+    }
+
+    private void saveFebrlResultsToCsv(FebrlContext febrlContext, double threshold) {
+        File expResults = ExpFileUtils.createOutputFile("FebrlExpResults.csv");
+        Map<Integer, FebrlMeasuresContext> measurments = febrlContext.getMeasurments(threshold);
+        if (expResults != null) {
+            parsingService.writeExperimentsMeasurements(measurments, expResults);
+        } else {
+            logger.warn("Failed to create file for measurements therefore no results are results will be given");
         }
     }
 

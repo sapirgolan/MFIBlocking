@@ -1,5 +1,7 @@
 package il.ac.technion.ie.experiments.threads;
 
+import org.apache.log4j.Logger;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -9,6 +11,9 @@ public class ProcessTimeoutThread implements Runnable {
     private Process process;
     private long timeoutValueInSeconds;
     private long afterExecTime;
+
+    static final Logger logger = Logger.getLogger(ProcessTimeoutThread.class);
+
 
     public ProcessTimeoutThread(Process aProcess, long afterExecTime, long timeoutValueInSeconds) {
         this.process = aProcess;
@@ -33,8 +38,9 @@ public class ProcessTimeoutThread implements Runnable {
             long timeSinceExecution = System.currentTimeMillis() - afterExecTime;
             Thread.sleep(TimeUnit.SECONDS.toMillis(timeoutValueInSeconds) - timeSinceExecution);
             process.destroy();
+            logger.warn(String.format("The process that has been executed reached a timeout of %dand therefore it has been shutdown", timeoutValueInSeconds));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Failed to terminate process due to timeout", ex);
         }
     }
 }

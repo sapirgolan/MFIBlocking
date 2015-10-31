@@ -21,6 +21,7 @@ public class ExprimentsService {
     static final Logger logger = Logger.getLogger(ExprimentsService.class);
     public static final String PARAMETER_NAME = "parameter=";
     public static final String CLOSE = ".";
+    public static final int WAIT_INTERVAL_IN_SECONDS = 15;
 
     /**
      * The method filters the blocks whose chosen representative is not the True Representative of the block.
@@ -78,9 +79,8 @@ public class ExprimentsService {
         logger.trace("uaiFileName is: " + uaiFileName);
         String outputFileName = "Out_" + System.nanoTime() + ".txt";
         logger.trace("outputFileName for binary file is: " + outputFileName);
-        int waitIntervalInSeconds = 3;
-        logger.debug("Create ConvexBPContext with waitIntervalInSeconds of " + waitIntervalInSeconds);
-        return new ConvexBPContext(DCBP_DIR, uaiFileName, outputFileName, waitIntervalInSeconds);
+        logger.debug("Create ConvexBPContext with waitIntervalInSeconds of " + WAIT_INTERVAL_IN_SECONDS);
+        return new ConvexBPContext(DCBP_DIR, uaiFileName, outputFileName, WAIT_INTERVAL_IN_SECONDS);
     }
 
     public Collection<File> findDatasets(String pathToDir) {

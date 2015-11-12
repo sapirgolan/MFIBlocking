@@ -82,4 +82,9 @@ public class Record {
     public static Logger getLogger() {
         return logger;
     }
+
+    @Override
+    public String toString() {
+        return RecordName;
+    }
 }

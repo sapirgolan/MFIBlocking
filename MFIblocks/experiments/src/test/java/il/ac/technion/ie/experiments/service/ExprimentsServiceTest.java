@@ -1,16 +1,21 @@
 package il.ac.technion.ie.experiments.service;
 
+import il.ac.technion.ie.experiments.model.BlockWithData;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.powermock.api.mockito.PowerMockito;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 public class ExprimentsServiceTest {
 
@@ -35,7 +40,7 @@ public class ExprimentsServiceTest {
         File file1 = File.createTempFile("file1", ".csv", tempDirectory);
         File file2 = File.createTempFile("file2", ".csv", tempDirectory);
 
-        Collection<File> datasets = classUnderTest.findDatasets(tempDirectory.getAbsolutePath());
+        Collection<File> datasets = classUnderTest.findDatasets(tempDirectory.getAbsolutePath(), false);
         assertThat(datasets, hasSize(2));
         assertThat(datasets, contains(file1, file2));
     }
@@ -56,5 +61,27 @@ public class ExprimentsServiceTest {
     public void testGetParameterValue_fileNameNotInFormat() throws Exception {
         File file = new File(FileUtils.getTempDirectory(), "someDataset_paramer_8.csv");
         assertThat(classUnderTest.getParameterValue(file), nullValue());
+    }
+
+    @Test
+    public void testCalcAvgBlockSize() throws Exception {
+        List<BlockWithData> blocks = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            BlockWithData mock = PowerMockito.mock(BlockWithData.class);
+            when(mock.size()).thenReturn(i);
+            blocks.add(mock);
+        }
+        assertThat(classUnderTest.calcAvgBlockSize(blocks), closeTo(7.0, 0.00001));
+    }
+
+    @Test
+    public void testCalcAvgBlockSize_resultIsNotInteger() throws Exception {
+        List<BlockWithData> blocks = new ArrayList<>();
+        for (int i = 0; i < 14; i++) {
+            BlockWithData mock = PowerMockito.mock(BlockWithData.class);
+            when(mock.size()).thenReturn(i);
+            blocks.add(mock);
+        }
+        assertThat(classUnderTest.calcAvgBlockSize(blocks), closeTo(6.5, 0.00001));
     }
 }

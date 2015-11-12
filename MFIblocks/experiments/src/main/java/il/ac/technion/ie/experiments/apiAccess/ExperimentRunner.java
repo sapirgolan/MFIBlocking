@@ -48,7 +48,8 @@ public class ExperimentRunner {
             //        experimentRunner.runSimpleExp(context.getPathToDataset());
             experimentRunner.runExperiments(context.getPathToDataset());
         } else {
-            experimentRunner.runFebrlExperiments(context.getPathToDataset(), context.getThresholds());
+            experimentRunner.findStatisticsOnDatasets(context.getPathToDataset());
+//            experimentRunner.runFebrlExperiments(context.getPathToDataset(), context.getThresholds());
         }
     }
 
@@ -125,7 +126,7 @@ public class ExperimentRunner {
     }
 
     private void runFebrlExperiments(String pathToDir, List<Double> thresholds) {
-        Collection<File> datasets = exprimentsService.findDatasets(pathToDir);
+        Collection<File> datasets = exprimentsService.findDatasets(pathToDir, false);
 
         Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = parseDatasetsToListsOfBlocks(datasets);
 
@@ -146,6 +147,33 @@ public class ExperimentRunner {
             saveFebrlResultsToCsv(febrlContext, threshold);
         }
 
+    }
+
+    private void findStatisticsOnDatasets(String pathToDir) {
+        Collection<File> datasets = exprimentsService.findDatasets(pathToDir, true);
+        List<DatasetStatistics> datasetStatisticses = calculateStatistics(datasets);
+        saveStatisticsToCsv(datasetStatisticses);
+    }
+
+    private void saveStatisticsToCsv(List<DatasetStatistics> datasetStatisticses) {
+        File expResults = ExpFileUtils.createOutputFile("dataSetsStatistics.csv");
+        if (expResults != null) {
+            parsingService.writeStatistics(datasetStatisticses, expResults);
+        } else {
+            logger.warn("Failed to create file for statistics, therefore no results are results will be given");
+        }
+    }
+
+    private List<DatasetStatistics> calculateStatistics(Collection<File> datasets) {
+        List<DatasetStatistics> statisticsList = new ArrayList<>();
+        for (File dataset : datasets) {
+            DatasetStatistics statistics = new DatasetStatistics(dataset.getName());
+            List<BlockWithData> blocks = parsingService.parseDataset(dataset.getAbsolutePath());
+            statistics.setNumberOfBlocks(blocks.size());
+            statistics.setAvgBlockSize(exprimentsService.calcAvgBlockSize(blocks));
+            statisticsList.add(statistics);
+        }
+        return statisticsList;
     }
 
     private Map<List<BlockWithData>, Integer> parseDatasetsToListsOfBlocks(Collection<File> datasets) {

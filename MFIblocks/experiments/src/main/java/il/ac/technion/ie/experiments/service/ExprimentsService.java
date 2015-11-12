@@ -21,7 +21,7 @@ public class ExprimentsService {
     static final Logger logger = Logger.getLogger(ExprimentsService.class);
     public static final String PARAMETER_NAME = "parameter=";
     public static final String CLOSE = ".";
-    public static final int WAIT_INTERVAL_IN_SECONDS = 15;
+    public static final int WAIT_INTERVAL_IN_SECONDS = 5;
 
     /**
      * The method filters the blocks whose chosen representative is not the True Representative of the block.
@@ -83,11 +83,11 @@ public class ExprimentsService {
         return new ConvexBPContext(DCBP_DIR, uaiFileName, outputFileName, WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public Collection<File> findDatasets(String pathToDir) {
+    public Collection<File> findDatasets(String pathToDir, boolean recursiveSearch) {
         Collection<File> files = null;
         File sourceDir = new File(pathToDir);
         if (sourceDir.isDirectory()) {
-            files = FileUtils.listFiles(sourceDir, new String[]{"csv"}, false);
+            files = FileUtils.listFiles(sourceDir, new String[]{"csv"}, recursiveSearch);
         }
         return files;
     }
@@ -103,5 +103,13 @@ public class ExprimentsService {
             logger.error("Didn't find Febrl parameter value in file name");
         }
         return numericParamValue;
+    }
+
+    public double calcAvgBlockSize(List<BlockWithData> blocks) {
+        double sum = 0;
+        for (BlockWithData block : blocks) {
+            sum += block.size();
+        }
+        return sum / blocks.size();
     }
 }

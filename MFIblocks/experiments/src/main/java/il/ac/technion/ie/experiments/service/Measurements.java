@@ -52,14 +52,20 @@ public class Measurements implements IMeasurements {
 
     private void calcMRR(List<BlockWithData> blocks, double threshold) {
         double mRRValue = measurService.calcMRR(blocks);
+        logger.debug(String.format("%s, MRR, %s", blocks.toString(), mRRValue));
         mrrValueMap.put(threshold, mRRValue);
-        normalizedMRRValues.put(threshold, mRRValue / numberOfBlocks(blocks.size()));
+        double normMRR = mRRValue / numberOfBlocks(blocks.size());
+        normalizedMRRValues.put(threshold, normMRR);
+        logger.debug(String.format("%s, Norm MRR, %s", blocks.toString(), normMRR));
     }
 
     private void calcRankedValue(List<BlockWithData> blocks, double threshold) {
         double rankedValue = measurService.calcRankedValue(blocks);
+        logger.debug(String.format("%s, Ranked Value, %s", blocks.toString(), rankedValue));
         rankedValueMap.put(threshold, rankedValue);
-        normalizedRankedValues.put(threshold, rankedValue / numberOfBlocks(blocks.size()));
+        double normRV = rankedValue / numberOfBlocks(blocks.size());
+        logger.debug(String.format("%s, Norm RV, %s", blocks.toString(), normRV));
+        normalizedRankedValues.put(threshold, normRV);
     }
 
     private int numberOfBlocks(int numberOfSpitedBlocks) {

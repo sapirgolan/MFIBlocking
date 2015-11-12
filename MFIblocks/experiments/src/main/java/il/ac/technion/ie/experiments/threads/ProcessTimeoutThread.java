@@ -38,7 +38,7 @@ public class ProcessTimeoutThread implements Runnable {
             long timeSinceExecution = System.currentTimeMillis() - afterExecTime;
             Thread.sleep(TimeUnit.SECONDS.toMillis(timeoutValueInSeconds) - timeSinceExecution);
             process.destroy();
-            logger.warn(String.format("The process that has been executed reached a timeout of %dand therefore it has been shutdown", timeoutValueInSeconds));
+            logger.warn(String.format("The process that has been executed reached a timeout of %d seconds and therefore it has been shutdown", timeoutValueInSeconds));
         } catch (Exception ex) {
             logger.error("Failed to terminate process due to timeout", ex);
         }

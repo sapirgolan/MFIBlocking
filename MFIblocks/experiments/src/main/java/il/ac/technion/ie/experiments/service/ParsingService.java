@@ -6,6 +6,7 @@ import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.DatasetStatistics;
 import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.model.Record;
@@ -31,6 +32,9 @@ public class ParsingService {
     public static final String FEBERL_PARAMETER = "Feberl parameter";
     public static final String AVERAGE_RANKED_VALUE = "Average Ranked Value";
     public static final String AVERAGE_MRR = "Average MRR";
+    public static final String FILE_NAME = "File Name";
+    public static final String NUMBER_OF_BLOCKS = "# Blocks";
+    public static final String AVG_BLOCK_SIZE = "Avg Block Size";
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
@@ -149,5 +153,17 @@ public class ParsingService {
                 (thresholds.size() != normalizedMRRValues.size())) {
             throw new SizeNotEqualException(String.format("The size of %s, %s and %s is not equal", RANKED_VALUE, MRR, THRESHOLD));
         }
+    }
+
+    public void writeStatistics(List<DatasetStatistics> datasetStatisticses, File outputFile) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(outputFile);
+        csvWriter.writeHeaders(FILE_NAME, NUMBER_OF_BLOCKS, AVG_BLOCK_SIZE);
+        for (DatasetStatistics statistics : datasetStatisticses) {
+            csvWriter.writeValue(FILE_NAME, statistics.getFileName());
+            csvWriter.writeValue(NUMBER_OF_BLOCKS, statistics.getNumberOfBlocks());
+            csvWriter.writeValue(AVG_BLOCK_SIZE, statistics.getAvgBlockSize());
+            csvWriter.writeValuesToRow();
+        }
+        csvWriter.close();
     }
 }

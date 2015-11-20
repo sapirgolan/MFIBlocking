@@ -1,5 +1,7 @@
 package il.ac.technion.ie.search.core;
 
+import com.google.common.base.Joiner;
+import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.exception.TooManySearchResults;
 import il.ac.technion.ie.search.module.DocInteraction;
 import org.apache.log4j.Logger;
@@ -63,8 +65,18 @@ public class SearchEngine {
             logger.error("Failed to create IndexWriter", e);
         }
 	}
-	
-	private void indexFileContent(BufferedReader bufferedReader, IndexWriter indexWriter) throws IOException {
+
+    private void indexRecords(List<Record> records, IndexWriter indexWriter) throws IOException {
+        for (Record record : records) {
+            logger.debug("indexing flowing record:" + record.getRecordName());
+            List<String> recordEntries = record.getEntries();
+            String recordContent = Joiner.on(" ").skipNulls().join(recordEntries);
+            docInteraction.addDoc(indexWriter, String.valueOf(record.getRecordID()), recordContent);
+        }
+
+    }
+
+    private void indexFileContent(BufferedReader bufferedReader, IndexWriter indexWriter) throws IOException {
 		String line = bufferedReader.readLine();
         logger.debug("indexing flowing line:" + line);
         //in the file that is being parred and indexed the first row which represents the first record

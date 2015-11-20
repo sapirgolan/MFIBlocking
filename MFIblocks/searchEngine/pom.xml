@@ -44,6 +44,11 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>${lucene.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${gueva.version}</version>
+        </dependency>
 
     </dependencies>
 

@@ -60,9 +60,8 @@ public class SearchEngine {
 			indexFileContent(reader, indexWriter);
 			indexWriter.close();
 		} catch (IOException e) {
-			System.err.println("Failed to create IndexWriter");
-			e.printStackTrace();
-		}
+            logger.error("Failed to create IndexWriter", e);
+        }
 	}
 	
 	private void indexFileContent(BufferedReader bufferedReader, IndexWriter indexWriter) throws IOException {

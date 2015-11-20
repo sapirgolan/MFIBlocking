@@ -1,12 +1,15 @@
 package il.ac.technion.ie.search.module;
 
 import il.ac.technion.ie.search.exception.TooManySearchResults;
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,4 +35,17 @@ public abstract class DocInteraction {
     }
 
     protected abstract List<String> retrieveTextFieldsFromRecord(Document document);
+
+    //tested
+    protected List<String> separateContentBySpace(String result) {
+        List<String> qgrams = new ArrayList<>();
+        if (result != null) {
+            result = result.trim();
+        }
+        if (!StringUtils.isEmpty(result)) {
+            String[] strings = StringUtils.splitByWholeSeparatorPreserveAllTokens(result, " ");
+            qgrams = new ArrayList<>(Arrays.asList(strings));
+        }
+        return qgrams;
+    }
 }

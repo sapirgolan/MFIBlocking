@@ -38,25 +38,6 @@ public class ComparisonInteractionTest {
         Whitebox.invokeMethod(classUnderTest, "obtainTopResult", indexSearcher, docs);
     }
 
-    @Test
-    public void testSeperateQgrams() throws Exception {
-        List<String> qgrams = Whitebox.invokeMethod(classUnderTest, "seperateQgrams", "1 2 3 ");
-        Set<String> expected = new HashSet<>(Arrays.asList("1", "2", "3"));
-        Assert.assertTrue("don't have all qgrams", qgrams.containsAll(expected));
-    }
-
-    @Test
-    public void testSeperateQgrams_noItems() throws Exception {
-        List<String> qgrams = Whitebox.invokeMethod(classUnderTest, "seperateQgrams", "");
-        Assert.assertTrue("Didn't obtain empty result", qgrams.isEmpty());
-    }
-
-    @Test
-    public void testSeperateQgrams_space() throws Exception {
-        List<String> qgrams = Whitebox.invokeMethod(classUnderTest, "seperateQgrams", " ");
-        Assert.assertTrue("Didn't obtain empty result", qgrams.isEmpty());
-    }
-
     @Test(expected = TooManySearchResults.class)
     public void testObtainTopResult_noDocs() throws Exception {
         IndexSearcher indexSearcher = PowerMockito.mock(IndexSearcher.class);

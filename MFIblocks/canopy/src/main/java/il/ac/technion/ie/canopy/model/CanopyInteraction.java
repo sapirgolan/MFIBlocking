@@ -1,5 +1,6 @@
-package il.ac.technion.ie.search.module;
+package il.ac.technion.ie.canopy.model;
 
+import il.ac.technion.ie.search.module.DocInteraction;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -10,31 +11,29 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by I062070 on 06/05/2015.
+ * Created by I062070 on 20/11/2015.
  */
-public class ComparisonInteraction extends DocInteraction {
-
-    public ComparisonInteraction() {
+public class CanopyInteraction extends DocInteraction {
+    public CanopyInteraction() {
         super(null);
     }
 
     @Override
     public void addDoc(IndexWriter indexWriter, String recordId, String recordText) throws IOException {
-        recordId = "#" + recordId;
         Document doc = new Document();
-        doc.add(new TextField("id", recordId, Field.Store.YES));
-        doc.add(new StringField("qgrams", recordText, Field.Store.YES));
+        doc.add(new StringField("id", recordId, Field.Store.YES));
+        doc.add(new TextField("content", recordText, Field.Store.YES));
         indexWriter.addDocument(doc);
     }
 
     @Override
     public void initFieldList(String scenario) {
+
     }
 
     @Override
     protected List<String> retrieveTextFieldsFromRecord(Document document) {
-        String concatonatedQgrams = document.get("qgrams");
-        return separateContentBySpace(concatonatedQgrams);
+        String content = document.get("content");
+        return separateContentBySpace(content);
     }
-
 }

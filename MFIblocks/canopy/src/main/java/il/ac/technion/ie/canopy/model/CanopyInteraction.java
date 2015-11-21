@@ -14,6 +14,10 @@ import java.util.List;
  * Created by I062070 on 20/11/2015.
  */
 public class CanopyInteraction extends DocInteraction {
+
+    public static final String CONTENT = "content";
+    public static final String ID = "id";
+
     public CanopyInteraction() {
         super(null);
     }
@@ -21,8 +25,8 @@ public class CanopyInteraction extends DocInteraction {
     @Override
     public void addDoc(IndexWriter indexWriter, String recordId, String recordText) throws IOException {
         Document doc = new Document();
-        doc.add(new StringField("id", recordId, Field.Store.YES));
-        doc.add(new TextField("content", recordText, Field.Store.YES));
+        doc.add(new StringField(ID, recordId, Field.Store.YES));
+        doc.add(new TextField(CONTENT, recordText, Field.Store.YES));
         indexWriter.addDocument(doc);
     }
 
@@ -33,7 +37,7 @@ public class CanopyInteraction extends DocInteraction {
 
     @Override
     protected List<String> retrieveTextFieldsFromRecord(Document document) {
-        String content = document.get("content");
+        String content = document.get(CONTENT);
         return separateContentBySpace(content);
     }
 }

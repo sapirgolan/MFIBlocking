@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.exception.TooManySearchResults;
 import il.ac.technion.ie.search.module.DocInteraction;
+import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
@@ -54,7 +55,16 @@ public class SearchEngine {
 		}
 		return attributes;
 	}
-	
+
+    public List<String> searchInIndex(ISearch iSearch, int hitsPerPage, List<String> terms) {
+        try {
+            return iSearch.search(standardAnalyzer, DirectoryReader.open(index), hitsPerPage, terms);
+        } catch (IOException e) {
+            logger.error("Failed to perform query", e);
+        }
+        return terms;
+    }
+
 	public void addRecords(String pathToFile){
 		//try-with-resources - new in JDK7 (http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
 		try (BufferedReader reader = connectToFile(pathToFile)) {
@@ -66,6 +76,16 @@ public class SearchEngine {
         }
 	}
 
+    public void addRecords(List<Record> records) {
+        try {
+            IndexWriter indexWriter = createInderWeiter();
+            indexRecords(records, indexWriter);
+            indexWriter.close();
+        } catch (IOException e) {
+            logger.error("Failed to create IndexWriter", e);
+        }
+    }
+
     private void indexRecords(List<Record> records, IndexWriter indexWriter) throws IOException {
         for (Record record : records) {
             logger.debug("indexing flowing record:" + record.getRecordName());
@@ -73,7 +93,6 @@ public class SearchEngine {
             String recordContent = Joiner.on(" ").skipNulls().join(recordEntries);
             docInteraction.addDoc(indexWriter, String.valueOf(record.getRecordID()), recordContent);
         }
-
     }
 
     private void indexFileContent(BufferedReader bufferedReader, IndexWriter indexWriter) throws IOException {

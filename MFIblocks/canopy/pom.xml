@@ -19,9 +19,21 @@
         <dependency>
             <groupId>il.ac.technion.ie</groupId>
             <artifactId>searchEngine</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
-        <!-- Lucene -->
+        <dependency>
+            <groupId>il.ac.technion.ie</groupId>
+            <artifactId>experiments</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>il.ac.technion.ie</groupId>
+            <artifactId>experiments</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <!--&lt;!&ndash; Lucene &ndash;&gt;
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
@@ -36,7 +48,8 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
             <version>${lucene.version}</version>
-        </dependency>
+        </dependency>-->
+
 
     </dependencies>
 

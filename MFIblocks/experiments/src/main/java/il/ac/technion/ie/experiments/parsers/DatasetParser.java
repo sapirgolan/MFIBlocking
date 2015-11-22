@@ -28,15 +28,46 @@ public class DatasetParser {
         return null;
     }
 
+
+    /**
+     * This method generate a parser that starts an iterator-style parsing cycle that
+     * does not rely in a {@link com.univocity.parsers.common.processor.RowProcessor}.
+     * <p/>
+     * To initialize a {@code CsvParser} with a default {@link com.univocity.parsers.common.processor.RowProcessor}
+     * use {@link il.ac.technion.ie.experiments.parsers.DatasetParser#getParserForFile(String, com.univocity.parsers.csv.CsvParserSettings)} set the
+     * parser in the {@link CsvParserSettings}
+     *
+     * @param pathToFile Full path in File System to a CSV file that contains records
+     * @return an instance of {@link com.univocity.parsers.csv.CsvParser}
+     */
     public CsvParser getParserForFile(String pathToFile) {
         // The settings object provides many configuration options
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
-        CsvParser parser = new CsvParser(parserSettings);
+        CsvParser parser = createParser(parserSettings);
         // the 'parse' method will parse the file and delegate each parsed row to the RowProcessor you defined
         parser.beginParsing(getReader(pathToFile));
 
         return parser;
+    }
+
+    /**
+     * This method generate a parser that parses the entirety of a given input and delegates each parsed row to
+     * an instance of {@link com.univocity.parsers.common.processor.RowProcessor} that is defined in
+     * <code>parserSettings</code>
+     *
+     * @param pathToFile     Full path in File System to a CSV file that contains records
+     * @param parserSettings a custom configuration for the {@code CsvParser} that is being returned
+     * @return an instance of {@link com.univocity.parsers.csv.CsvParser}
+     */
+    public CsvParser getParserForFile(String pathToFile, CsvParserSettings parserSettings) {
+        CsvParser parser = createParser(parserSettings);
+        parser.parse(getReader(pathToFile));
+        return parser;
+    }
+
+    private CsvParser createParser(CsvParserSettings parserSettings) {
+        return new CsvParser(parserSettings);
     }
 
     public CsvWriter preparOutputFile(String pathToFile) {

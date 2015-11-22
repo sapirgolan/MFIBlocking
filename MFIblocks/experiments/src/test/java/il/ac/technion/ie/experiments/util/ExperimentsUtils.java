@@ -1,9 +1,13 @@
 package il.ac.technion.ie.experiments.util;
 
+import com.univocity.parsers.common.processor.RowListProcessor;
+import com.univocity.parsers.csv.CsvParserSettings;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.experiments.service.FuzzyService;
 import il.ac.technion.ie.experiments.service.ParsingService;
 import il.ac.technion.ie.experiments.service.ProbabilityService;
+import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.api.mockito.PowerMockito;
@@ -67,7 +71,7 @@ public class ExperimentsUtils {
         probabilityService.calcProbabilitiesOfRecords(originalBlocks);
 
         List<BlockWithData> copyOfOriginalBlocks = new ArrayList<>(originalBlocks);
-        Map splitProbMap = PowerMockito.mock(Map.class);
+        Map<Integer, Double> splitProbMap = PowerMockito.mock(Map.class);
         PowerMockito.when(splitProbMap.size()).thenReturn(originalBlocks.size());
         List<BlockWithData> fuzzyBlocks = fuzzyService.splitBlocks(copyOfOriginalBlocks, splitProbMap, 0.6);
         probabilityService.calcProbabilitiesOfRecords(fuzzyBlocks);
@@ -83,5 +87,45 @@ public class ExperimentsUtils {
         PowerMock.replay(fuzzyService);
 
         return fuzzyService;
+    }
+
+    /**
+     * Return a List<String[]> of the parsed file.
+     * The first item in the list <code>list.get(0)</code> is a <code>String[]<code/> of headers. The rest
+     * of the elements are rows in the file
+     *
+     * @param pathToFile Full path in File System to a CSV file that contains records
+     * @return List<String[]> where the first record is the field names and the rest are the records
+     */
+    public static List<String[]> readRecordsFromTestFile(String pathToFile) {
+        // The settings object provides many configuration options
+        CsvParserSettings parserSettings = new CsvParserSettings();
+
+        //You can configure the parser to automatically detect what line separator sequence is in the input
+        parserSettings.setLineSeparatorDetectionEnabled(true);
+
+        // A RowListProcessor stores each parsed row in a List.
+        RowListProcessor rowProcessor = new RowListProcessor();
+
+        // You can configure the parser to use a RowProcessor to process the values of each parsed row.
+        // You will find more RowProcessors in the 'com.univocity.parsers.common.processor' package, but you can also create your own.
+        parserSettings.setRowProcessor(rowProcessor);
+
+        parserSettings.setEmptyValue(StringUtils.EMPTY);
+
+        // Let's consider the first parsed row as the headers of each column in the file.
+        parserSettings.setHeaderExtractionEnabled(true);
+
+        DatasetParser datasetParser = new DatasetParser();
+        datasetParser.getParserForFile(pathToFile, parserSettings);
+
+        // get the parsed records from the RowListProcessor here.
+        // Note that different implementations of RowProcessor will provide different sets of functionalities.
+        String[] headers = rowProcessor.getHeaders();
+        List<String[]> rows = rowProcessor.getRows();
+        List<String[]> results = new ArrayList<>();
+        results.add(headers);
+        results.addAll(rows);
+        return results;
     }
 }

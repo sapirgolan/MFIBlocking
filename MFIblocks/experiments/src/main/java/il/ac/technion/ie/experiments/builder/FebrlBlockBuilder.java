@@ -14,7 +14,6 @@ import java.util.List;
  */
 public class FebrlBlockBuilder implements iBlockBuilder {
 
-    private static final String EMPTY_STRING = "";
     private static final int FIRST_RECORD_ID = 1;
     private static final int STARTING_RECORD_INDEX = 2;
     private List<String> fieldsNames;
@@ -76,7 +75,7 @@ public class FebrlBlockBuilder implements iBlockBuilder {
         for (int i = 0; i < values.size(); i++) {
             String val = values.get(i);
             if (val == null) {
-                values.set(i, EMPTY_STRING);
+                values.set(i, StringUtils.EMPTY);
             }
         }
         return new Record(fieldsNames, values, id);

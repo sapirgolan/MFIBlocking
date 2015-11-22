@@ -14,6 +14,8 @@ import java.util.List;
  * with Application to Reference Matching" at http://www.kamalnigam.com/papers/canopy-kdd00.pdf
  * <p/>
  * There are two parameters: T2, T1 and T2 > T1
+ *
+ * http://webdam.inria.fr/Jorge/html/wdmch18.html
  */
 public class Canopy {
 

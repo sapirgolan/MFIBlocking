@@ -24,14 +24,16 @@ import java.util.List;
  */
 public class SearchCanopy implements ISearch {
 
-    static final Logger logger = Logger.getLogger(SearchCanopy.class);
+    private static final Logger logger = Logger.getLogger(SearchCanopy.class);
+
+    public static final int DEFAULT_HITS_PER_PAGE = 30;
     /**
      * see  https://lucene.apache.org/core/2_9_4/queryparsersyntax.html
      */
     public static final String FUZZY_SYNTAX = "%s~0.7";
 
     @Override
-    public List<String> search(Analyzer analyzer, IndexReader index, int hitsPerPage, List<String> terms) {
+    public List<String> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms) {
 
         List<String> recordsIDs = new ArrayList<>();
         try {
@@ -43,7 +45,8 @@ public class SearchCanopy implements ISearch {
                 // Instantiate a searcher
                 IndexSearcher searcher = new IndexSearcher(index);
                 // Ranker
-                TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+                int maxHits = determineHitsPerPage(hitsPerPage);
+                TopScoreDocCollector collector = TopScoreDocCollector.create(maxHits, true);
                 // Search!
                 searcher.search(q, collector);
                 // Retrieve the top-10 documents
@@ -64,6 +67,16 @@ public class SearchCanopy implements ISearch {
             logger.error("Failed to perform search", e);
         }
         return recordsIDs;
+    }
+
+    private int determineHitsPerPage(Integer hitsPerPage) {
+        int hits;
+        if (hitsPerPage != null && hitsPerPage > 0) {
+            hits = hitsPerPage;
+        } else {
+            hits = DEFAULT_HITS_PER_PAGE;
+        }
+        return hits;
     }
 
     private Query createFuzzyQuery(QueryParser parser, List<String> terms) {

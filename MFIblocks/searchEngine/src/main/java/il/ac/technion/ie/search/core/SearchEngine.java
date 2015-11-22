@@ -56,7 +56,7 @@ public class SearchEngine {
 		return attributes;
 	}
 
-    public List<String> searchInIndex(ISearch iSearch, int hitsPerPage, List<String> terms) {
+    public List<String> searchInIndex(ISearch iSearch, Integer hitsPerPage, List<String> terms) {
         try {
             return iSearch.search(standardAnalyzer, DirectoryReader.open(index), hitsPerPage, terms);
         } catch (IOException e) {

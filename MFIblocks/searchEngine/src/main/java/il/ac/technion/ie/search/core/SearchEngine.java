@@ -23,6 +23,7 @@ import org.apache.lucene.util.Version;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -56,6 +57,12 @@ public class SearchEngine {
 		return attributes;
 	}
 
+    /**
+     * @param iSearch     an Implementation
+     * @param hitsPerPage Maximum number of results per query or -1 to let the implementation use its default value
+     * @param terms       the query terms
+     * @return List<String>, the value of each String is defined in {@link il.ac.technion.ie.search.search.ISearch}
+     */
     public List<String> searchInIndex(ISearch iSearch, Integer hitsPerPage, List<String> terms) {
         try {
             return iSearch.search(standardAnalyzer, DirectoryReader.open(index), hitsPerPage, terms);
@@ -74,9 +81,9 @@ public class SearchEngine {
 		} catch (IOException e) {
             logger.error("Failed to create IndexWriter", e);
         }
-	}
+    }
 
-    public void addRecords(List<Record> records) {
+    public void addRecords(Collection<Record> records) {
         try {
             IndexWriter indexWriter = createInderWeiter();
             indexRecords(records, indexWriter);
@@ -86,7 +93,7 @@ public class SearchEngine {
         }
     }
 
-    private void indexRecords(List<Record> records, IndexWriter indexWriter) throws IOException {
+    private void indexRecords(Collection<Record> records, IndexWriter indexWriter) throws IOException {
         for (Record record : records) {
             logger.debug("indexing flowing record:" + record.getRecordName());
             List<String> recordEntries = record.getEntries();

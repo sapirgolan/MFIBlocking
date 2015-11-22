@@ -1,7 +1,7 @@
 package il.ac.technion.ie.experiments.threads;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.lprobability.SimilarityCalculator;
+import il.ac.technion.ie.probability.SimilarityCalculator;
 import il.ac.technion.ie.model.Record;
 
 import java.util.List;

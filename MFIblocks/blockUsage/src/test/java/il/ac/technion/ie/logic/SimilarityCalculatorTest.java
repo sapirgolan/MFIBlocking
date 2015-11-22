@@ -1,6 +1,6 @@
 package il.ac.technion.ie.logic;
 
-import il.ac.technion.ie.lprobability.SimilarityCalculator;
+import il.ac.technion.ie.probability.SimilarityCalculator;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;

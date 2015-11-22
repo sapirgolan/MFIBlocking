@@ -2,7 +2,7 @@ package il.ac.technion.ie.experiments.service;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.threads.CalcProbabilityAction;
-import il.ac.technion.ie.lprobability.SimilarityCalculator;
+import il.ac.technion.ie.probability.SimilarityCalculator;
 import org.apache.log4j.Logger;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 

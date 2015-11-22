@@ -1,4 +1,4 @@
-package il.ac.technion.ie.lprobability;
+package il.ac.technion.ie.probability;
 
 import uk.ac.shef.wit.simmetrics.similaritymetrics.AbstractStringMetric;
 

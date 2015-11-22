@@ -1,7 +1,8 @@
 package il.ac.technion.ie.logic;
 
 import il.ac.technion.ie.context.MfiContext;
-import il.ac.technion.ie.lprobability.SimilarityCalculator;
+import il.ac.technion.ie.probability.ClusterSimilarity;
+import il.ac.technion.ie.probability.SimilarityCalculator;
 import il.ac.technion.ie.model.*;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.BlockInteraction;
@@ -173,7 +174,7 @@ public class BlockLogic implements iBlockLogic {
         Map<Integer, List<String>> blockAttributes = getMembersAtributes(blockMembers, searchEngine);
 
         for (Integer currentRecordId : blockAttributes.keySet()) {
-            float currentRecordSimilarity = calcRecordSimilarityInBlock(currentRecordId, blockAttributes, similarityCalculator);
+            float currentRecordSimilarity = ClusterSimilarity.calcRecordSimilarityInCluster(currentRecordId, blockAttributes, similarityCalculator);
             block.setMemberSimScore(currentRecordId, currentRecordSimilarity);
         }
     }
@@ -188,30 +189,6 @@ public class BlockLogic implements iBlockLogic {
             block.setMemberProbability(member, block.getMemberScore(member) / allScores);
         }
 
-    }
-
-    /**
-     * The method sumup the similarity of a record (currentRecordId) to all other records in a block.
-     * It doesn't calculate the similarity of a record to itself.
-     *
-     * @param currentRecordId      - the record whose similarity with other we want to measure.
-     * @param blockAtributess      - Map where for each ID in it the corresponding list with all fields that the record has.
-     * @param similarityCalculator - a calculator to calc similarity by.
-     * @return
-     */
-    private float calcRecordSimilarityInBlock(Integer currentRecordId, final Map<Integer, List<String>> blockAtributess,
-                                              SimilarityCalculator similarityCalculator) {
-        float recordsSim = 0;
-        //case block contains a single record
-        if (blockAtributess.size() == 1) {
-            return 1;
-        }
-        for (Integer next : blockAtributess.keySet()) {
-            if (next != currentRecordId) {
-                recordsSim += similarityCalculator.calcRecordsSim(blockAtributess.get(next), blockAtributess.get(currentRecordId));
-            }
-        }
-        return recordsSim;
     }
 
     /**

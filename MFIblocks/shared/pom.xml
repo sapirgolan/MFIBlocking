@@ -27,6 +27,11 @@
             <artifactId>commons-configuration</artifactId>
             <version>1.10</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${gueva.version}</version>
+        </dependency>
     </dependencies>
 
 

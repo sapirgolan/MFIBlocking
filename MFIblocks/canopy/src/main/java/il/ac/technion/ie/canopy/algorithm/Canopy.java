@@ -1,6 +1,7 @@
 package il.ac.technion.ie.canopy.algorithm;
 
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
+import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.core.SearchEngine;
@@ -55,8 +56,9 @@ public class Canopy {
             Record rootRecord = sampleRecordRandomly(recordsPool);
             List<String> IDs = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
             List<Record> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(IDs);
-            /*CanopyCluster canopy = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
-            List<Record> tightedRecords = canopy.getTightedRecords();
+            CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
+            canopyCluster.removeRecordsBelowT2();
+            /*List<Record> tightedRecords = canopyCluster.getTightedRecords();
             removeRecords(recordsPool, rootRecord, tightedRecords);*/
         }
 

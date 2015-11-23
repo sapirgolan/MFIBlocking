@@ -45,7 +45,7 @@ public class CanopyTest {
     @Test
     public void testVerifyAllRecordsAreAdded() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
-        List<Record> records = readRecordsFromTestFile(pathToBigRecordsFile);
+        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.3, 0.6);
         classUnderTest.initSearchEngine(canopyInteraction);
         Mockito.verify(canopyInteraction, Mockito.times(NUMBER_OF_RECORDS_IN_BIG_FILE)).addDoc(Mockito.any(IndexWriter.class), Mockito.anyString(), Mockito.anyString());
@@ -68,7 +68,7 @@ public class CanopyTest {
     @Test
     public void testFetchRecordsBasedOnIDs() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
-        List<Record> records = readRecordsFromTestFile(pathToBigRecordsFile);
+        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.3, 0.6);
 
         List<Integer> iDsRandomly = createIDsRandomly(records);
@@ -79,7 +79,6 @@ public class CanopyTest {
             Record record = fetchRecordsBasedOnIDs.get(i);
             assertThat(iDsRandomly, hasItem(record.getRecordID()));
         }
-
     }
 
     private List<String> convertIdsToString(List<Integer> iDsRandomly) {
@@ -102,7 +101,7 @@ public class CanopyTest {
         return new ArrayList<>(Arrays.asList(rangeNumbers));
     }
 
-    private List<Record> readRecordsFromTestFile(String pathToBigRecordsFile) {
+/*    private List<Record> readRecordsFromTestFile(String pathToBigRecordsFile) {
         List<String[]> strings = ExperimentsUtils.readRecordsFromTestFile(pathToBigRecordsFile);
         List<Record> records = new ArrayList<>(strings.size());
         List<String> fieldNames = convertArrayToList(strings.get(0));
@@ -119,6 +118,6 @@ public class CanopyTest {
         List<String> list = new ArrayList<>(Arrays.asList(array));
         list.remove(0);
         return list;
-    }
+    }*/
 
 }

@@ -7,6 +7,7 @@ import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.experiments.service.FuzzyService;
 import il.ac.technion.ie.experiments.service.ParsingService;
 import il.ac.technion.ie.experiments.service.ProbabilityService;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.powermock.api.easymock.PowerMock;
@@ -112,6 +113,7 @@ public class ExperimentsUtils {
         parserSettings.setRowProcessor(rowProcessor);
 
         parserSettings.setEmptyValue(StringUtils.EMPTY);
+        parserSettings.setNullValue(StringUtils.EMPTY);
 
         // Let's consider the first parsed row as the headers of each column in the file.
         parserSettings.setHeaderExtractionEnabled(true);
@@ -127,5 +129,23 @@ public class ExperimentsUtils {
         results.add(headers);
         results.addAll(rows);
         return results;
+    }
+
+    public static List<Record> createRecordsFromTestFile(String pathToBigRecordsFile) {
+        List<String[]> strings = ExperimentsUtils.readRecordsFromTestFile(pathToBigRecordsFile);
+        List<Record> records = new ArrayList<>(strings.size());
+        List<String> fieldNames = convertArrayToList(strings.get(0));
+        for (int i = 1; i < strings.size(); i++) { //skipping first element since it is the field names
+            List<String> values = convertArrayToList(strings.get(i));
+            Record record = new Record(fieldNames, values, i);
+            records.add(record);
+        }
+        return records;
+    }
+
+    private static List<String> convertArrayToList(String[] array) {
+        List<String> list = new ArrayList<>(Arrays.asList(array));
+        list.remove(0);
+        return list;
     }
 }

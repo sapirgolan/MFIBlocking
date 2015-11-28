@@ -1,6 +1,7 @@
 package il.ac.technion.ie.canopy.search;
 
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
+import il.ac.technion.ie.search.module.SearchResult;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
@@ -14,7 +15,7 @@ import java.util.concurrent.Callable;
 /**
  * Created by I062070 on 25/11/2015.
  */
-public class ProcessResultsFuture implements Callable<List<String>> {
+public class ProcessResultsFuture implements Callable<List<SearchResult>> {
 
     private static final Logger logger = Logger.getLogger(ProcessResultsFuture.class);
 
@@ -29,8 +30,9 @@ public class ProcessResultsFuture implements Callable<List<String>> {
     }
 
     @Override
-    public List<String> call() throws Exception {
-        List<String> recordsIDs = new ArrayList<>(scoreDocs.size());
+    public List<SearchResult> call() throws Exception {
+//        List<String> recordsIDs = new ArrayList<>(scoreDocs.size());
+        List<SearchResult> results = new ArrayList<>(scoreDocs.size());
         //do processing on results
         logger.info("Found " + scoreDocs.size() + " hits.");
         for (ScoreDoc hit : scoreDocs) {
@@ -38,8 +40,9 @@ public class ProcessResultsFuture implements Callable<List<String>> {
             Document document = searcher.doc(docId);
             logger.debug(String.format("Received document with content '%s'", document.get(CanopyInteraction.CONTENT)));
             String recordID = document.get(CanopyInteraction.ID);
-            recordsIDs.add(recordID);
+            results.add(new SearchResult(recordID, hit.score));
+//            recordsIDs.add(recordID);
         }
-        return recordsIDs;
+        return results;
     }
 }

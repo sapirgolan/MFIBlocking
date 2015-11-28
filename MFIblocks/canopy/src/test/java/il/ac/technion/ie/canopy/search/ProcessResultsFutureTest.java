@@ -1,6 +1,7 @@
 package il.ac.technion.ie.canopy.search;
 
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
+import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.utils.MockIterator;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
@@ -44,7 +45,7 @@ public class ProcessResultsFutureTest {
 
     @Test
     public void testCall() throws Exception {
-        List<String> expected = new ArrayList<>();
+        List<SearchResult> expected = new ArrayList<>();
         //mock actual documents
         List<ScoreDoc> docs = new ArrayList<>();
         for (int i = 1; i <= NUMBER_OF_DOCS; i++) {
@@ -52,7 +53,8 @@ public class ProcessResultsFutureTest {
             Document document = mock(Document.class);
             when(searcher.doc(i)).thenReturn(document);
             when(document.get(CanopyInteraction.ID)).thenReturn(String.valueOf(-1 * i));
-            expected.add(String.valueOf(-1 * i));
+            ;
+            expected.add(new SearchResult(String.valueOf(-1 * i), 0));
             docs.add(scoreDoc);
         }
         //mock size of documents
@@ -60,9 +62,9 @@ public class ProcessResultsFutureTest {
         //mock iteration
         MockIterator.mockIterable(scoreDocs, docs);
 
-        List<String> docsIDs = classUnderTest.call();
-        assertThat(docsIDs, hasSize(NUMBER_OF_DOCS));
-        assertThat(docsIDs, contains(expected.toArray(new String[expected.size()])));
+        List<SearchResult> results = classUnderTest.call();
+        assertThat(results, hasSize(NUMBER_OF_DOCS));
+        assertThat(results, contains(expected.toArray(new SearchResult[expected.size()])));
 
     }
 }

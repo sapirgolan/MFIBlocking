@@ -1,5 +1,6 @@
 package il.ac.technion.ie.search.search;
 
+import il.ac.technion.ie.search.module.SearchResult;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 
@@ -19,5 +20,5 @@ public interface ISearch {
      * @param terms         List of terms that form the query
      * @return List of recordIds that fits the query and <code>hitsPerPage</code> value
      */
-    List<String> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms);
+    List<SearchResult> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms);
 }

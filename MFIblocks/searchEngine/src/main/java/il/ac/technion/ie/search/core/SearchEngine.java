@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.exception.TooManySearchResults;
 import il.ac.technion.ie.search.module.DocInteraction;
+import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -59,17 +60,19 @@ public class SearchEngine {
 
     /**
      * @param iSearch     an Implementation
-     * @param hitsPerPage Maximum number of results per query or -1 to let the implementation use its default value
+     * @param hitsPerPage Maximum number of results in each page for the query or -1 to let the implementation use its default value.
+     *                    This parameter is used for performance only, unless you find out that that search run in a poor manner don't
+     *                    pass any value
      * @param terms       the query terms
-     * @return List<String>, the value of each String is defined in {@link il.ac.technion.ie.search.search.ISearch}
+     * @return List<SearchResult>, the value of each String is defined in {@link il.ac.technion.ie.search.search.ISearch}
      */
-    public List<String> searchInIndex(ISearch iSearch, Integer hitsPerPage, List<String> terms) {
+    public List<SearchResult> searchInIndex(ISearch iSearch, Integer hitsPerPage, List<String> terms) {
         try {
             return iSearch.search(standardAnalyzer, DirectoryReader.open(index), hitsPerPage, terms);
         } catch (IOException e) {
             logger.error("Failed to perform query", e);
         }
-        return terms;
+        return null;
     }
 
 	public void addRecords(String pathToFile){

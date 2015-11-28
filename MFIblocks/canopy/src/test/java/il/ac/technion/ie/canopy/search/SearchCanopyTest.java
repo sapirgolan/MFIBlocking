@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.core.SearchEngine;
+import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
 import org.junit.After;
 import org.junit.Before;
@@ -56,9 +57,9 @@ public class SearchCanopyTest {
 //        Record recordTwo = new Record(fieldNames, valuesTwo, 2);
         searchEngine.addRecords(Lists.newArrayList(recordOne));
 
-        List<String> recordsIDs = searchEngine.searchInIndex(classUnderTest, 1, valuesOne);
+        List<SearchResult> recordsIDs = searchEngine.searchInIndex(classUnderTest, 1, valuesOne);
         assertThat(recordsIDs, hasSize(1));
-        assertThat(recordsIDs, contains("1"));
+        assertThat(recordsIDs.get(0).getID(), is("1"));
     }
 
     @Test
@@ -70,9 +71,9 @@ public class SearchCanopyTest {
         Record recordOne = new Record(fieldNames, valuesOne, 1);
         searchEngine.addRecords(Lists.newArrayList(recordOne));
 
-        List<String> recordsIDs = searchEngine.searchInIndex(classUnderTest, 1, valuesTwo);
+        List<SearchResult> recordsIDs = searchEngine.searchInIndex(classUnderTest, 1, valuesTwo);
         assertThat(recordsIDs, hasSize(1));
-        assertThat(recordsIDs, contains("1"));
+        assertThat(recordsIDs.get(0).getID(), is("1"));
     }
 
     @Test
@@ -85,9 +86,18 @@ public class SearchCanopyTest {
         Record recordTwo = new Record(fieldNames, valuesTwo, 2);
         searchEngine.addRecords(Lists.newArrayList(recordOne, recordTwo));
 
-        List<String> recordsIDs = searchEngine.searchInIndex(classUnderTest, 2, valuesOne);
-        assertThat(recordsIDs, hasSize(2));
-        assertThat(recordsIDs, contains("1", "2"));
+        List<SearchResult> searchResults = searchEngine.searchInIndex(classUnderTest, 2, valuesOne);
+        assertThat(searchResults, hasSize(2));
+        List<String> recordIDs = extractRecordIDs(searchResults);
+        assertThat(recordIDs, contains("1", "2"));
+    }
+
+    private List<String> extractRecordIDs(List<SearchResult> searchResults) {
+        List<String> recordIDs = new ArrayList<>();
+        for (SearchResult searchResult : searchResults) {
+            recordIDs.add(searchResult.getID());
+        }
+        return recordIDs;
     }
 
     @Test
@@ -100,9 +110,10 @@ public class SearchCanopyTest {
         Record recordTwo = new Record(fieldNames, valuesTwo, 2);
         searchEngine.addRecords(Lists.newArrayList(recordOne, recordTwo));
 
-        List<String> recordsIDs = searchEngine.searchInIndex(classUnderTest, 1, valuesOne);
-        assertThat(recordsIDs, hasSize(1));
-        assertThat(recordsIDs, contains("1"));
+        List<SearchResult> searchResults = searchEngine.searchInIndex(classUnderTest, 1, valuesOne);
+        assertThat(searchResults, hasSize(1));
+        List<String> recordIDs = extractRecordIDs(searchResults);
+        assertThat(recordIDs, contains("1"));
     }
 
     @Test
@@ -119,8 +130,8 @@ public class SearchCanopyTest {
         }
         searchEngine.addRecords(allRecords);
 
-        List<String> recordsIDs = searchEngine.searchInIndex(classUnderTest, null, seedValues);
-        assertThat(recordsIDs, hasSize(numberOfRecordsInDataset));
+        List<SearchResult> searchResults = searchEngine.searchInIndex(classUnderTest, null, seedValues);
+        assertThat(searchResults, hasSize(numberOfRecordsInDataset));
     }
 
     private String generateRandomString(int numberOfChars) {

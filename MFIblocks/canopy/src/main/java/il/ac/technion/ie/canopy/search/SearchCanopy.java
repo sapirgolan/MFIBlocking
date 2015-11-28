@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
+import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -38,11 +39,11 @@ public class SearchCanopy implements ISearch {
     private int maxHits;
 
     @Override
-    public List<String> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms) {
+    public List<SearchResult> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms) {
 
-        List<String> recordsIDs = Collections.synchronizedList(new ArrayList<String>());
+        List<SearchResult> recordsIDs = Collections.synchronizedList(new ArrayList<SearchResult>());
         listeningExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
-        List<ListenableFuture<List<String>>> futureRecordIDs = new ArrayList<>();
+        List<ListenableFuture<List<SearchResult>>> futureRecordIDs = new ArrayList<>();
 
         try {
             // Instantiate a query parser
@@ -71,13 +72,13 @@ public class SearchCanopy implements ISearch {
                     //perform the actual search on documents
                     topDocs = performSearch(q, searcher, lastScoreDoc);
                 }
-                ListenableFuture<List<List<String>>> successfulRecordIDs = Futures.successfulAsList(futureRecordIDs);
+                ListenableFuture<List<List<SearchResult>>> successfulRecordIDs = Futures.successfulAsList(futureRecordIDs);
                 logger.debug("Start for all threads to finish");
                 long startTime = System.nanoTime();
-                List<List<String>> lists = successfulRecordIDs.get();
+                List<List<SearchResult>> lists = successfulRecordIDs.get();
                 long endTime = System.nanoTime();
                 logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
-                for (List<String> list : lists) {
+                for (List<SearchResult> list : lists) {
                     logger.debug("Adding '" + list.size() + "' docs to result from Search Engine");
                     recordsIDs.addAll(list);
                 }
@@ -107,9 +108,9 @@ public class SearchCanopy implements ISearch {
         return collector.topDocs();
     }
 
-    private void createFutureForDocsProcessing(IndexSearcher searcher, List<ListenableFuture<List<String>>> futureRecordIDs, ScoreDoc[] scoreDocs) {
+    private void createFutureForDocsProcessing(IndexSearcher searcher, List<ListenableFuture<List<SearchResult>>> futureRecordIDs, ScoreDoc[] scoreDocs) {
         ProcessResultsFuture future = new ProcessResultsFuture(scoreDocs, searcher);
-        ListenableFuture<List<String>> submit = listeningExecutorService.submit(future);
+        ListenableFuture<List<SearchResult>> submit = listeningExecutorService.submit(future);
         futureRecordIDs.add(submit);
     }
 

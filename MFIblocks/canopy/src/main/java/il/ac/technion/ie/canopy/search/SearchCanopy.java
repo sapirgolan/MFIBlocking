@@ -1,72 +1,116 @@
 package il.ac.technion.ie.canopy.search;
 
 import com.google.common.base.Joiner;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.*;
 import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by I062070 on 20/11/2015.
  */
 public class SearchCanopy implements ISearch {
 
-    private static final Logger logger = Logger.getLogger(SearchCanopy.class);
-
-    public static final int DEFAULT_HITS_PER_PAGE = 30;
+    public static final int DEFAULT_HITS_PER_PAGE = 50;
     /**
      * see  https://lucene.apache.org/core/2_9_4/queryparsersyntax.html
      */
     public static final String FUZZY_SYNTAX = "%s~0.7";
+    private static final Logger logger = Logger.getLogger(SearchCanopy.class);
+    private ListeningExecutorService listeningExecutorService;
+    private int maxHits;
 
     @Override
     public List<String> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms) {
 
-        List<String> recordsIDs = new ArrayList<>();
+        List<String> recordsIDs = Collections.synchronizedList(new ArrayList<String>());
+        listeningExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
+        List<ListenableFuture<List<String>>> futureRecordIDs = new ArrayList<>();
+
         try {
             // Instantiate a query parser
             QueryParser parser = new QueryParser(Version.LUCENE_48, CanopyInteraction.CONTENT, analyzer);
+            maxHits = determineHitsPerPage(hitsPerPage);
             // Parse
             Query q = createFuzzyQuery(parser, terms);
             if (q != null) {
                 // Instantiate a searcher
                 IndexSearcher searcher = new IndexSearcher(index);
-                // Ranker
-                int maxHits = determineHitsPerPage(hitsPerPage);
-                TopScoreDocCollector collector = TopScoreDocCollector.create(maxHits, true);
-                // Search!
-                searcher.search(q, collector);
-                // Retrieve the top-10 documents
-                ScoreDoc[] hits = collector.topDocs().scoreDocs;
-                logger.debug("Retrieved total of " + hits.length + " docs");
+                performSearch(q, searcher, null);
+                TopDocs topDocs = this.performSearch(q, searcher);
 
-                // Display results
-                logger.info("Found " + hits.length + " hits.");
-                for (ScoreDoc hit : hits) {
-                    int docId = hit.doc;
-                    Document document = searcher.doc(docId);
-                    logger.debug(String.format("Received document with content '%s'", document.get(CanopyInteraction.CONTENT)));
-                    String recordID = document.get(CanopyInteraction.ID);
-                    recordsIDs.add(recordID);
+                int numberOfDocumentsInCorpus = topDocs.totalHits;
+                int processedDocs = 0;
+
+                while (numberOfDocumentsInCorpus > processedDocs) {
+                    //get The results from TopScoreDocCollector
+                    ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+                    logger.debug("Retrieved total of " + scoreDocs.length + " docs");
+                    ScoreDoc lastScoreDoc = scoreDocs[scoreDocs.length - 1];
+                    processedDocs += scoreDocs.length;
+
+                    // create a future job for processing the results of the query
+                    createFutureForDocsProcessing(searcher, futureRecordIDs, scoreDocs);
+                    //perform the actual search on documents
+                    topDocs = performSearch(q, searcher, lastScoreDoc);
+                }
+                ListenableFuture<List<List<String>>> successfulRecordIDs = Futures.successfulAsList(futureRecordIDs);
+                logger.debug("Start for all threads to finish");
+                long startTime = System.nanoTime();
+                List<List<String>> lists = successfulRecordIDs.get();
+                long endTime = System.nanoTime();
+                logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
+                for (List<String> list : lists) {
+                    logger.debug("Adding '" + list.size() + "' docs to result from Search Engine");
+                    recordsIDs.addAll(list);
                 }
             }
         } catch (IOException e) {
             logger.error("Failed to perform search", e);
+        } catch (InterruptedException e) {
+            logger.error("Failed to perform search", e);
+        } catch (ExecutionException e) {
+            logger.error("Failed to perform search", e);
         }
         return recordsIDs;
+    }
+
+    private TopDocs performSearch(Query q, IndexSearcher searcher) throws IOException {
+        TopScoreDocCollector collector = TopScoreDocCollector.create(maxHits, true);
+        return retriveDocs(q, searcher, collector);
+    }
+
+    private TopDocs performSearch(Query q, IndexSearcher searcher, ScoreDoc lastScoreDoc) throws IOException {
+        TopScoreDocCollector collector = TopScoreDocCollector.create(maxHits, lastScoreDoc, true);
+        return retriveDocs(q, searcher, collector);
+    }
+
+    private TopDocs retriveDocs(Query q, IndexSearcher searcher, TopScoreDocCollector collector) throws IOException {
+        searcher.search(q, collector);
+        return collector.topDocs();
+    }
+
+    private void createFutureForDocsProcessing(IndexSearcher searcher, List<ListenableFuture<List<String>>> futureRecordIDs, ScoreDoc[] scoreDocs) {
+        ProcessResultsFuture future = new ProcessResultsFuture(scoreDocs, searcher);
+        ListenableFuture<List<String>> submit = listeningExecutorService.submit(future);
+        futureRecordIDs.add(submit);
     }
 
     private int determineHitsPerPage(Integer hitsPerPage) {

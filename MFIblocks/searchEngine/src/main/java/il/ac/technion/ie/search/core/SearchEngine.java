@@ -160,4 +160,8 @@ public class SearchEngine {
 		searcher.search(query, collector);
         return collector.topDocs().scoreDocs;
 	}
+
+    public void destroy() {
+        ((RAMDirectory) index).close();
+    }
 }

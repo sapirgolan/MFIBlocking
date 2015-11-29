@@ -1,11 +1,6 @@
 package il.ac.technion.ie.canopy.model;
 
-import il.ac.technion.ie.model.Record;
-import il.ac.technion.ie.probability.ClusterSimilarity;
-import il.ac.technion.ie.probability.SimilarityCalculator;
-import il.ac.technion.ie.utils.MathUtils;
 import org.apache.log4j.Logger;
-import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
 
 import java.util.*;
 
@@ -13,60 +8,65 @@ import java.util.*;
  * Created by I062070 on 22/11/2015.
  */
 public class CanopyCluster {
-    private final Map<Integer, Record> candidateRecords;
+    private final List<CanopyRecord> candidateRecords;
     private final double t2;
     private final double t1;
-    private List<Record> allRecords;
+    private final double range;
+    private final double minScore;
+    private List<CanopyRecord> allRecords;
+    private List<CanopyRecord> tightRecords;
 
     private static final Logger logger = Logger.getLogger(CanopyCluster.class);
 
 
-    public CanopyCluster(List<Record> candidateRecordsForCanopy, double t2, double t1) {
-        candidateRecords = new HashMap<>();
-        for (Record record : candidateRecordsForCanopy) {
-            candidateRecords.put(record.getRecordID(), record);
+    public CanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) {
+        candidateRecords = candidateRecordsForCanopy;
+        double localMaxScore = 0;
+        double localMinScore = 0;
+        for (CanopyRecord canopyRecord : candidateRecordsForCanopy) {
+            localMinScore = Math.min(localMinScore, canopyRecord.getScore());
+            localMaxScore = Math.max(localMaxScore, canopyRecord.getScore());
         }
+        this.range = localMaxScore - localMinScore;
+        this.minScore = localMinScore;
         this.t2 = t2;
         this.t1 = t1;
         allRecords = new ArrayList<>();
+        tightRecords = new ArrayList<>();
     }
 
     public void removeRecordsBelowT2() {
-        Map<Integer, List<String>> integerListHashMap = getMapForSimilarityCalculation();
-        Map<Integer, Float> recordIDToSimilarity = calcRecordSimilarityOnAllRecords(integerListHashMap);
-        MathUtils.normilize(recordIDToSimilarity);
-        removeLessThanLooseRecords(recordIDToSimilarity);
+        double normRange = convertThreshold(t2);
+        logger.debug("The normalized T2 value is: " + normRange);
+        logger.debug("Removing records whose score is below T2 parameter");
+        removeLessThanLooseRecords(normRange, allRecords);
     }
 
-    private void removeLessThanLooseRecords(Map<Integer, Float> recordIDToSimilarity) {
-        for (Map.Entry<Integer, Float> entry : recordIDToSimilarity.entrySet()) {
-            if (entry.getValue() >= t2) {
-                Record record = candidateRecords.get(entry.getKey());
-                allRecords.add(record);
+    public void removeRecordsBelowT1() {
+        double normRange = convertThreshold(t1);
+        logger.debug("The normalized T1 value is: " + normRange);
+        logger.debug("Removing records whose score is below T1 parameter");
+        removeLessThanLooseRecords(normRange, tightRecords);
+    }
+
+    private void removeLessThanLooseRecords(double normRange, Collection<CanopyRecord> collection) {
+        for (CanopyRecord canopyRecord : candidateRecords) {
+            if (canopyRecord.getScore() >= normRange) {
+                logger.trace(canopyRecord + " was added to a collection");
+                collection.add(canopyRecord);
             }
         }
     }
 
-    private Map<Integer, Float> calcRecordSimilarityOnAllRecords(Map<Integer, List<String>> integerListHashMap) {
-        Map<Integer, Float> recordIDToSimilarity = new HashMap<>();
-        SimilarityCalculator similarityCalculator = new SimilarityCalculator(new JaroWinkler());
-        for (Integer recordID : candidateRecords.keySet()) {
-            float recordSimilarityInCluster = ClusterSimilarity.calcRecordSimilarityInCluster(recordID, integerListHashMap, similarityCalculator);
-            logger.trace(String.format("Similarity of record with ID '%d' is: %s", recordID, recordSimilarityInCluster));
-            recordIDToSimilarity.put(recordID, recordSimilarityInCluster);
-        }
-        return recordIDToSimilarity;
-    }
-
-    private Map<Integer, List<String>> getMapForSimilarityCalculation() {
-        Map<Integer, List<String>> integerListHashMap = new HashMap<>();
-        for (Map.Entry<Integer, Record> entry : candidateRecords.entrySet()) {
-            integerListHashMap.put(entry.getKey(), entry.getValue().getEntries());
-        }
-        return integerListHashMap;
-    }
-
-    public List<Record> getAllRecords() {
+    public List<CanopyRecord> getAllRecords() {
         return Collections.unmodifiableList(allRecords);
+    }
+
+    public List<CanopyRecord> getTightRecords() {
+        return Collections.unmodifiableList(tightRecords);
+    }
+
+    private double convertThreshold(double threshold) {
+        return range * threshold + minScore;
     }
 }

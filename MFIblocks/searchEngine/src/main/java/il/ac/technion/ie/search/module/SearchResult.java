@@ -25,4 +25,8 @@ public class SearchResult {
         }
         return super.equals(obj);
     }
+
+    public double getScore() {
+        return score;
+    }
 }

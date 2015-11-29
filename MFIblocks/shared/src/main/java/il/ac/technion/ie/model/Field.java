@@ -19,4 +19,11 @@ public class Field {
     public String getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                name + "='" + value + '\'' +
+                '}';
+    }
 }

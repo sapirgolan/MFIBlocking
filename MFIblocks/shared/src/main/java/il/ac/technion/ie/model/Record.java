@@ -1,5 +1,6 @@
 package il.ac.technion.ie.model;
 
+import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -10,7 +11,7 @@ import java.util.*;
 public class Record {
     protected Map<String, Field> fields;
     protected Integer recordID;
-    protected String RecordName;
+    protected String recordName;
 
     static final Logger logger = Logger.getLogger(Record.class);
 
@@ -28,7 +29,7 @@ public class Record {
         for (int i = 0; i < fieldsName.size(); i++) {
             String fieldName =  fieldsName.get(i);
             if (isFieldRecordID(fieldName)) {
-                this.RecordName = values.get(i);
+                this.recordName = values.get(i);
             }
             fields.put(fieldName, new Field(fieldName, values.get(i)));
         }
@@ -50,7 +51,7 @@ public class Record {
     }
 
     public String getRecordName() {
-        return RecordName;
+        return recordName;
     }
 
     /**
@@ -85,6 +86,9 @@ public class Record {
 
     @Override
     public String toString() {
-        return RecordName;
+        if (recordName != null) {
+            return recordName;
+        }
+        return Joiner.on(" ").join(fields.values());
     }
 }

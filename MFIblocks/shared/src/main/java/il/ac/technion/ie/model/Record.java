@@ -1,9 +1,11 @@
 package il.ac.technion.ie.model;
 
-import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by I062070 on 21/08/2015.
@@ -89,6 +91,7 @@ public class Record {
         if (recordName != null) {
             return recordName;
         }
-        return Joiner.on(" ").join(fields.values());
+//        return Joiner.on(" ").join(fields.values());
+        return String.valueOf(recordID);
     }
 }

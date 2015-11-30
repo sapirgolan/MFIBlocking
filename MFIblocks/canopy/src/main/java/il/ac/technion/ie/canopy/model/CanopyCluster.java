@@ -2,7 +2,10 @@ package il.ac.technion.ie.canopy.model;
 
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by I062070 on 22/11/2015.

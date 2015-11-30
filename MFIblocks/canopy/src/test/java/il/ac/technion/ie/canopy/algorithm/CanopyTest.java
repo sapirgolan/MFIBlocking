@@ -8,7 +8,9 @@ import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.search.module.SearchResult;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.lucene.index.IndexWriter;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.powermock.reflect.Whitebox;
 
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,6 +37,7 @@ public class CanopyTest {
 
     @Before
     public void setUp() throws Exception {
+        classUnderTest = Whitebox.newInstance(Canopy.class);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -72,8 +76,8 @@ public class CanopyTest {
         classUnderTest = new Canopy(records, 0.3, 0.6);
 
         List<Integer> iDsRandomly = createIDsRandomly(records);
-        List<String> iDsRandomlyStr = convertIdsToString(iDsRandomly);
-        List<Record> fetchRecordsBasedOnIDs = Whitebox.invokeMethod(classUnderTest, "fetchRecordsBasedOnIDs", iDsRandomlyStr);
+        List<SearchResult> searchResults = convertIdsToSearchResults(iDsRandomly);
+        List<Record> fetchRecordsBasedOnIDs = Whitebox.invokeMethod(classUnderTest, "fetchRecordsBasedOnIDs", searchResults);
         assertThat(fetchRecordsBasedOnIDs, hasSize(iDsRandomly.size()));
         for (int i = 0; i < fetchRecordsBasedOnIDs.size(); i++) {
             Record record = fetchRecordsBasedOnIDs.get(i);
@@ -81,10 +85,25 @@ public class CanopyTest {
         }
     }
 
-    private List<String> convertIdsToString(List<Integer> iDsRandomly) {
-        List<String> list = new ArrayList<>(iDsRandomly.size());
+    @Test
+    public void testRemoveRecords() throws Exception {
+        List<Record> pool = getRecordsFromCsv();
+        Record root = pool.get(10);
+        List<Record> list = new ArrayList<>(pool.subList(5, 9));
+        int expectedSize = pool.size() - list.size() - 1;
+
+        Whitebox.invokeMethod(classUnderTest, "removeRecords", pool, root, list);
+
+        assertThat(pool, hasSize(expectedSize));
+        assertThat(pool, not(containsInAnyOrder(list.toArray())));
+    }
+
+    private List<SearchResult> convertIdsToSearchResults(List<Integer> iDsRandomly) {
+        UniformRealDistribution distribution = new UniformRealDistribution();
+        List<SearchResult> list = new ArrayList<>(iDsRandomly.size());
+
         for (Integer id : iDsRandomly) {
-            list.add(String.valueOf(id));
+            list.add(new SearchResult(String.valueOf(id), distribution.sample()));
         }
         return list;
     }
@@ -101,23 +120,11 @@ public class CanopyTest {
         return new ArrayList<>(Arrays.asList(rangeNumbers));
     }
 
-/*    private List<Record> readRecordsFromTestFile(String pathToBigRecordsFile) {
-        List<String[]> strings = ExperimentsUtils.readRecordsFromTestFile(pathToBigRecordsFile);
-        List<Record> records = new ArrayList<>(strings.size());
-        List<String> fieldNames = convertArrayToList(strings.get(0));
-        for (int i = 1; i < strings.size(); i++) { //skipping first element since it is the field names
-            List<String> values = convertArrayToList(strings.get(i));
-            Record record = new Record(fieldNames, values, i);
-            records.add(record);
-        }
+    private List<Record> getRecordsFromCsv() throws URISyntaxException {
+        //read records from CSV file
+        String pathToSmallRecordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
+        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToSmallRecordsFile);
+        assertThat(records, hasSize(20));
         return records;
-
     }
-
-    private List<String> convertArrayToList(String[] array) {
-        List<String> list = new ArrayList<>(Arrays.asList(array));
-        list.remove(0);
-        return list;
-    }*/
-
 }

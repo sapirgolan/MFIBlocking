@@ -2,10 +2,12 @@ package il.ac.technion.ie.canopy.algorithm;
 
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
+import il.ac.technion.ie.canopy.model.CanopyRecord;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.DocInteraction;
+import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 
@@ -54,29 +56,35 @@ public class Canopy {
         List<Record> recordsPool = new ArrayList<>(records.values());
         while (!recordsPool.isEmpty()) {
             Record rootRecord = sampleRecordRandomly(recordsPool);
-            List<String> IDs = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
-            List<Record> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(IDs);
+            List<SearchResult> searchResults = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
+            List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
             CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
             canopyCluster.removeRecordsBelowT2();
-            /*List<Record> tightedRecords = canopyCluster.getTightedRecords();
-            removeRecords(recordsPool, rootRecord, tightedRecords);*/
+            canopyCluster.removeRecordsBelowT1();
+            List<CanopyRecord> tightedRecords = canopyCluster.getTightRecords();
+            removeRecords(recordsPool, rootRecord, tightedRecords);
         }
 
     }
 
-    private List<Record> fetchRecordsBasedOnIDs(List<String> iDs) {
-        ArrayList<Record> list = new ArrayList<>();
-        for (String ID : iDs) {
+    private void removeRecords(Collection<Record> recordsPool, Record rootRecord, Collection<? extends Record> tightedRecords) {
+        recordsPool.remove(rootRecord);
+        recordsPool.removeAll(tightedRecords);
+    }
+
+    private List<CanopyRecord> fetchRecordsBasedOnIDs(List<SearchResult> searchResults) {
+        ArrayList<CanopyRecord> list = new ArrayList<>();
+        for (SearchResult searchResult : searchResults) {
             try {
-                int intID = Integer.parseInt(ID);
+                int intID = Integer.parseInt(searchResult.getID());
                 Record record = records.get(intID);
                 if (record != null) {
-                    list.add(record);
+                    list.add(new CanopyRecord(record, searchResult.getScore()));
                 } else {
                     logger.warn(String.format("Didn't find a records that corresponds to ID: '%d'", intID));
                 }
             } catch (NumberFormatException e) {
-                logger.error(String.format("Failed to retrieve record corresponds to ID '%s'", ID), e);
+                logger.error(String.format("Failed to retrieve record corresponds to ID '%s'", searchResult), e);
             }
         }
         return list;

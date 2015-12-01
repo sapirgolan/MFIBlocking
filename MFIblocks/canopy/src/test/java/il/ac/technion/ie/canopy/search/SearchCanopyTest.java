@@ -1,5 +1,6 @@
 package il.ac.technion.ie.canopy.search;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.model.Record;
@@ -45,6 +46,25 @@ public class SearchCanopyTest {
         List<String> terms = Lists.newArrayList("pninit", "ariel");
         String queryTerm = Whitebox.invokeMethod(classUnderTest, "concatTermsToFuzzy", terms);
         assertThat(queryTerm, is("pninit~0.7 OR ariel~0.7"));
+    }
+
+    @Test
+    public void testRemoveEmptyStringsFromQueryTerms() throws Exception {
+        String allTermsConcatenated = "unk, , , , mr, , aaron, vic, south kibngsville,3806,5, kempthjsoe, , ,5780788,6, NoRole";
+        List<String> terms = new ArrayList<>(Splitter.on(',').trimResults().splitToList(allTermsConcatenated));
+
+        Whitebox.invokeMethod(classUnderTest, "removeEmptyStrings", terms);
+        assertThat(terms, hasSize(11));
+        assertThat(terms, containsInAnyOrder("unk", "mr", "aaron", "vic", "south kibngsville", "5", "6", "NoRole", "5780788", "kempthjsoe", "3806"));
+    }
+
+    @Test
+    public void testCreateFuzzyQueryWithBlankValues() throws Exception {
+        String allTermsConcatenated = "unk, , , , mr, , aaron, vic, south kibngsville,3806,5, kempthjsoe, , ,5780788,6, NoRole";
+        List<String> terms = new ArrayList<>(Splitter.on(',').trimResults().splitToList(allTermsConcatenated));
+
+        String queryTerm = Whitebox.invokeMethod(classUnderTest, "concatTermsToFuzzy", terms);
+        assertThat(queryTerm, is("unk~0.7 OR mr~0.7 OR aaron~0.7 OR vic~0.7 OR south kibngsville~0.7 OR 3806~0.7 OR 5~0.7 OR kempthjsoe~0.7 OR 5780788~0.7 OR 6~0.7 OR NoRole~0.7"));
     }
 
     @Test

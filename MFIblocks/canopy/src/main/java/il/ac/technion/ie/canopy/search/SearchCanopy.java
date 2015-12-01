@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
@@ -19,6 +20,7 @@ import org.apache.lucene.util.Version;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -82,6 +84,8 @@ public class SearchCanopy implements ISearch {
                     logger.debug("Adding '" + list.size() + "' docs to result from Search Engine");
                     recordsIDs.addAll(list);
                 }
+            } else {
+                logger.warn("failed to create query from terms: " + Joiner.on(" ").join(terms));
             }
         } catch (IOException e) {
             logger.error("Failed to perform search", e);
@@ -137,6 +141,8 @@ public class SearchCanopy implements ISearch {
     }
 
     private String concatTermsToFuzzy(List<String> terms) {
+        removeEmptyStrings(terms);
+
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < terms.size(); i++) {
             builder.append(String.format(FUZZY_SYNTAX, terms.get(i)));
@@ -145,5 +151,15 @@ public class SearchCanopy implements ISearch {
             }
         }
         return builder.toString();
+    }
+
+    private void removeEmptyStrings(List<String> terms) {
+        Iterator<String> iterator = terms.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            if (StringUtils.isEmpty(next)) {
+                iterator.remove();
+            }
+        }
     }
 }

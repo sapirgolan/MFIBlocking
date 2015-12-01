@@ -1,5 +1,7 @@
 package il.ac.technion.ie.canopy.model;
 
+import il.ac.technion.ie.canopy.algorithm.Canopy;
+import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -22,7 +24,8 @@ public class CanopyCluster {
     private static final Logger logger = Logger.getLogger(CanopyCluster.class);
 
 
-    public CanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) {
+    public CanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
+        Canopy.assertT1andT2(t1, t2);
         candidateRecords = candidateRecordsForCanopy;
         double localMaxScore = 0;
         double localMinScore = 0;

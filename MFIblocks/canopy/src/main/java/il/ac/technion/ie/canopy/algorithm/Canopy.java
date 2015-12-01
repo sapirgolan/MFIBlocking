@@ -35,9 +35,7 @@ public class Canopy {
     private SearchEngine searchEngine;
 
     public Canopy(List<Record> records, double t1, double t2) throws CanopyParametersException {
-        if (t1 >= t2) {
-            throw new CanopyParametersException(String.format("The value of T2 (%s) must be bigger than the value of T1 (%s)", t2, t1));
-        }
+        Canopy.assertT1andT2(t1, t2);
         this.records = new HashMap<>(records.size());
         for (Record record : records) {
             this.records.put(record.getRecordID(), record);
@@ -47,6 +45,12 @@ public class Canopy {
         this.searcher = new SearchCanopy();
     }
 
+    public static void assertT1andT2(double t1, double t2) throws CanopyParametersException {
+        if (t2 >= t1) {
+            throw new CanopyParametersException(String.format("The value of T1 (%s) must be bigger than the value of T2 (%s)", t1, t2));
+        }
+    }
+
     public synchronized void initSearchEngine(DocInteraction canopyInteraction) {
         searchEngine = new SearchEngine(canopyInteraction);
         searchEngine.addRecords(records.values());
@@ -54,15 +58,21 @@ public class Canopy {
 
     public void createCanopies() {
         List<Record> recordsPool = new ArrayList<>(records.values());
+        List<CanopyCluster> canopies = new ArrayList<>();
         while (!recordsPool.isEmpty()) {
             Record rootRecord = sampleRecordRandomly(recordsPool);
             List<SearchResult> searchResults = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
             List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
-            CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
-            canopyCluster.removeRecordsBelowT2();
-            canopyCluster.removeRecordsBelowT1();
-            List<CanopyRecord> tightedRecords = canopyCluster.getTightRecords();
-            removeRecords(recordsPool, rootRecord, tightedRecords);
+            try {
+                CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
+                canopyCluster.removeRecordsBelowT2();
+                canopyCluster.removeRecordsBelowT1();
+                List<CanopyRecord> tightedRecords = canopyCluster.getTightRecords();
+                removeRecords(recordsPool, rootRecord, tightedRecords);
+                canopies.add(canopyCluster);
+            } catch (CanopyParametersException e) {
+                logger.error("Failed to create Canopy", e);
+            }
         }
 
     }

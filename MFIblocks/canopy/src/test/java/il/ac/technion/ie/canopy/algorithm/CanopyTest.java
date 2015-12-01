@@ -42,15 +42,15 @@ public class CanopyTest {
     }
 
     @Test(expected = CanopyParametersException.class)
-    public void testConstractorT2SmallerThanT1() throws Exception {
-        new Canopy(mock(List.class), 0.6, 0.4);
+    public void testConstractorT1SmallerThanT2() throws Exception {
+        new Canopy(mock(List.class), 0.4, 0.5);
     }
 
     @Test
     public void testVerifyAllRecordsAreAdded() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
         List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
-        classUnderTest = new Canopy(records, 0.3, 0.6);
+        classUnderTest = new Canopy(records, 0.6, 0.3);
         classUnderTest.initSearchEngine(canopyInteraction);
         Mockito.verify(canopyInteraction, Mockito.times(NUMBER_OF_RECORDS_IN_BIG_FILE)).addDoc(Mockito.any(IndexWriter.class), Mockito.anyString(), Mockito.anyString());
     }
@@ -73,7 +73,7 @@ public class CanopyTest {
     public void testFetchRecordsBasedOnIDs() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
         List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
-        classUnderTest = new Canopy(records, 0.3, 0.6);
+        classUnderTest = new Canopy(records, 0.6, 0.3);
 
         List<Integer> iDsRandomly = createIDsRandomly(records);
         List<SearchResult> searchResults = convertIdsToSearchResults(iDsRandomly);

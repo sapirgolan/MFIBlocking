@@ -2,10 +2,13 @@ package il.ac.technion.ie.canopy.algorithm;
 
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
+import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
+import il.ac.technion.ie.canopy.model.CanopyRecord;
 import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.module.SearchResult;
@@ -13,6 +16,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.lucene.index.IndexWriter;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -96,6 +100,52 @@ public class CanopyTest {
 
         assertThat(pool, hasSize(expectedSize));
         assertThat(pool, not(containsInAnyOrder(list.toArray())));
+    }
+
+    /**
+     * This test verify that in a given List<Records> list, one can remove records from it
+     * by:
+     * 1) supplying an instance of the list
+     * 2) supplying subclass instance of the list that was constructed by an instance of the list
+     * 3) supplying subclass instance of the list that was constructed with the same values as an instance of the list
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testRemoveRecordsWhereRemovedOneAreNotSubsetFromSameSource() throws Exception {
+        List<String> fieldsName = Lists.newArrayList("First", "Last", "Gender");
+        List<Record> originRecords = new ArrayList<>();
+        Record davidZ = new Record(fieldsName, Lists.newArrayList("David", "Zuaretz", "M"), 1);
+        Record pavelNedved = new Record(fieldsName, Lists.newArrayList("Pavel", "Nedved", "M"), 4);
+        Record needToRemain = new Record(fieldsName, Lists.newArrayList("Robert", "Lev", "M"), 3);
+
+        originRecords.add(davidZ);
+        originRecords.add(new Record(fieldsName, Lists.newArrayList("Yael", "Sidi", "F"), 2));
+        originRecords.add(pavelNedved);
+        originRecords.add(needToRemain);
+
+        //remove records contain 2 records from origin
+        List<CanopyRecord> removeRecords = new ArrayList<>();
+        removeRecords.add(new CanopyRecord(pavelNedved, 0.2));
+        removeRecords.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("Yael", "Sidi", "F"), 2), 0.4));
+        removeRecords.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("Yael", "Mekel", "F"), 6), 0.1));
+
+        Whitebox.invokeMethod(classUnderTest, "removeRecords", originRecords, davidZ, removeRecords);
+
+        assertThat(originRecords, hasSize(1));
+        assertThat(originRecords, contains(needToRemain));
+    }
+
+    @Test
+    @Ignore
+    public void testCreateCanopies() throws Exception {
+        String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
+        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
+        classUnderTest = new Canopy(records, 0.3, 0.05);
+        classUnderTest.initSearchEngine(new CanopyInteraction());
+        List<CanopyCluster> canopies = classUnderTest.createCanopies();
+        assertThat(canopies, not(empty()));
+        assertThat(canopies, not(hasSize(records.size())));
     }
 
     private List<SearchResult> convertIdsToSearchResults(List<Integer> iDsRandomly) {

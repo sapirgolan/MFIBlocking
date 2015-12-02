@@ -1,5 +1,6 @@
 package il.ac.technion.ie.model;
 
+import il.ac.technion.ie.utils.MathUtils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -94,4 +95,44 @@ public class Record {
 //        return Joiner.on(" ").join(fields.values());
         return String.valueOf(recordID);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !(o instanceof Record)) {
+            return false;
+        }
+
+        Record record = (Record) o;
+
+        if (!recordID.equals(record.recordID)) {
+            return false;
+        }
+        List<String> copyOfValues = new ArrayList<>(this.getEntries());
+
+        if (!copyOfValues.containsAll(record.getEntries())) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        List<String> entries = this.getEntries();
+        List<Integer> primeNumbers = MathUtils.getPrimeNumbers(entries.size() + 1);
+        if (primeNumbers != null) {
+            for (int i = 0; i < entries.size(); i++) {
+                hashCode += entries.get(i).hashCode() * primeNumbers.get(i);
+            }
+            hashCode += recordID.hashCode() * primeNumbers.get(primeNumbers.size() - 1);
+
+        } else {
+            hashCode = fields.hashCode();
+            hashCode = 31 * hashCode + recordID.hashCode();
+        }
+        return hashCode;
+    }
+
+
 }

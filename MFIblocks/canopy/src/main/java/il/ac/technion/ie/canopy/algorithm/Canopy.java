@@ -1,6 +1,7 @@
 package il.ac.technion.ie.canopy.algorithm;
 
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
+import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyRecord;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
@@ -56,12 +57,15 @@ public class Canopy {
         searchEngine.addRecords(records.values());
     }
 
-    public void createCanopies() {
+    public List<CanopyCluster> createCanopies() throws InvalidSearchResultException {
         List<Record> recordsPool = new ArrayList<>(records.values());
         List<CanopyCluster> canopies = new ArrayList<>();
         while (!recordsPool.isEmpty()) {
             Record rootRecord = sampleRecordRandomly(recordsPool);
             List<SearchResult> searchResults = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
+            if (searchResults.isEmpty()) {
+                throw new InvalidSearchResultException("The search engine has failed to find any records, even the one that was submitted to search");
+            }
             List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
             try {
                 CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
@@ -74,6 +78,7 @@ public class Canopy {
                 logger.error("Failed to create Canopy", e);
             }
         }
+        return canopies;
 
     }
 

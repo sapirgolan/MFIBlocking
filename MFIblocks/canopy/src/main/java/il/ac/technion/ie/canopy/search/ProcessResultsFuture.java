@@ -38,7 +38,7 @@ public class ProcessResultsFuture implements Callable<List<SearchResult>> {
         for (ScoreDoc hit : scoreDocs) {
             int docId = hit.doc;
             Document document = searcher.doc(docId);
-            logger.debug(String.format("Received document with content '%s'", document.get(CanopyInteraction.CONTENT)));
+            logger.trace(String.format("Received document with content '%s'", document.get(CanopyInteraction.CONTENT)));
             String recordID = document.get(CanopyInteraction.ID);
             results.add(new SearchResult(recordID, hit.score));
 //            recordsIDs.add(recordID);

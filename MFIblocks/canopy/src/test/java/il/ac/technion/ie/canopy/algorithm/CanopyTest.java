@@ -16,7 +16,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.lucene.index.IndexWriter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -24,7 +23,10 @@ import org.mockito.Spy;
 import org.powermock.reflect.Whitebox;
 
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -137,11 +139,10 @@ public class CanopyTest {
     }
 
     @Test
-    @Ignore
     public void testCreateCanopies() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
         List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
-        classUnderTest = new Canopy(records, 0.3, 0.05);
+        classUnderTest = new Canopy(records, 0.1, 0.01);
         classUnderTest.initSearchEngine(new CanopyInteraction());
         List<CanopyCluster> canopies = classUnderTest.createCanopies();
         assertThat(canopies, not(empty()));

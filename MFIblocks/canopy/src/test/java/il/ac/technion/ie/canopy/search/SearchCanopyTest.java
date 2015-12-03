@@ -65,7 +65,7 @@ public class SearchCanopyTest {
         List<String> terms = new ArrayList<>(Splitter.on(',').trimResults().splitToList(allTermsConcatenated));
 
         String queryTerm = Whitebox.invokeMethod(classUnderTest, "concatTermsToFuzzy", terms);
-        assertThat(queryTerm, is("unk~0.7 OR mr~0.7 OR aaron~0.7 OR vic~0.7 OR south kibngsville~0.7 OR 3806~0.7 OR 5~0.7 OR kempthjsoe~0.7 OR 5780788~0.7 OR 6~0.7 OR NoRole~0.7"));
+        assertThat(queryTerm, equalToIgnoringCase("unk~0.7 OR mr~0.7 OR aaron~0.7 OR vic~0.7 OR south kibngsville~0.7 OR 3806~0.7 OR 5~0.7 OR kempthjsoe~0.7 OR 5780788~0.7 OR 6~0.7 OR NoRole~0.7"));
     }
 
     @Test
@@ -166,10 +166,20 @@ public class SearchCanopyTest {
     }
 
     @Test
+    public void testbConcatTermsToFuzzyOnInputThatFailedBefore_1() throws Exception {
+        List<String> terms = Lists.newArrayList("port jacks  n circuit", " m0orho us e", " 22", " 4", " chi", " 19930805", " NoRole", " dani l e",
+                "7 63476595", "22 8 5", " m", " 2346032", " s", " z", " parv", " on");
+
+        String queryTerm = Whitebox.invokeMethod(classUnderTest, "concatTermsToFuzzy", terms);
+
+        assertThat(StringUtils.countMatches(queryTerm, "OR"), is(14));
+        assertThat(queryTerm, is("port jacks n circuit~0.7 OR m0orho us e~0.7 OR 22~0.7 OR 4~0.7 OR chi~0.7 OR 19930805~0.7 OR norole~0.7 OR dani l e~0.7 OR 7 63476595~0.7 OR 22 8 5~0.7 OR m~0.7 OR 2346032~0.7 OR s~0.7 OR z~0.7 OR parv~0.7"));
+    }
+
+    @Test
     public void testbConcatTermsToFuzzyOnInputThatFailedBeforeFromLog() throws Exception {
         List<String> terms = Lists.newArrayList("port jacks n circuit", "m0orho us e", "22", "4", "chi", "19930805", "norole", "dani l e",
                 "7 63476595", "22 8 5", "m", "2346032", "s", "z", "parv");
-
         String queryTerm = Whitebox.invokeMethod(classUnderTest, "concatTermsToFuzzy", terms);
 
         assertThat(StringUtils.countMatches(queryTerm, "OR"), is(14));

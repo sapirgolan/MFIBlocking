@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
+import il.ac.technion.ie.search.core.LuceneUtils;
 import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +38,7 @@ public class SearchCanopy implements ISearch {
      */
     public static final String FUZZY_SYNTAX = "%s~0.7";
     private static final Logger logger = Logger.getLogger(SearchCanopy.class);
+    public static final String OR = " OR ";
     private ListeningExecutorService listeningExecutorService;
     private int maxHits;
 
@@ -63,6 +65,9 @@ public class SearchCanopy implements ISearch {
                 int processedDocs = 0;
 
                 while (numberOfDocumentsInCorpus > processedDocs) {
+                    if (topDocs == null) {
+                        break;
+                    }
                     //get The results from TopScoreDocCollector
                     ScoreDoc[] scoreDocs = topDocs.scoreDocs;
                     logger.debug("Retrieved total of " + scoreDocs.length + " docs");
@@ -78,6 +83,7 @@ public class SearchCanopy implements ISearch {
                 logger.debug("Start for all threads to finish");
                 long startTime = System.nanoTime();
                 List<List<SearchResult>> lists = successfulRecordIDs.get();
+                logger.info("Out of " + futureRecordIDs.size() + " jobs, " + lists.size() + " were successful");
                 long endTime = System.nanoTime();
                 logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
                 for (List<SearchResult> list : lists) {
@@ -108,8 +114,15 @@ public class SearchCanopy implements ISearch {
     }
 
     private TopDocs retriveDocs(Query q, IndexSearcher searcher, TopScoreDocCollector collector) throws IOException {
-        searcher.search(q, collector);
-        return collector.topDocs();
+        try {
+            searcher.search(q, collector);
+            return collector.topDocs();
+        } catch (BooleanQuery.TooManyClauses e) {
+            logger.error("Failed to perform query. There were too many clauses", e);
+        } catch (IOException e) {
+            logger.error("Failed to perform query", e);
+        }
+        return null;
     }
 
     private void createFutureForDocsProcessing(IndexSearcher searcher, List<ListenableFuture<List<SearchResult>>> futureRecordIDs, ScoreDoc[] scoreDocs) {
@@ -129,13 +142,14 @@ public class SearchCanopy implements ISearch {
     }
 
     private Query createFuzzyQuery(QueryParser parser, List<String> terms) {
-        String concatenatedTerms = Joiner.on(" ").join(terms);
+        String concatenatedTerms = Joiner.on(" ").join(terms),
+                query = StringUtils.EMPTY;
         try {
-            String query = concatTermsToFuzzy(terms);
+            query = concatTermsToFuzzy(terms);
             logger.info(String.format("built following query '%s' out of '%s'", query, concatenatedTerms));
             return parser.parse(query);
         } catch (ParseException e) {
-            logger.error(String.format("Failed to perform search on '%s'", concatenatedTerms));
+            logger.error(String.format("Failed to perform search from: '%s'.\nThe output query was: '%s'", terms, query), e);
         }
         return null;
     }
@@ -145,12 +159,16 @@ public class SearchCanopy implements ISearch {
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < terms.size(); i++) {
-            builder.append(String.format(FUZZY_SYNTAX, terms.get(i)));
-            if (i + 1 != terms.size()) {
-                builder.append(" OR ");
+            String tokenTerm = LuceneUtils.tokenTerm(terms.get(i));
+            if (StringUtils.isNotEmpty(tokenTerm)) {
+                builder.append(String.format(FUZZY_SYNTAX, tokenTerm));
+                if (i + 1 != terms.size()) {
+                    builder.append(OR);
+                }
             }
         }
-        return builder.toString();
+        String query = builder.toString();
+        return StringUtils.removeEnd(query, OR);
     }
 
     private void removeEmptyStrings(List<String> terms) {

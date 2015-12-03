@@ -7,6 +7,7 @@ import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -152,6 +153,26 @@ public class SearchCanopyTest {
 
         List<SearchResult> searchResults = searchEngine.searchInIndex(classUnderTest, null, seedValues);
         assertThat(searchResults, hasSize(numberOfRecordsInDataset));
+    }
+
+    @Test
+    public void testbConcatTermsToFuzzyOnInputThatFailedBefore() throws Exception {
+        String allTermsConcatenated = "chi, m,22,19930805, , dani l e, on , s , parv , 22 8 5, z  , port jacks  n circuit, m0orho us e, 7 63476595,2346032,4, NoRole";
+        List<String> terms = new ArrayList<>(Splitter.on(',').trimResults().splitToList(allTermsConcatenated));
+
+        String queryTerm = Whitebox.invokeMethod(classUnderTest, "concatTermsToFuzzy", terms);
+
+        assertThat(StringUtils.countMatches(queryTerm, "OR"), is(14));
+    }
+
+    @Test
+    public void testbConcatTermsToFuzzyOnInputThatFailedBeforeFromLog() throws Exception {
+        List<String> terms = Lists.newArrayList("port jacks n circuit", "m0orho us e", "22", "4", "chi", "19930805", "norole", "dani l e",
+                "7 63476595", "22 8 5", "m", "2346032", "s", "z", "parv");
+
+        String queryTerm = Whitebox.invokeMethod(classUnderTest, "concatTermsToFuzzy", terms);
+
+        assertThat(StringUtils.countMatches(queryTerm, "OR"), is(14));
     }
 
     private String generateRandomString(int numberOfChars) {

@@ -67,12 +67,15 @@ public class Canopy {
                 throw new InvalidSearchResultException("The search engine has failed to find any records, even the one that was submitted to search");
             }
             List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
+            retainLegalCandidates(candidateRecordsForCanopy, recordsPool);
             try {
                 CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
                 canopyCluster.removeRecordsBelowT2();
                 canopyCluster.removeRecordsBelowT1();
-                List<CanopyRecord> tightedRecords = canopyCluster.getTightRecords();
-                removeRecords(recordsPool, rootRecord, tightedRecords);
+                List<CanopyRecord> tightRecords = canopyCluster.getTightRecords();
+                logger.info(String.format("Created Canopy cluster with %d records and seed of %d records",
+                        canopyCluster.getAllRecords().size(), canopyCluster.getTightRecords().size()));
+                removeRecords(recordsPool, rootRecord, tightRecords);
                 canopies.add(canopyCluster);
             } catch (CanopyParametersException e) {
                 logger.error("Failed to create Canopy", e);
@@ -80,6 +83,30 @@ public class Canopy {
         }
         return canopies;
 
+    }
+
+    /**
+     * Retains only the elements in this list that are contained in the
+     * specified collection (optional operation).  In other words, removes
+     * from this list all of its elements that are not contained in the
+     * specified collection.
+     *
+     * @param candidateRecordsForCanopy List with all elements
+     * @param recordsPool               List containing elements to be retained in this list
+     */
+    private void retainLegalCandidates(List<CanopyRecord> candidateRecordsForCanopy, List<Record> recordsPool) {
+        Map<Integer, CanopyRecord> biMap = new HashMap<>(candidateRecordsForCanopy.size());
+        for (CanopyRecord canopyRecord : candidateRecordsForCanopy) {
+            biMap.put(canopyRecord.getRecordID(), canopyRecord);
+        }
+
+        for (Record record : recordsPool) {
+            Integer key = record.getRecordID();
+            if (biMap.containsKey(key)) {
+                biMap.remove(key);
+            }
+        }
+        candidateRecordsForCanopy.removeAll(biMap.values());
     }
 
     private void removeRecords(Collection<Record> recordsPool, Record rootRecord, Collection<? extends Record> tightedRecords) {

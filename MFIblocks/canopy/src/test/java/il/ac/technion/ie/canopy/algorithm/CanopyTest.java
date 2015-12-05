@@ -142,11 +142,62 @@ public class CanopyTest {
     public void testCreateCanopies() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
         List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
-        classUnderTest = new Canopy(records, 0.1, 0.01);
+        classUnderTest = new Canopy(records, 0.15, 0.05);
         classUnderTest.initSearchEngine(new CanopyInteraction());
         List<CanopyCluster> canopies = classUnderTest.createCanopies();
         assertThat(canopies, not(empty()));
         assertThat(canopies, not(hasSize(records.size())));
+        assertThat(canopies.size(), lessThan(records.size()));
+    }
+
+    @Test
+    public void testRetainLegalCandidates() throws Exception {
+        List<String> fieldsName = Lists.newArrayList("First", "Last", "Gender");
+        List<Record> recordsPool = new ArrayList<>();
+        Record recordOne = new Record(fieldsName, Lists.newArrayList("David", "Zuaretz", "M"), 1);
+        Record recordTwo = new Record(fieldsName, Lists.newArrayList("Pavel", "Nedved", "M"), 4);
+        Record recordThree = new Record(fieldsName, Lists.newArrayList("Robert", "Lev", "M"), 3);
+        Record recordFour = new Record(fieldsName, Lists.newArrayList("Yael", "Sidi", "F"), 2);
+
+        recordsPool.add(recordOne);
+        recordsPool.add(recordFour);
+        recordsPool.add(recordTwo);
+        recordsPool.add(recordThree);
+
+        //remove records contain 2 records from origin
+        List<CanopyRecord> candidateRecordsForCanopy = new ArrayList<>();
+        CanopyRecord recordThatNeedToRemain = new CanopyRecord(recordTwo, 0.2);
+        candidateRecordsForCanopy.add(recordThatNeedToRemain);
+        candidateRecordsForCanopy.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("Yael", "Mekel", "F"), 9), 0.4));
+
+        Whitebox.invokeMethod(classUnderTest, "retainLegalCandidates", candidateRecordsForCanopy, recordsPool);
+
+        assertThat(candidateRecordsForCanopy, hasSize(1));
+        assertThat(candidateRecordsForCanopy, contains(recordThatNeedToRemain));
+    }
+
+    @Test
+    public void testRetainLegalCandidates_notContainsFromPool() throws Exception {
+        List<String> fieldsName = Lists.newArrayList("First", "Last", "Gender");
+        List<Record> recordsPool = new ArrayList<>();
+        Record recordOne = new Record(fieldsName, Lists.newArrayList("David", "Zuaretz", "M"), 1);
+        Record recordTwo = new Record(fieldsName, Lists.newArrayList("Pavel", "Nedved", "M"), 4);
+        Record recordThree = new Record(fieldsName, Lists.newArrayList("Robert", "Lev", "M"), 3);
+        Record recordFour = new Record(fieldsName, Lists.newArrayList("Yael", "Sidi", "F"), 2);
+
+        recordsPool.add(recordOne);
+        recordsPool.add(recordFour);
+        recordsPool.add(recordTwo);
+        recordsPool.add(recordThree);
+
+        //remove records contain 2 records from origin
+        List<CanopyRecord> candidateRecordsForCanopy = new ArrayList<>();
+        candidateRecordsForCanopy.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("David", "Robert", "F"), 6), 0.4));
+        candidateRecordsForCanopy.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("Yael", "Mekel", "F"), 9), 0.4));
+
+        Whitebox.invokeMethod(classUnderTest, "retainLegalCandidates", candidateRecordsForCanopy, recordsPool);
+
+        assertThat(candidateRecordsForCanopy, hasSize(0));
     }
 
     private List<SearchResult> convertIdsToSearchResults(List<Integer> iDsRandomly) {

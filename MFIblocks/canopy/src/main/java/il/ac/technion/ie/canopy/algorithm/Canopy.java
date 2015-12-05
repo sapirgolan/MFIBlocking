@@ -5,6 +5,7 @@ import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyRecord;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
+import il.ac.technion.ie.canopy.utils.CanopyUtils;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.DocInteraction;
@@ -36,7 +37,7 @@ public class Canopy {
     private SearchEngine searchEngine;
 
     public Canopy(List<Record> records, double t1, double t2) throws CanopyParametersException {
-        Canopy.assertT1andT2(t1, t2);
+        CanopyUtils.assertT1andT2(t1, t2);
         this.records = new HashMap<>(records.size());
         for (Record record : records) {
             this.records.put(record.getRecordID(), record);
@@ -44,12 +45,6 @@ public class Canopy {
         T2 = t2;
         T1 = t1;
         this.searcher = new SearchCanopy();
-    }
-
-    public static void assertT1andT2(double t1, double t2) throws CanopyParametersException {
-        if (t2 >= t1) {
-            throw new CanopyParametersException(String.format("The value of T1 (%s) must be bigger than the value of T2 (%s)", t1, t2));
-        }
     }
 
     public synchronized void initSearchEngine(DocInteraction canopyInteraction) {

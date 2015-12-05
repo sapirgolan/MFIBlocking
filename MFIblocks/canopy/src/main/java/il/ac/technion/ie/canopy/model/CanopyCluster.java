@@ -1,7 +1,7 @@
 package il.ac.technion.ie.canopy.model;
 
-import il.ac.technion.ie.canopy.algorithm.Canopy;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
+import il.ac.technion.ie.canopy.utils.CanopyUtils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class CanopyCluster {
 
 
     public CanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
-        Canopy.assertT1andT2(t1, t2);
+        CanopyUtils.assertT1andT2(t1, t2);
         candidateRecords = candidateRecordsForCanopy;
         double localMaxScore = 0;
         double localMinScore = 0;
@@ -46,13 +46,19 @@ public class CanopyCluster {
         logger.debug("The normalized T2 value is: " + normRange);
         logger.debug("Removing records whose score is below T2 parameter");
         removeLessThanLooseRecords(normRange, allRecords);
+        candidateRecords.clear();
     }
 
     public void removeRecordsBelowT1() {
         double normRange = convertThreshold(t1);
         logger.debug("The normalized T1 value is: " + normRange);
         logger.debug("Removing records whose score is below T1 parameter");
-        removeLessThanLooseRecords(normRange, tightRecords);
+        for (CanopyRecord canopyRecord : allRecords) {
+            if (canopyRecord.getScore() >= normRange) {
+                logger.trace(canopyRecord + " was added to a collection");
+                tightRecords.add(canopyRecord);
+            }
+        }
     }
 
     private void removeLessThanLooseRecords(double normRange, Collection<CanopyRecord> collection) {

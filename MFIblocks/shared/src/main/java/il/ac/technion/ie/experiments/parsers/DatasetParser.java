@@ -71,6 +71,7 @@ public class DatasetParser {
     }
 
     public CsvWriter preparOutputFile(String pathToFile) {
+
         File file = ExpFileUtils.createFile(pathToFile);
         return this.preparOutputFile(file);
     }

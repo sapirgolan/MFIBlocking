@@ -3,6 +3,7 @@ package il.ac.technion.ie.canopy.model;
 import com.google.common.collect.Lists;
 import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class CanopyClusterTest {
     private List<Record> getRecordsFromCsv() throws URISyntaxException {
         //read records from CSV file
         String pathToSmallRecordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
-        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToSmallRecordsFile);
+        List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToSmallRecordsFile);
         assertThat(records, hasSize(20));
         return records;
     }

@@ -12,6 +12,7 @@ import il.ac.technion.ie.canopy.model.CanopyRecord;
 import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.module.SearchResult;
+import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.lucene.index.IndexWriter;
@@ -55,7 +56,7 @@ public class CanopyTest {
     @Test
     public void testVerifyAllRecordsAreAdded() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
-        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
+        List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.6, 0.3);
         classUnderTest.initSearchEngine(canopyInteraction);
         Mockito.verify(canopyInteraction, Mockito.times(NUMBER_OF_RECORDS_IN_BIG_FILE)).addDoc(Mockito.any(IndexWriter.class), Mockito.anyString(), Mockito.anyString());
@@ -78,7 +79,7 @@ public class CanopyTest {
     @Test
     public void testFetchRecordsBasedOnIDs() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
-        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
+        List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.6, 0.3);
 
         List<Integer> iDsRandomly = createIDsRandomly(records);
@@ -141,7 +142,7 @@ public class CanopyTest {
     @Test
     public void testCreateCanopies() throws Exception {
         String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
-        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToBigRecordsFile);
+        List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.15, 0.05);
         classUnderTest.initSearchEngine(new CanopyInteraction());
         List<CanopyCluster> canopies = classUnderTest.createCanopies();
@@ -225,7 +226,7 @@ public class CanopyTest {
     private List<Record> getRecordsFromCsv() throws URISyntaxException {
         //read records from CSV file
         String pathToSmallRecordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
-        List<Record> records = ExperimentsUtils.createRecordsFromTestFile(pathToSmallRecordsFile);
+        List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToSmallRecordsFile);
         assertThat(records, hasSize(20));
         return records;
     }

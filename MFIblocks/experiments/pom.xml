@@ -72,6 +72,13 @@
         </dependency>
         <dependency>
             <groupId>il.ac.technion.ie</groupId>
+            <artifactId>shared</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>il.ac.technion.ie</groupId>
             <artifactId>measurements</artifactId>
             <version>0.0.1</version>
         </dependency>

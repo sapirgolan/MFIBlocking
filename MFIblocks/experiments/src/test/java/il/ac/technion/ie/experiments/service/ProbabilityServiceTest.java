@@ -1,8 +1,8 @@
 package il.ac.technion.ie.experiments.service;
 
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +43,6 @@ public class ProbabilityServiceTest {
 
     private List<BlockWithData> getBlocks() throws URISyntaxException {
         ParsingService parsingService = new ParsingService();
-        return parsingService.parseDataset(ExperimentsUtils.getPathToBigRecordsFile());
+        return parsingService.parseDataset(UtilitiesForBlocksAndRecords.getPathToBigRecordsFile());
     }
 }

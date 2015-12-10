@@ -9,7 +9,6 @@ import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.canopy.model.CanopyRecord;
-import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
@@ -55,7 +54,7 @@ public class CanopyTest {
 
     @Test
     public void testVerifyAllRecordsAreAdded() throws Exception {
-        String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
+        String pathToBigRecordsFile = UtilitiesForBlocksAndRecords.getPathToBigRecordsFile();
         List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.6, 0.3);
         classUnderTest.initSearchEngine(canopyInteraction);
@@ -78,7 +77,7 @@ public class CanopyTest {
 
     @Test
     public void testFetchRecordsBasedOnIDs() throws Exception {
-        String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
+        String pathToBigRecordsFile = UtilitiesForBlocksAndRecords.getPathToBigRecordsFile();
         List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.6, 0.3);
 
@@ -141,7 +140,7 @@ public class CanopyTest {
 
     @Test
     public void testCreateCanopies() throws Exception {
-        String pathToBigRecordsFile = ExperimentsUtils.getPathToBigRecordsFile();
+        String pathToBigRecordsFile = UtilitiesForBlocksAndRecords.getPathToBigRecordsFile();
         List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.15, 0.05);
         classUnderTest.initSearchEngine(new CanopyInteraction());
@@ -225,7 +224,7 @@ public class CanopyTest {
 
     private List<Record> getRecordsFromCsv() throws URISyntaxException {
         //read records from CSV file
-        String pathToSmallRecordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
+        String pathToSmallRecordsFile = UtilitiesForBlocksAndRecords.getPathToSmallRecordsFile();
         List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToSmallRecordsFile);
         assertThat(records, hasSize(20));
         return records;

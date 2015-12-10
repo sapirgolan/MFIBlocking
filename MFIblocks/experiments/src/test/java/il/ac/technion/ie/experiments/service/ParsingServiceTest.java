@@ -3,7 +3,7 @@ package il.ac.technion.ie.experiments.service;
 import com.google.common.collect.Lists;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.util.ExperimentsUtils;
+import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class ParsingServiceTest {
 
     @Test
     public void testParseDataset() throws Exception {
-        String recordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
+        String recordsFile = UtilitiesForBlocksAndRecords.getPathToSmallRecordsFile();
         List<BlockWithData> blockWithDatas = classUnderTest.parseDataset(recordsFile);
         assertThat(blockWithDatas, hasSize(4));
     }

@@ -4,6 +4,7 @@ import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.service.FuzzyService;
 import il.ac.technion.ie.experiments.service.ParsingService;
 import il.ac.technion.ie.experiments.service.ProbabilityService;
+import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.easymock.EasyMock;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.api.mockito.PowerMockito;
@@ -29,12 +30,6 @@ public class ExperimentsUtils {
         return huge.split(",");
     }
 
-    public static String getPathToSmallRecordsFile() throws URISyntaxException {
-        String pathToFile = "/20Records.csv";
-        File file = getFileFromResourceDir(pathToFile);
-        return file.getAbsolutePath();
-    }
-
     public static File getUaiFile() throws URISyntaxException {
         String pathToFile = "/uaiFile.uai";
         return getFileFromResourceDir(pathToFile);
@@ -50,14 +45,8 @@ public class ExperimentsUtils {
         return new File(resourceUrl.toURI());
     }
 
-    public static String getPathToBigRecordsFile() throws URISyntaxException {
-        String pathToFile = "/1kRecords.csv";
-        File file = getFileFromResourceDir(pathToFile);
-        return file.getAbsolutePath();
-    }
-
     public static List<BlockWithData> createFuzzyBlocks() throws Exception {
-        String recordsFile = ExperimentsUtils.getPathToSmallRecordsFile();
+        String recordsFile = UtilitiesForBlocksAndRecords.getPathToSmallRecordsFile();
 
         ParsingService parsingService = new ParsingService();
         ProbabilityService probabilityService = new ProbabilityService();

@@ -6,6 +6,9 @@ import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.model.Record;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -71,5 +74,22 @@ public class UtilitiesForBlocksAndRecords {
         List<String> list = new ArrayList<>(Arrays.asList(array));
         list.remove(0);
         return list;
+    }
+
+    public static String getPathToSmallRecordsFile() throws URISyntaxException {
+        String pathToFile = "/20Records.csv";
+        File file = getFileFromResourceDir(pathToFile);
+        return file.getAbsolutePath();
+    }
+
+    public static File getFileFromResourceDir(String pathToFile) throws URISyntaxException {
+        URL resourceUrl = UtilitiesForBlocksAndRecords.class.getResource(pathToFile);
+        return new File(resourceUrl.toURI());
+    }
+
+    public static String getPathToBigRecordsFile() throws URISyntaxException {
+        String pathToFile = "/1kRecords.csv";
+        File file = getFileFromResourceDir(pathToFile);
+        return file.getAbsolutePath();
     }
 }

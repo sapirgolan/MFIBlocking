@@ -7,7 +7,6 @@ import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class CanopyClusterTest {
     @Test
     public void testRemoveRecordsBelowT2() throws Exception {
         //fetch subset of records
-        List<Record> records = getRecordsFromCsv();
+        List<Record> records = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         List<Record> subList = records.subList(0, 5);
         assertThat(subList, hasSize(5));
         List<CanopyRecord> canopyRecords = generateSimScoresOnRecords(subList, Lists.newArrayList(0.77, 0.88, 0.65, 0.7, 0.2));
@@ -46,7 +45,7 @@ public class CanopyClusterTest {
     @Test
     public void testGetTightRecords() throws Exception {
         //fetch subset of records
-        List<Record> recordsFromCsv = getRecordsFromCsv();
+        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         List<Record> subList = recordsFromCsv.subList(11, 20);
         assertThat(subList, hasSize(9));
 
@@ -77,14 +76,6 @@ public class CanopyClusterTest {
         canopyCluster.removeRecordsBelowT2();
         canopyCluster.removeRecordsBelowT1();
         assertThat(canopyCluster.getTightRecords(), hasSize(numberRelevantRecords));
-    }
-
-    private List<Record> getRecordsFromCsv() throws URISyntaxException {
-        //read records from CSV file
-        String pathToSmallRecordsFile = UtilitiesForBlocksAndRecords.getPathToSmallRecordsFile();
-        List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToSmallRecordsFile);
-        assertThat(records, hasSize(20));
-        return records;
     }
 
     private List<CanopyRecord> generateSimScoresOnRecords(List<Record> records) {

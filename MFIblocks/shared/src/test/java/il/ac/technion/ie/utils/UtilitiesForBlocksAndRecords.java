@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+
 /**
  * Created by I062070 on 10/12/2015.
  */
@@ -91,5 +94,13 @@ public class UtilitiesForBlocksAndRecords {
         String pathToFile = "/1kRecords.csv";
         File file = getFileFromResourceDir(pathToFile);
         return file.getAbsolutePath();
+    }
+
+    public static List<Record> getRecordsFromCsv() throws URISyntaxException {
+        //read records from CSV file
+        String pathToSmallRecordsFile = getPathToSmallRecordsFile();
+        List<Record> records = createRecordsFromTestFile(pathToSmallRecordsFile);
+        assertThat(records, hasSize(20));
+        return records;
     }
 }

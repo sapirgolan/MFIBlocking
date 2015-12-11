@@ -2,6 +2,7 @@ package il.ac.technion.ie.canopy.model;
 
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.utils.CanopyUtils;
+import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -80,5 +81,9 @@ public class CanopyCluster {
 
     private double convertThreshold(double threshold) {
         return range * threshold + minScore;
+    }
+
+    public boolean contains(Record record) {
+        return allRecords.contains(record);
     }
 }

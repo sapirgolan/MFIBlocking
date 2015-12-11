@@ -1,13 +1,15 @@
 package il.ac.technion.ie.experiments.service;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -20,10 +22,9 @@ public class CanopyService {
     static final Logger logger = Logger.getLogger(CanopyService.class);
 
 
-    public Multimap<Record, CanopyCluster> fetchCanopiesOfSeeds(List<CanopyCluster> canopies, List<BlockWithData> cleanBlocks) {
+    public Multimap<Record, CanopyCluster> fetchCanopiesOfSeeds(List<CanopyCluster> canopies, Collection<Record> trueRepresentatives) {
         Multimap<Record, CanopyCluster> multimap = ArrayListMultimap.create();
 
-        List<Record> trueRepresentatives = getAllTrueRepresentatives(cleanBlocks);
         for (Record trueRepresentative : trueRepresentatives) {
             for (CanopyCluster canopy : canopies) {
                 if (canopy.contains(trueRepresentative)) {
@@ -31,18 +32,17 @@ public class CanopyService {
                 }
             }
         }
-
         return multimap;
     }
 
-    public List<Record> getAllTrueRepresentatives(List<BlockWithData> cleanBlocks) {
-        List<Record> trueRepresentatives = new ArrayList<>(cleanBlocks.size());
+    public BiMap<Record, BlockWithData> getAllTrueRepresentatives(List<BlockWithData> cleanBlocks) {
+        HashBiMap<Record, BlockWithData> map = HashBiMap.create(cleanBlocks.size());
         for (BlockWithData cleanBlock : cleanBlocks) {
             Record trueRepresentative = cleanBlock.getTrueRepresentative();
             logger.trace("Adding " + trueRepresentative + " to list of True Representatives");
-            trueRepresentatives.add(trueRepresentative);
+            map.put(trueRepresentative, cleanBlock);
         }
-        logger.trace("Total of " + trueRepresentatives.size() + " were found for " + cleanBlocks.size() + " blocks.");
-        return trueRepresentatives;
+        logger.trace("Total of " + map.size() + " were found for " + cleanBlocks.size() + " blocks.");
+        return map;
     }
 }

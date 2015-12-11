@@ -75,7 +75,7 @@ public class UtilitiesForBlocksAndRecords {
 
     private static List<String> convertArrayToList(String[] array) {
         List<String> list = new ArrayList<>(Arrays.asList(array));
-        list.remove(0);
+//        list.remove(0);
         return list;
     }
 

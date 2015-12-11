@@ -63,7 +63,10 @@ public class Record {
     public List<String> getEntries() {
         List<String> entries = new ArrayList<>();
         for (Field field : fields.values()) {
-            entries.add(field.getValue());
+            String value = field.getValue();
+            if (!isFieldRecordID(value)) {
+                entries.add(value);
+            }
         }
         return entries;
     }

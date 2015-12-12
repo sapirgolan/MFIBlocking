@@ -48,11 +48,10 @@ public class CanopyService {
         for (Record trueRep : trueReps) {
             Collection<CanopyCluster> canopyClusters = repToCanopyMap.get(trueRep);
             BlockWithData blockWithData = repToBlockMap.get(trueRep);
-            List<Record> blockMembers = blockWithData.getMembers();
 
             TreeMap<Integer, CanopyCluster> treeMap = new TreeMap<>();
             for (CanopyCluster canopyCluster : canopyClusters) {
-                TreeMap<Integer, CanopyCluster> entry = calcIntersection(blockMembers, canopyCluster);
+                TreeMap<Integer, CanopyCluster> entry = calcIntersection(blockWithData.getMembers(), canopyCluster);
                 treeMap.putAll(entry);
             }
             CanopyCluster value = treeMap.lastEntry().getValue();
@@ -64,7 +63,15 @@ public class CanopyService {
         return result;
     }
 
-    public TreeMap<Integer, CanopyCluster> calcIntersection(List<Record> blockMembers, CanopyCluster canopyCluster) {
+    public BiMap<BlockWithData, CanopyCluster> mapCanopiesToBlocks(Map<Record, CanopyCluster> recordToCanopyMap, Map<Record, BlockWithData> repToBlockMap) {
+        BiMap<BlockWithData, CanopyCluster> blockToCanopyMap = HashBiMap.create(recordToCanopyMap.size());
+        for (Record record : recordToCanopyMap.keySet()) {
+            blockToCanopyMap.put(repToBlockMap.get(record), recordToCanopyMap.get(record));
+        }
+        return blockToCanopyMap;
+    }
+
+    private TreeMap<Integer, CanopyCluster> calcIntersection(List<Record> blockMembers, CanopyCluster canopyCluster) {
         TreeMap<Integer, CanopyCluster> element = new TreeMap<>();
         Sets.SetView<Record> intersection = Sets.intersection(new HashSet<>(blockMembers), new HashSet<>(canopyCluster.getAllRecords()));
         logger.debug(String.format("The intersection between %s and %s is: %d",

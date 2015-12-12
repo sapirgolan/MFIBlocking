@@ -19,6 +19,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 public class CanopyServiceTest {
 
@@ -100,6 +101,27 @@ public class CanopyServiceTest {
         TreeMap<Integer, CanopyCluster> entry = Whitebox.invokeMethod(classUnderTest, "calcIntersection", blockMembers, canopyCluster);
         assertThat(entry, hasKey(3));
         assertThat(entry.get(3), is(canopyCluster));
+    }
+
+    @Test
+    public void testMapCanopiesToBlocks() throws Exception {
+        int size = 15;
+        Map<Record, BlockWithData> recordToBlock = new HashMap<>();
+        Map<Record, CanopyCluster> recordToCanopyMap = new HashMap<>();
+        for (int i = 0; i < size; i++) {
+            Record record = mock(Record.class);
+            BlockWithData block = mock(BlockWithData.class);
+            recordToBlock.put(record, block);
+            CanopyCluster canopy = mock(CanopyCluster.class);
+            recordToCanopyMap.put(record, canopy);
+        }
+        BiMap<BlockWithData, CanopyCluster> blockToCanopyMap = classUnderTest.mapCanopiesToBlocks(recordToCanopyMap, recordToBlock);
+        for (Record record : recordToBlock.keySet()) {
+            BlockWithData blockWithData = recordToBlock.get(record);
+            CanopyCluster canopyCluster = recordToCanopyMap.get(record);
+            assertThat(blockToCanopyMap.get(blockWithData), is(canopyCluster));
+            assertThat(blockToCanopyMap.inverse().get(canopyCluster), is(blockWithData));
+        }
     }
 
     private CanopyCluster createCanopy(List<List<Record>> records) throws CanopyParametersException {

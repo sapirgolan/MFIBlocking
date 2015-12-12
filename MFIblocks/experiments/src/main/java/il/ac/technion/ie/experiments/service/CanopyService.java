@@ -1,16 +1,12 @@
 package il.ac.technion.ie.experiments.service;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by I062070 on 10/12/2015.
@@ -44,5 +40,36 @@ public class CanopyService {
         }
         logger.trace("Total of " + map.size() + " were found for " + cleanBlocks.size() + " blocks.");
         return map;
+    }
+
+    public BiMap<Record, CanopyCluster> selectCanopiesForRepresentatives(Multimap<Record, CanopyCluster> repToCanopyMap, Map<Record, BlockWithData> repToBlockMap) {
+        HashBiMap<Record, CanopyCluster> result = HashBiMap.create(repToBlockMap.size());
+        Set<Record> trueReps = repToCanopyMap.keySet();
+        for (Record trueRep : trueReps) {
+            Collection<CanopyCluster> canopyClusters = repToCanopyMap.get(trueRep);
+            BlockWithData blockWithData = repToBlockMap.get(trueRep);
+            List<Record> blockMembers = blockWithData.getMembers();
+
+            TreeMap<Integer, CanopyCluster> treeMap = new TreeMap<>();
+            for (CanopyCluster canopyCluster : canopyClusters) {
+                TreeMap<Integer, CanopyCluster> entry = calcIntersection(blockMembers, canopyCluster);
+                treeMap.putAll(entry);
+            }
+            CanopyCluster value = treeMap.lastEntry().getValue();
+            logger.debug(String.format("Adding the pair <%s, %s> to mapping between True Rep records and their canopies",
+                    trueRep, value));
+            result.put(trueRep, value);
+
+        }
+        return result;
+    }
+
+    public TreeMap<Integer, CanopyCluster> calcIntersection(List<Record> blockMembers, CanopyCluster canopyCluster) {
+        TreeMap<Integer, CanopyCluster> element = new TreeMap<>();
+        Sets.SetView<Record> intersection = Sets.intersection(new HashSet<>(blockMembers), new HashSet<>(canopyCluster.getAllRecords()));
+        logger.debug(String.format("The intersection between %s and %s is: %d",
+                blockMembers, canopyCluster, intersection.size()));
+        element.put(intersection.size(), canopyCluster);
+        return element;
     }
 }

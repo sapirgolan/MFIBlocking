@@ -63,7 +63,8 @@ public class BlockWithData extends AbstractBlock<Record>{
     public int getTrueRepresentativePosition() {
         ArrayList<Pair> pairs = new ArrayList<>();
         if (membersProbability.entrySet().isEmpty()) {
-            logger.error("Cannot execute method 'getTrueRepresentativePosition()'");
+            logger.error("Cannot execute method 'getTrueRepresentativePosition()' since there are no probabilities." +
+                    "This happen since you didn't invoke 'setMemberSimScore()' before");
             return 0;
         }
         for (Map.Entry<Record, Float> entry : membersProbability.entrySet()) {

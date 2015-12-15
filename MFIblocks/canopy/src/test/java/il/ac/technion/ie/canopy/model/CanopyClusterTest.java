@@ -2,6 +2,7 @@ package il.ac.technion.ie.canopy.model;
 
 import com.google.common.collect.Lists;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
+import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.math3.distribution.UniformRealDistribution;

@@ -1,6 +1,4 @@
-package il.ac.technion.ie.canopy.model;
-
-import il.ac.technion.ie.model.Record;
+package il.ac.technion.ie.model;
 
 /**
  * Created by I062070 on 28/11/2015.

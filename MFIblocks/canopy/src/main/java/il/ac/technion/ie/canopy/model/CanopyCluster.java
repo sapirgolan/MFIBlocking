@@ -2,6 +2,7 @@ package il.ac.technion.ie.canopy.model;
 
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.utils.CanopyUtils;
+import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 

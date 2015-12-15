@@ -3,7 +3,7 @@ package il.ac.technion.ie.canopy.algorithm;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
-import il.ac.technion.ie.canopy.model.CanopyRecord;
+import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
 import il.ac.technion.ie.canopy.utils.CanopyUtils;
 import il.ac.technion.ie.model.Record;

@@ -8,7 +8,7 @@ import com.google.common.primitives.Ints;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
-import il.ac.technion.ie.canopy.model.CanopyRecord;
+import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;

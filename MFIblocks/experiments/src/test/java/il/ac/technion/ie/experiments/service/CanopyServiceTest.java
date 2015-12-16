@@ -6,24 +6,35 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
-import il.ac.technion.ie.canopy.model.CanopyRecord;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.utils.AbstractAppenderTest;
 import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.apache.log4j.Level;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-public class CanopyServiceTest {
+public class CanopyServiceTest extends AbstractAppenderTest {
 
     private CanopyService classUnderTest;
+    private static List<Record> recordsFromCsv;
+
+    @BeforeClass
+    public static void initClass() throws URISyntaxException {
+        recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -32,7 +43,6 @@ public class CanopyServiceTest {
 
     @Test
     public void testFetchCanopiesOfSeeds() throws Exception {
-        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         ArrayList<BlockWithData> blocksWithDatas = new ArrayList<>();
         blocksWithDatas.add(new BlockWithData(recordsFromCsv.subList(0, 4)));
         Record trueRepBlockOne = recordsFromCsv.get(3);
@@ -51,7 +61,6 @@ public class CanopyServiceTest {
 
     @Test
     public void testSelectCanopiesForRepresentatives() throws Exception {
-        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         Map<Record, BlockWithData> repToBlock = new HashMap<>();
 
         //create mapping trueRep of block #1
@@ -94,7 +103,6 @@ public class CanopyServiceTest {
 
     @Test
     public void testCalcIntersection() throws Exception {
-        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         List<Record> blockMembers = recordsFromCsv.subList(0, 4);
         CanopyCluster canopyCluster = this.createCanopySingleList(recordsFromCsv.subList(1, 4));
 
@@ -124,6 +132,83 @@ public class CanopyServiceTest {
         }
     }
 
+    @Test
+    public void testConvertCanopyToBlockAndTestSimilarity() throws Exception {
+        //prepare
+        List<Record> records = recordsFromCsv.subList(1, 6);
+        List<Double> similarities = new ArrayList<>();
+        UniformRealDistribution realDistribution = new UniformRealDistribution(0.2, 3.0);
+        for (int i = 0; i < records.size(); i++) {
+            similarities.add(realDistribution.sample());
+        }
+        CanopyCluster canopyCluster = createCanopySingleList(records, similarities);
+
+        //execution
+        BlockWithData blockWithData = classUnderTest.convertCanopyToBlock(canopyCluster);
+
+        //assertion
+        assertThat(blockWithData, notNullValue());
+        for (CanopyRecord canopyRecord : canopyCluster.getAllRecords()) {
+            assertThat(canopyRecord.getScore(), closeTo(blockWithData.getMemberScore(canopyRecord), 0.0001));
+        }
+    }
+
+    @Test
+    public void testConvertCanopyToBlockAndVerifyRepresentativePosition() throws Exception {
+        //prepare
+        List<Record> records = recordsFromCsv.subList(1, 6);
+        List<Double> similarities = Lists.newArrayList(0.8, 1.2, 2.7, 0.88, 0.4);
+        CanopyCluster canopyCluster = createCanopySingleList(records, similarities);
+
+        //execute
+        BlockWithData blockWithData = classUnderTest.convertCanopyToBlock(canopyCluster);
+        assertThat(appender.getLogByLevel(Level.ERROR), empty());
+        assertThat(appender.getLogByLevel(Level.WARN), empty());
+
+        //assertion
+        int trueRepresentativePosition = blockWithData.getTrueRepresentativePosition();
+        assertThat(appender.getLogByLevel(Level.ERROR), empty());
+        assertThat(trueRepresentativePosition, is(1));
+        assertThat(blockWithData.getTrueRepresentative().getRecordName(), equalToIgnoringCase("rec-0-org"));
+    }
+
+    @Test
+    public void testConvertCanopyToBlockAndVerifyRepresentativePositionNotfirst() throws Exception {
+        //prepare
+        List<Record> records = recordsFromCsv.subList(1, 6);
+        List<Double> similarities = Lists.newArrayList(0.8, 2.88, 2.2, 1.7, 0.4);
+        CanopyCluster canopyCluster = createCanopySingleList(records, similarities);
+
+        //execute
+        BlockWithData blockWithData = classUnderTest.convertCanopyToBlock(canopyCluster);
+        assertThat(appender.getLogByLevel(Level.ERROR), empty());
+        assertThat(appender.getLogByLevel(Level.WARN), empty());
+
+        //assertion
+        int trueRepresentativePosition = blockWithData.getTrueRepresentativePosition();
+        assertThat(appender.getLogByLevel(Level.ERROR), empty());
+        assertThat(trueRepresentativePosition, is(2));
+        assertThat(blockWithData.getTrueRepresentative().getRecordName(), equalToIgnoringCase("rec-0-org"));
+    }
+
+    @Test
+    public void testCovertCanopyRecordsToRecords_null() throws Exception {
+        List<Record> records = Whitebox.invokeMethod(classUnderTest, "covertCanopyRecordsToRecords", null);
+        assertThat(records, hasSize(0));
+    }
+
+    @Test
+    public void testCovertCanopyRecordsToRecords_OneCanopy() throws Exception {
+        CanopyCluster canopyCluster = createCanopySingleList(recordsFromCsv.subList(1, 6));
+
+        //execute
+        List<CanopyRecord> allRecords = canopyCluster.getAllRecords();
+        List<Record> records = Whitebox.invokeMethod(classUnderTest, "covertCanopyRecordsToRecords", allRecords);
+
+        //assert
+        assertThat(records, hasSize(5));
+    }
+
     private CanopyCluster createCanopy(List<List<Record>> records) throws CanopyParametersException {
 
         List<CanopyRecord> canopyRecords = new ArrayList<>();
@@ -138,7 +223,27 @@ public class CanopyServiceTest {
         return canopyCluster;
     }
 
+    private CanopyCluster createCanopy(List<List<Record>> records, List<Double> scores) throws CanopyParametersException {
+
+        List<CanopyRecord> canopyRecords = new ArrayList<>();
+        int index = 0;
+        for (List<Record> sublist : records) {
+            for (Record record : sublist) {
+                canopyRecords.add(new CanopyRecord(record, scores.get(index)));
+                index++;
+            }
+        }
+        CanopyCluster canopyCluster = new CanopyCluster(canopyRecords, 0.01, 0.2);
+        Whitebox.setInternalState(canopyCluster, "allRecords", canopyRecords);
+
+        return canopyCluster;
+    }
+
     private CanopyCluster createCanopySingleList(List<Record> records) throws CanopyParametersException {
         return this.createCanopy(Lists.<List<Record>>newArrayList(records));
+    }
+
+    private CanopyCluster createCanopySingleList(List<Record> records, List<Double> scores) throws CanopyParametersException {
+        return this.createCanopy(Lists.<List<Record>>newArrayList(records), scores);
     }
 }

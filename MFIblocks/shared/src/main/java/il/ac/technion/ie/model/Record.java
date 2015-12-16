@@ -38,6 +38,11 @@ public class Record {
         }
     }
 
+    public Record(CanopyRecord canopyRecord) {
+        this.fields = canopyRecord.getFields();
+        this.recordID = canopyRecord.getRecordID();
+        this.recordName = canopyRecord.getRecordName();
+    }
     /**
      * DO NOT USE THIS CONSTRUCTOR
      */

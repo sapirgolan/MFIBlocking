@@ -3,6 +3,7 @@ package il.ac.technion.ie.experiments.service;
 import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
@@ -66,7 +67,10 @@ public class CanopyService {
     public BiMap<BlockWithData, CanopyCluster> mapCanopiesToBlocks(Map<Record, CanopyCluster> recordToCanopyMap, Map<Record, BlockWithData> repToBlockMap) {
         BiMap<BlockWithData, CanopyCluster> blockToCanopyMap = HashBiMap.create(recordToCanopyMap.size());
         for (Record record : recordToCanopyMap.keySet()) {
-            blockToCanopyMap.put(repToBlockMap.get(record), recordToCanopyMap.get(record));
+            BlockWithData blockWithData = repToBlockMap.get(record);
+            CanopyCluster canopyCluster = recordToCanopyMap.get(record);
+            logger.trace(String.format("%s is mapped to %s by using %s", blockWithData, canopyCluster, record));
+            blockToCanopyMap.put(blockWithData, canopyCluster);
         }
         return blockToCanopyMap;
     }
@@ -78,5 +82,42 @@ public class CanopyService {
                 blockMembers, canopyCluster, intersection.size()));
         element.put(intersection.size(), canopyCluster);
         return element;
+    }
+
+    /**
+     * The method created a BlockWithData out of a CanopyCluster.
+     * It assigns similarities on block records according to the similarity score of each
+     * {@link CanopyRecord} and calc the probabilities of the blocks records according to
+     * that similarities.
+     *
+     * @param canopyCluster a cluster to be converted
+     * @return BlockWithData
+     */
+    public BlockWithData convertCanopyToBlock(CanopyCluster canopyCluster) {
+        ProbabilityService probabilityService = new ProbabilityService();
+        List<CanopyRecord> allCanopyRecords = canopyCluster.getAllRecords();
+        List<Record> allRecords = covertCanopyRecordsToRecords(allCanopyRecords);
+        BlockWithData blockWithData = new BlockWithData(allRecords);
+        for (Record blockRecord : allRecords) {
+            if (allCanopyRecords.contains(blockRecord)) {
+                int indexOf = allCanopyRecords.indexOf(blockRecord);
+                blockWithData.setMemberSimScore(blockRecord, (float) allCanopyRecords.get(indexOf).getScore());
+            } else {
+                logger.warn("failed to set similarity score on " + blockRecord);
+            }
+        }
+        probabilityService.calcProbabilitiesOfRecords(Lists.newArrayList(blockWithData));
+        return blockWithData;
+    }
+
+    private List<Record> covertCanopyRecordsToRecords(List<CanopyRecord> allCanopyRecords) {
+        List<Record> records = new ArrayList<>();
+        if (allCanopyRecords != null) {
+            for (CanopyRecord canopyRecord : allCanopyRecords) {
+                Record record = new Record(canopyRecord);
+                records.add(record);
+            }
+        }
+        return records;
     }
 }

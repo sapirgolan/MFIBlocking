@@ -53,13 +53,13 @@ public class ExperimentsUtils {
         FuzzyService fuzzyService = initFuzzyService();
 
         List<BlockWithData> originalBlocks = parsingService.parseDataset(recordsFile);
-        probabilityService.calcProbabilitiesOfRecords(originalBlocks);
+        probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(originalBlocks);
 
         List<BlockWithData> copyOfOriginalBlocks = new ArrayList<>(originalBlocks);
         Map<Integer, Double> splitProbMap = PowerMockito.mock(Map.class);
         PowerMockito.when(splitProbMap.size()).thenReturn(originalBlocks.size());
         List<BlockWithData> fuzzyBlocks = fuzzyService.splitBlocks(copyOfOriginalBlocks, splitProbMap, 0.6);
-        probabilityService.calcProbabilitiesOfRecords(fuzzyBlocks);
+        probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(fuzzyBlocks);
 
         return fuzzyBlocks;
     }

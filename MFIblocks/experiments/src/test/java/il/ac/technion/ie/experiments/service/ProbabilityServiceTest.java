@@ -27,9 +27,9 @@ public class ProbabilityServiceTest {
      * @throws Exception
      */
     @Test
-    public void testCalcProbabilitiesOfRecords() throws Exception {
+    public void testCalcSimilaritiesAndProbabilitiesOfRecords() throws Exception {
         List<BlockWithData> blocksWithData = getBlocks();
-        classUnderTest.calcProbabilitiesOfRecords(blocksWithData);
+        classUnderTest.calcSimilaritiesAndProbabilitiesOfRecords(blocksWithData);
         for (BlockWithData blockWithData : blocksWithData) {
             double sumProbability = 0;
             for (Record record : blockWithData.getMembers()) {

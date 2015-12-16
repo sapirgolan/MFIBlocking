@@ -55,7 +55,7 @@ public class ExperimentRunner {
 
     public void runSimpleExp(String datasetPath) {
         List<BlockWithData> blockWithDatas = parsingService.parseDataset(datasetPath);
-        probabilityService.calcProbabilitiesOfRecords(blockWithDatas);
+        probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(blockWithDatas);
         double rankedValue = measurService.calcRankedValue(blockWithDatas);
         double mrr = measurService.calcMRR(blockWithDatas);
         System.out.println("The RankedValue is: " + rankedValue);
@@ -93,7 +93,7 @@ public class ExperimentRunner {
             logger.debug("splitting blocks");
             List<BlockWithData> splitedBlocks = fuzzyService.splitBlocks(blockWithDatas, splitProbabilityForBlocks, threshold);
             logger.debug("calculating probabilities on blocks after they were split");
-            probabilityService.calcProbabilitiesOfRecords(splitedBlocks);
+            probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(splitedBlocks);
             UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
             logger.debug("creating UAI file");
             UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
@@ -191,7 +191,7 @@ public class ExperimentRunner {
     }
 
     private void calculateMillerResults(List<BlockWithData> blockWithDatas) {
-        probabilityService.calcProbabilitiesOfRecords(blockWithDatas);
+        probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(blockWithDatas);
         measurements.calculate(blockWithDatas, 0.0);
     }
 

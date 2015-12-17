@@ -120,4 +120,12 @@ public class CanopyService {
         }
         return records;
     }
+
+    public List<BlockWithData> convertCanopiesToBlocks(List<CanopyCluster> canopies) {
+        List<BlockWithData> list = new ArrayList<>();
+        for (CanopyCluster canopy : canopies) {
+            list.add(convertCanopyToBlock(canopy));
+        }
+        return list;
+    }
 }

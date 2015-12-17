@@ -123,6 +123,14 @@ public class ExperimentRunner {
 
     }
 
+    private List<Record> getRecordsFromBlcoks(List<BlockWithData> cleanBlocks) {
+        Set<Record> set = new HashSet<>();
+        for (BlockWithData cleanBlock : cleanBlocks) {
+            set.addAll(cleanBlock.getMembers());
+        }
+        return new ArrayList<>(set);
+    }
+
     private void executeExperimentWithThreshold(List<BlockWithData> blockWithDatas, Map<Integer, Double> splitProbabilityForBlocks, CommandExacter commandExacter, Double threshold) {
         try {
             logger.debug("splitting blocks");

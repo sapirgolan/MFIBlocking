@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
+import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 
 import java.util.ArrayList;
@@ -29,6 +30,15 @@ public class TestAppender extends AppenderSkeleton {
 
     @Override
     public void close() {
+    }
+
+    public List<LoggingEvent> getLogsByLevel(Filter filter) {
+        TestAppender testAppender = new TestAppender();
+        testAppender.addFilter(filter);
+        for (LoggingEvent event : log) {
+            testAppender.doAppend(event);
+        }
+        return testAppender.getLog();
     }
 
     public List<LoggingEvent> getLog() {

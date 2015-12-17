@@ -9,13 +9,14 @@ import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
-import il.ac.technion.ie.utils.AbstractAppenderTest;
+import il.ac.technion.ie.utils.LoggingRule;
 import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.log4j.Level;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
@@ -26,7 +27,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-public class CanopyServiceTest extends AbstractAppenderTest {
+public class CanopyServiceTest {
+
+    @Rule
+    public LoggingRule loggingRule = new LoggingRule();
 
     private CanopyService classUnderTest;
     private static List<Record> recordsFromCsv;
@@ -162,12 +166,12 @@ public class CanopyServiceTest extends AbstractAppenderTest {
 
         //execute
         BlockWithData blockWithData = classUnderTest.convertCanopyToBlock(canopyCluster);
-        assertThat(appender.getLogByLevel(Level.ERROR), empty());
-        assertThat(appender.getLogByLevel(Level.WARN), empty());
 
         //assertion
+        assertThat(loggingRule.getAllLogsAbove(Level.WARN), empty());
+
         int trueRepresentativePosition = blockWithData.getTrueRepresentativePosition();
-        assertThat(appender.getLogByLevel(Level.ERROR), empty());
+        assertThat(loggingRule.getAllLogsAbove(Level.ERROR), empty());
         assertThat(trueRepresentativePosition, is(1));
         assertThat(blockWithData.getTrueRepresentative().getRecordName(), equalToIgnoringCase("rec-0-org"));
     }
@@ -181,12 +185,12 @@ public class CanopyServiceTest extends AbstractAppenderTest {
 
         //execute
         BlockWithData blockWithData = classUnderTest.convertCanopyToBlock(canopyCluster);
-        assertThat(appender.getLogByLevel(Level.ERROR), empty());
-        assertThat(appender.getLogByLevel(Level.WARN), empty());
 
         //assertion
+        assertThat(loggingRule.getAllLogsAbove(Level.WARN), empty());
+
         int trueRepresentativePosition = blockWithData.getTrueRepresentativePosition();
-        assertThat(appender.getLogByLevel(Level.ERROR), empty());
+        assertThat(loggingRule.getAllLogsAbove(Level.ERROR), empty());
         assertThat(trueRepresentativePosition, is(2));
         assertThat(blockWithData.getTrueRepresentative().getRecordName(), equalToIgnoringCase("rec-0-org"));
     }

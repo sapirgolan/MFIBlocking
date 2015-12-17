@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by I062070 on 17/12/2015.
  */
-public class LoggingRule implements TestRule {
+public class Logging implements TestRule {
     private static final String MESSAGE_WITHOUT_THROWABLE = "%s: %s, %s.";
     private static final String MESSAGE_WITH_THROWABLE = MESSAGE_WITHOUT_THROWABLE + " %s";
     protected TestAppender appender;

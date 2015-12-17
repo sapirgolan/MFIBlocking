@@ -9,7 +9,7 @@ import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
-import il.ac.technion.ie.utils.LoggingRule;
+import il.ac.technion.ie.utils.Logging;
 import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.log4j.Level;
@@ -30,7 +30,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 public class CanopyServiceTest {
 
     @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+    public Logging logging = new Logging();
 
     private CanopyService classUnderTest;
     private static List<Record> recordsFromCsv;
@@ -168,10 +168,10 @@ public class CanopyServiceTest {
         BlockWithData blockWithData = classUnderTest.convertCanopyToBlock(canopyCluster);
 
         //assertion
-        assertThat(loggingRule.getAllLogsAbove(Level.WARN), empty());
+        assertThat(logging.getAllLogsAbove(Level.WARN), empty());
 
         int trueRepresentativePosition = blockWithData.getTrueRepresentativePosition();
-        assertThat(loggingRule.getAllLogsAbove(Level.ERROR), empty());
+        assertThat(logging.getAllLogsAbove(Level.ERROR), empty());
         assertThat(trueRepresentativePosition, is(1));
         assertThat(blockWithData.getTrueRepresentative().getRecordName(), equalToIgnoringCase("rec-0-org"));
     }
@@ -187,10 +187,10 @@ public class CanopyServiceTest {
         BlockWithData blockWithData = classUnderTest.convertCanopyToBlock(canopyCluster);
 
         //assertion
-        assertThat(loggingRule.getAllLogsAbove(Level.WARN), empty());
+        assertThat(logging.getAllLogsAbove(Level.WARN), empty());
 
         int trueRepresentativePosition = blockWithData.getTrueRepresentativePosition();
-        assertThat(loggingRule.getAllLogsAbove(Level.ERROR), empty());
+        assertThat(logging.getAllLogsAbove(Level.ERROR), empty());
         assertThat(trueRepresentativePosition, is(2));
         assertThat(blockWithData.getTrueRepresentative().getRecordName(), equalToIgnoringCase("rec-0-org"));
     }

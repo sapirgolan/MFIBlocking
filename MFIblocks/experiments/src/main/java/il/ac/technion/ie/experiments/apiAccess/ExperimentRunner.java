@@ -1,5 +1,10 @@
 package il.ac.technion.ie.experiments.apiAccess;
 
+import il.ac.technion.ie.canopy.algorithm.Canopy;
+import il.ac.technion.ie.canopy.exception.CanopyParametersException;
+import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
+import il.ac.technion.ie.canopy.model.CanopyCluster;
+import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.exception.NoValueExistsException;
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
@@ -10,6 +15,7 @@ import il.ac.technion.ie.experiments.service.*;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -32,6 +38,7 @@ public class ExperimentRunner {
     private iMeasurService measurService;
     private ExprimentsService exprimentsService;
     private IMeasurements measurements;
+    private CanopyService canopyService;
 
     public ExperimentRunner() {
         parsingService = new ParsingService();
@@ -39,6 +46,7 @@ public class ExperimentRunner {
         measurService = new MeasurService();
         exprimentsService = new ExprimentsService();
         fuzzyService = new FuzzyService();
+        canopyService = new CanopyService();
     }
 
     public static void main(String[] args) {
@@ -77,7 +85,6 @@ public class ExperimentRunner {
         final Map<Integer, Double> splitProbabilityForBlocks = exprimentsService.sampleSplitProbabilityForBlocks(blockWithDatas);
         List<Double> thresholds = exprimentsService.getThresholdSorted(splitProbabilityForBlocks.values());
 
-
         CommandExacter commandExacter = new CommandExacter();
         logger.info("Will execute experiments on following split thresholds: " + StringUtils.join(thresholds, ','));
         for (Double threshold : thresholds) {
@@ -88,27 +95,42 @@ public class ExperimentRunner {
         saveResultsToCsvFile();
     }
 
+    public void runExperimentsWithCanopy(String datasetPath) throws CanopyParametersException, InvalidSearchResultException {
+        List<BlockWithData> cleanBlocks = parsingService.parseDataset(datasetPath);
+        List<Record> records = getRecordsFromBlcoks(cleanBlocks);
+        Canopy canopy = new Canopy(records, 0.15, 0.05);
+        canopy.initSearchEngine(new CanopyInteraction());
+        List<CanopyCluster> canopies = canopy.createCanopies();
+        List<BlockWithData> dirtyBlocks = canopyService.convertCanopiesToBlocks(canopies);
+        calculateMillerResults(dirtyBlocks);
+        try {
+            boolean convexBP = runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
+            if (convexBP) {
+
+            }
+        } catch (SizeNotEqualException e) {
+            logger.error("Failed to create probabilities matrices for convexBP");
+            e.printStackTrace();
+        } catch (IOException e) {
+            logger.error("Cannot create context for ConvexBP algorithm", e);
+        } catch (OSNotSupportedException e) {
+            logger.error("Cannot run ConvexBP algorithm on current machine", e);
+        } catch (InterruptedException e) {
+            logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
+        } catch (NoValueExistsException e) {
+            logger.error("Failed to consume new probabilities", e);
+        }
+
+    }
+
     private void executeExperimentWithThreshold(List<BlockWithData> blockWithDatas, Map<Integer, Double> splitProbabilityForBlocks, CommandExacter commandExacter, Double threshold) {
         try {
             logger.debug("splitting blocks");
             List<BlockWithData> splitedBlocks = fuzzyService.splitBlocks(blockWithDatas, splitProbabilityForBlocks, threshold);
             logger.debug("calculating probabilities on blocks after they were split");
             probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(splitedBlocks);
-            UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
-            logger.debug("creating UAI file");
-            UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
-            logger.debug("UAI file was created at: " + uaiVariableContext.getUaiFile().getAbsoluteFile());
-            ConvexBPContext convexBPContext = exprimentsService.createConvexBPContext(uaiVariableContext);
-            convexBPContext.setThreshold(threshold);
-            //critical section - cannot be multi-thread
-            File outputFile = commandExacter.execute(convexBPContext);
-            if (outputFile.exists()) {
-                logger.debug("Binary output of convexBP was created on: " + outputFile.getAbsolutePath());
-                UaiConsumer uaiConsumer = new UaiConsumer(uaiVariableContext, outputFile);
-                uaiConsumer.consumePotentials();
-                FileUtils.forceDeleteOnExit(outputFile);
-                logger.debug("Applying new probabilities on blocks");
-                uaiConsumer.applyNewProbabilities(splitedBlocks);
+            boolean convexBP = runConvexBP(commandExacter, threshold, splitedBlocks);
+            if (convexBP) {
                 logger.debug("Calculating measurements");
                 measurements.calculate(splitedBlocks, threshold);
             }
@@ -123,6 +145,27 @@ public class ExperimentRunner {
         } catch (NoValueExistsException e) {
             logger.error("Failed to consume new probabilities", e);
         }
+    }
+
+    private boolean runConvexBP(CommandExacter commandExacter, Double threshold, List<BlockWithData> splitedBlocks) throws SizeNotEqualException, IOException, OSNotSupportedException, InterruptedException, NoValueExistsException {
+        UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
+        logger.debug("creating UAI file");
+        UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
+        logger.debug("UAI file was created at: " + uaiVariableContext.getUaiFile().getAbsoluteFile());
+        ConvexBPContext convexBPContext = exprimentsService.createConvexBPContext(uaiVariableContext);
+        convexBPContext.setThreshold(threshold);
+        //critical section - cannot be multi-thread
+        File outputFile = commandExacter.execute(convexBPContext);
+        if (outputFile.exists()) {
+            logger.debug("Binary output of convexBP was created on: " + outputFile.getAbsolutePath());
+            UaiConsumer uaiConsumer = new UaiConsumer(uaiVariableContext, outputFile);
+            uaiConsumer.consumePotentials();
+            FileUtils.forceDeleteOnExit(outputFile);
+            logger.debug("Applying new probabilities on blocks");
+            uaiConsumer.applyNewProbabilities(splitedBlocks);
+            return true;
+        }
+        return false;
     }
 
     private void runFebrlExperiments(String pathToDir, List<Double> thresholds) {

@@ -1,11 +1,11 @@
 package il.ac.technion.ie.experiments.service;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
+import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.math3.distribution.UniformIntegerDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
@@ -274,5 +274,41 @@ public class MeasurementsTest {
         assertThat(averageMRR, closeTo(0.4, 0.00001));
     }
 
+    @Test
+    public void testRepresentativesDuplicateElimanation_dupRemoved() throws Exception {
+        Record representative = mock(Record.class);
+        Multimap duplicates = ArrayListMultimap.create();
+        Multimap cleaned = ArrayListMultimap.create();
 
+        duplicates.putAll(representative, Lists.newArrayList(
+                mock(BlockWithData.class), mock(BlockWithData.class), mock(BlockWithData.class)));
+        cleaned.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
+
+        //execute
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(duplicates, cleaned, 1);
+
+        //assert
+        assertThat(reductionContext.getDuplicatesRemoved(), is(1));
+        assertThat((double) reductionContext.getDupReductionPercentage(), closeTo(33.333333, 0.01));
+        assertThat((double) reductionContext.getImprovementPercentage(), closeTo(100, 0.01));
+    }
+
+    @Test
+    public void testRepresentativesDuplicateElimanation_noDupRemoved() throws Exception {
+        Record representative = mock(Record.class);
+        Multimap duplicates = ArrayListMultimap.create();
+        Multimap cleaned = ArrayListMultimap.create();
+
+        duplicates.putAll(representative, Lists.newArrayList(
+                mock(BlockWithData.class), mock(BlockWithData.class)));
+        cleaned.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
+
+        //execute
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(duplicates, cleaned, 1);
+
+        //assert
+        assertThat(reductionContext.getDuplicatesRemoved(), is(0));
+        assertThat((double) reductionContext.getDupReductionPercentage(), closeTo(0, 0.01));
+        assertThat((double) reductionContext.getImprovementPercentage(), closeTo(0, 0.01));
+    }
 }

@@ -2,10 +2,13 @@ package il.ac.technion.ie.experiments.service;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
+import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.log4j.Logger;
@@ -126,8 +129,21 @@ public class Measurements implements IMeasurements {
     public FebrlMeasuresContext getFebrlMeasuresContext(Double threshold) {
         double averageRankedValue = this.getAverageRankedValue(threshold);
         double averageMRR = this.getAverageMRR(threshold);
-        FebrlMeasuresContext febrlMeasuresContext = new FebrlMeasuresContext(averageRankedValue, averageMRR);
-        return febrlMeasuresContext;
+        return new FebrlMeasuresContext(averageRankedValue, averageMRR);
+    }
+
+    @Override
+    public DuplicateReductionContext representativesDuplicateElimanation(
+            Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal) {
+        logger.info("In 'dirtyBlocks', there are " + duplicates.keySet().size() + " representatives out of " + cleanGoal);
+        logger.info("In 'cleanBlocks', there are " + cleaned.keySet().size() + " representatives out of " + cleanGoal);
+        int millerSize = duplicates.size();
+        int convexSize = cleaned.size();
+        int duplicatesRemoved = millerSize - convexSize;
+        float dupReductionPercentage = (millerSize - convexSize) / (float) millerSize;
+        float improvementPercentage = (millerSize - convexSize) / (float) cleanGoal;
+
+        return new DuplicateReductionContext(duplicatesRemoved, dupReductionPercentage, improvementPercentage);
     }
 
     private double getAverageRankedValue(double threshold) {

@@ -1,7 +1,10 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.collect.Multimap;
+import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
+import il.ac.technion.ie.model.Record;
 
 import java.util.List;
 
@@ -26,4 +29,6 @@ public interface IMeasurements {
     List<Double> getNormalizedRankedValuesSortedByThreshold();
 
     FebrlMeasuresContext getFebrlMeasuresContext(Double threshold);
+
+    DuplicateReductionContext representativesDuplicateElimanation(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal);
 }

@@ -1,8 +1,11 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.ConvexBPContext;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
+import il.ac.technion.ie.model.Record;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
@@ -111,5 +114,16 @@ public class ExprimentsService {
             sum += block.size();
         }
         return sum / blocks.size();
+    }
+
+    public Multimap<Record, BlockWithData> fetchRepresentatives(List<BlockWithData> blocks) {
+        Multimap<Record, BlockWithData> multimap = ArrayListMultimap.create();
+        for (BlockWithData block : blocks) {
+            Map<Record, Float> blockRepresentatives = block.findBlockRepresentatives();
+            for (Record record : blockRepresentatives.keySet()) {
+                multimap.put(record, block);
+            }
+        }
+        return multimap;
     }
 }

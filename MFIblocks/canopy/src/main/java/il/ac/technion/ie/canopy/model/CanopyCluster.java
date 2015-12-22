@@ -87,4 +87,8 @@ public class CanopyCluster {
     public boolean contains(Record record) {
         return allRecords.contains(record);
     }
+
+    public int size() {
+        return this.getAllRecords().size();
+    }
 }

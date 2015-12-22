@@ -119,7 +119,7 @@ public class ExprimentsService {
     public Multimap<Record, BlockWithData> fetchRepresentatives(List<BlockWithData> blocks) {
         Multimap<Record, BlockWithData> multimap = ArrayListMultimap.create();
         for (BlockWithData block : blocks) {
-            Map<Record, Float> blockRepresentatives = block.findBlockRepresentatives();
+            Map<Record, Float> blockRepresentatives = block.reFindBlockRepresentatives();
             for (Record record : blockRepresentatives.keySet()) {
                 multimap.put(record, block);
             }

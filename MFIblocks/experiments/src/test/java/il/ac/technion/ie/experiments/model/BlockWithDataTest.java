@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BlockWithData.class)
@@ -47,7 +47,7 @@ public class BlockWithDataTest {
     @Test (expected = SizeNotEqualException.class)
     public void testReplaceMembers_throwSizeNotEqualException() throws Exception {
         List newMembers = PowerMockito.mock(List.class);
-        PowerMockito.when(newMembers.size()).thenReturn(9);
+        when(newMembers.size()).thenReturn(9);
 
         classUnderTest.replaceMembers(newMembers);
     }
@@ -57,8 +57,8 @@ public class BlockWithDataTest {
         //create Existing members
         List<Record> existingMembers = createMockRecords(6, Record.class);
         Record oldRepresentative = PowerMockito.mock(Record.class);
-        PowerMockito.when(oldRepresentative.getRecordID()).thenReturn(77);
-        PowerMockito.when(oldRepresentative.getRecordName()).thenReturn("org");
+        when(oldRepresentative.getRecordID()).thenReturn(77);
+        when(oldRepresentative.getRecordName()).thenReturn("org");
         existingMembers.add(oldRepresentative);
         List<Record> copyOfExistingMembers = new ArrayList<>(existingMembers);
 
@@ -70,8 +70,8 @@ public class BlockWithDataTest {
         //create new members
         List<RecordSplit> newMembers = createMockRecords(6, RecordSplit.class);
         RecordSplit newRepresentative = PowerMockito.mock(RecordSplit.class);
-        PowerMockito.when(newRepresentative.getRecordID()).thenReturn(77);
-        PowerMockito.when(newRepresentative.getRecordName()).thenReturn("org");
+        when(newRepresentative.getRecordID()).thenReturn(77);
+        when(newRepresentative.getRecordName()).thenReturn("org");
         newMembers.add(newRepresentative);
         Collections.shuffle(newMembers);
 
@@ -87,7 +87,7 @@ public class BlockWithDataTest {
         List<T> records = new ArrayList<>();
         for (int i = 0; i < numberOfMembers; i++) {
             T record = (T) PowerMockito.mock(aClass);
-            PowerMockito.when(record.getRecordID()).thenReturn(i);
+            when(record.getRecordID()).thenReturn(i);
             records.add(record);
         }
         return records;

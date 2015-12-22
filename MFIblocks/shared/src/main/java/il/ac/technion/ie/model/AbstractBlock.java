@@ -61,25 +61,29 @@ public abstract class AbstractBlock<T> {
     }
 
     public Map<T, Float> findBlockRepresentatives() {
-
         //caching internally blockRepresentatives
         if (blockRepresentatives == null) {
-            float maxProb = 0;
-            blockRepresentatives = new HashMap<>();
-            //find the max service score in the block
-            for (Map.Entry<T, Float> entry : membersProbability.entrySet()) {
-                Float localProb = entry.getValue();
-                maxProb = Math.max(localProb, maxProb);
-            }
-            Block.logger.debug("Max service of records in this Block is:" + maxProb + ". Block Members: " + members);
+            return this.reFindBlockRepresentatives();
+        }
+        return blockRepresentatives;
+    }
 
-            //add all entries that have the max score.
-            //More that one entry can the max score
-            for (Map.Entry<T, Float> entry : membersProbability.entrySet()) {
-                if (maxProb == entry.getValue()) {
-                    Block.logger.debug("Adding '" + entry.getKey() + "' as representative of the block");
-                    blockRepresentatives.put(entry.getKey(), entry.getValue());
-                }
+    public Map<T, Float> reFindBlockRepresentatives() {
+        float maxProb = 0;
+        blockRepresentatives = new HashMap<>();
+        //find the max service score in the block
+        for (Map.Entry<T, Float> entry : membersProbability.entrySet()) {
+            Float localProb = entry.getValue();
+            maxProb = Math.max(localProb, maxProb);
+        }
+        Block.logger.debug("Max service of records in this Block is:" + maxProb + ". Block Members: " + members);
+
+        //add all entries that have the max score.
+        //More that one entry can the max score
+        for (Map.Entry<T, Float> entry : membersProbability.entrySet()) {
+            if (maxProb == entry.getValue()) {
+                Block.logger.debug("Adding '" + entry.getKey() + "' as representative of the block");
+                blockRepresentatives.put(entry.getKey(), entry.getValue());
             }
         }
         return blockRepresentatives;

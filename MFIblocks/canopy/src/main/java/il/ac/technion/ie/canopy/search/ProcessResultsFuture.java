@@ -34,7 +34,7 @@ public class ProcessResultsFuture implements Callable<List<SearchResult>> {
 //        List<String> recordsIDs = new ArrayList<>(scoreDocs.size());
         List<SearchResult> results = new ArrayList<>(scoreDocs.size());
         //do processing on results
-        logger.info("Found " + scoreDocs.size() + " hits.");
+        logger.debug("Found " + scoreDocs.size() + " hits.");
         for (ScoreDoc hit : scoreDocs) {
             int docId = hit.doc;
             Document document = searcher.doc(docId);

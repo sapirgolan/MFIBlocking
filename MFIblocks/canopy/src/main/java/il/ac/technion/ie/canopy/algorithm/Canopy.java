@@ -3,9 +3,9 @@ package il.ac.technion.ie.canopy.algorithm;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
-import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
 import il.ac.technion.ie.canopy.utils.CanopyUtils;
+import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.DocInteraction;
@@ -68,7 +68,7 @@ public class Canopy {
                 canopyCluster.removeRecordsBelowT2();
                 canopyCluster.removeRecordsBelowT1();
                 List<CanopyRecord> tightRecords = canopyCluster.getTightRecords();
-                logger.info(String.format("Created Canopy cluster with %d records and seed of %d records",
+                logger.debug(String.format("Created Canopy cluster with %d records and seed of %d records",
                         canopyCluster.getAllRecords().size(), canopyCluster.getTightRecords().size()));
                 removeRecords(recordsPool, rootRecord, tightRecords);
                 canopies.add(canopyCluster);
@@ -76,6 +76,7 @@ public class Canopy {
                 logger.error("Failed to create Canopy", e);
             }
         }
+        logger.info("Created total of " + canopies.size() + " canopies");
         return canopies;
 
     }

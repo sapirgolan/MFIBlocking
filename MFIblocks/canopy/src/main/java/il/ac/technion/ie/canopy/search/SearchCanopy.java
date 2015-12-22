@@ -146,7 +146,7 @@ public class SearchCanopy implements ISearch {
                 query = StringUtils.EMPTY;
         try {
             query = concatTermsToFuzzy(terms);
-            logger.info(String.format("built following query '%s' out of '%s'", query, concatenatedTerms));
+            logger.debug(String.format("built following query '%s' out of '%s'", query, concatenatedTerms));
             return parser.parse(query);
         } catch (ParseException e) {
             logger.error(String.format("Failed to perform search from: '%s'.\nThe output query was: '%s'", terms, query), e);

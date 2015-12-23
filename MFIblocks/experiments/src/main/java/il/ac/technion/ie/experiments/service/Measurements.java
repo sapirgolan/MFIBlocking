@@ -13,10 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by I062070 on 15/10/2015.
@@ -137,6 +134,10 @@ public class Measurements implements IMeasurements {
             Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal) {
         logger.info("In 'dirtyBlocks', there are " + duplicates.keySet().size() + " representatives out of " + cleanGoal);
         logger.info("In 'cleanBlocks', there are " + cleaned.keySet().size() + " representatives out of " + cleanGoal);
+        if (logger.isDebugEnabled()) {
+            writeToLogInfo(duplicates);
+            writeToLogInfo(cleaned);
+        }
         int millerSize = duplicates.size();
         int convexSize = cleaned.size();
         int duplicatesRemoved = millerSize - convexSize;
@@ -144,6 +145,19 @@ public class Measurements implements IMeasurements {
         float improvementPercentage = (millerSize - convexSize) / (float) cleanGoal;
 
         return new DuplicateReductionContext(duplicatesRemoved, dupReductionPercentage, improvementPercentage);
+    }
+
+    public void writeToLogInfo(Multimap<Record, BlockWithData> duplicates) {
+        for (Map.Entry<Record, Collection<BlockWithData>> entry : duplicates.asMap().entrySet()) {
+            if (entry.getValue().size() >= 2) {
+                StringBuilder message = new StringBuilder();
+                message.append(entry.getKey() + " represents more than one block: ");
+                for (BlockWithData blockWithData : entry.getValue()) {
+                    message.append(blockWithData);
+                }
+                logger.debug(message.toString());
+            }
+        }
     }
 
     private double getAverageRankedValue(double threshold) {

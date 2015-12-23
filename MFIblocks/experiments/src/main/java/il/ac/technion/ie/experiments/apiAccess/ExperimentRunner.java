@@ -1,10 +1,12 @@
 package il.ac.technion.ie.experiments.apiAccess;
 
+import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.algorithm.Canopy;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
+import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.exception.NoValueExistsException;
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
@@ -54,7 +56,12 @@ public class ExperimentRunner {
         ExperimentRunner experimentRunner = new ExperimentRunner();
         if (context.size() == 1) {
             //        experimentRunner.runSimpleExp(context.getPathToDataset());
-            experimentRunner.runExperiments(context.getPathToDataset());
+//            experimentRunner.runExperiments(context.getPathToDataset());
+            try {
+                experimentRunner.runExperimentsWithCanopy(context.getPathToDataset());
+            } catch (CanopyParametersException | InvalidSearchResultException e) {
+                logger.error("Failed to run Canopy experiment", e);
+            }
         } else {
             experimentRunner.findStatisticsOnDatasets(context.getPathToDataset());
 //            experimentRunner.runFebrlExperiments(context.getPathToDataset(), context.getThresholds());
@@ -102,12 +109,21 @@ public class ExperimentRunner {
         canopy.initSearchEngine(new CanopyInteraction());
         List<CanopyCluster> canopies = canopy.createCanopies();
         List<BlockWithData> dirtyBlocks = canopyService.convertCanopiesToBlocks(canopies);
+        logger.info("Converted " + dirtyBlocks.size() + " canopies to blocks. " + (canopies.size() - dirtyBlocks.size()) + " were of size 1 and therefore removed");
+        this.measurements = new Measurements(cleanBlocks.size());
         calculateMillerResults(dirtyBlocks);
+        Multimap<Record, BlockWithData> millerRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
         try {
             boolean convexBP = runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
-            if (convexBP) {
-
+            if (!convexBP) {
+                logger.warn("Failed to run ConvexBP on canopy clusters");
+                return;
             }
+            Multimap<Record, BlockWithData> convexBPRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
+            DuplicateReductionContext reductionContext = measurements.representativesDuplicateElimanation(
+                    millerRepresentatives, convexBPRepresentatives, cleanBlocks.size());
+
+            saveConvexBPResultsToCsv(reductionContext);
         } catch (SizeNotEqualException e) {
             logger.error("Failed to create probabilities matrices for convexBP");
             e.printStackTrace();
@@ -120,7 +136,8 @@ public class ExperimentRunner {
         } catch (NoValueExistsException e) {
             logger.error("Failed to consume new probabilities", e);
         }
-
+        System.exit(0);
+        return;
     }
 
     private List<Record> getRecordsFromBlcoks(List<BlockWithData> cleanBlocks) {
@@ -267,6 +284,17 @@ public class ExperimentRunner {
         } else {
             logger.warn("Failed to create file for measurements therefore no results are results will be given");
         }
+    }
+
+    private void saveConvexBPResultsToCsv(DuplicateReductionContext duplicateReductionContext) {
+        File expResults = ExpFileUtils.createOutputFile("convexBPResults.csv");
+        if (expResults != null) {
+            logger.info("saving results of ExperimentsWithCanopy");
+            parsingService.writeExperimentsMeasurements(duplicateReductionContext, expResults);
+        } else {
+            logger.warn("Failed to create file for measurements therefore no results are results will be given");
+        }
+        logger.info("Finished saving results of ExperimentsWithCanopy");
     }
 
 }

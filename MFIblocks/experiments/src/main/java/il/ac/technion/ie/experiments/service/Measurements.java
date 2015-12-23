@@ -147,6 +147,14 @@ public class Measurements implements IMeasurements {
         return new DuplicateReductionContext(duplicatesRemoved, dupReductionPercentage, improvementPercentage);
     }
 
+    @Override
+    public void representationDiff(Set<Record> source, Set<Record> other, DuplicateReductionContext reductionContext) {
+        Set<Record> sourceCopy = new HashSet<>(source);
+        Set<Record> otherCopy = new HashSet<>(other);
+        sourceCopy.removeAll(otherCopy);
+        reductionContext.setRepresentationDiff(sourceCopy.size());
+    }
+
     public void writeToLogInfo(Multimap<Record, BlockWithData> duplicates) {
         for (Map.Entry<Record, Collection<BlockWithData>> entry : duplicates.asMap().entrySet()) {
             if (entry.getValue().size() >= 2) {

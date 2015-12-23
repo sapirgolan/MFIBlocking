@@ -122,6 +122,8 @@ public class ExperimentRunner {
             Multimap<Record, BlockWithData> convexBPRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
             DuplicateReductionContext reductionContext = measurements.representativesDuplicateElimanation(
                     millerRepresentatives, convexBPRepresentatives, cleanBlocks.size());
+            Multimap<Record, BlockWithData> trueRepsMap = exprimentsService.fetchRepresentatives(cleanBlocks);
+            measurements.representationDiff(trueRepsMap.asMap().keySet(), convexBPRepresentatives.asMap().keySet(), reductionContext);
 
             saveConvexBPResultsToCsv(reductionContext);
         } catch (SizeNotEqualException e) {

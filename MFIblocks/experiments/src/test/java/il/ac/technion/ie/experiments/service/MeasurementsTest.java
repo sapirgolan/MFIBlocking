@@ -311,4 +311,35 @@ public class MeasurementsTest {
         assertThat((double) reductionContext.getDupReductionPercentage(), closeTo(0, 0.01));
         assertThat((double) reductionContext.getImprovementPercentage(), closeTo(0, 0.01));
     }
+
+    @Test
+    public void testRepresentationDiff() throws Exception {
+        Set<Record> source = new HashSet<>();
+        Set<Record> other = new HashSet<>();
+        //create common records
+        Set<Record> commonRecords = new HashSet<>();
+        createMockRecords(commonRecords, 5);
+
+        //create onlySourceRecords records
+        createMockRecords(source, 3);
+        source.addAll(commonRecords);
+
+        //create onlyOtherRecords
+        other.addAll(commonRecords);
+        createMockRecords(other, 1);
+
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+
+        //execution
+        classUnderTest.representationDiff(source, other, reductionContext);
+
+        //assertion
+        assertThat(reductionContext.getRepresentationDiff(), is(3));
+    }
+
+    private void createMockRecords(Set<Record> set, int numberOfRecords) {
+        for (int i = 0; i < numberOfRecords; i++) {
+            set.add(mock(Record.class));
+        }
+    }
 }

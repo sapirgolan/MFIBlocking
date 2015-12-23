@@ -7,6 +7,7 @@ import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.model.Record;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by I062070 on 17/10/2015.
@@ -31,4 +32,6 @@ public interface IMeasurements {
     FebrlMeasuresContext getFebrlMeasuresContext(Double threshold);
 
     DuplicateReductionContext representativesDuplicateElimanation(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal);
+
+    void representationDiff(Set<Record> source, Set<Record> other, DuplicateReductionContext reductionContext);
 }

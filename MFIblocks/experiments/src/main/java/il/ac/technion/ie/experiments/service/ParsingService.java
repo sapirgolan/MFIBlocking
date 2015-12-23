@@ -170,7 +170,8 @@ public class ParsingService {
 
     public void writeExperimentsMeasurements(DuplicateReductionContext duplicateReductionContext, File file) {
         CsvWriter csvWriter = dataParser.preparOutputFile(file);
-        csvWriter.writeHeaders("duplicatesRemoved", "improvementPercentage", "dupReductionPercentage");
+        csvWriter.writeHeaders("diff of true representation vs found", "duplicatesRemoved", "improvementPercentage", "dupReductionPercentage");
+        csvWriter.writeValue("diff of true representation vs found", duplicateReductionContext.getRepresentationDiff());
         csvWriter.writeValue("duplicatesRemoved", duplicateReductionContext.getDuplicatesRemoved());
         csvWriter.writeValue("improvementPercentage", duplicateReductionContext.getImprovementPercentage());
         csvWriter.writeValue("dupReductionPercentage", duplicateReductionContext.getDupReductionPercentage());

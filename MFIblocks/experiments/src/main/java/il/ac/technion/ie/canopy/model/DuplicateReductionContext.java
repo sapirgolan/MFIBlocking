@@ -18,6 +18,7 @@ public class DuplicateReductionContext {
     private final float improvementPercentage;
     private final int duplicatesRemoved;
     private final float dupReductionPercentage;
+    private int representationDiff;
 
     public DuplicateReductionContext(int duplicatesRemoved, float dupReductionPercentage, float improvementPercentage) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -35,5 +36,13 @@ public class DuplicateReductionContext {
 
     public float getDupReductionPercentage() {
         return dupReductionPercentage * 100;
+    }
+
+    public int getRepresentationDiff() {
+        return representationDiff;
+    }
+
+    public void setRepresentationDiff(int representationDiff) {
+        this.representationDiff = representationDiff;
     }
 }

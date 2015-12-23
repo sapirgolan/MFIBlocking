@@ -277,15 +277,15 @@ public class MeasurementsTest {
     @Test
     public void testRepresentativesDuplicateElimanation_dupRemoved() throws Exception {
         Record representative = mock(Record.class);
-        Multimap duplicates = ArrayListMultimap.create();
-        Multimap cleaned = ArrayListMultimap.create();
+        Multimap miller = ArrayListMultimap.create();
+        Multimap convexBP = ArrayListMultimap.create();
 
-        duplicates.putAll(representative, Lists.newArrayList(
+        miller.putAll(representative, Lists.newArrayList(
                 mock(BlockWithData.class), mock(BlockWithData.class), mock(BlockWithData.class)));
-        cleaned.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
+        convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(duplicates, cleaned, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(miller, convexBP, 1);
 
         //assert
         assertThat(reductionContext.getDuplicatesRemoved(), is(1));
@@ -296,15 +296,15 @@ public class MeasurementsTest {
     @Test
     public void testRepresentativesDuplicateElimanation_noDupRemoved() throws Exception {
         Record representative = mock(Record.class);
-        Multimap duplicates = ArrayListMultimap.create();
-        Multimap cleaned = ArrayListMultimap.create();
+        Multimap miller = ArrayListMultimap.create();
+        Multimap convexBP = ArrayListMultimap.create();
 
-        duplicates.putAll(representative, Lists.newArrayList(
+        miller.putAll(representative, Lists.newArrayList(
                 mock(BlockWithData.class), mock(BlockWithData.class)));
-        cleaned.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
+        convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(duplicates, cleaned, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(miller, convexBP, 1);
 
         //assert
         assertThat(reductionContext.getDuplicatesRemoved(), is(0));

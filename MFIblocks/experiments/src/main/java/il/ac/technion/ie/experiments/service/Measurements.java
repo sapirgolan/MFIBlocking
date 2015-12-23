@@ -131,9 +131,9 @@ public class Measurements implements IMeasurements {
 
     @Override
     public DuplicateReductionContext representativesDuplicateElimanation(
-            Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal) {
-        logger.info("In 'dirtyBlocks', there are " + duplicates.keySet().size() + " representatives out of " + cleanGoal);
-        logger.info("In 'cleanBlocks', there are " + cleaned.keySet().size() + " representatives out of " + cleanGoal);
+            Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanBlocksSize) {
+        logger.info("In 'dirtyBlocks', there are " + duplicates.keySet().size() + " representatives out of " + cleanBlocksSize);
+        logger.info("In 'cleanBlocks', there are " + cleaned.keySet().size() + " representatives out of " + cleanBlocksSize);
         if (logger.isDebugEnabled()) {
             writeToLogInfo(duplicates);
             writeToLogInfo(cleaned);
@@ -142,7 +142,7 @@ public class Measurements implements IMeasurements {
         int convexSize = cleaned.size();
         int duplicatesRemoved = millerSize - convexSize;
         float dupReductionPercentage = (millerSize - convexSize) / (float) millerSize;
-        float improvementPercentage = (millerSize - convexSize) / (float) cleanGoal;
+        float improvementPercentage = (millerSize - convexSize) / (float) cleanBlocksSize;
 
         return new DuplicateReductionContext(duplicatesRemoved, dupReductionPercentage, improvementPercentage);
     }

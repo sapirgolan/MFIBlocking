@@ -2,6 +2,7 @@ package il.ac.technion.ie.experiments.service;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvWriter;
+import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
@@ -164,6 +165,16 @@ public class ParsingService {
             csvWriter.writeValue(AVG_BLOCK_SIZE, statistics.getAvgBlockSize());
             csvWriter.writeValuesToRow();
         }
+        csvWriter.close();
+    }
+
+    public void writeExperimentsMeasurements(DuplicateReductionContext duplicateReductionContext, File file) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(file);
+        csvWriter.writeHeaders("duplicatesRemoved", "improvementPercentage", "dupReductionPercentage");
+        csvWriter.writeValue("duplicatesRemoved", duplicateReductionContext.getDuplicatesRemoved());
+        csvWriter.writeValue("improvementPercentage", duplicateReductionContext.getImprovementPercentage());
+        csvWriter.writeValue("dupReductionPercentage", duplicateReductionContext.getDupReductionPercentage());
+        csvWriter.writeValuesToRow();
         csvWriter.close();
     }
 }

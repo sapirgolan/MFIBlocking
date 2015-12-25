@@ -123,7 +123,8 @@ public class ExperimentRunner {
             DuplicateReductionContext reductionContext = measurements.representativesDuplicateElimanation(
                     millerRepresentatives, convexBPRepresentatives, cleanBlocks.size());
             Multimap<Record, BlockWithData> trueRepsMap = exprimentsService.fetchRepresentatives(cleanBlocks);
-            measurements.representationDiff(trueRepsMap.asMap().keySet(), convexBPRepresentatives.asMap().keySet(), reductionContext);
+            measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
+            measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
             saveConvexBPResultsToCsv(reductionContext);
         } catch (SizeNotEqualException e) {

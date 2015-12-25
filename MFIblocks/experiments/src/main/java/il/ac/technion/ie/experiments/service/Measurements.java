@@ -180,12 +180,12 @@ public class Measurements implements IMeasurements {
                 powerOfRecord = powerOfRecord / blockWithDatas.size();
             }
             sumOfPowerOfRecord += powerOfRecord;
+            logger.info("The power of '" + record + "' as representative is: " + sumOfPowerOfRecord);
         }
         double power = sumOfPowerOfRecord / numberOfRecords;
+        logger.info("The total average power of all representatives is: " + power);
         reductionContext.setRepresntativesPower(power);
         return power;
-
-
     }
 
     private double existingMembersDividedAllMembers(BlockWithData cleanBlock, BlockWithData dirtyBlock) {

@@ -62,7 +62,7 @@ public class BlockWithData extends AbstractBlock<Record>{
     @Override
     public int getTrueRepresentativePosition() {
         ArrayList<Pair> pairs = new ArrayList<>();
-        if (membersProbability.entrySet().isEmpty()) {
+        if (nomProbabilityAssigned()) {
             logger.error("Cannot execute method 'getTrueRepresentativePosition()' since there are no probabilities." +
                     "This happen since you didn't invoke 'setMemberSimScore()' before");
             return 0;
@@ -178,7 +178,16 @@ public class BlockWithData extends AbstractBlock<Record>{
      */
     @Override
     public String toString() {
-        String result = String.format("%s %d-%s-%d", this.getClass().getName(), size(), trueRepresentative, getTrueRepresentativePosition());
+        String result;
+        if (nomProbabilityAssigned()) {
+            result = String.format("%s %d-%s", this.getClass().getName(), size(), trueRepresentative);
+        } else {
+            result = String.format("%s %d-%s-%d", this.getClass().getName(), size(), trueRepresentative, getTrueRepresentativePosition());
+        }
         return result;
+    }
+
+    private boolean nomProbabilityAssigned() {
+        return membersProbability.entrySet().isEmpty();
     }
 }

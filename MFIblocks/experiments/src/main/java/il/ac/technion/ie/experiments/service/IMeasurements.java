@@ -33,5 +33,7 @@ public interface IMeasurements {
 
     DuplicateReductionContext representativesDuplicateElimanation(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal);
 
-    void representationDiff(Set<Record> source, Set<Record> other, DuplicateReductionContext reductionContext);
+    void representationDiff(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext);
+
+    double calcPowerOfRep(final Multimap<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext);
 }

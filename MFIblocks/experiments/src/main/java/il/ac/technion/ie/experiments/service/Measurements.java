@@ -148,11 +148,71 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public void representationDiff(Set<Record> source, Set<Record> other, DuplicateReductionContext reductionContext) {
+    public void representationDiff(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext) {
         Set<Record> sourceCopy = new HashSet<>(source);
         Set<Record> otherCopy = new HashSet<>(other);
         sourceCopy.removeAll(otherCopy);
         reductionContext.setRepresentationDiff(sourceCopy.size());
+    }
+
+    @Override
+    public double calcPowerOfRep(Multimap<Record, BlockWithData> trueRepsMap, Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext) {
+        int numberOfRecords = 0;
+        double sumOfPowerOfRecord = 0;
+        Set<Record> trueReps = trueRepsMap.keySet();
+        logger.debug("Calculating the power measurement for '" + trueReps.size() + "' records");
+        for (Record record : trueReps) {
+            double powerOfRecord = 0;
+            Collection<BlockWithData> realBlocks = trueRepsMap.get(record);
+            if (realBlocks.size() > 1) {
+                logger.warn("On clean Dataset, record '" + record + "' represents more than one block");
+                continue;
+            }
+            BlockWithData blockForRecord = getBlockForRecord(record, realBlocks);
+            logger.trace("The power measurement is calculated for '" + record + "'; representing of " + blockForRecord);
+            verifyBlockNoEmpty(blockForRecord);
+            if (verifyBlockNoEmpty(blockForRecord)) {
+                numberOfRecords++;
+                Collection<BlockWithData> blockWithDatas = convexBPRepresentatives.get(record);
+                for (BlockWithData blockWithData : blockWithDatas) {
+                    powerOfRecord += existingMembersDividedAllMembers(blockForRecord, blockWithData);
+                }
+                powerOfRecord = powerOfRecord / blockWithDatas.size();
+            }
+            sumOfPowerOfRecord += powerOfRecord;
+        }
+        double power = sumOfPowerOfRecord / numberOfRecords;
+        reductionContext.setRepresntativesPower(power);
+        return power;
+
+
+    }
+
+    private double existingMembersDividedAllMembers(BlockWithData cleanBlock, BlockWithData dirtyBlock) {
+        List<Record> membersDirtyBlock = new ArrayList<>(dirtyBlock.getMembers());
+        int membersDirtyBlockSize = membersDirtyBlock.size();
+        membersDirtyBlock.retainAll(cleanBlock.getMembers());
+        int membersContainedInCleanBlockSize = membersDirtyBlock.size();
+        return (double) membersContainedInCleanBlockSize / membersDirtyBlockSize;
+    }
+
+    private boolean verifyBlockNoEmpty(BlockWithData blockForRecord) {
+        boolean returnStatment = blockForRecord.size() > 0;
+        if (returnStatment == false) {
+            logger.warn(blockForRecord + " doesn't contain any records");
+        }
+        return returnStatment;
+    }
+
+    private BlockWithData getBlockForRecord(Record record, Collection<BlockWithData> realBlocks) {
+        BlockWithData blockWithData = null;
+        Iterator<BlockWithData> iterator = realBlocks.iterator();
+        if (!iterator.hasNext()) {
+            logger.warn("Record '" + record + "' is not assigned to any block");
+        } else {
+            blockWithData = iterator.next();
+        }
+        return blockWithData;
     }
 
     public void writeToLogInfo(Multimap<Record, BlockWithData> duplicates) {

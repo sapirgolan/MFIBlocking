@@ -6,9 +6,13 @@ import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
 import il.ac.technion.ie.model.Record;
+import il.ac.technion.ie.utils.Logging;
+import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.math3.distribution.UniformIntegerDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.apache.log4j.Level;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
@@ -25,6 +29,9 @@ import static org.mockito.Matchers.anyList;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 public class MeasurementsTest {
+
+    @Rule
+    public Logging logging = new Logging();
 
     @InjectMocks
     private Measurements classUnderTest;
@@ -341,5 +348,70 @@ public class MeasurementsTest {
         for (int i = 0; i < numberOfRecords; i++) {
             set.add(mock(Record.class));
         }
+    }
+
+    @Test
+    public void testCalcPowerOfRep() throws Exception {
+        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
+        Record trueRep = recordsFromCsv.get(3);
+        Multimap<Record, BlockWithData> trueRepsMap = ArrayListMultimap.create(1, 4);
+        trueRepsMap.put(trueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
+
+        Multimap<Record, BlockWithData> convexBPRepresentatives = ArrayListMultimap.create(2, 4);
+        convexBPRepresentatives.put(trueRep, new BlockWithData(recordsFromCsv.subList(2, 7)));
+        convexBPRepresentatives.put(trueRep, new BlockWithData(recordsFromCsv.subList(3, 6)));
+        convexBPRepresentatives.put(recordsFromCsv.get(8), new BlockWithData(recordsFromCsv.subList(4, 9)));
+
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+
+        classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+
+        assertThat(logging.getAllLogsAbove(Level.WARN), empty());
+        assertThat(reductionContext.getRepresntativesPower(), closeTo(0.366666667, 0.0001));
+    }
+
+    @Test
+    public void testCalcPowerOfRep_oneTrueRepIsNotRep() throws Exception {
+        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
+        Record trueRep = recordsFromCsv.get(3);
+        Multimap<Record, BlockWithData> trueRepsMap = ArrayListMultimap.create(1, 4);
+        trueRepsMap.put(trueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
+
+        Multimap<Record, BlockWithData> convexBPRepresentatives = ArrayListMultimap.create(2, 4);
+        BlockWithData block = new BlockWithData(recordsFromCsv.subList(2, 7));
+        Whitebox.setInternalState(block, "trueRepresentative", recordsFromCsv.get(6));
+        convexBPRepresentatives.put(recordsFromCsv.get(6), block);
+        convexBPRepresentatives.put(trueRep, new BlockWithData(recordsFromCsv.subList(3, 6)));
+        convexBPRepresentatives.put(recordsFromCsv.get(8), new BlockWithData(recordsFromCsv.subList(4, 9)));
+
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+
+        classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+
+        assertThat(logging.getAllLogsAbove(Level.WARN), empty());
+        assertThat(reductionContext.getRepresntativesPower(), closeTo(0.333333, 0.0001));
+    }
+
+    @Test
+    public void testCalcPowerOfRep_TwoCleanBlocksOneTrueRepIsNotRep() throws Exception {
+        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
+        Record BlockZeroTrueRep = recordsFromCsv.get(3);
+        Record BlockOneTrueRep = recordsFromCsv.get(7);
+        Multimap<Record, BlockWithData> trueRepsMap = ArrayListMultimap.create(1, 4);
+        trueRepsMap.put(BlockZeroTrueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
+        trueRepsMap.put(BlockOneTrueRep, new BlockWithData(recordsFromCsv.subList(4, 8)));
+
+        Multimap<Record, BlockWithData> convexBPRepresentatives = ArrayListMultimap.create(2, 4);
+        convexBPRepresentatives.put(BlockZeroTrueRep, new BlockWithData(recordsFromCsv.subList(2, 7)));
+        convexBPRepresentatives.put(BlockZeroTrueRep, new BlockWithData(recordsFromCsv.subList(3, 6)));
+        convexBPRepresentatives.put(recordsFromCsv.get(5), new BlockWithData(recordsFromCsv.subList(3, 7)));
+        convexBPRepresentatives.put(recordsFromCsv.get(7), new BlockWithData(recordsFromCsv.subList(4, 9)));
+
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+
+        classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+
+        assertThat(logging.getAllLogsAbove(Level.WARN), empty());
+        assertThat(reductionContext.getRepresntativesPower(), closeTo(0.58333333, 0.0001));
     }
 }

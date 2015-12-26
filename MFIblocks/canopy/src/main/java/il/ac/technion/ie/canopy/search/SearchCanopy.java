@@ -99,6 +99,8 @@ public class SearchCanopy implements ISearch {
             logger.error("Failed to perform search", e);
         } catch (ExecutionException e) {
             logger.error("Failed to perform search", e);
+        } finally {
+            listeningExecutorService.shutdown();
         }
         return recordsIDs;
     }

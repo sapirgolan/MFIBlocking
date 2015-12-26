@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.apiAccess;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.algorithm.Canopy;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
@@ -66,6 +67,7 @@ public class ExperimentRunner {
             experimentRunner.findStatisticsOnDatasets(context.getPathToDataset());
 //            experimentRunner.runFebrlExperiments(context.getPathToDataset(), context.getThresholds());
         }
+        System.exit(0);
     }
 
     public void runSimpleExp(String datasetPath) {
@@ -116,13 +118,13 @@ public class ExperimentRunner {
         try {
             boolean convexBP = runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
             if (!convexBP) {
-                logger.warn("Failed to run ConvexBP on canopy clusters");
-                return;
+                logger.error("Failed to run ConvexBP on canopy clusters");
+                System.exit(1);
             }
             Multimap<Record, BlockWithData> convexBPRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
             DuplicateReductionContext reductionContext = measurements.representativesDuplicateElimanation(
                     millerRepresentatives, convexBPRepresentatives, cleanBlocks.size());
-            Multimap<Record, BlockWithData> trueRepsMap = exprimentsService.fetchRepresentatives(cleanBlocks);
+            BiMap<Record, BlockWithData> trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
             measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
             measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
@@ -139,7 +141,6 @@ public class ExperimentRunner {
         } catch (NoValueExistsException e) {
             logger.error("Failed to consume new probabilities", e);
         }
-        System.exit(0);
         return;
     }
 

@@ -180,9 +180,9 @@ public class BlockWithData extends AbstractBlock<Record>{
     public String toString() {
         String result;
         if (nomProbabilityAssigned()) {
-            result = String.format("%s %d-%s", this.getClass().getName(), size(), trueRepresentative);
+            result = String.format("%d; %s", size(), trueRepresentative);
         } else {
-            result = String.format("%s %d-%s-%d", this.getClass().getName(), size(), trueRepresentative, getTrueRepresentativePosition());
+            result = String.format("%d; %s at pos %d", size(), trueRepresentative, getTrueRepresentativePosition());
         }
         return result;
     }

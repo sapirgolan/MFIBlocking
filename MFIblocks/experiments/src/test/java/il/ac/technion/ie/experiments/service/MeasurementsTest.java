@@ -354,7 +354,7 @@ public class MeasurementsTest {
     public void testCalcPowerOfRep() throws Exception {
         List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         Record trueRep = recordsFromCsv.get(3);
-        Multimap<Record, BlockWithData> trueRepsMap = ArrayListMultimap.create(1, 4);
+        Map<Record, BlockWithData> trueRepsMap = new HashMap<>();
         trueRepsMap.put(trueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
 
         Multimap<Record, BlockWithData> convexBPRepresentatives = ArrayListMultimap.create(2, 4);
@@ -374,7 +374,7 @@ public class MeasurementsTest {
     public void testCalcPowerOfRep_oneTrueRepIsNotRep() throws Exception {
         List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         Record trueRep = recordsFromCsv.get(3);
-        Multimap<Record, BlockWithData> trueRepsMap = ArrayListMultimap.create(1, 4);
+        Map<Record, BlockWithData> trueRepsMap = new HashMap<>();
         trueRepsMap.put(trueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
 
         Multimap<Record, BlockWithData> convexBPRepresentatives = ArrayListMultimap.create(2, 4);
@@ -397,7 +397,7 @@ public class MeasurementsTest {
         List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         Record BlockZeroTrueRep = recordsFromCsv.get(3);
         Record BlockOneTrueRep = recordsFromCsv.get(7);
-        Multimap<Record, BlockWithData> trueRepsMap = ArrayListMultimap.create(1, 4);
+        Map<Record, BlockWithData> trueRepsMap = new HashMap<>();
         trueRepsMap.put(BlockZeroTrueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
         trueRepsMap.put(BlockOneTrueRep, new BlockWithData(recordsFromCsv.subList(4, 8)));
 

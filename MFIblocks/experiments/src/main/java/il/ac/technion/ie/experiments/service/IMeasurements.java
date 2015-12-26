@@ -7,6 +7,7 @@ import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.model.Record;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,5 +36,5 @@ public interface IMeasurements {
 
     void representationDiff(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext);
 
-    double calcPowerOfRep(final Multimap<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext);
+    double calcPowerOfRep(final Map<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext);
 }

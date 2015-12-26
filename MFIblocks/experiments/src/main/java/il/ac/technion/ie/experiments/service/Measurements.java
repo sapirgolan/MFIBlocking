@@ -52,19 +52,19 @@ public class Measurements implements IMeasurements {
 
     private void calcMRR(List<BlockWithData> blocks, double threshold) {
         double mRRValue = measurService.calcMRR(blocks);
-        logger.debug(String.format("%s, MRR, %s", blocks.toString(), mRRValue));
+        logger.debug(String.format("MRR, %s", mRRValue));
         mrrValueMap.put(threshold, mRRValue);
         double normMRR = mRRValue / numberOfBlocks(blocks.size());
         normalizedMRRValues.put(threshold, normMRR);
-        logger.debug(String.format("%s, Norm MRR, %s", blocks.toString(), normMRR));
+        logger.debug(String.format("Norm MRR, %s", normMRR));
     }
 
     private void calcRankedValue(List<BlockWithData> blocks, double threshold) {
         double rankedValue = measurService.calcRankedValue(blocks);
-        logger.debug(String.format("%s, Ranked Value, %s", blocks.toString(), rankedValue));
+        logger.debug(String.format("Ranked Value, %s", rankedValue));
         rankedValueMap.put(threshold, rankedValue);
         double normRV = rankedValue / numberOfBlocks(blocks.size());
-        logger.debug(String.format("%s, Norm RV, %s", blocks.toString(), normRV));
+        logger.debug(String.format("Norm RV, %s", normRV));
         normalizedRankedValues.put(threshold, normRV);
     }
 
@@ -132,9 +132,9 @@ public class Measurements implements IMeasurements {
     @Override
     public DuplicateReductionContext representativesDuplicateElimanation(
             Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanBlocksSize) {
-        logger.info("In 'dirtyBlocks', there are " + duplicates.keySet().size() + " representatives out of " + cleanBlocksSize);
-        logger.info("In 'cleanBlocks', there are " + cleaned.keySet().size() + " representatives out of " + cleanBlocksSize);
-        if (logger.isDebugEnabled()) {
+        logger.info("In 'dirtyBlocks', there are " + duplicates.keySet().size() + " representatives for " + cleanBlocksSize + " clean blocks");
+        logger.info("In 'cleanBlocks', there are " + cleaned.keySet().size() + " representatives for " + cleanBlocksSize + " clean blocks");
+        if (logger.isTraceEnabled()) {
             writeToLogInfo(duplicates);
             writeToLogInfo(cleaned);
         }
@@ -156,31 +156,28 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public double calcPowerOfRep(Multimap<Record, BlockWithData> trueRepsMap, Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext) {
+    public double calcPowerOfRep(Map<Record, BlockWithData> trueRepsMap, Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext) {
         int numberOfRecords = 0;
         double sumOfPowerOfRecord = 0;
         Set<Record> trueReps = trueRepsMap.keySet();
-        logger.debug("Calculating the power measurement for '" + trueReps.size() + "' records");
+        logger.debug("Calculating the power measurement for " + trueReps.size() + " records");
         for (Record record : trueReps) {
             double powerOfRecord = 0;
-            Collection<BlockWithData> realBlocks = trueRepsMap.get(record);
-            if (realBlocks.size() > 1) {
-                logger.warn("On clean Dataset, record '" + record + "' represents more than one block");
-                continue;
-            }
-            BlockWithData blockForRecord = getBlockForRecord(record, realBlocks);
-            logger.trace("The power measurement is calculated for '" + record + "'; representing of " + blockForRecord);
+            BlockWithData blockForRecord = trueRepsMap.get(record);
             verifyBlockNoEmpty(blockForRecord);
             if (verifyBlockNoEmpty(blockForRecord)) {
+                logger.trace("The power measurement is calculated for '" + record + "'; representing of " + blockForRecord);
                 numberOfRecords++;
                 Collection<BlockWithData> blockWithDatas = convexBPRepresentatives.get(record);
-                for (BlockWithData blockWithData : blockWithDatas) {
-                    powerOfRecord += existingMembersDividedAllMembers(blockForRecord, blockWithData);
+                if (!blockWithDatas.isEmpty()) {
+                    for (BlockWithData blockWithData : blockWithDatas) {
+                        powerOfRecord += existingMembersDividedAllMembers(blockForRecord, blockWithData);
+                    }
+                    powerOfRecord = powerOfRecord / blockWithDatas.size();
                 }
-                powerOfRecord = powerOfRecord / blockWithDatas.size();
             }
             sumOfPowerOfRecord += powerOfRecord;
-            logger.info("The power of '" + record + "' as representative is: " + sumOfPowerOfRecord);
+            logger.info("The power of '" + record + "' as representative is: " + powerOfRecord);
         }
         double power = sumOfPowerOfRecord / numberOfRecords;
         logger.info("The total average power of all representatives is: " + power);
@@ -208,7 +205,8 @@ public class Measurements implements IMeasurements {
         BlockWithData blockWithData = null;
         Iterator<BlockWithData> iterator = realBlocks.iterator();
         if (!iterator.hasNext()) {
-            logger.warn("Record '" + record + "' is not assigned to any block");
+            logger.warn("Record '" + record + "' is not assigned to any block." +
+                    "Therefore we will not calculate its power as representative");
         } else {
             blockWithData = iterator.next();
         }
@@ -223,7 +221,7 @@ public class Measurements implements IMeasurements {
                 for (BlockWithData blockWithData : entry.getValue()) {
                     message.append(blockWithData);
                 }
-                logger.debug(message.toString());
+                logger.trace(message.toString());
             }
         }
     }

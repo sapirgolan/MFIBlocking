@@ -443,7 +443,7 @@ public class MeasurementsTest {
         }
 
         //execution
-        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks);
+        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0, (float) 0.0, (float) 0.0));
 
         //assertion
         assertThat(wisdomCrowds, closeTo(0.25, 0.0001));
@@ -480,7 +480,7 @@ public class MeasurementsTest {
         }
 
         //execution
-        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks);
+        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0, (float) 0.0, (float) 0.0));
 
         //assertion
         assertThat(wisdomCrowds, closeTo(0.0, 0.0001));

@@ -127,6 +127,7 @@ public class ExperimentRunner {
             BiMap<Record, BlockWithData> trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
             measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
             measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+            measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(convexBPRepresentatives.values()), reductionContext);
 
             saveConvexBPResultsToCsv(reductionContext);
         } catch (SizeNotEqualException e) {

@@ -186,7 +186,7 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks) {
+    public double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext) {
         //todo: for performance, we can change BlockWithData to its hashCode
         final Map<Record, BlockWithData> recordToBlockMap = initRecordToBlockMap(cleanBlocks);
         Multimap<BlockWithData, BlockCounter> globalBlockCounters = ArrayListMultimap.create();
@@ -203,7 +203,9 @@ public class Measurements implements IMeasurements {
             }
         }
 
-        return representativesIdentical / (double) cleanBlocks.size();
+        double wisdomCrowds = representativesIdentical / (double) cleanBlocks.size();
+        reductionContext.setWisdomCrowds(wisdomCrowds);
+        return wisdomCrowds;
     }
 
     private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {

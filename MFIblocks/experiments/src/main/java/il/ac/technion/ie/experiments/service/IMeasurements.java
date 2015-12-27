@@ -37,4 +37,6 @@ public interface IMeasurements {
     void representationDiff(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext);
 
     double calcPowerOfRep(final Map<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext);
+
+    double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks);
 }

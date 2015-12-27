@@ -185,6 +185,77 @@ public class Measurements implements IMeasurements {
         return power;
     }
 
+    @Override
+    public double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks) {
+        //todo: for performance, we can change BlockWithData to its hashCode
+        final Map<Record, BlockWithData> recordToBlockMap = initRecordToBlockMap(cleanBlocks);
+        Multimap<BlockWithData, BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        for (BlockWithData dirtyBlock : dirtyBlocks) {
+            Map<BlockWithData, Integer> localBlockCounters = getNumberOfRecordsInEachCleanBlock(dirtyBlock, recordToBlockMap);
+            updateGlobalCounters(dirtyBlock, localBlockCounters, globalBlockCounters);
+        }
+
+        int representativesIdentical = 0;
+        for (BlockWithData cleanBlock : globalBlockCounters.keySet()) {
+            boolean trueRepIdenticalToDirtyBlockRep = isTrueRepIdenticalToDirtyBlockRep(globalBlockCounters, cleanBlock);
+            if (trueRepIdenticalToDirtyBlockRep) {
+                representativesIdentical++;
+            }
+        }
+
+        return representativesIdentical / (double) cleanBlocks.size();
+    }
+
+    private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {
+        Record trueRepresentative = cleanBlock.getTrueRepresentative();
+        for (BlockCounter blockCounter : globalBlockCounters.get(cleanBlock)) {
+            Set<Record> dirtyBlockRepresentatives = blockCounter.getBlock().findBlockRepresentatives().keySet();
+            if (dirtyBlockRepresentatives.contains(trueRepresentative)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateGlobalCounters(BlockWithData dirtyBlock, Map<BlockWithData, Integer> localBlockCounters, Multimap<BlockWithData, BlockCounter> globalBlockCounters) {
+        for (Map.Entry<BlockWithData, Integer> entry : localBlockCounters.entrySet()) {
+            BlockWithData cleanBlock = entry.getKey();
+            Integer localCounter = entry.getValue();
+            Collection<BlockCounter> blockCounterOfCleanBlock = globalBlockCounters.get(cleanBlock);
+            if (blockCounterOfCleanBlock.isEmpty() || blockCounterOfCleanBlock.iterator().next().getCounter() == localCounter) {
+                globalBlockCounters.put(cleanBlock, new BlockCounter(dirtyBlock, localCounter));
+            } else if (blockCounterOfCleanBlock.iterator().next().getCounter() < localCounter) {
+                globalBlockCounters.removeAll(cleanBlock);
+                globalBlockCounters.put(cleanBlock, new BlockCounter(dirtyBlock, localCounter));
+            }
+        }
+    }
+
+    private Map<BlockWithData, Integer> getNumberOfRecordsInEachCleanBlock(BlockWithData dirtyBlock, Map<Record, BlockWithData> recordToBlockMap) {
+        Map<BlockWithData, Integer> map = new HashMap<>();
+
+        for (Record record : dirtyBlock.getMembers()) {
+            BlockWithData blockWithData = recordToBlockMap.get(record);
+            if (map.containsKey(blockWithData)) {
+                int counter = map.get(blockWithData);
+                map.put(blockWithData, counter + 1);
+            } else {
+                map.put(blockWithData, 1);
+            }
+        }
+        return map;
+    }
+
+    private Map<Record, BlockWithData> initRecordToBlockMap(Set<BlockWithData> cleanBlocks) {
+        Map<Record, BlockWithData> recordToBlockMap = new HashMap<>(cleanBlocks.size());
+        for (BlockWithData cleanBlock : cleanBlocks) {
+            for (Record record : cleanBlock.getMembers()) {
+                recordToBlockMap.put(record, cleanBlock);
+            }
+        }
+        return Collections.unmodifiableMap(recordToBlockMap);
+    }
+
     private double existingMembersDividedAllMembers(BlockWithData cleanBlock, BlockWithData dirtyBlock) {
         List<Record> membersDirtyBlock = new ArrayList<>(dirtyBlock.getMembers());
         int membersDirtyBlockSize = membersDirtyBlock.size();
@@ -243,5 +314,24 @@ public class Measurements implements IMeasurements {
     @Override
     public List<Double> getNormalizedMRRValuesSortedByThreshold() {
         return getMeasureSortedByThreshold(normalizedMRRValues);
+    }
+
+    protected class BlockCounter {
+
+        private final BlockWithData block;
+        private int counter;
+
+        public BlockCounter(BlockWithData block, int counter) {
+            this.block = block;
+            this.counter = counter;
+        }
+
+        public int getCounter() {
+            return counter;
+        }
+
+        public BlockWithData getBlock() {
+            return block;
+        }
     }
 }

@@ -12,6 +12,7 @@ import org.apache.commons.math3.distribution.UniformIntegerDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.log4j.Level;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -38,7 +39,12 @@ public class MeasurementsTest {
 
     @Spy
     private iMeasurService measurService = new MeasurService();
+    private static List<Record> recordsFromCsv;
 
+    @BeforeClass
+    public static void prepareClass() throws Exception {
+        recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -352,7 +358,6 @@ public class MeasurementsTest {
 
     @Test
     public void testCalcPowerOfRep() throws Exception {
-        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         Record trueRep = recordsFromCsv.get(3);
         Map<Record, BlockWithData> trueRepsMap = new HashMap<>();
         trueRepsMap.put(trueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
@@ -372,7 +377,6 @@ public class MeasurementsTest {
 
     @Test
     public void testCalcPowerOfRep_oneTrueRepIsNotRep() throws Exception {
-        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         Record trueRep = recordsFromCsv.get(3);
         Map<Record, BlockWithData> trueRepsMap = new HashMap<>();
         trueRepsMap.put(trueRep, new BlockWithData(recordsFromCsv.subList(0, 4)));
@@ -394,7 +398,6 @@ public class MeasurementsTest {
 
     @Test
     public void testCalcPowerOfRep_TwoCleanBlocksOneTrueRepIsNotRep() throws Exception {
-        List<Record> recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
         Record BlockZeroTrueRep = recordsFromCsv.get(3);
         Record BlockOneTrueRep = recordsFromCsv.get(7);
         Map<Record, BlockWithData> trueRepsMap = new HashMap<>();
@@ -414,4 +417,308 @@ public class MeasurementsTest {
         assertThat(logging.getAllLogsAbove(Level.WARN), empty());
         assertThat(reductionContext.getRepresntativesPower(), closeTo(0.58333333, 0.0001));
     }
+
+    @Test
+    public void calcWisdomCrowdsSingleCleanBlock() throws Exception {
+        //prepare
+        BlockWithData dirtyBlockOne = new BlockWithData(recordsFromCsv.subList(2, 4));
+        dirtyBlockOne.setMemberProbability(recordsFromCsv.get(2), (float) 0.6);
+        dirtyBlockOne.setMemberProbability(recordsFromCsv.get(3), (float) 0.4);
+
+        BlockWithData dirtyBlockTwo = new BlockWithData(recordsFromCsv.subList(1, 5));
+        dirtyBlockTwo.setMemberProbability(recordsFromCsv.get(1), (float) 0.1);
+        dirtyBlockTwo.setMemberProbability(recordsFromCsv.get(2), (float) 0.2);
+        dirtyBlockTwo.setMemberProbability(recordsFromCsv.get(3), (float) 0.4);
+        dirtyBlockTwo.setMemberProbability(recordsFromCsv.get(4), (float) 0.3);
+
+
+        BlockWithData dirtyBlockThree = new BlockWithData(recordsFromCsv.subList(5, 7));
+        dirtyBlockThree.setMemberProbability(recordsFromCsv.get(5), (float) 0.4);
+        dirtyBlockThree.setMemberProbability(recordsFromCsv.get(6), (float) 0.4);
+
+        Set<BlockWithData> dirtyBlocks = Sets.newHashSet(dirtyBlockThree, dirtyBlockOne, dirtyBlockTwo);
+        //invoke findBlockRepresentatives() so that representatives will be known afterwards
+        for (BlockWithData dirtyBlock : dirtyBlocks) {
+            dirtyBlock.findBlockRepresentatives();
+        }
+
+        //execution
+        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks);
+
+        //assertion
+        assertThat(wisdomCrowds, closeTo(0.25, 0.0001));
+    }
+
+    private final Set<BlockWithData> getCleanBlocks() {
+        BlockWithData blockOne = new BlockWithData(recordsFromCsv.subList(0, 4));
+        BlockWithData blockTwo = new BlockWithData(recordsFromCsv.subList(4, 8));
+        BlockWithData blockThree = new BlockWithData(recordsFromCsv.subList(8, 13));
+        BlockWithData blockFour = new BlockWithData(recordsFromCsv.subList(13, 20));
+        return Collections.unmodifiableSet(Sets.newHashSet(blockOne, blockTwo, blockThree, blockFour));
+    }
+
+    @Test
+    public void calcWisdomCrowdsSingleCleanBlockWithoutRealRepresentative() throws Exception {
+        //prepare
+        BlockWithData dirtyBlockOne = new BlockWithData(recordsFromCsv.subList(2, 4));
+        dirtyBlockOne.setMemberProbability(recordsFromCsv.get(2), (float) 0.4);
+        dirtyBlockOne.setMemberProbability(recordsFromCsv.get(3), (float) 0.6);
+
+        BlockWithData dirtyBlockTwo = new BlockWithData(recordsFromCsv.subList(0, 3));
+        dirtyBlockTwo.setMemberProbability(recordsFromCsv.get(0), (float) 0.2);
+        dirtyBlockTwo.setMemberProbability(recordsFromCsv.get(1), (float) 0.3);
+        dirtyBlockOne.setMemberProbability(recordsFromCsv.get(2), (float) 0.5);
+
+        BlockWithData dirtyBlockThree = new BlockWithData(recordsFromCsv.subList(5, 7));
+        dirtyBlockThree.setMemberProbability(recordsFromCsv.get(5), (float) 0.2);
+        dirtyBlockThree.setMemberProbability(recordsFromCsv.get(6), (float) 0.8);
+
+        HashSet<BlockWithData> dirtyBlocks = Sets.newHashSet(dirtyBlockThree, dirtyBlockOne, dirtyBlockTwo);
+        //invoke findBlockRepresentatives() so that representatives will be known afterwards
+        for (BlockWithData dirtyBlock : dirtyBlocks) {
+            dirtyBlock.findBlockRepresentatives();
+        }
+
+        //execution
+        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks);
+
+        //assertion
+        assertThat(wisdomCrowds, closeTo(0.0, 0.0001));
+    }
+
+    @Test
+    public void initRecordToBlockMap_sameKeyExistsSeveralTimes() throws Exception {
+        //prepare
+        BlockWithData blockOne = new BlockWithData(recordsFromCsv.subList(0, 4));
+        BlockWithData blockTwo = new BlockWithData(recordsFromCsv.subList(4, 8));
+        BlockWithData blockThree = new BlockWithData(recordsFromCsv.subList(8, 12));
+        BlockWithData blockFour = new BlockWithData(recordsFromCsv.subList(12, 20));
+        BlockWithData blockFive = new BlockWithData(recordsFromCsv.subList(6, 10));
+
+        //execute
+        Map<Record, BlockWithData> recordToBlockMap = Whitebox.invokeMethod(classUnderTest, "initRecordToBlockMap",
+                Sets.newHashSet(blockOne, blockTwo, blockThree, blockFour, blockFive));
+
+        //assert
+        assertThat(recordToBlockMap.keySet(), hasSize(20));
+        assertThat(recordToBlockMap.keySet(), containsInAnyOrder(recordsFromCsv.toArray(new Record[20])));
+        assertThat(recordToBlockMap.values(), hasSize(20));
+    }
+
+    @Test
+    public void getBlockWithMostRecordsIn() throws Exception {
+        //prepare
+        BlockWithData dirtyBlock = new BlockWithData(recordsFromCsv.subList(2, 7));
+        BlockWithData cleanBlockA = new BlockWithData(recordsFromCsv.subList(0, 4));
+        BlockWithData cleanBlockB = new BlockWithData(recordsFromCsv.subList(4, 8));
+        Map<Record, BlockWithData> recordToBlockMap = Whitebox.invokeMethod(classUnderTest, "initRecordToBlockMap", Sets.newHashSet(cleanBlockA, cleanBlockB));
+
+        //execution
+        Map<BlockWithData, Integer> numberOfRecordsInEachCleanBlock = Whitebox.invokeMethod(classUnderTest, "getNumberOfRecordsInEachCleanBlock", dirtyBlock, recordToBlockMap);
+
+        //assertion
+        assertThat(numberOfRecordsInEachCleanBlock.get(cleanBlockA), is(2));
+        assertThat(numberOfRecordsInEachCleanBlock.get(cleanBlockB), is(3));
+        assertThat(numberOfRecordsInEachCleanBlock.keySet(), containsInAnyOrder(cleanBlockA, cleanBlockB));
+    }
+
+    @Test
+    public void getBlockWithMostRecordsIn_ThereAreTwoBlocks() throws Exception {
+        //prepare
+        BlockWithData dirtyBlock = new BlockWithData(recordsFromCsv.subList(2, 6));
+        BlockWithData cleanBlockA = new BlockWithData(recordsFromCsv.subList(0, 4));
+        BlockWithData cleanBlockB = new BlockWithData(recordsFromCsv.subList(4, 8));
+        Map<Record, BlockWithData> recordToBlockMap = Whitebox.invokeMethod(classUnderTest, "initRecordToBlockMap", Sets.newHashSet(cleanBlockA, cleanBlockB));
+
+        //execution
+        Map<BlockWithData, Integer> numberOfRecordsInEachCleanBlock = Whitebox.invokeMethod(classUnderTest, "getNumberOfRecordsInEachCleanBlock", dirtyBlock, recordToBlockMap);
+
+        //assertion
+        //assertion
+        assertThat(numberOfRecordsInEachCleanBlock.get(cleanBlockA), is(2));
+        assertThat(numberOfRecordsInEachCleanBlock.get(cleanBlockB), is(2));
+        assertThat(numberOfRecordsInEachCleanBlock.keySet(), containsInAnyOrder(cleanBlockA, cleanBlockB));
+    }
+
+    @Test
+    public void testUpdateGlobalCountersUpdateAllCounters() throws Exception {
+        //prepare
+        BlockWithData cleanBlockA = new BlockWithData(recordsFromCsv.subList(0, 4));
+        BlockWithData cleanBlockB = new BlockWithData(recordsFromCsv.subList(4, 8));
+        BlockWithData dirtyBlock = new BlockWithData(recordsFromCsv.subList(2, 6));
+
+        Multimap<BlockWithData, Measurements.BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        globalBlockCounters.put(cleanBlockA, classUnderTest.new BlockCounter(mock(BlockWithData.class), 1));
+
+        Map<BlockWithData, Integer> localBlockCounters = Maps.newHashMap(ImmutableMap.of(cleanBlockA, 2, cleanBlockB, 2));
+
+        //execute
+        Whitebox.invokeMethod(classUnderTest, "updateGlobalCounters", dirtyBlock, localBlockCounters, globalBlockCounters);
+
+        //assertion
+        assertThat(globalBlockCounters.keySet(), containsInAnyOrder(cleanBlockA, cleanBlockB));
+
+        assertThat(globalBlockCounters.get(cleanBlockA), hasSize(1));
+        Measurements.BlockCounter blockCounterA = globalBlockCounters.get(cleanBlockA).iterator().next();
+        assertThat(blockCounterA.getCounter(), is(2));
+        assertThat(blockCounterA.getBlock(), is(dirtyBlock));
+
+        assertThat(globalBlockCounters.get(cleanBlockB), hasSize(1));
+        Measurements.BlockCounter blockCounterB = globalBlockCounters.get(cleanBlockB).iterator().next();
+        assertThat(blockCounterB.getCounter(), is(2));
+        assertThat(blockCounterB.getBlock(), is(dirtyBlock));
+    }
+
+    @Test
+    public void testUpdateGlobalCountersDontUpdateOneConter() throws Exception {
+        //prepare
+        BlockWithData cleanBlockA = new BlockWithData(recordsFromCsv.subList(0, 4));
+        BlockWithData cleanBlockB = new BlockWithData(recordsFromCsv.subList(4, 8));
+        BlockWithData dirtyBlock = new BlockWithData(recordsFromCsv.subList(2, 6));
+        BlockWithData mock = mock(BlockWithData.class);
+
+        Multimap<BlockWithData, Measurements.BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        globalBlockCounters.put(cleanBlockA, classUnderTest.new BlockCounter(mock, 5));
+
+        Map<BlockWithData, Integer> localBlockCounters = Maps.newHashMap(ImmutableMap.of(cleanBlockA, 2, cleanBlockB, 2));
+
+        //execute
+        Whitebox.invokeMethod(classUnderTest, "updateGlobalCounters", dirtyBlock, localBlockCounters, globalBlockCounters);
+
+        //assertion
+        assertThat(globalBlockCounters.keySet(), containsInAnyOrder(cleanBlockA, cleanBlockB));
+        assertThat(globalBlockCounters.get(cleanBlockA), hasSize(1));
+        Measurements.BlockCounter blockCounterA = globalBlockCounters.get(cleanBlockA).iterator().next();
+        assertThat(blockCounterA.getCounter(), is(5));
+        assertThat(blockCounterA.getBlock(), is(mock));
+
+        assertThat(globalBlockCounters.get(cleanBlockB), hasSize(1));
+        Measurements.BlockCounter blockCounterB = globalBlockCounters.get(cleanBlockB).iterator().next();
+        assertThat(blockCounterB.getCounter(), is(2));
+        assertThat(blockCounterB.getBlock(), is(dirtyBlock));
+    }
+
+
+    @Test
+    public void testUpdateGlobalCountersHasTwoDirtyBlockSameCount() throws Exception {
+        //prepare
+        BlockWithData cleanBlockA = new BlockWithData(recordsFromCsv.subList(0, 4));
+        BlockWithData cleanBlockB = new BlockWithData(recordsFromCsv.subList(4, 8));
+        BlockWithData dirtyBlockA = new BlockWithData(recordsFromCsv.subList(2, 6));
+        BlockWithData dirtyBlockB = mock(BlockWithData.class);
+
+        Multimap<BlockWithData, Measurements.BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        globalBlockCounters.put(cleanBlockA, classUnderTest.new BlockCounter(mock(BlockWithData.class), 1));
+
+        Map<BlockWithData, Integer> localBlockCounters = Maps.newHashMap(ImmutableMap.of(cleanBlockA, 2, cleanBlockB, 2));
+
+        //execute
+        Whitebox.invokeMethod(classUnderTest, "updateGlobalCounters", dirtyBlockA, localBlockCounters, globalBlockCounters);
+        localBlockCounters = Maps.newHashMap(ImmutableMap.of(cleanBlockA, 2, cleanBlockB, 1));
+        Whitebox.invokeMethod(classUnderTest, "updateGlobalCounters", dirtyBlockB, localBlockCounters, globalBlockCounters);
+
+        //assertion
+        assertThat(globalBlockCounters.keySet(), containsInAnyOrder(cleanBlockA, cleanBlockB));
+
+        //assert there are two BlockCounters associated with cleanBlockA
+        assertThat(globalBlockCounters.get(cleanBlockA), hasSize(2));
+
+        Iterator<Measurements.BlockCounter> blockCounterAIterator = globalBlockCounters.get(cleanBlockA).iterator();
+        //assertion on the first blockCounter that should contain dirtyBlockA
+        Measurements.BlockCounter blockCounterA = blockCounterAIterator.next();
+        assertThat(blockCounterA.getBlock(), is(dirtyBlockA));
+        assertThat(blockCounterA.getCounter(), is(2));
+        //assertion on the first blockCounter that should contain dirtyBlockB
+        blockCounterA = blockCounterAIterator.next();
+        assertThat(blockCounterA.getBlock(), is(dirtyBlockB));
+        assertThat(blockCounterA.getCounter(), is(2));
+
+        assertThat(globalBlockCounters.get(cleanBlockB), hasSize(1));
+        Measurements.BlockCounter blockCounterB = globalBlockCounters.get(cleanBlockB).iterator().next();
+        assertThat(blockCounterB.getCounter(), is(2));
+        assertThat(blockCounterB.getBlock(), is(dirtyBlockA));
+    }
+
+    @Test
+    public void isTrueRepIdenticalToDirtyBlockRep_yes() throws Exception {
+        //prepare
+        Multimap<BlockWithData, Measurements.BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        BlockWithData cleanBlock = mock(BlockWithData.class);
+        Record realRep = mock(Record.class);
+        when(cleanBlock.getTrueRepresentative()).thenReturn(realRep);
+
+        BlockWithData dirtyBlock = mock(BlockWithData.class);
+        when(dirtyBlock.findBlockRepresentatives()).thenReturn(Maps.newHashMap(ImmutableMap.of(realRep, (float) 0.2)));
+        globalBlockCounters.put(cleanBlock, classUnderTest.new BlockCounter(dirtyBlock, 4));
+
+        //execution
+        boolean result = Whitebox.invokeMethod(classUnderTest, "isTrueRepIdenticalToDirtyBlockRep", globalBlockCounters, cleanBlock);
+
+        //assertion
+        assertThat(result, is(true));
+    }
+
+    @Test
+    public void isTrueRepIdenticalToDirtyBlockRep_dirtyBlockHasSeveralReps() throws Exception {
+        //prepare
+        Multimap<BlockWithData, Measurements.BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        BlockWithData cleanBlock = mock(BlockWithData.class);
+        Record realRep = mock(Record.class);
+        when(cleanBlock.getTrueRepresentative()).thenReturn(realRep);
+
+        BlockWithData dirtyBlock = mock(BlockWithData.class);
+        Map<Record, Float> dirtyRepresentatives = Maps.newHashMap(ImmutableMap.of(mock(Record.class), (float) 0.2, realRep, (float) 0.2));
+        when(dirtyBlock.findBlockRepresentatives()).thenReturn(dirtyRepresentatives);
+        globalBlockCounters.put(cleanBlock, classUnderTest.new BlockCounter(dirtyBlock, 4));
+
+        //execution
+        boolean result = Whitebox.invokeMethod(classUnderTest, "isTrueRepIdenticalToDirtyBlockRep", globalBlockCounters, cleanBlock);
+
+        //assertion
+        assertThat(result, is(true));
+    }
+
+    @Test
+    public void isTrueRepIdenticalToDirtyBlockRep_dirtyBlockNotContaingTrueRep() throws Exception {
+        //prepare
+        Multimap<BlockWithData, Measurements.BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        BlockWithData cleanBlock = mock(BlockWithData.class);
+        Record realRep = mock(Record.class);
+        when(cleanBlock.getTrueRepresentative()).thenReturn(realRep);
+
+        BlockWithData dirtyBlock = mock(BlockWithData.class);
+        globalBlockCounters.put(cleanBlock, classUnderTest.new BlockCounter(dirtyBlock, 4));
+
+        //execution
+        boolean result = Whitebox.invokeMethod(classUnderTest, "isTrueRepIdenticalToDirtyBlockRep", globalBlockCounters, cleanBlock);
+
+        //assertion
+        assertThat(result, is(false));
+    }
+
+    @Test
+    public void isTrueRepIdenticalToDirtyBlockRep_globalBlockCountersContainsSeveralDirtyBlocks() throws Exception {
+        //prepare
+        Multimap<BlockWithData, Measurements.BlockCounter> globalBlockCounters = ArrayListMultimap.create();
+        BlockWithData cleanBlock = mock(BlockWithData.class);
+        Record realRep = mock(Record.class);
+        when(cleanBlock.getTrueRepresentative()).thenReturn(realRep);
+
+        BlockWithData dirtyBlock = mock(BlockWithData.class);
+        BlockWithData dirtyBlockWithRep = mock(BlockWithData.class);
+        Map<Record, Float> dirtyRepresentatives = Maps.newHashMap(ImmutableMap.of(mock(Record.class), (float) 0.2, realRep, (float) 0.2));
+        when(dirtyBlockWithRep.findBlockRepresentatives()).thenReturn(dirtyRepresentatives);
+
+
+        globalBlockCounters.put(cleanBlock, classUnderTest.new BlockCounter(dirtyBlock, 5));
+        globalBlockCounters.put(cleanBlock, classUnderTest.new BlockCounter(dirtyBlockWithRep, 5));
+
+        //execution
+        boolean result = Whitebox.invokeMethod(classUnderTest, "isTrueRepIdenticalToDirtyBlockRep", globalBlockCounters, cleanBlock);
+
+        //assertion
+        assertThat(result, is(true));
+    }
+
+
 }

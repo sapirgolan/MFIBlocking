@@ -301,7 +301,7 @@ public class MeasurementsTest {
         DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(miller, convexBP, 1);
 
         //assert
-        assertThat(reductionContext.getDuplicatesRemoved(), is(1));
+        assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(1.0, 0.001));
         assertThat((double) reductionContext.getDupReductionPercentage(), closeTo(33.333333, 0.01));
         assertThat((double) reductionContext.getImprovementPercentage(), closeTo(100, 0.01));
     }
@@ -320,7 +320,7 @@ public class MeasurementsTest {
         DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(miller, convexBP, 1);
 
         //assert
-        assertThat(reductionContext.getDuplicatesRemoved(), is(0));
+        assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(0, 0.01));
         assertThat((double) reductionContext.getDupReductionPercentage(), closeTo(0, 0.01));
         assertThat((double) reductionContext.getImprovementPercentage(), closeTo(0, 0.01));
     }
@@ -347,7 +347,7 @@ public class MeasurementsTest {
         classUnderTest.representationDiff(source, other, reductionContext);
 
         //assertion
-        assertThat(reductionContext.getRepresentationDiff(), is(3));
+        assertThat((double) reductionContext.getRepresentationDiff(), closeTo(3, 0.01));
     }
 
     private void createMockRecords(Set<Record> set, int numberOfRecords) {

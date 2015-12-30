@@ -16,9 +16,9 @@ package il.ac.technion.ie.canopy.model;
  */
 public class DuplicateReductionContext {
     private final float improvementPercentage;
-    private final int duplicatesRemoved;
+    private final float duplicatesRemoved;
     private final float dupReductionPercentage;
-    private int representationDiff;
+    private float representationDiff;
     private double represntativesPower;
     private double wisdomCrowds;
 
@@ -28,11 +28,20 @@ public class DuplicateReductionContext {
         this.improvementPercentage = improvementPercentage;
     }
 
+    public DuplicateReductionContext(float improvementPercentage, float duplicatesRemoved, float dupReductionPercentage, float representationDiff, double represntativesPower, double wisdomCrowds) {
+        this.improvementPercentage = improvementPercentage;
+        this.duplicatesRemoved = duplicatesRemoved;
+        this.dupReductionPercentage = dupReductionPercentage;
+        this.representationDiff = representationDiff;
+        this.represntativesPower = represntativesPower;
+        this.wisdomCrowds = wisdomCrowds;
+    }
+
     public float getImprovementPercentage() {
         return improvementPercentage * 100;
     }
 
-    public int getDuplicatesRemoved() {
+    public float getDuplicatesRemoved() {
         return duplicatesRemoved;
     }
 
@@ -40,7 +49,7 @@ public class DuplicateReductionContext {
         return dupReductionPercentage * 100;
     }
 
-    public int getRepresentationDiff() {
+    public float getRepresentationDiff() {
         return representationDiff;
     }
 

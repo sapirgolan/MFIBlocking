@@ -8,7 +8,6 @@ import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.DatasetStatistics;
-import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.model.Record;
 
@@ -113,7 +112,7 @@ public class ParsingService {
         csvWriter.close();
     }
 
-    public void writeExperimentsMeasurements(Map<Integer, FebrlMeasuresContext> measures, File tempFile) {
+/*    public void writeExperimentsMeasurements(Map<Integer, FebrlMeasuresContext> measures, File tempFile) {
         CsvWriter csvWriter = dataParser.preparOutputFile(tempFile);
         csvWriter.writeHeaders(FEBERL_PARAMETER, AVERAGE_RANKED_VALUE, AVERAGE_MRR);
         for (Map.Entry<Integer, FebrlMeasuresContext> febrlMeasuresContextEntry : measures.entrySet()) {
@@ -123,7 +122,7 @@ public class ParsingService {
             csvWriter.writeValuesToRow();
         }
         csvWriter.close();
-    }
+    }*/
 
     private Double getMillerMRRValue(List<Double> mrrValues) {
         if (!mrrValues.isEmpty()) {
@@ -172,6 +171,11 @@ public class ParsingService {
         CsvWriter csvWriter = dataParser.preparOutputFile(file);
         csvWriter.writeHeaders("diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
                 "duplicatesRemoved", "improvementPercentage", "dupReductionPercentage");
+        writeDuplicateReductionContext(duplicateReductionContext, csvWriter);
+        csvWriter.close();
+    }
+
+    private void writeDuplicateReductionContext(DuplicateReductionContext duplicateReductionContext, CsvWriter csvWriter) {
         csvWriter.writeValue("diff of true representation vs found", duplicateReductionContext.getRepresentationDiff());
         csvWriter.writeValue("duplicatesRemoved", duplicateReductionContext.getDuplicatesRemoved());
         csvWriter.writeValue("improvementPercentage", duplicateReductionContext.getImprovementPercentage());
@@ -179,6 +183,16 @@ public class ParsingService {
         csvWriter.writeValue("Power of real representatives in soft clusters", duplicateReductionContext.getRepresntativesPower());
         csvWriter.writeValue("wisdom of the crowd", duplicateReductionContext.getWisdomCrowds());
         csvWriter.writeValuesToRow();
+    }
+
+    public void writeExperimentsMeasurements(Map<Integer, DuplicateReductionContext> map, File expResults) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
+        csvWriter.writeHeaders(FEBERL_PARAMETER, "diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
+                "duplicatesRemoved", "improvementPercentage", "dupReductionPercentage");
+        for (Map.Entry<Integer, DuplicateReductionContext> entry : map.entrySet()) {
+            csvWriter.writeValue(FEBERL_PARAMETER, entry.getKey());
+            this.writeDuplicateReductionContext(entry.getValue(), csvWriter);
+        }
         csvWriter.close();
     }
 }

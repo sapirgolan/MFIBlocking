@@ -12,7 +12,10 @@ import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.exception.NoValueExistsException;
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
-import il.ac.technion.ie.experiments.model.*;
+import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.ConvexBPContext;
+import il.ac.technion.ie.experiments.model.DatasetStatistics;
+import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import il.ac.technion.ie.experiments.parsers.UaiBuilder;
 import il.ac.technion.ie.experiments.service.*;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
@@ -33,7 +36,7 @@ import java.util.*;
 public class ExperimentRunner {
 
     static final Logger logger = Logger.getLogger(ExperimentRunner.class);
-    public static final int NUMBER_OF_EXPERIMENTS = 2;
+    public static final int NUMBER_OF_EXPERIMENTS = 10;
 
     private final FuzzyService fuzzyService;
     private ParsingService parsingService;
@@ -52,20 +55,18 @@ public class ExperimentRunner {
         canopyService = new CanopyService();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CanopyParametersException, InvalidSearchResultException {
         ArgumentsContext context = new ArgumentsContext(args).invoke();
         ExperimentRunner experimentRunner = new ExperimentRunner();
         if (context.size() == 1) {
-            //        experimentRunner.runSimpleExp(context.getPathToDataset());
-//            experimentRunner.runExperiments(context.getPathToDataset());
             try {
-                experimentRunner.runExperimentsWithCanopy(context.getPathToDataset());
+//                experimentRunner.runExperimentsWithCanopy(context.getPathToDataset());
+                experimentRunner.runFebrlExperiments(context.getPathToDataset());
             } catch (CanopyParametersException | InvalidSearchResultException e) {
                 logger.error("Failed to run Canopy experiment", e);
             }
         } else {
-            experimentRunner.findStatisticsOnDatasets(context.getPathToDataset());
-//            experimentRunner.runFebrlExperiments(context.getPathToDataset(), context.getThresholds());
+            experimentRunner.runFebrlExperiments(context.getPathToDataset());
         }
         System.exit(0);
     }
@@ -106,15 +107,25 @@ public class ExperimentRunner {
 
     public void runExperimentsWithCanopy(String datasetPath) throws CanopyParametersException, InvalidSearchResultException {
         List<BlockWithData> cleanBlocks = parsingService.parseDataset(datasetPath);
+        this.measurements = new Measurements(cleanBlocks.size());
+
+        DuplicateReductionContext reductionContext = canopyCoreExperiment(cleanBlocks);
+        if (reductionContext != null) {
+            saveConvexBPResultsToCsv(reductionContext);
+        }
+        return;
+    }
+
+    private DuplicateReductionContext canopyCoreExperiment(List<BlockWithData> cleanBlocks) throws CanopyParametersException, InvalidSearchResultException {
         List<Record> records = getRecordsFromBlcoks(cleanBlocks);
         Canopy canopy = new Canopy(records, 0.15, 0.05);
         canopy.initSearchEngine(new CanopyInteraction());
         List<CanopyCluster> canopies = canopy.createCanopies();
         List<BlockWithData> dirtyBlocks = canopyService.convertCanopiesToBlocks(canopies);
         logger.info("Converted " + dirtyBlocks.size() + " canopies to blocks. " + (canopies.size() - dirtyBlocks.size()) + " were of size 1 and therefore removed");
-        this.measurements = new Measurements(cleanBlocks.size());
         calculateMillerResults(dirtyBlocks);
         Multimap<Record, BlockWithData> millerRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
+        DuplicateReductionContext reductionContext = null;
         try {
             boolean convexBP = runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
             if (!convexBP) {
@@ -122,14 +133,13 @@ public class ExperimentRunner {
                 System.exit(1);
             }
             Multimap<Record, BlockWithData> convexBPRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
-            DuplicateReductionContext reductionContext = measurements.representativesDuplicateElimanation(
+            reductionContext = measurements.representativesDuplicateElimanation(
                     millerRepresentatives, convexBPRepresentatives, cleanBlocks.size());
             BiMap<Record, BlockWithData> trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
             measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
             measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
             measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(convexBPRepresentatives.values()), reductionContext);
 
-            saveConvexBPResultsToCsv(reductionContext);
         } catch (SizeNotEqualException e) {
             logger.error("Failed to create probabilities matrices for convexBP");
             e.printStackTrace();
@@ -142,7 +152,51 @@ public class ExperimentRunner {
         } catch (NoValueExistsException e) {
             logger.error("Failed to consume new probabilities", e);
         }
-        return;
+        return reductionContext;
+    }
+
+    private void runFebrlExperiments(String pathToDir) throws CanopyParametersException, InvalidSearchResultException {
+        Collection<File> datasets = exprimentsService.findDatasets(pathToDir, false);
+        Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = parseDatasetsToListsOfBlocks(datasets);
+        Map<Integer, DuplicateReductionContext> experimentsResults = new HashMap<>();
+
+        //for each dataset, the experiment NUMBER_OF_EXPERIMENTS
+        for (List<BlockWithData> cleanBlocks : datasetToFebrlParamMap.keySet()) {
+            List<DuplicateReductionContext> reductionContexts = new ArrayList<>();
+            for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) {
+                measurements = new Measurements(cleanBlocks.size());
+                logger.debug(String.format("Executing #%d out of %d experiments", i, NUMBER_OF_EXPERIMENTS));
+                DuplicateReductionContext reductionContext = this.canopyCoreExperiment(cleanBlocks);
+                reductionContexts.add(reductionContext);
+            }
+            DuplicateReductionContext avgReductionContext = avgAllReductionContext(reductionContexts);
+            experimentsResults.put(datasetToFebrlParamMap.get(cleanBlocks), avgReductionContext);
+        }
+        saveFebrlResultsToCsv(experimentsResults);
+
+    }
+
+    private DuplicateReductionContext avgAllReductionContext(List<DuplicateReductionContext> reductionContexts) {
+        float improvementPercentage = 0,
+                dupReductionPercentage = 0,
+                size = reductionContexts.size();
+        int duplicatesRemoved = 0,
+                representationDiff = 0;
+        double represntativesPower = 0,
+                wisdomCrowds = 0;
+
+        for (DuplicateReductionContext reductionContext : reductionContexts) {
+            improvementPercentage += reductionContext.getImprovementPercentage();
+            dupReductionPercentage += reductionContext.getDuplicatesRemoved();
+            duplicatesRemoved += reductionContext.getDuplicatesRemoved();
+            representationDiff += reductionContext.getRepresentationDiff();
+            represntativesPower += reductionContext.getRepresntativesPower();
+            wisdomCrowds += reductionContext.getWisdomCrowds();
+        }
+
+        return new DuplicateReductionContext(improvementPercentage / size, duplicatesRemoved / size,
+                dupReductionPercentage / size, representationDiff / size,
+                represntativesPower / size, wisdomCrowds / size);
     }
 
     private List<Record> getRecordsFromBlcoks(List<BlockWithData> cleanBlocks) {
@@ -198,7 +252,7 @@ public class ExperimentRunner {
         return false;
     }
 
-    private void runFebrlExperiments(String pathToDir, List<Double> thresholds) {
+/*    private void runFebrlExperiments(String pathToDir, List<Double> thresholds) {
         Collection<File> datasets = exprimentsService.findDatasets(pathToDir, false);
 
         Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = parseDatasetsToListsOfBlocks(datasets);
@@ -220,7 +274,7 @@ public class ExperimentRunner {
             saveFebrlResultsToCsv(febrlContext, threshold);
         }
 
-    }
+    }*/
 
     private void findStatisticsOnDatasets(String pathToDir) {
         Collection<File> datasets = exprimentsService.findDatasets(pathToDir, true);
@@ -257,7 +311,7 @@ public class ExperimentRunner {
                 List<BlockWithData> blocks = parsingService.parseDataset(dataset.getAbsolutePath());
                 listIntegerHashMap.put(blocks, febrlParamValue);
             } else {
-                logger.error("Failed to determine febrlParamValue, therefore will not process file named " + dataset.getAbsolutePath());
+                logger.error("Failed to determine Febrl ParamValue, therefore will not process file named " + dataset.getAbsolutePath());
             }
         }
         return listIntegerHashMap;
@@ -281,11 +335,21 @@ public class ExperimentRunner {
         }
     }
 
-    private void saveFebrlResultsToCsv(FebrlContext febrlContext, double threshold) {
+/*    private void saveFebrlResultsToCsv(FebrlContext febrlContext, double threshold) {
         File expResults = ExpFileUtils.createOutputFile("FebrlExpResults.csv");
         Map<Integer, FebrlMeasuresContext> measurments = febrlContext.getMeasurments(threshold);
         if (expResults != null) {
             parsingService.writeExperimentsMeasurements(measurments, expResults);
+        } else {
+            logger.warn("Failed to create file for measurements therefore no results are results will be given");
+        }
+    }*/
+
+    private void saveFebrlResultsToCsv(Map<Integer, DuplicateReductionContext> map) {
+        File expResults = ExpFileUtils.createOutputFile("CanopyExpResults.csv");
+        if (expResults != null) {
+            logger.info("saving results of ExperimentsWithCanopy");
+            parsingService.writeExperimentsMeasurements(map, expResults);
         } else {
             logger.warn("Failed to create file for measurements therefore no results are results will be given");
         }

@@ -32,8 +32,30 @@ public interface IMeasurements {
 
     FebrlMeasuresContext getFebrlMeasuresContext(Double threshold);
 
+    /**
+     * The method calculates the number of records that used to represent more than one block,
+     * but now represent only a single block.
+     * <p/>
+     * <br><br>
+     * Also know as measurement #4
+     *
+     * @param duplicates
+     * @param cleaned
+     * @param cleanGoal
+     * @return
+     */
     DuplicateReductionContext representativesDuplicateElimanation(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal);
 
+    /**
+     * This method calculates the number of records in @param source that were not present in @param other.
+     * The result is stored in @param reductionContext. <br><br>
+     * <p/>
+     * Also know as measurement #1
+     *
+     * @param source           source records, preferably the True representatives.
+     * @param other            records from other source, preferably the representatives that were found in blocks
+     * @param reductionContext context to store the result
+     */
     void representationDiff(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext);
 
     double calcPowerOfRep(final Map<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext);

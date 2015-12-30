@@ -69,25 +69,20 @@ public class FebrlExperiment extends CanopyExperiment {
     }
 
     private DuplicateReductionContext avgAllReductionContext(List<DuplicateReductionContext> reductionContexts) {
-        float improvementPercentage = 0,
-                dupReductionPercentage = 0,
-                size = reductionContexts.size();
+        float size = reductionContexts.size();
         int duplicatesRemoved = 0,
                 representationDiff = 0;
         double representativesPower = 0,
                 wisdomCrowds = 0;
 
         for (DuplicateReductionContext reductionContext : reductionContexts) {
-            improvementPercentage += reductionContext.getImprovementPercentage();
-            dupReductionPercentage += reductionContext.getDuplicatesRemoved();
             duplicatesRemoved += reductionContext.getDuplicatesRemoved();
             representationDiff += reductionContext.getRepresentationDiff();
             representativesPower += reductionContext.getRepresntativesPower();
             wisdomCrowds += reductionContext.getWisdomCrowds();
         }
 
-        return new DuplicateReductionContext(improvementPercentage / size, duplicatesRemoved / size,
-                dupReductionPercentage / size, representationDiff / size,
+        return new DuplicateReductionContext(duplicatesRemoved / size, representationDiff / size,
                 representativesPower / size, wisdomCrowds / size);
     }
 }

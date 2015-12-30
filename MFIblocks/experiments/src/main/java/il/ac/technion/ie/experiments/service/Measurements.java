@@ -132,19 +132,18 @@ public class Measurements implements IMeasurements {
     @Override
     public DuplicateReductionContext representativesDuplicateElimanation(
             Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanBlocksSize) {
-        logger.info("In 'dirtyBlocks', there are " + duplicates.keySet().size() + " representatives for " + cleanBlocksSize + " clean blocks");
-        logger.info("In 'cleanBlocks', there are " + cleaned.keySet().size() + " representatives for " + cleanBlocksSize + " clean blocks");
+        logger.info("In blocks that were created by Canopy and probs calculated by Miller, there are " + duplicates.keySet().size() + "unique representatives.");
+        logger.info("In blocks that were created by Canopy and probs calculated by ConvexBP, there are " + cleaned.keySet().size() + "unique representatives.");
         if (logger.isTraceEnabled()) {
             writeToLogInfo(duplicates);
             writeToLogInfo(cleaned);
         }
-        int millerSize = duplicates.size();
-        int convexSize = cleaned.size();
+        int millerSize = duplicates.keys().size() - duplicates.keySet().size();
+        int convexSize = cleaned.keys().size() - cleaned.keySet().size();
         int duplicatesRemoved = millerSize - convexSize;
-        float dupReductionPercentage = (millerSize - convexSize) / (float) millerSize;
-        float improvementPercentage = (millerSize - convexSize) / (float) cleanBlocksSize;
+        logger.info("Total of " + duplicatesRemoved + " records represent less blocks than before.");
 
-        return new DuplicateReductionContext(duplicatesRemoved, dupReductionPercentage, improvementPercentage);
+        return new DuplicateReductionContext(duplicatesRemoved);
     }
 
     @Override

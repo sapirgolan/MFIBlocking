@@ -7,46 +7,28 @@ package il.ac.technion.ie.canopy.model;
  * <ol>
  * <li>duplicatesRemoved - the number of representatives that used to represent several blocks but now represent a single block.
  * The value can be obtained by {@link #getDuplicatesRemoved()}</li>
- * <li>dupReductionPercentage - the ratio between the number of representatives removed and the number of duplicate representatives.
- * The value can be obtained by {@link #getDupReductionPercentage()} ()}</li>
- * <li>improvementPercentage - the ratio between the number of representatives removed and the number of real representatives.
- * The value can be obtained by {@link #getImprovementPercentage()} ()}</li>
  * </ol>
  * duplicatesRemoved
  */
 public class DuplicateReductionContext {
-    private final float improvementPercentage;
     private final float duplicatesRemoved;
-    private final float dupReductionPercentage;
     private float representationDiff;
     private double represntativesPower;
     private double wisdomCrowds;
 
-    public DuplicateReductionContext(int duplicatesRemoved, float dupReductionPercentage, float improvementPercentage) {
+    public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
-        this.dupReductionPercentage = dupReductionPercentage;
-        this.improvementPercentage = improvementPercentage;
     }
 
-    public DuplicateReductionContext(float improvementPercentage, float duplicatesRemoved, float dupReductionPercentage, float representationDiff, double represntativesPower, double wisdomCrowds) {
-        this.improvementPercentage = improvementPercentage;
+    public DuplicateReductionContext(float duplicatesRemoved, float representationDiff, double represntativesPower, double wisdomCrowds) {
         this.duplicatesRemoved = duplicatesRemoved;
-        this.dupReductionPercentage = dupReductionPercentage;
         this.representationDiff = representationDiff;
         this.represntativesPower = represntativesPower;
         this.wisdomCrowds = wisdomCrowds;
     }
 
-    public float getImprovementPercentage() {
-        return improvementPercentage * 100;
-    }
-
     public float getDuplicatesRemoved() {
         return duplicatesRemoved;
-    }
-
-    public float getDupReductionPercentage() {
-        return dupReductionPercentage * 100;
     }
 
     public float getRepresentationDiff() {

@@ -302,8 +302,6 @@ public class MeasurementsTest {
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(1.0, 0.001));
-        assertThat((double) reductionContext.getDupReductionPercentage(), closeTo(33.333333, 0.01));
-        assertThat((double) reductionContext.getImprovementPercentage(), closeTo(100, 0.01));
     }
 
     @Test
@@ -321,8 +319,6 @@ public class MeasurementsTest {
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(0, 0.01));
-        assertThat((double) reductionContext.getDupReductionPercentage(), closeTo(0, 0.01));
-        assertThat((double) reductionContext.getImprovementPercentage(), closeTo(0, 0.01));
     }
 
     @Test
@@ -341,7 +337,7 @@ public class MeasurementsTest {
         other.addAll(commonRecords);
         createMockRecords(other, 1);
 
-        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
         //execution
         classUnderTest.representationDiff(source, other, reductionContext);
@@ -367,7 +363,7 @@ public class MeasurementsTest {
         convexBPRepresentatives.put(trueRep, new BlockWithData(recordsFromCsv.subList(3, 6)));
         convexBPRepresentatives.put(recordsFromCsv.get(8), new BlockWithData(recordsFromCsv.subList(4, 9)));
 
-        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
         classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
@@ -388,7 +384,7 @@ public class MeasurementsTest {
         convexBPRepresentatives.put(trueRep, new BlockWithData(recordsFromCsv.subList(3, 6)));
         convexBPRepresentatives.put(recordsFromCsv.get(8), new BlockWithData(recordsFromCsv.subList(4, 9)));
 
-        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
         classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
@@ -410,7 +406,7 @@ public class MeasurementsTest {
         convexBPRepresentatives.put(recordsFromCsv.get(5), new BlockWithData(recordsFromCsv.subList(3, 7)));
         convexBPRepresentatives.put(recordsFromCsv.get(7), new BlockWithData(recordsFromCsv.subList(4, 9)));
 
-        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0, (float) 0, (float) 0);
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
         classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
@@ -443,7 +439,7 @@ public class MeasurementsTest {
         }
 
         //execution
-        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0, (float) 0.0, (float) 0.0));
+        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0));
 
         //assertion
         assertThat(wisdomCrowds, closeTo(0.25, 0.0001));
@@ -480,7 +476,7 @@ public class MeasurementsTest {
         }
 
         //execution
-        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0, (float) 0.0, (float) 0.0));
+        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0));
 
         //assertion
         assertThat(wisdomCrowds, closeTo(0.0, 0.0001));

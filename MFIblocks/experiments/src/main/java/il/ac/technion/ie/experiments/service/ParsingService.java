@@ -170,7 +170,7 @@ public class ParsingService {
     public void writeExperimentsMeasurements(DuplicateReductionContext duplicateReductionContext, File file) {
         CsvWriter csvWriter = dataParser.preparOutputFile(file);
         csvWriter.writeHeaders("diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
-                "duplicatesRemoved", "improvementPercentage", "dupReductionPercentage");
+                "duplicatesRemoved");
         writeDuplicateReductionContext(duplicateReductionContext, csvWriter);
         csvWriter.close();
     }
@@ -178,8 +178,6 @@ public class ParsingService {
     private void writeDuplicateReductionContext(DuplicateReductionContext duplicateReductionContext, CsvWriter csvWriter) {
         csvWriter.writeValue("diff of true representation vs found", duplicateReductionContext.getRepresentationDiff());
         csvWriter.writeValue("duplicatesRemoved", duplicateReductionContext.getDuplicatesRemoved());
-        csvWriter.writeValue("improvementPercentage", duplicateReductionContext.getImprovementPercentage());
-        csvWriter.writeValue("dupReductionPercentage", duplicateReductionContext.getDupReductionPercentage());
         csvWriter.writeValue("Power of real representatives in soft clusters", duplicateReductionContext.getRepresntativesPower());
         csvWriter.writeValue("wisdom of the crowd", duplicateReductionContext.getWisdomCrowds());
         csvWriter.writeValuesToRow();

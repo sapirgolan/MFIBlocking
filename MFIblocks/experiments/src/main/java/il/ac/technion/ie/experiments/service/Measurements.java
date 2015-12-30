@@ -132,8 +132,8 @@ public class Measurements implements IMeasurements {
     @Override
     public DuplicateReductionContext representativesDuplicateElimination(
             Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanBlocksSize) {
-        logger.info("In blocks that were created by Canopy and probs calculated by Miller, there are " + duplicates.keySet().size() + "unique representatives.");
-        logger.info("In blocks that were created by Canopy and probs calculated by ConvexBP, there are " + cleaned.keySet().size() + "unique representatives.");
+        logger.info("In blocks that were created by Canopy and probs calculated by Miller, there are " + duplicates.keySet().size() + " unique representatives.");
+        logger.info("In blocks that were created by Canopy and probs calculated by ConvexBP, there are " + cleaned.keySet().size() + " unique representatives.");
         if (logger.isTraceEnabled()) {
             writeToLogInfo(duplicates);
             writeToLogInfo(cleaned);

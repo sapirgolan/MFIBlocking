@@ -78,7 +78,7 @@ public class FebrlExperiment extends CanopyExperiment {
         for (DuplicateReductionContext reductionContext : reductionContexts) {
             duplicatesRemoved += reductionContext.getDuplicatesRemoved();
             representationDiff += reductionContext.getRepresentationDiff();
-            representativesPower += reductionContext.getRepresntativesPower();
+            representativesPower += reductionContext.getRepresentativesPower();
             wisdomCrowds += reductionContext.getWisdomCrowds();
         }
 

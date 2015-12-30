@@ -178,7 +178,7 @@ public class ParsingService {
     private void writeDuplicateReductionContext(DuplicateReductionContext duplicateReductionContext, CsvWriter csvWriter) {
         csvWriter.writeValue("diff of true representation vs found", duplicateReductionContext.getRepresentationDiff());
         csvWriter.writeValue("duplicatesRemoved", duplicateReductionContext.getDuplicatesRemoved());
-        csvWriter.writeValue("Power of real representatives in soft clusters", duplicateReductionContext.getRepresntativesPower());
+        csvWriter.writeValue("Power of real representatives in soft clusters", duplicateReductionContext.getRepresentativesPower());
         csvWriter.writeValue("wisdom of the crowd", duplicateReductionContext.getWisdomCrowds());
         csvWriter.writeValuesToRow();
     }

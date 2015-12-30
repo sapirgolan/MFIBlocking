@@ -73,7 +73,7 @@ public class CanopyExperiment extends AbstractExperiment {
                 System.exit(1);
             }
             Multimap<Record, BlockWithData> convexBPRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
-            reductionContext = measurements.representativesDuplicateElimanation(
+            reductionContext = measurements.representativesDuplicateElimination(
                     millerRepresentatives, convexBPRepresentatives, cleanBlocks.size());
             BiMap<Record, BlockWithData> trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
             measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);

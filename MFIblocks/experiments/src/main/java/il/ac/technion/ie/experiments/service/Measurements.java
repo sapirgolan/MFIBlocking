@@ -130,7 +130,7 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public DuplicateReductionContext representativesDuplicateElimanation(
+    public DuplicateReductionContext representativesDuplicateElimination(
             Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanBlocksSize) {
         logger.info("In blocks that were created by Canopy and probs calculated by Miller, there are " + duplicates.keySet().size() + "unique representatives.");
         logger.info("In blocks that were created by Canopy and probs calculated by ConvexBP, there are " + cleaned.keySet().size() + "unique representatives.");
@@ -180,7 +180,7 @@ public class Measurements implements IMeasurements {
         }
         double power = sumOfPowerOfRecord / numberOfRecords;
         logger.info("The total average power of all representatives is: " + power);
-        reductionContext.setRepresntativesPower(power);
+        reductionContext.setRepresentativesPower(power);
         return power;
     }
 

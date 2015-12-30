@@ -298,7 +298,7 @@ public class MeasurementsTest {
         convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(miller, convexBP, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP, 1);
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(1.0, 0.001));
@@ -315,7 +315,7 @@ public class MeasurementsTest {
         convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimanation(miller, convexBP, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP, 1);
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(0, 0.01));
@@ -368,7 +368,7 @@ public class MeasurementsTest {
         classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
         assertThat(logging.getAllLogsAbove(Level.WARN), empty());
-        assertThat(reductionContext.getRepresntativesPower(), closeTo(0.366666667, 0.0001));
+        assertThat(reductionContext.getRepresentativesPower(), closeTo(0.366666667, 0.0001));
     }
 
     @Test
@@ -389,7 +389,7 @@ public class MeasurementsTest {
         classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
         assertThat(logging.getAllLogsAbove(Level.WARN), empty());
-        assertThat(reductionContext.getRepresntativesPower(), closeTo(0.333333, 0.0001));
+        assertThat(reductionContext.getRepresentativesPower(), closeTo(0.333333, 0.0001));
     }
 
     @Test
@@ -411,7 +411,7 @@ public class MeasurementsTest {
         classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
 
         assertThat(logging.getAllLogsAbove(Level.WARN), empty());
-        assertThat(reductionContext.getRepresntativesPower(), closeTo(0.58333333, 0.0001));
+        assertThat(reductionContext.getRepresentativesPower(), closeTo(0.58333333, 0.0001));
     }
 
     @Test

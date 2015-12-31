@@ -47,6 +47,7 @@ public class ExpFileUtils {
             }
         } catch (IOException e) {
             logger.error("Failed to create file for measurements of Experiment", e);
+            return ExpFileUtils.createOutputFile(filename + System.nanoTime());
         }
         return expResults;
     }

@@ -1,5 +1,7 @@
 package il.ac.technion.ie.experiments.experimentRunners;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
@@ -21,45 +23,51 @@ public class FebrlExperiment extends CanopyExperiment {
 
     @Override
     public void runExperiments(String pathToDatasetFile) {
-        Collection<File> datasets = exprimentsService.findDatasets(pathToDatasetFile, false);
-        Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = parseDatasetsToListsOfBlocks(datasets);
-        Map<Integer, DuplicateReductionContext> experimentsResults = new HashMap<>();
+        Collection<File> datasets = exprimentsService.findDatasets(pathToDatasetFile, true);
+        Table<String, List<BlockWithData>, Integer> dirToDatasetToFebrlParamTable = parseDatasetsToListsOfBlocks(datasets);
 
         //for each dataset, the experiment NUMBER_OF_EXPERIMENTS
-        for (List<BlockWithData> cleanBlocks : datasetToFebrlParamMap.keySet()) {
-            List<DuplicateReductionContext> reductionContexts = new ArrayList<>();
-            for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) {
-                measurements = new Measurements(cleanBlocks.size());
-                logger.debug(String.format("Executing #%d out of %d experiments", i, NUMBER_OF_EXPERIMENTS));
-                try {
-                    DuplicateReductionContext reductionContext = super.canopyCoreExperiment(cleanBlocks);
-                    reductionContexts.add(reductionContext);
-                } catch (InvalidSearchResultException | CanopyParametersException e) {
-                    logger.error("Failed to run single canopy experiment", e);
+        Map<String, Map<List<BlockWithData>, Integer>> map = dirToDatasetToFebrlParamTable.rowMap();
+        for (Map.Entry<String, Map<List<BlockWithData>, Integer>> entry : map.entrySet()) {
+            Map<Integer, DuplicateReductionContext> experimentsResults = new HashMap<>();
+            Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = entry.getValue();
+            for (List<BlockWithData> cleanBlocks : datasetToFebrlParamMap.keySet()) {
+                List<DuplicateReductionContext> reductionContexts = new ArrayList<>();
+                for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) {
+                    measurements = new Measurements(cleanBlocks.size());
+                    logger.debug(String.format("Executing #%d out of %d experiments", i, NUMBER_OF_EXPERIMENTS));
+                    try {
+                        DuplicateReductionContext reductionContext = super.canopyCoreExperiment(cleanBlocks);
+                        reductionContexts.add(reductionContext);
+                    } catch (InvalidSearchResultException | CanopyParametersException e) {
+                        logger.error("Failed to run single canopy experiment", e);
+                    }
                 }
+                DuplicateReductionContext avgReductionContext = avgAllReductionContext(reductionContexts);
+                experimentsResults.put(datasetToFebrlParamMap.get(cleanBlocks), avgReductionContext);
             }
-            DuplicateReductionContext avgReductionContext = avgAllReductionContext(reductionContexts);
-            experimentsResults.put(datasetToFebrlParamMap.get(cleanBlocks), avgReductionContext);
+            saveFebrlResultsToCsv(experimentsResults, entry.getKey());
         }
-        saveFebrlResultsToCsv(experimentsResults);
     }
 
-    private Map<List<BlockWithData>, Integer> parseDatasetsToListsOfBlocks(Collection<File> datasets) {
-        Map<List<BlockWithData>, Integer> listIntegerHashMap = new HashMap<>();
+    private Table<String, List<BlockWithData>, Integer> parseDatasetsToListsOfBlocks(Collection<File> datasets) {
+        Table<String, List<BlockWithData>, Integer> filesTable = HashBasedTable.create();
+//        Map<List<BlockWithData>, Integer> listIntegerHashMap = new HashMap<>();
         for (File dataset : datasets) {
             Integer febrlParamValue = exprimentsService.getParameterValue(dataset);
             if (febrlParamValue != null) {
                 List<BlockWithData> blocks = parsingService.parseDataset(dataset.getAbsolutePath());
-                listIntegerHashMap.put(blocks, febrlParamValue);
+//                listIntegerHashMap.put(blocks, febrlParamValue);
+                filesTable.put(dataset.getParentFile().getName(), blocks, febrlParamValue);
             } else {
                 logger.error("Failed to determine Febrl ParamValue, therefore will not process file named " + dataset.getAbsolutePath());
             }
         }
-        return listIntegerHashMap;
+        return filesTable;
     }
 
-    private void saveFebrlResultsToCsv(Map<Integer, DuplicateReductionContext> map) {
-        File expResults = ExpFileUtils.createOutputFile("CanopyExpResults.csv");
+    private void saveFebrlResultsToCsv(Map<Integer, DuplicateReductionContext> map, String dirName) {
+        File expResults = ExpFileUtils.createOutputFile(dirName + "-CanopyExpResults.csv");
         if (expResults != null) {
             logger.info("saving results of ExperimentsWithCanopy");
             parsingService.writeExperimentsMeasurements(map, expResults);

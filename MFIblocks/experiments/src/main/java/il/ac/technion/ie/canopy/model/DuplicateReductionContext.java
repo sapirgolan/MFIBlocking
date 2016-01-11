@@ -14,7 +14,7 @@ package il.ac.technion.ie.canopy.model;
  */
 public class DuplicateReductionContext {
     private final float duplicatesRemoved;
-    private float representationDiff;
+    private double representationDiff;
     private double representativesPower;
     private double wisdomCrowds;
     private double numberOfDirtyBlocks;
@@ -34,11 +34,11 @@ public class DuplicateReductionContext {
         return duplicatesRemoved;
     }
 
-    public float getRepresentationDiff() {
+    public double getRepresentationDiff() {
         return representationDiff;
     }
 
-    public void setRepresentationDiff(int representationDiff) {
+    public void setRepresentationDiff(double representationDiff) {
         this.representationDiff = representationDiff;
     }
 

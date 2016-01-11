@@ -151,7 +151,7 @@ public class Measurements implements IMeasurements {
         Set<Record> sourceCopy = new HashSet<>(source);
         Set<Record> otherCopy = new HashSet<>(other);
         sourceCopy.removeAll(otherCopy);
-        reductionContext.setRepresentationDiff(sourceCopy.size());
+        reductionContext.setRepresentationDiff((double) sourceCopy.size() / source.size());
     }
 
     @Override

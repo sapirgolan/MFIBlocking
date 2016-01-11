@@ -47,8 +47,10 @@ public interface IMeasurements {
     DuplicateReductionContext representativesDuplicateElimination(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal);
 
     /**
-     * This method calculates the number of records in @param source that were not present in @param other.
-     * The result is stored in @param reductionContext. <br><br>
+     * This method finds the number of records in @param source that were not present in @param other.
+     * It then calculate the percentage of those records from the total number of records in @param source.
+     * The result is stored in @param reductionContext.
+     * <br><br>
      * Also know as measurement #1
      *
      * @param source           source records, preferably the True representatives.

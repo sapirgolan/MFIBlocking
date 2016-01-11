@@ -41,10 +41,9 @@ public interface IMeasurements {
      *
      * @param duplicates
      * @param cleaned
-     * @param cleanGoal
      * @return
      */
-    DuplicateReductionContext representativesDuplicateElimination(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal);
+    DuplicateReductionContext representativesDuplicateElimination(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned);
 
     /**
      * This method finds the number of records in @param source that were not present in @param other.

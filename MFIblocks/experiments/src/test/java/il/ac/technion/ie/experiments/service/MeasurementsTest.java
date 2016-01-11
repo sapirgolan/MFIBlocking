@@ -298,7 +298,7 @@ public class MeasurementsTest {
         convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP);
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(1.0, 0.001));
@@ -315,7 +315,7 @@ public class MeasurementsTest {
         convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP);
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(0, 0.01));
@@ -343,7 +343,7 @@ public class MeasurementsTest {
         classUnderTest.representationDiff(source, other, reductionContext);
 
         //assertion
-        assertThat((double) reductionContext.getRepresentationDiff(), closeTo(3, 0.01));
+        assertThat(reductionContext.getRepresentationDiff(), closeTo(3.0 / 8, 0.01));
     }
 
     private void createMockRecords(Set<Record> set, int numberOfRecords) {

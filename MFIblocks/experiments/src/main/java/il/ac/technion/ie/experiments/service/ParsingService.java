@@ -180,13 +180,14 @@ public class ParsingService {
         csvWriter.writeValue("duplicatesRemoved", duplicateReductionContext.getDuplicatesRemoved());
         csvWriter.writeValue("Power of real representatives in soft clusters", duplicateReductionContext.getRepresentativesPower());
         csvWriter.writeValue("wisdom of the crowd", duplicateReductionContext.getWisdomCrowds());
+        csvWriter.writeValue("Average block size", duplicateReductionContext.getNumberOfDirtyBlocks());
         csvWriter.writeValuesToRow();
     }
 
     public void writeExperimentsMeasurements(Map<Integer, DuplicateReductionContext> map, File expResults) {
         CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
         csvWriter.writeHeaders(FEBERL_PARAMETER, "diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
-                "duplicatesRemoved");
+                "duplicatesRemoved", "Average block size");
         for (Map.Entry<Integer, DuplicateReductionContext> entry : map.entrySet()) {
             csvWriter.writeValue(FEBERL_PARAMETER, entry.getKey());
             this.writeDuplicateReductionContext(entry.getValue(), csvWriter);

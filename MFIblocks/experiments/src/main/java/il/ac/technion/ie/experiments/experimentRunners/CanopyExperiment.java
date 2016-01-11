@@ -79,6 +79,7 @@ public class CanopyExperiment extends AbstractExperiment {
             measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
             measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
             measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(convexBPRepresentatives.values()), reductionContext);
+            reductionContext.setNumberOfDirtyBlocks(dirtyBlocks.size());
 
         } catch (SizeNotEqualException e) {
             logger.error("Failed to create probabilities matrices for convexBP");

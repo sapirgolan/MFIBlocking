@@ -17,6 +17,7 @@ public class DuplicateReductionContext {
     private float representationDiff;
     private double representativesPower;
     private double wisdomCrowds;
+    private double numberOfDirtyBlocks;
 
     public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -55,5 +56,13 @@ public class DuplicateReductionContext {
 
     public double getWisdomCrowds() {
         return wisdomCrowds;
+    }
+
+    public void setNumberOfDirtyBlocks(double size) {
+        this.numberOfDirtyBlocks = size;
+    }
+
+    public double getNumberOfDirtyBlocks() {
+        return numberOfDirtyBlocks;
     }
 }

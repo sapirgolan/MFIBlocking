@@ -28,12 +28,12 @@ public class FebrlExperiment extends CanopyExperiment {
 
         //for each dataset, the experiment NUMBER_OF_EXPERIMENTS
         Map<String, Map<List<BlockWithData>, Integer>> map = dirToDatasetToFebrlParamTable.rowMap();
-        for (Map.Entry<String, Map<List<BlockWithData>, Integer>> entry : map.entrySet()) {
+        for (Map.Entry<String, Map<List<BlockWithData>, Integer>> entry : map.entrySet()) { //each Febrl parameter
             Map<Integer, DuplicateReductionContext> experimentsResults = new HashMap<>();
             Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = entry.getValue();
-            for (List<BlockWithData> cleanBlocks : datasetToFebrlParamMap.keySet()) {
+            for (List<BlockWithData> cleanBlocks : datasetToFebrlParamMap.keySet()) { //for each dataset
                 List<DuplicateReductionContext> reductionContexts = new ArrayList<>();
-                for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) {
+                for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) { //repeat experiment several times
                     measurements = new Measurements(cleanBlocks.size());
                     logger.debug(String.format("Executing #%d out of %d experiments", i, NUMBER_OF_EXPERIMENTS));
                     try {
@@ -81,16 +81,20 @@ public class FebrlExperiment extends CanopyExperiment {
         int duplicatesRemoved = 0,
                 representationDiff = 0;
         double representativesPower = 0,
-                wisdomCrowds = 0;
+                wisdomCrowds = 0,
+                numberOfDirtyBlocks = 0;
 
         for (DuplicateReductionContext reductionContext : reductionContexts) {
             duplicatesRemoved += reductionContext.getDuplicatesRemoved();
             representationDiff += reductionContext.getRepresentationDiff();
             representativesPower += reductionContext.getRepresentativesPower();
             wisdomCrowds += reductionContext.getWisdomCrowds();
+            numberOfDirtyBlocks += reductionContext.getNumberOfDirtyBlocks();
         }
-
-        return new DuplicateReductionContext(duplicatesRemoved / size, representationDiff / size,
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(duplicatesRemoved / size, representationDiff / size,
                 representativesPower / size, wisdomCrowds / size);
+        reductionContext.setNumberOfDirtyBlocks(numberOfDirtyBlocks / size);
+
+        return reductionContext;
     }
 }

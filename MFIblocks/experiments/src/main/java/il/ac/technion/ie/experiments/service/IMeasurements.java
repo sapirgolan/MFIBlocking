@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
@@ -44,6 +45,19 @@ public interface IMeasurements {
      * @return
      */
     DuplicateReductionContext representativesDuplicateElimination(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned);
+
+    /**
+     * This method is an extension of {@link il.ac.technion.ie.experiments.service.IMeasurements#representativesDuplicateElimination(com.google.common.collect.Multimap, com.google.common.collect.Multimap)}.
+     * It finds out how many records that represents more than one block are also real representatives.
+     * <br><br>
+     * Also know as measurement #4 extension
+     *
+     * @param duplicates
+     * @param cleaned
+     * @param trueRepsMap
+     * @return
+     */
+    double duplicatesRealRepresentatives(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, BiMap<Record, BlockWithData> trueRepsMap);
 
     /**
      * This method finds the number of records in @param source that were not present in @param other.

@@ -1,8 +1,6 @@
 package il.ac.technion.ie.experiments.service;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
@@ -144,6 +142,27 @@ public class Measurements implements IMeasurements {
         logger.info("Total of " + duplicatesRemoved + " records represent less blocks than before.");
 
         return new DuplicateReductionContext(duplicatesRemoved);
+    }
+
+    @Override
+    public double duplicatesRealRepresentatives(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, BiMap<Record, BlockWithData> trueRepsMap) {
+        Set<Record> duplicateRecordsWhoRepresentMoreThanOneBlock = recordsWhoRepresentMoreThanOneBlock(duplicates);
+        Set<Record> cleanRecordsWhoRepresentMoreThanOneBlock = recordsWhoRepresentMoreThanOneBlock(cleaned);
+        duplicateRecordsWhoRepresentMoreThanOneBlock.removeAll(cleanRecordsWhoRepresentMoreThanOneBlock);
+
+        Set<Record> trueRepresentatives = trueRepsMap.keySet();
+        Sets.SetView<Record> intersection = Sets.intersection(trueRepresentatives, duplicateRecordsWhoRepresentMoreThanOneBlock);
+
+
+        return intersection.size() / (double) duplicateRecordsWhoRepresentMoreThanOneBlock.size();
+    }
+
+    private Set<Record> recordsWhoRepresentMoreThanOneBlock(Multimap<Record, BlockWithData> duplicates) {
+        Multiset<Record> millerKeyMultiset = HashMultiset.create(duplicates.keys());
+        Set<Record> millerKeySet = new HashSet<>(duplicates.keySet());
+
+        Multisets.removeOccurrences(millerKeyMultiset, millerKeySet);
+        return millerKeyMultiset.elementSet();
     }
 
     @Override

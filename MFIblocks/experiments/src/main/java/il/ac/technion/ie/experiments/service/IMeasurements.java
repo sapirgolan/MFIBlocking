@@ -100,4 +100,6 @@ public interface IMeasurements {
      * @return the calculated value
      */
     double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
+
+    void calcAverageBlockSize(List<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
 }

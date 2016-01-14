@@ -749,6 +749,24 @@ public class MeasurementsTest {
         assertThat(duplicatesRealRepresentatives, closeTo(0.5, 0.00001));
     }
 
+    @Test
+    public void duplicatesRealRepresentatives_duplicateRecordsWhoRepresentMoreThanOneBlockIsZero() throws Exception {
+        List<Record> records = generateRecords(10);
+        List<BlockWithData> blocks = generateBlocks(10);
+        Multimap<Record, BlockWithData> duplicates = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> cleaned = ArrayListMultimap.create();
+        BiMap<Record, BlockWithData> trueReps = HashBiMap.create();
+
+        duplicates.putAll(records.get(1), Lists.newArrayList(blocks.get(1)));
+        cleaned.putAll(records.get(1), Lists.newArrayList(blocks.get(1)));
+        trueReps.put(records.get(1), blocks.get(1));
+
+        // execute your test
+        double duplicatesRealRepresentatives = classUnderTest.duplicatesRealRepresentatives(duplicates, cleaned, trueReps);
+        assertThat(duplicatesRealRepresentatives, closeTo(0.0, 0.00001));
+
+    }
+
     private List<BlockWithData> generateBlocks(int size) {
         List<BlockWithData> records = new ArrayList<>();
         for (int i = 0; i < size; i++) {

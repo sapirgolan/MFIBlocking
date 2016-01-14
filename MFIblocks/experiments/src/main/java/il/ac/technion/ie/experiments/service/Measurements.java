@@ -153,7 +153,9 @@ public class Measurements implements IMeasurements {
         Set<Record> trueRepresentatives = trueRepsMap.keySet();
         Sets.SetView<Record> intersection = Sets.intersection(trueRepresentatives, duplicateRecordsWhoRepresentMoreThanOneBlock);
 
-
+        if (duplicateRecordsWhoRepresentMoreThanOneBlock.size() == 0) {
+            return 0;
+        }
         return intersection.size() / (double) duplicateRecordsWhoRepresentMoreThanOneBlock.size();
     }
 
@@ -170,7 +172,7 @@ public class Measurements implements IMeasurements {
         Set<Record> sourceCopy = new HashSet<>(source);
         Set<Record> otherCopy = new HashSet<>(other);
         sourceCopy.removeAll(otherCopy);
-        reductionContext.setRepresentationDiff((double) sourceCopy.size() / source.size());
+        reductionContext.setRepresentationDiff(sourceCopy.size());
     }
 
     @Override
@@ -224,6 +226,16 @@ public class Measurements implements IMeasurements {
         double wisdomCrowds = representativesIdentical / (double) cleanBlocks.size();
         reductionContext.setWisdomCrowds(wisdomCrowds);
         return wisdomCrowds;
+    }
+
+    @Override
+    public void calcAverageBlockSize(List<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext) {
+        double size = 0;
+        for (BlockWithData dirtyBlock : dirtyBlocks) {
+            size += dirtyBlock.size();
+        }
+        size = (size / dirtyBlocks.size());
+        reductionContext.setAverageBlockSize(size);
     }
 
     private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {

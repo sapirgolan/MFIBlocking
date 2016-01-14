@@ -19,7 +19,7 @@ import java.util.*;
 public class FebrlExperiment extends CanopyExperiment {
 
     private static final Logger logger = Logger.getLogger(FebrlExperiment.class);
-    private static final int NUMBER_OF_EXPERIMENTS = 5;
+    private static final int NUMBER_OF_EXPERIMENTS = 3;
 
     @Override
     public void runExperiments(String pathToDatasetFile) {
@@ -82,7 +82,9 @@ public class FebrlExperiment extends CanopyExperiment {
                 representationDiff = 0;
         double representativesPower = 0,
                 wisdomCrowds = 0,
-                numberOfDirtyBlocks = 0;
+                numberOfDirtyBlocks = 0,
+                averageBlockSize = 0,
+                duplicatesRealRepresentatives = 0;
 
         for (DuplicateReductionContext reductionContext : reductionContexts) {
             duplicatesRemoved += reductionContext.getDuplicatesRemoved();
@@ -90,10 +92,15 @@ public class FebrlExperiment extends CanopyExperiment {
             representativesPower += reductionContext.getRepresentativesPower();
             wisdomCrowds += reductionContext.getWisdomCrowds();
             numberOfDirtyBlocks += reductionContext.getNumberOfDirtyBlocks();
+            duplicatesRealRepresentatives += reductionContext.getDuplicatesRealRepresentatives();
+            averageBlockSize += reductionContext.getAverageBlockSize();
         }
         DuplicateReductionContext reductionContext = new DuplicateReductionContext(duplicatesRemoved / size, representationDiff / size,
                 representativesPower / size, wisdomCrowds / size);
+
         reductionContext.setNumberOfDirtyBlocks(numberOfDirtyBlocks / size);
+        reductionContext.setDuplicatesRealRepresentatives(duplicatesRealRepresentatives / size);
+        reductionContext.setAverageBlockSize(averageBlockSize / size);
 
         return reductionContext;
     }

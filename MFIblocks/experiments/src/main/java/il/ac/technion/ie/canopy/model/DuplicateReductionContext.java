@@ -18,6 +18,8 @@ public class DuplicateReductionContext {
     private double representativesPower;
     private double wisdomCrowds;
     private double numberOfDirtyBlocks;
+    private double duplicatesRealRepresentatives;
+    private double averageBlockSize;
 
     public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -64,5 +66,21 @@ public class DuplicateReductionContext {
 
     public double getNumberOfDirtyBlocks() {
         return numberOfDirtyBlocks;
+    }
+
+    public void setDuplicatesRealRepresentatives(double duplicatesRealRepresentatives) {
+        this.duplicatesRealRepresentatives = duplicatesRealRepresentatives;
+    }
+
+    public double getDuplicatesRealRepresentatives() {
+        return duplicatesRealRepresentatives;
+    }
+
+    public double getAverageBlockSize() {
+        return averageBlockSize;
+    }
+
+    public void setAverageBlockSize(double averageBlockSize) {
+        this.averageBlockSize = averageBlockSize;
     }
 }

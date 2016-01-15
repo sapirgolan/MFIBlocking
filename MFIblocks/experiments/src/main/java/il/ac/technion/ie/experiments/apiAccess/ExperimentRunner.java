@@ -17,6 +17,7 @@ public class ExperimentRunner {
         ArgumentsContext context = new ArgumentsContext(args).invoke();
 
         AbstractExperiment experiment = new FebrlExperiment();
+        logger.info("Starting an experiment");
         experiment.runExperiments(context.getPathToDataset());
         System.exit(0);
     }

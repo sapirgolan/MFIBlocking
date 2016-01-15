@@ -23,7 +23,9 @@ public class FebrlExperiment extends CanopyExperiment {
 
     @Override
     public void runExperiments(String pathToDatasetFile) {
+        logger.info("Starting Febrl Experiment");
         Collection<File> datasets = exprimentsService.findDatasets(pathToDatasetFile, true);
+        logger.info(String.format("There're %d under experiment", datasets.size()));
         Table<String, List<BlockWithData>, Integer> dirToDatasetToFebrlParamTable = parseDatasetsToListsOfBlocks(datasets);
 
         //for each dataset, the experiment NUMBER_OF_EXPERIMENTS
@@ -52,12 +54,11 @@ public class FebrlExperiment extends CanopyExperiment {
 
     private Table<String, List<BlockWithData>, Integer> parseDatasetsToListsOfBlocks(Collection<File> datasets) {
         Table<String, List<BlockWithData>, Integer> filesTable = HashBasedTable.create();
-//        Map<List<BlockWithData>, Integer> listIntegerHashMap = new HashMap<>();
         for (File dataset : datasets) {
             Integer febrlParamValue = exprimentsService.getParameterValue(dataset);
             if (febrlParamValue != null) {
+                logger.debug("Parsing dataset - '" + dataset.getAbsolutePath() + "'");
                 List<BlockWithData> blocks = parsingService.parseDataset(dataset.getAbsolutePath());
-//                listIntegerHashMap.put(blocks, febrlParamValue);
                 filesTable.put(dataset.getParentFile().getName(), blocks, febrlParamValue);
             } else {
                 logger.error("Failed to determine Febrl ParamValue, therefore will not process file named " + dataset.getAbsolutePath());

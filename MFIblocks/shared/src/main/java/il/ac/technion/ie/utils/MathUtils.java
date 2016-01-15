@@ -1,13 +1,10 @@
 package il.ac.technion.ie.utils;
 
 import com.google.common.base.Splitter;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,10 +32,10 @@ public class MathUtils {
     public static List<Integer> getPrimeNumbers(int howManyNumbers) {
         if (primeNumbers == null) {
             primeNumbers = new ArrayList<>();
-            URL resourceUrl = MathUtils.class.getResource("/primeNumbers.txt");
+
+            ClassLoader classLoader = MathUtils.class.getClassLoader();
             try {
-                File file = new File(resourceUrl.toURI());
-                String fileToString = FileUtils.readFileToString(file);
+                String fileToString = IOUtils.toString(classLoader.getResourceAsStream("primeNumbers.txt"));
                 List<String> primeNumbersStr = Splitter.on(' ').trimResults().omitEmptyStrings().splitToList(fileToString);
                 for (String primeNumberStr : primeNumbersStr) {
                     try {
@@ -48,7 +45,7 @@ public class MathUtils {
                         logger.error("Failed to parse " + primeNumberStr + " to integer", e);
                     }
                 }
-            } catch (URISyntaxException | IOException e) {
+            } catch (IOException e) {
                 logger.error("Failed to read file of prime numbers", e);
                 return null;
             }

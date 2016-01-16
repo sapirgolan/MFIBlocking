@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
@@ -41,14 +42,28 @@ public interface IMeasurements {
      *
      * @param duplicates
      * @param cleaned
-     * @param cleanGoal
      * @return
      */
-    DuplicateReductionContext representativesDuplicateElimination(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanGoal);
+    DuplicateReductionContext representativesDuplicateElimination(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned);
 
     /**
-     * This method calculates the number of records in @param source that were not present in @param other.
-     * The result is stored in @param reductionContext. <br><br>
+     * This method is an extension of {@link il.ac.technion.ie.experiments.service.IMeasurements#representativesDuplicateElimination(com.google.common.collect.Multimap, com.google.common.collect.Multimap)}.
+     * It finds out how many records that represents more than one block are also real representatives.
+     * <br><br>
+     * Also know as measurement #4 extension
+     *
+     * @param duplicates
+     * @param cleaned
+     * @param trueRepsMap
+     * @return
+     */
+    double duplicatesRealRepresentatives(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, BiMap<Record, BlockWithData> trueRepsMap);
+
+    /**
+     * This method finds the number of records in @param source that were not present in @param other.
+     * It then calculate the percentage of those records from the total number of records in @param source.
+     * The result is stored in @param reductionContext.
+     * <br><br>
      * Also know as measurement #1
      *
      * @param source           source records, preferably the True representatives.
@@ -85,4 +100,6 @@ public interface IMeasurements {
      * @return the calculated value
      */
     double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
+
+    void calcAverageBlockSize(List<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
 }

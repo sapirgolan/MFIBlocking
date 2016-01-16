@@ -298,7 +298,7 @@ public class MeasurementsTest {
         convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP);
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(1.0, 0.001));
@@ -315,7 +315,7 @@ public class MeasurementsTest {
         convexBP.putAll(representative, Lists.newArrayList(mock(BlockWithData.class), mock(BlockWithData.class)));
 
         //execute
-        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP, 1);
+        DuplicateReductionContext reductionContext = classUnderTest.representativesDuplicateElimination(miller, convexBP);
 
         //assert
         assertThat((double) reductionContext.getDuplicatesRemoved(), closeTo(0, 0.01));
@@ -343,7 +343,7 @@ public class MeasurementsTest {
         classUnderTest.representationDiff(source, other, reductionContext);
 
         //assertion
-        assertThat((double) reductionContext.getRepresentationDiff(), closeTo(3, 0.01));
+        assertThat(reductionContext.getRepresentationDiff(), closeTo(3.0 / 8, 0.01));
     }
 
     private void createMockRecords(Set<Record> set, int numberOfRecords) {
@@ -716,5 +716,70 @@ public class MeasurementsTest {
         assertThat(result, is(true));
     }
 
+    @Test
+    public void duplicatesRealRepresentatives() throws Exception {
+        //prepare
+        List<Record> records = generateRecords(10);
+        List<BlockWithData> blocks = generateBlocks(10);
+        Multimap<Record, BlockWithData> duplicates = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> cleaned = ArrayListMultimap.create();
+        BiMap<Record, BlockWithData> trueReps = HashBiMap.create();
 
+        duplicates.putAll(records.get(0), Lists.newArrayList(blocks.get(0), blocks.get(1)));
+        duplicates.putAll(records.get(1), Lists.newArrayList(blocks.get(1)));
+        duplicates.putAll(records.get(2), Lists.newArrayList(blocks.get(1), blocks.get(2), blocks.get(0)));
+        duplicates.putAll(records.get(3), Lists.newArrayList(blocks.get(3), blocks.get(4), blocks.get(5)));
+        duplicates.putAll(records.get(9), Lists.newArrayList(blocks.get(6), blocks.get(7)));
+
+        cleaned.putAll(records.get(0), Lists.newArrayList(blocks.get(0))); //fixed
+        cleaned.putAll(records.get(1), Lists.newArrayList(blocks.get(1)));
+        cleaned.putAll(records.get(2), Lists.newArrayList(blocks.get(1), blocks.get(2))); // didn't entirely fix
+        cleaned.putAll(records.get(3), Lists.newArrayList(blocks.get(3), blocks.get(4), blocks.get(5))); // didn't fix
+        cleaned.putAll(records.get(9), Lists.newArrayList(blocks.get(6))); // not real representative
+
+        trueReps.put(records.get(0), blocks.get(0));
+        trueReps.put(records.get(1), blocks.get(1));
+        trueReps.put(records.get(2), blocks.get(2));
+        trueReps.put(records.get(3), blocks.get(3));
+
+        //execute
+        double duplicatesRealRepresentatives = classUnderTest.duplicatesRealRepresentatives(duplicates, cleaned, trueReps);
+
+        //assert
+        assertThat(duplicatesRealRepresentatives, closeTo(0.5, 0.00001));
+    }
+
+    @Test
+    public void duplicatesRealRepresentatives_duplicateRecordsWhoRepresentMoreThanOneBlockIsZero() throws Exception {
+        List<Record> records = generateRecords(10);
+        List<BlockWithData> blocks = generateBlocks(10);
+        Multimap<Record, BlockWithData> duplicates = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> cleaned = ArrayListMultimap.create();
+        BiMap<Record, BlockWithData> trueReps = HashBiMap.create();
+
+        duplicates.putAll(records.get(1), Lists.newArrayList(blocks.get(1)));
+        cleaned.putAll(records.get(1), Lists.newArrayList(blocks.get(1)));
+        trueReps.put(records.get(1), blocks.get(1));
+
+        // execute your test
+        double duplicatesRealRepresentatives = classUnderTest.duplicatesRealRepresentatives(duplicates, cleaned, trueReps);
+        assertThat(duplicatesRealRepresentatives, closeTo(0.0, 0.00001));
+
+    }
+
+    private List<BlockWithData> generateBlocks(int size) {
+        List<BlockWithData> records = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            records.add(mock(BlockWithData.class));
+        }
+        return records;
+    }
+
+    private List<Record> generateRecords(int size) {
+        List<Record> records = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            records.add(mock(Record.class));
+        }
+        return records;
+    }
 }

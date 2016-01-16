@@ -19,21 +19,23 @@ import java.util.*;
 public class FebrlExperiment extends CanopyExperiment {
 
     private static final Logger logger = Logger.getLogger(FebrlExperiment.class);
-    private static final int NUMBER_OF_EXPERIMENTS = 5;
+    private static final int NUMBER_OF_EXPERIMENTS = 3;
 
     @Override
     public void runExperiments(String pathToDatasetFile) {
+        logger.info("Starting Febrl Experiment");
         Collection<File> datasets = exprimentsService.findDatasets(pathToDatasetFile, true);
+        logger.info(String.format("There're %d under experiment", datasets.size()));
         Table<String, List<BlockWithData>, Integer> dirToDatasetToFebrlParamTable = parseDatasetsToListsOfBlocks(datasets);
 
         //for each dataset, the experiment NUMBER_OF_EXPERIMENTS
         Map<String, Map<List<BlockWithData>, Integer>> map = dirToDatasetToFebrlParamTable.rowMap();
-        for (Map.Entry<String, Map<List<BlockWithData>, Integer>> entry : map.entrySet()) {
+        for (Map.Entry<String, Map<List<BlockWithData>, Integer>> entry : map.entrySet()) { //each Febrl parameter
             Map<Integer, DuplicateReductionContext> experimentsResults = new HashMap<>();
             Map<List<BlockWithData>, Integer> datasetToFebrlParamMap = entry.getValue();
-            for (List<BlockWithData> cleanBlocks : datasetToFebrlParamMap.keySet()) {
+            for (List<BlockWithData> cleanBlocks : datasetToFebrlParamMap.keySet()) { //for each dataset
                 List<DuplicateReductionContext> reductionContexts = new ArrayList<>();
-                for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) {
+                for (int i = 0; i < NUMBER_OF_EXPERIMENTS; i++) { //repeat experiment several times
                     measurements = new Measurements(cleanBlocks.size());
                     logger.debug(String.format("Executing #%d out of %d experiments", i, NUMBER_OF_EXPERIMENTS));
                     try {
@@ -52,12 +54,11 @@ public class FebrlExperiment extends CanopyExperiment {
 
     private Table<String, List<BlockWithData>, Integer> parseDatasetsToListsOfBlocks(Collection<File> datasets) {
         Table<String, List<BlockWithData>, Integer> filesTable = HashBasedTable.create();
-//        Map<List<BlockWithData>, Integer> listIntegerHashMap = new HashMap<>();
         for (File dataset : datasets) {
             Integer febrlParamValue = exprimentsService.getParameterValue(dataset);
             if (febrlParamValue != null) {
+                logger.debug("Parsing dataset - '" + dataset.getAbsolutePath() + "'");
                 List<BlockWithData> blocks = parsingService.parseDataset(dataset.getAbsolutePath());
-//                listIntegerHashMap.put(blocks, febrlParamValue);
                 filesTable.put(dataset.getParentFile().getName(), blocks, febrlParamValue);
             } else {
                 logger.error("Failed to determine Febrl ParamValue, therefore will not process file named " + dataset.getAbsolutePath());
@@ -81,16 +82,27 @@ public class FebrlExperiment extends CanopyExperiment {
         int duplicatesRemoved = 0,
                 representationDiff = 0;
         double representativesPower = 0,
-                wisdomCrowds = 0;
+                wisdomCrowds = 0,
+                numberOfDirtyBlocks = 0,
+                averageBlockSize = 0,
+                duplicatesRealRepresentatives = 0;
 
         for (DuplicateReductionContext reductionContext : reductionContexts) {
             duplicatesRemoved += reductionContext.getDuplicatesRemoved();
             representationDiff += reductionContext.getRepresentationDiff();
             representativesPower += reductionContext.getRepresentativesPower();
             wisdomCrowds += reductionContext.getWisdomCrowds();
+            numberOfDirtyBlocks += reductionContext.getNumberOfDirtyBlocks();
+            duplicatesRealRepresentatives += reductionContext.getDuplicatesRealRepresentatives();
+            averageBlockSize += reductionContext.getAverageBlockSize();
         }
-
-        return new DuplicateReductionContext(duplicatesRemoved / size, representationDiff / size,
+        DuplicateReductionContext reductionContext = new DuplicateReductionContext(duplicatesRemoved / size, representationDiff / size,
                 representativesPower / size, wisdomCrowds / size);
+
+        reductionContext.setNumberOfDirtyBlocks(numberOfDirtyBlocks / size);
+        reductionContext.setDuplicatesRealRepresentatives(duplicatesRealRepresentatives / size);
+        reductionContext.setAverageBlockSize(averageBlockSize / size);
+
+        return reductionContext;
     }
 }

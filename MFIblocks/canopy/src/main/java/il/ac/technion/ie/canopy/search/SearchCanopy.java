@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SearchCanopy implements ISearch {
 
-    public static final int DEFAULT_HITS_PER_PAGE = 50;
+    public static final int DEFAULT_HITS_PER_PAGE = 10000;
     /**
      * see  https://lucene.apache.org/core/2_9_4/queryparsersyntax.html
      */
@@ -58,7 +58,6 @@ public class SearchCanopy implements ISearch {
             if (q != null) {
                 // Instantiate a searcher
                 IndexSearcher searcher = new IndexSearcher(index);
-                performSearch(q, searcher, null);
                 TopDocs topDocs = this.performSearch(q, searcher);
 
                 int numberOfDocumentsInCorpus = topDocs.totalHits;
@@ -75,12 +74,13 @@ public class SearchCanopy implements ISearch {
                     processedDocs += scoreDocs.length;
 
                     // create a future job for processing the results of the query
+                    //this is where the "magic" happens. Here we pass the search results and build List<SearchResult>
                     createFutureForDocsProcessing(searcher, futureRecordIDs, scoreDocs);
                     //perform the actual search on documents
                     topDocs = performSearch(q, searcher, lastScoreDoc);
                 }
                 ListenableFuture<List<List<SearchResult>>> successfulRecordIDs = Futures.successfulAsList(futureRecordIDs);
-                logger.debug("Start for all threads to finish");
+                logger.debug("Start waiting for all threads to finish");
                 long startTime = System.nanoTime();
                 List<List<SearchResult>> lists = successfulRecordIDs.get();
                 logger.info("Out of " + futureRecordIDs.size() + " jobs, " + lists.size() + " were successful");

@@ -1,8 +1,6 @@
 package il.ac.technion.ie.experiments.service;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
@@ -131,7 +129,7 @@ public class Measurements implements IMeasurements {
 
     @Override
     public DuplicateReductionContext representativesDuplicateElimination(
-            Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, int cleanBlocksSize) {
+            Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned) {
         logger.info("In blocks that were created by Canopy and probs calculated by Miller, there are " + duplicates.keySet().size() + " unique representatives.");
         logger.info("In blocks that were created by Canopy and probs calculated by ConvexBP, there are " + cleaned.keySet().size() + " unique representatives.");
         if (logger.isTraceEnabled()) {
@@ -144,6 +142,29 @@ public class Measurements implements IMeasurements {
         logger.info("Total of " + duplicatesRemoved + " records represent less blocks than before.");
 
         return new DuplicateReductionContext(duplicatesRemoved);
+    }
+
+    @Override
+    public double duplicatesRealRepresentatives(Multimap<Record, BlockWithData> duplicates, Multimap<Record, BlockWithData> cleaned, BiMap<Record, BlockWithData> trueRepsMap) {
+        Set<Record> duplicateRecordsWhoRepresentMoreThanOneBlock = recordsWhoRepresentMoreThanOneBlock(duplicates);
+        Set<Record> cleanRecordsWhoRepresentMoreThanOneBlock = recordsWhoRepresentMoreThanOneBlock(cleaned);
+        duplicateRecordsWhoRepresentMoreThanOneBlock.removeAll(cleanRecordsWhoRepresentMoreThanOneBlock);
+
+        Set<Record> trueRepresentatives = trueRepsMap.keySet();
+        Sets.SetView<Record> intersection = Sets.intersection(trueRepresentatives, duplicateRecordsWhoRepresentMoreThanOneBlock);
+
+        if (duplicateRecordsWhoRepresentMoreThanOneBlock.size() == 0) {
+            return 0;
+        }
+        return intersection.size() / (double) duplicateRecordsWhoRepresentMoreThanOneBlock.size();
+    }
+
+    private Set<Record> recordsWhoRepresentMoreThanOneBlock(Multimap<Record, BlockWithData> duplicates) {
+        Multiset<Record> millerKeyMultiset = HashMultiset.create(duplicates.keys());
+        Set<Record> millerKeySet = new HashSet<>(duplicates.keySet());
+
+        Multisets.removeOccurrences(millerKeyMultiset, millerKeySet);
+        return millerKeyMultiset.elementSet();
     }
 
     @Override
@@ -205,6 +226,16 @@ public class Measurements implements IMeasurements {
         double wisdomCrowds = representativesIdentical / (double) cleanBlocks.size();
         reductionContext.setWisdomCrowds(wisdomCrowds);
         return wisdomCrowds;
+    }
+
+    @Override
+    public void calcAverageBlockSize(List<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext) {
+        double size = 0;
+        for (BlockWithData dirtyBlock : dirtyBlocks) {
+            size += dirtyBlock.size();
+        }
+        size = (size / dirtyBlocks.size());
+        reductionContext.setAverageBlockSize(size);
     }
 
     private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {

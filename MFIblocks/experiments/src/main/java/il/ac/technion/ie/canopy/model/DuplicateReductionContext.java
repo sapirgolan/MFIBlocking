@@ -14,9 +14,12 @@ package il.ac.technion.ie.canopy.model;
  */
 public class DuplicateReductionContext {
     private final float duplicatesRemoved;
-    private float representationDiff;
+    private double representationDiff;
     private double representativesPower;
     private double wisdomCrowds;
+    private double numberOfDirtyBlocks;
+    private double duplicatesRealRepresentatives;
+    private double averageBlockSize;
 
     public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -33,11 +36,11 @@ public class DuplicateReductionContext {
         return duplicatesRemoved;
     }
 
-    public float getRepresentationDiff() {
+    public double getRepresentationDiff() {
         return representationDiff;
     }
 
-    public void setRepresentationDiff(int representationDiff) {
+    public void setRepresentationDiff(double representationDiff) {
         this.representationDiff = representationDiff;
     }
 
@@ -55,5 +58,29 @@ public class DuplicateReductionContext {
 
     public double getWisdomCrowds() {
         return wisdomCrowds;
+    }
+
+    public void setNumberOfDirtyBlocks(double size) {
+        this.numberOfDirtyBlocks = size;
+    }
+
+    public double getNumberOfDirtyBlocks() {
+        return numberOfDirtyBlocks;
+    }
+
+    public void setDuplicatesRealRepresentatives(double duplicatesRealRepresentatives) {
+        this.duplicatesRealRepresentatives = duplicatesRealRepresentatives;
+    }
+
+    public double getDuplicatesRealRepresentatives() {
+        return duplicatesRealRepresentatives;
+    }
+
+    public double getAverageBlockSize() {
+        return averageBlockSize;
+    }
+
+    public void setAverageBlockSize(double averageBlockSize) {
+        this.averageBlockSize = averageBlockSize;
     }
 }

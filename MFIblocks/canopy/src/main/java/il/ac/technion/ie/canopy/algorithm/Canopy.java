@@ -62,7 +62,7 @@ public class Canopy {
                 throw new InvalidSearchResultException("The search engine has failed to find any records, even the one that was submitted to search");
             }
             List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
-            retainLegalCandidates(candidateRecordsForCanopy, recordsPool);
+            candidateRecordsForCanopy = retainLegalCandidates(candidateRecordsForCanopy, recordsPool);
             try {
                 CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
                 canopyCluster.removeRecordsBelowT2();
@@ -86,11 +86,10 @@ public class Canopy {
      * specified collection (optional operation).  In other words, removes
      * from this list all of its elements that are not contained in the
      * specified collection.
-     *
-     * @param candidateRecordsForCanopy List with all elements
+     *  @param candidateRecordsForCanopy List with all elements
      * @param recordsPool               List containing elements to be retained in this list
      */
-    private void retainLegalCandidates(List<CanopyRecord> candidateRecordsForCanopy, List<Record> recordsPool) {
+    private List<CanopyRecord> retainLegalCandidates(List<CanopyRecord> candidateRecordsForCanopy, List<Record> recordsPool) {
         Map<Integer, CanopyRecord> biMap = new HashMap<>(candidateRecordsForCanopy.size());
         for (CanopyRecord canopyRecord : candidateRecordsForCanopy) {
             biMap.put(canopyRecord.getRecordID(), canopyRecord);
@@ -102,7 +101,9 @@ public class Canopy {
                 biMap.remove(key);
             }
         }
-        candidateRecordsForCanopy.removeAll(biMap.values());
+        Set<CanopyRecord> canopyRecords = new HashSet<>(candidateRecordsForCanopy);
+        canopyRecords.removeAll(biMap.values());
+        return new ArrayList<>(canopyRecords);
     }
 
     private void removeRecords(Collection<Record> recordsPool, Record rootRecord, Collection<? extends Record> tightedRecords) {

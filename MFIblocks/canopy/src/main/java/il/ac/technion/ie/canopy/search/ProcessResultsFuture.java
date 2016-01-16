@@ -31,7 +31,6 @@ public class ProcessResultsFuture implements Callable<List<SearchResult>> {
 
     @Override
     public List<SearchResult> call() throws Exception {
-//        List<String> recordsIDs = new ArrayList<>(scoreDocs.size());
         List<SearchResult> results = new ArrayList<>(scoreDocs.size());
         //do processing on results
         logger.debug("Found " + scoreDocs.size() + " hits.");
@@ -41,7 +40,6 @@ public class ProcessResultsFuture implements Callable<List<SearchResult>> {
             logger.trace(String.format("Received document with content '%s'", document.get(CanopyInteraction.CONTENT)));
             String recordID = document.get(CanopyInteraction.ID);
             results.add(new SearchResult(recordID, hit.score));
-//            recordsIDs.add(recordID);
         }
         return results;
     }

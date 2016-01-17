@@ -50,7 +50,7 @@ public class CacheWrapper {
      * @param docIDs
      * @return
      */
-    public ImmutableMap<Integer, Document> getAll(Collection<Integer> docIDs) {
+    public synchronized ImmutableMap<Integer, Document> getAll(Collection<Integer> docIDs) {
         return cache.getAllPresent(docIDs);
     }
 }

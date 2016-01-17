@@ -64,6 +64,7 @@ public class Canopy {
             List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
             candidateRecordsForCanopy = retainLegalCandidates(candidateRecordsForCanopy, recordsPool);
             try {
+                logger.debug("Creating a Canopy with input records of size " + candidateRecordsForCanopy.size());
                 CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
                 canopyCluster.removeRecordsBelowT2();
                 canopyCluster.removeRecordsBelowT1();

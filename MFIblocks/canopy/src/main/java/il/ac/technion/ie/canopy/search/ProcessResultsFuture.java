@@ -35,41 +35,45 @@ public class ProcessResultsFuture implements Callable<List<SearchResult>> {
         //do processing on results
         logger.debug("Found " + scoreDocs.size() + " hits.");
 
-        Set<Integer> scoreDocsIDs = getAllDocsIDs();
+        Map<Integer, Float> docIdToScore = getAllDocsIDs();
         logger.debug("Fetching data in 'batch' from cache");
-        ImmutableMap<Integer, Document> allPresentDocuments = cacheWrapper.getAll(scoreDocsIDs);
+        ImmutableMap<Integer, Document> allPresentDocuments = cacheWrapper.getAll(docIdToScore.keySet());
         logger.debug("fetched " + allPresentDocuments.size() + " items from cache");
-        logger.debug((scoreDocsIDs.size() - allPresentDocuments.size()) + " items are not in cache.");
+        logger.debug((docIdToScore.size() - allPresentDocuments.size()) + " items are not in cache.");
 
         for (Map.Entry<Integer, Document> entry : allPresentDocuments.entrySet()) {
-            SearchResult searchResult = this.buildSearchResultFromDocument(entry.getKey(), entry.getValue());
+            Integer docId = entry.getKey();
+            Document document = entry.getValue();
+            Float score = docIdToScore.get(docId);
+            SearchResult searchResult = this.buildSearchResultFromDocument(document, score);
             results.add(searchResult);
         }
 
-        scoreDocsIDs.removeAll(allPresentDocuments.keySet());
+        docIdToScore.keySet().removeAll(allPresentDocuments.keySet());
 
-        logger.debug("Fetching " + scoreDocsIDs.size() + " Items from Lucene");
-        for (Integer docId : scoreDocsIDs) {
+        logger.debug("Fetching " + docIdToScore.size() + " Items from Lucene");
+        for (Integer docId : docIdToScore.keySet()) {
             Document document = cacheWrapper.get(docId, new DocumentCallable(docId));
-            SearchResult searchResult = buildSearchResultFromDocument(docId, document);
+            Float score = docIdToScore.get(docId);
+            SearchResult searchResult = buildSearchResultFromDocument(document, score);
             results.add(searchResult);
         }
         return results;
     }
 
-    private SearchResult buildSearchResultFromDocument(Integer docId, Document document) {
+    private SearchResult buildSearchResultFromDocument(Document document, Float score) {
         logger.trace(String.format("Received document with content '%s'", document.get(CanopyInteraction.CONTENT)));
         String recordID = document.get(CanopyInteraction.ID);
-        return new SearchResult(recordID, docId);
+        return new SearchResult(recordID, score);
 
     }
 
-    private Set<Integer> getAllDocsIDs() {
-        Set<Integer> set = new HashSet<>(scoreDocs.size());
+    private Map<Integer, Float> getAllDocsIDs() {
+        Map<Integer, Float> docIdToScore = new HashMap<>(scoreDocs.size());
         for (ScoreDoc scoreDoc : scoreDocs) {
-            set.add(scoreDoc.doc);
+            docIdToScore.put(scoreDoc.doc, scoreDoc.score);
         }
-        return set;
+        return docIdToScore;
     }
 
     public class DocumentCallable implements Callable<Document> {

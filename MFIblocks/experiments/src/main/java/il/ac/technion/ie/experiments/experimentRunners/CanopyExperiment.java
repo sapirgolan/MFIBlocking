@@ -61,6 +61,7 @@ public class CanopyExperiment extends AbstractExperiment {
         Canopy canopy = new Canopy(records, 0.15, 0.05);
         canopy.initSearchEngine(new CanopyInteraction());
         List<CanopyCluster> canopies = canopy.createCanopies();
+        logger.info("There are " + canopies.size() + " canopies in dataset");
         List<BlockWithData> dirtyBlocks = canopyService.convertCanopiesToBlocks(canopies);
         logger.info("Converted " + dirtyBlocks.size() + " canopies to blocks. " + (canopies.size() - dirtyBlocks.size()) + " were of size 1 and therefore removed");
         super.calculateMillerResults(dirtyBlocks);

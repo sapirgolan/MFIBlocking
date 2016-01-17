@@ -36,7 +36,11 @@ public class ProcessResultsFuture implements Callable<List<SearchResult>> {
         logger.debug("Found " + scoreDocs.size() + " hits.");
 
         Set<Integer> scoreDocsIDs = getAllDocsIDs();
+        logger.debug("Fetching data in 'batch' from cache");
         ImmutableMap<Integer, Document> allPresentDocuments = cacheWrapper.getAll(scoreDocsIDs);
+        logger.debug("fetched " + allPresentDocuments.size() + " items from cache");
+        logger.debug((scoreDocsIDs.size() - allPresentDocuments.size()) + " items are not in cache.");
+
         for (Map.Entry<Integer, Document> entry : allPresentDocuments.entrySet()) {
             SearchResult searchResult = this.buildSearchResultFromDocument(entry.getKey(), entry.getValue());
             results.add(searchResult);
@@ -44,6 +48,7 @@ public class ProcessResultsFuture implements Callable<List<SearchResult>> {
 
         scoreDocsIDs.removeAll(allPresentDocuments.keySet());
 
+        logger.debug("Fetching " + scoreDocsIDs.size() + " Items from Lucene");
         for (Integer docId : scoreDocsIDs) {
             Document document = cacheWrapper.get(docId, new DocumentCallable(docId));
             SearchResult searchResult = buildSearchResultFromDocument(docId, document);

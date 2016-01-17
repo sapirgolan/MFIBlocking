@@ -91,20 +91,13 @@ public class Canopy {
      * @param recordsPool               List containing elements to be retained in this list
      */
     private List<CanopyRecord> retainLegalCandidates(List<CanopyRecord> candidateRecordsForCanopy, List<Record> recordsPool) {
-        Map<Integer, CanopyRecord> biMap = new HashMap<>(candidateRecordsForCanopy.size());
-        for (CanopyRecord canopyRecord : candidateRecordsForCanopy) {
-            biMap.put(canopyRecord.getRecordID(), canopyRecord);
-        }
-
-        for (Record record : recordsPool) {
-            Integer key = record.getRecordID();
-            if (biMap.containsKey(key)) {
-                biMap.remove(key);
+        List<CanopyRecord> recordsForCanopyCluster = new ArrayList<>(candidateRecordsForCanopy.size());
+        for (CanopyRecord candidate : candidateRecordsForCanopy) {
+            if (recordsPool.contains(candidate)) {
+                recordsForCanopyCluster.add(candidate);
             }
         }
-        Set<CanopyRecord> canopyRecords = new HashSet<>(candidateRecordsForCanopy);
-        canopyRecords.removeAll(biMap.values());
-        return new ArrayList<>(canopyRecords);
+        return recordsForCanopyCluster;
     }
 
     private void removeRecords(Collection<Record> recordsPool, Record rootRecord, Collection<? extends Record> tightedRecords) {

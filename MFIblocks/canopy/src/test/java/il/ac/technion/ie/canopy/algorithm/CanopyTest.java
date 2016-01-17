@@ -170,10 +170,10 @@ public class CanopyTest {
         candidateRecordsForCanopy.add(recordThatNeedToRemain);
         candidateRecordsForCanopy.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("Yael", "Mekel", "F"), 9), 0.4));
 
-        Whitebox.invokeMethod(classUnderTest, "retainLegalCandidates", candidateRecordsForCanopy, recordsPool);
+        List<CanopyRecord> retained = Whitebox.invokeMethod(classUnderTest, "retainLegalCandidates", candidateRecordsForCanopy, recordsPool);
 
-        assertThat(candidateRecordsForCanopy, hasSize(1));
-        assertThat(candidateRecordsForCanopy, contains(recordThatNeedToRemain));
+        assertThat(retained, hasSize(1));
+        assertThat(retained, contains(recordThatNeedToRemain));
     }
 
     @Test
@@ -195,9 +195,9 @@ public class CanopyTest {
         candidateRecordsForCanopy.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("David", "Robert", "F"), 6), 0.4));
         candidateRecordsForCanopy.add(new CanopyRecord(new Record(fieldsName, Lists.newArrayList("Yael", "Mekel", "F"), 9), 0.4));
 
-        Whitebox.invokeMethod(classUnderTest, "retainLegalCandidates", candidateRecordsForCanopy, recordsPool);
+        List<CanopyRecord> retained = Whitebox.invokeMethod(classUnderTest, "retainLegalCandidates", candidateRecordsForCanopy, recordsPool);
 
-        assertThat(candidateRecordsForCanopy, hasSize(0));
+        assertThat(retained, hasSize(0));
     }
 
     private List<SearchResult> convertIdsToSearchResults(List<Integer> iDsRandomly) {

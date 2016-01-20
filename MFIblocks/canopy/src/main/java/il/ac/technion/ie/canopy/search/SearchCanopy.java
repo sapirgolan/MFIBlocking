@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SearchCanopy implements ISearch {
 
-    public static final int DEFAULT_HITS_PER_PAGE = 10000;
+    public static final int DEFAULT_HITS_PER_PAGE = 50000;
     /**
      * see  https://lucene.apache.org/core/2_9_4/queryparsersyntax.html
      */

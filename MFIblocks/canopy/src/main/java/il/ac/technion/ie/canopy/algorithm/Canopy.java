@@ -67,6 +67,7 @@ public class Canopy {
         ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
         Collection<ListenableFuture<CanopyCluster>> futureCanopies = new ArrayList<>();
         List<CanopyCluster> canopies = new ArrayList<>();
+        long poolWaitTimeInMillis = (long)(Math.log10(recordsPool.size()) * 1000);
 
         try {
 
@@ -98,19 +99,29 @@ public class Canopy {
                 }
 
             }
-            ListenableFuture<List<CanopyCluster>> successfulCanopyCluster = Futures.successfulAsList(futureCanopies);
+            ListenableFuture<List<CanopyCluster>> successfulCanopyClusters = Futures.successfulAsList(futureCanopies);
             logger.debug("Start waiting for all threads to finish");
             long startTime = System.nanoTime();
+            Thread.sleep(poolWaitTimeInMillis);
+            int cancelledCanopies = 0,
+                    completedCanopies = 0;
+            for (ListenableFuture<CanopyCluster> futureCanopy : futureCanopies) {
+                if (!futureCanopy.isDone()) {
+                    futureCanopy.cancel(true);
+                    cancelledCanopies++;
+                } else {
+                    completedCanopies++;
+                }
+            }
 
-            canopies = successfulCanopyCluster.get();
+            canopies = successfulCanopyClusters.get();
             long endTime = System.nanoTime();
-            logger.info("Out of " + futureCanopies.size() + " canopies, " + canopies.size() + " were created successfully");
+            logger.info("Out of " + futureCanopies.size() + " canopies, " + completedCanopies + " were created successfully");
             logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
             logger.info("Created total of " + canopies.size() + " canopies");
             return canopies;
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Failed to calculate canopies", e);
-            e.printStackTrace();
         } finally {
             listeningReadersExecutorService.shutdown();
             listeningWritersExecutorService.shutdown();

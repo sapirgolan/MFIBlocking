@@ -19,7 +19,7 @@ import java.util.*;
 public class FebrlExperiment extends CanopyExperiment {
 
     private static final Logger logger = Logger.getLogger(FebrlExperiment.class);
-    private static final int NUMBER_OF_EXPERIMENTS = 3;
+    private static final int NUMBER_OF_EXPERIMENTS = 5;
 
     @Override
     public void runExperiments(String pathToDatasetFile) {

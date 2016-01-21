@@ -1,19 +1,25 @@
 package il.ac.technion.ie.canopy.algorithm;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
 import il.ac.technion.ie.canopy.utils.CanopyUtils;
-import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.search.core.SearchEngine;
 import il.ac.technion.ie.search.module.DocInteraction;
-import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by I062070 on 21/11/2015.
@@ -29,12 +35,13 @@ public class Canopy {
 
     private static final Logger logger = Logger.getLogger(Canopy.class);
 
-
     private final Map<Integer, Record> records;
     private final double T2;
     private final double T1;
     private final ISearch searcher;
     private SearchEngine searchEngine;
+    private ListeningExecutorService listeningReadersExecutorService;
+    private ListeningExecutorService listeningWritersExecutorService;
 
     public Canopy(List<Record> records, double t1, double t2) throws CanopyParametersException {
         CanopyUtils.assertT1andT2(t1, t2);
@@ -45,6 +52,8 @@ public class Canopy {
         T2 = t2;
         T1 = t1;
         this.searcher = new SearchCanopy();
+        listeningReadersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
+        listeningWritersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
     }
 
     public synchronized void initSearchEngine(DocInteraction canopyInteraction) {
@@ -53,43 +62,70 @@ public class Canopy {
     }
 
     public List<CanopyCluster> createCanopies() throws InvalidSearchResultException {
-        List<Record> recordsPool = new ArrayList<>(records.values());
+        Set<Record> recordsPool = new HashSet<>(records.values());
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+        ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+        Collection<ListenableFuture<CanopyCluster>> futureCanopies = new ArrayList<>();
         List<CanopyCluster> canopies = new ArrayList<>();
-        while (!recordsPool.isEmpty()) {
-            Record rootRecord = sampleRecordRandomly(recordsPool);
-            List<SearchResult> searchResults = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
-            if (searchResults.isEmpty()) {
-                throw new InvalidSearchResultException("The search engine has failed to find any records, even the one that was submitted to search");
-            }
-            List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
-            candidateRecordsForCanopy = retainLegalCandidates(candidateRecordsForCanopy, recordsPool);
-            try {
-                logger.debug("Creating a Canopy with input records of size " + candidateRecordsForCanopy.size());
-                CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
-                canopyCluster.removeRecordsBelowT2();
-                canopyCluster.removeRecordsBelowT1();
-                List<CanopyRecord> tightRecords = canopyCluster.getTightRecords();
-                logger.debug(String.format("Created Canopy cluster with %d records and seed of %d records",
-                        canopyCluster.getAllRecords().size(), canopyCluster.getTightRecords().size()));
-                removeRecords(recordsPool, rootRecord, tightRecords);
-                canopies.add(canopyCluster);
-            } catch (CanopyParametersException e) {
-                logger.error("Failed to create Canopy", e);
-            }
-        }
-        logger.info("Created total of " + canopies.size() + " canopies");
-        return canopies;
 
+        try {
+
+            while (!recordsPool.isEmpty()) {
+                List<Reader> readers = new ArrayList<>();
+                for (int i = 0; i < 4; i++) {
+                    Reader reader = new Reader(recordsPool, searchEngine, searcher, readLock);
+                    readers.add(reader);
+                }
+
+                final Object waitForReader = new Object();
+                for (Reader reader : readers) {
+                    logger.debug("Executing new 'reader' job ");
+                    ListenableFuture<Reader.SearchResultContext> futureSearchResultContext = listeningReadersExecutorService.submit(reader);
+                    futureSearchResultContext.addListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (waitForReader) {
+                                waitForReader.notifyAll();
+                            }
+                        }
+                    }, listeningReadersExecutorService);
+                    ListenableFuture<CanopyCluster> futureCanopy = Futures.transform(
+                            futureSearchResultContext, new Writer(records, recordsPool, T2, T1, lock), listeningWritersExecutorService);
+                    futureCanopies.add(futureCanopy);
+                }
+                synchronized (waitForReader) {
+                    waitForReader.wait();
+                }
+
+            }
+            ListenableFuture<List<CanopyCluster>> successfulCanopyCluster = Futures.successfulAsList(futureCanopies);
+            logger.debug("Start waiting for all threads to finish");
+            long startTime = System.nanoTime();
+
+            canopies = successfulCanopyCluster.get();
+            long endTime = System.nanoTime();
+            logger.info("Out of " + futureCanopies.size() + " canopies, " + canopies.size() + " were created successfully");
+            logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
+            logger.info("Created total of " + canopies.size() + " canopies");
+            return canopies;
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Failed to calculate canopies", e);
+            e.printStackTrace();
+        } finally {
+            listeningReadersExecutorService.shutdown();
+            listeningWritersExecutorService.shutdown();
+        }
+        return canopies;
     }
 
-    /**
+ /*   *//**
      * Retains only the elements in this list that are contained in the
      * specified collection (optional operation).  In other words, removes
      * from this list all of its elements that are not contained in the
      * specified collection.
      *  @param candidateRecordsForCanopy List with all elements
      * @param recordsPool               List containing elements to be retained in this list
-     */
+     *//*
     private List<CanopyRecord> retainLegalCandidates(List<CanopyRecord> candidateRecordsForCanopy, List<Record> recordsPool) {
         List<CanopyRecord> recordsForCanopyCluster = new ArrayList<>(candidateRecordsForCanopy.size());
         for (CanopyRecord candidate : candidateRecordsForCanopy) {
@@ -128,5 +164,5 @@ public class Canopy {
         Random random = new Random();
         int randomIndex = random.nextInt(recordsPool.size());
         return recordsPool.get(randomIndex);
-    }
+    }*/
 }

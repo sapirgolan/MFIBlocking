@@ -39,6 +39,7 @@ public class Canopy {
     private final double T2;
     private final double T1;
     private final ISearch searcher;
+    private final int cores;
     private SearchEngine searchEngine;
     private ListeningExecutorService listeningReadersExecutorService;
     private ListeningExecutorService listeningWritersExecutorService;
@@ -52,8 +53,9 @@ public class Canopy {
         T2 = t2;
         T1 = t1;
         this.searcher = new SearchCanopy();
-        listeningReadersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
-        listeningWritersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(4));
+        cores = Runtime.getRuntime().availableProcessors();
+        listeningReadersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(cores));
+        listeningWritersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(cores));
     }
 
     public synchronized void initSearchEngine(DocInteraction canopyInteraction) {
@@ -73,7 +75,7 @@ public class Canopy {
 
             while (!recordsPool.isEmpty()) {
                 List<Reader> readers = new ArrayList<>();
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < cores; i++) {
                     Reader reader = new Reader(recordsPool, searchEngine, searcher, readLock);
                     readers.add(reader);
                 }

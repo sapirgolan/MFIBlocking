@@ -1,9 +1,11 @@
 package il.ac.technion.ie.model;
 
+import java.io.Serializable;
+
 /**
  * Created by I062070 on 28/11/2015.
  */
-public class CanopyRecord extends Record {
+public class CanopyRecord extends Record implements Serializable {
     protected double score;
 
     public CanopyRecord(Record record, double score) {

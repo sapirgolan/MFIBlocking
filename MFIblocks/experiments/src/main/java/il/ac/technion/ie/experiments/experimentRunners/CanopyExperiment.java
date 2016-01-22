@@ -57,11 +57,7 @@ public class CanopyExperiment extends AbstractExperiment {
     }
 
     protected DuplicateReductionContext canopyCoreExperiment(List<BlockWithData> cleanBlocks) throws CanopyParametersException, InvalidSearchResultException {
-        List<Record> records = getRecordsFromBlcoks(cleanBlocks);
-        Canopy canopy = new Canopy(records, 0.15, 0.05);
-        canopy.initSearchEngine(new CanopyInteraction());
-        List<CanopyCluster> canopies = canopy.createCanopies();
-        logger.info("There are " + canopies.size() + " canopies in dataset");
+        List<CanopyCluster> canopies = createCaniopies(cleanBlocks);
         List<BlockWithData> dirtyBlocks = canopyService.convertCanopiesToBlocks(canopies);
         logger.info("Converted " + dirtyBlocks.size() + " canopies to blocks. " + (canopies.size() - dirtyBlocks.size()) + " were of size 1 and therefore removed");
         super.calculateMillerResults(dirtyBlocks);
@@ -98,6 +94,15 @@ public class CanopyExperiment extends AbstractExperiment {
             logger.error("Failed to consume new probabilities", e);
         }
         return reductionContext;
+    }
+
+    protected List<CanopyCluster> createCaniopies(List<BlockWithData> cleanBlocks) throws CanopyParametersException, InvalidSearchResultException {
+        List<Record> records = getRecordsFromBlcoks(cleanBlocks);
+        Canopy canopy = new Canopy(records, 0.15, 0.05);
+        canopy.initSearchEngine(new CanopyInteraction());
+        List<CanopyCluster> canopies = canopy.createCanopies();
+        logger.info("There are " + canopies.size() + " canopies in dataset");
+        return canopies;
     }
 
     private void saveConvexBPResultsToCsv(DuplicateReductionContext duplicateReductionContext) {

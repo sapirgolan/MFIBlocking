@@ -6,6 +6,7 @@ import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Created by I062070 on 22/11/2015.
  */
-public class CanopyCluster {
+public class CanopyCluster implements Serializable{
     private final List<CanopyRecord> candidateRecords;
     private final double t2;
     private final double t1;

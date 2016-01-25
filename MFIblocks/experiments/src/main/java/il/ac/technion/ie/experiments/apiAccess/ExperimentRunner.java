@@ -18,7 +18,12 @@ public class ExperimentRunner {
 
         AbstractExperiment experiment = new CreateCanopies();
         logger.info("Starting an experiment");
-        experiment.runExperiments(context.getPathToDataset());
+
+        try {
+            experiment.runExperiments(context.getPathToDataset());
+        } catch (Throwable e) {
+            logger.error("There was an exception!", e);
+        }
         System.exit(0);
     }
 }

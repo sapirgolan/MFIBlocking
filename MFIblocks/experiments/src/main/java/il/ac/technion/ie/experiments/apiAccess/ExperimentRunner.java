@@ -3,7 +3,7 @@ package il.ac.technion.ie.experiments.apiAccess;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.experiments.experimentRunners.AbstractExperiment;
-import il.ac.technion.ie.experiments.experimentRunners.FebrlExperiment;
+import il.ac.technion.ie.experiments.experimentRunners.CreateCanopies;
 import org.apache.log4j.Logger;
 
 /**
@@ -16,7 +16,7 @@ public class ExperimentRunner {
     public static void main(String[] args) throws CanopyParametersException, InvalidSearchResultException {
         ArgumentsContext context = new ArgumentsContext(args).invoke();
 
-        AbstractExperiment experiment = new FebrlExperiment();
+        AbstractExperiment experiment = new CreateCanopies();
         logger.info("Starting an experiment");
         experiment.runExperiments(context.getPathToDataset());
         System.exit(0);

@@ -7,6 +7,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
+import il.ac.technion.ie.canopy.search.CacheWrapper;
 import il.ac.technion.ie.canopy.search.SearchCanopy;
 import il.ac.technion.ie.canopy.utils.CanopyUtils;
 import il.ac.technion.ie.model.Record;
@@ -56,6 +57,7 @@ public class Canopy {
         cores = Runtime.getRuntime().availableProcessors();
         listeningReadersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(cores));
         listeningWritersExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(cores));
+        CacheWrapper.init(records.size());
     }
 
     public synchronized void initSearchEngine(DocInteraction canopyInteraction) {

@@ -15,7 +15,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheWrapper {
 
-    public static CacheWrapper instance = null;
+    public static final int DEFAULT_SIZE = 10000;
+    public static volatile CacheWrapper instance = null;
 
     private static final Object lock = new Object();
     private Cache<Integer, Document> cache;
@@ -26,7 +27,7 @@ public class CacheWrapper {
             synchronized (lock) {
                 r = instance; //force method to recheck the value of 'instance'
                 if (r == null) {
-                    r = new CacheWrapper();
+                    r = init(DEFAULT_SIZE);
                     instance = r;
                 }
             }
@@ -34,10 +35,14 @@ public class CacheWrapper {
         return instance;
     }
 
-    private CacheWrapper() {
+    public static CacheWrapper init(int size) {
+        return new CacheWrapper(size);
+    }
+
+    private CacheWrapper(long maxSize) {
         cache = CacheBuilder.newBuilder()
-                .maximumSize(100000)
-                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .maximumSize(maxSize)
+                .expireAfterAccess(30, TimeUnit.MINUTES)
                 .build();
     }
 

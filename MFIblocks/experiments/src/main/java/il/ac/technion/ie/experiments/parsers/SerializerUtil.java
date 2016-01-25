@@ -23,7 +23,7 @@ public class SerializerUtil {
             } catch (IOException e) {
                 logger.error("Failed to write canopies to: '" + canopiesFile.getAbsolutePath() + "'", e);
             }
-            logger.debug("Successfully written canopies to: '" + canopiesFile.getAbsolutePath() + "'");
+            logger.info("Successfully written canopies to: '" + canopiesFile.getAbsolutePath() + "'");
             wasSerialized = true;
             outputStream.close();
         } catch (IOException e) {

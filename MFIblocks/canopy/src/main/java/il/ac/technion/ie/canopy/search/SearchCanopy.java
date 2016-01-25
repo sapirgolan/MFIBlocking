@@ -83,7 +83,7 @@ public class SearchCanopy implements ISearch {
                 logger.debug("Start waiting for all threads to finish");
                 long startTime = System.nanoTime();
                 List<List<SearchResult>> lists = successfulRecordIDs.get();
-                logger.info("Out of " + futureRecordIDs.size() + " jobs, " + lists.size() + " were successful");
+                logger.debug("Out of " + futureRecordIDs.size() + " jobs, " + lists.size() + " were successful");
                 long endTime = System.nanoTime();
                 logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
                 for (List<SearchResult> list : lists) {

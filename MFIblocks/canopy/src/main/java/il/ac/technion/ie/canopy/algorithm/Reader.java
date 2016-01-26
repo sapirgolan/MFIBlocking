@@ -22,7 +22,7 @@ public class Reader implements Callable<Reader.SearchResultContext> {
     private static final Logger logger = Logger.getLogger(Reader.class);
 
     private final Lock lock;
-    private Set<Record> recordsPool;
+    private volatile Set<Record> recordsPool;
     private SearchEngine searchEngine;
     private ISearch searcher;
 

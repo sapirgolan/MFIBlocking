@@ -121,5 +121,6 @@ public class Writer implements Function<Reader.SearchResultContext, CanopyCluste
     private void removeRecords(Record rootRecord, Collection<? extends Record> tightRecords) {
         recordsPool.remove(rootRecord);
         recordsPool.removeAll(tightRecords);
+        logger.info("There are " + recordsPool.size() + " available for processing");
     }
 }

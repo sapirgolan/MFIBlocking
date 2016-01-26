@@ -44,6 +44,7 @@ public class Canopy {
     private SearchEngine searchEngine;
     private ListeningExecutorService listeningReadersExecutorService;
     private ListeningExecutorService listeningWritersExecutorService;
+    private volatile Set<Record> recordsPool;
 
     public Canopy(List<Record> records, double t1, double t2) throws CanopyParametersException {
         CanopyUtils.assertT1andT2(t1, t2);
@@ -51,6 +52,7 @@ public class Canopy {
         for (Record record : records) {
             this.records.put(record.getRecordID(), record);
         }
+        recordsPool = new HashSet<>(this.records.values());
         T2 = t2;
         T1 = t1;
         this.searcher = new SearchCanopy();
@@ -66,7 +68,6 @@ public class Canopy {
     }
 
     public List<CanopyCluster> createCanopies() throws InvalidSearchResultException {
-        Set<Record> recordsPool = new HashSet<>(records.values());
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
         ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
         Collection<ListenableFuture<CanopyCluster>> futureCanopies = new ArrayList<>();

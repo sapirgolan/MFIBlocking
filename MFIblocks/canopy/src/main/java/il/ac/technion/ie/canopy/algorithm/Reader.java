@@ -7,9 +7,11 @@ import il.ac.technion.ie.search.module.SearchResult;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -17,28 +19,38 @@ import java.util.concurrent.locks.Lock;
 /**
  * Created by I062070 on 20/01/2016.
  */
-public class Reader implements Callable<Reader.SearchResultContext> {
+public class Reader implements Callable<BigInteger> {
 
     private static final Logger logger = Logger.getLogger(Reader.class);
 
     private final Lock lock;
-    private volatile Set<Record> recordsPool;
+    private final ArrayBlockingQueue<SearchResultContext> queue;
+    private final Set<Record> recordsPool;
+    private final BigInteger counter;
     private SearchEngine searchEngine;
     private ISearch searcher;
 
-    public Reader(Set<Record> recordsPool, SearchEngine searchEngine, ISearch searcher, Lock readLock) {
+    public Reader(Set<Record> recordsPool, SearchEngine searchEngine, ISearch searcher, Lock readLock, ArrayBlockingQueue<SearchResultContext> queue) {
+        this.counter = BigInteger.ZERO;
         this.recordsPool = recordsPool;
         this.searchEngine = searchEngine;
         this.searcher = searcher;
         this.lock = readLock;
+        this.queue = queue;
     }
 
     @Override
-    public SearchResultContext call() throws Exception {
-        Record rootRecord = sampleRecordRandomly();
-        List<SearchResult> searchResults = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
-        SearchResultContext context = new SearchResultContext(searchResults, rootRecord);
-        return context;
+    public BigInteger call() throws Exception {
+        while (!recordsPool.isEmpty()) {
+            Record rootRecord = sampleRecordRandomly();
+            List<SearchResult> searchResults = searchEngine.searchInIndex(searcher, SearchCanopy.DEFAULT_HITS_PER_PAGE, rootRecord.getEntries());
+            SearchResultContext context = new SearchResultContext(searchResults, rootRecord);
+            while (!queue.offer(context)) {
+                queue.wait();
+            }
+            counter.add(BigInteger.ONE);
+        }
+        return counter;
     }
 
     private Record sampleRecordRandomly() {

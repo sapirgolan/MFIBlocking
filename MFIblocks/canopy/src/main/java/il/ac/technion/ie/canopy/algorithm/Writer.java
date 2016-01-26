@@ -1,6 +1,5 @@
 package il.ac.technion.ie.canopy.algorithm;
 
-import com.google.common.base.Function;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.model.CanopyRecord;
@@ -9,72 +8,85 @@ import il.ac.technion.ie.search.module.SearchResult;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by I062070 on 20/01/2016.
  */
-public class Writer implements Function<Reader.SearchResultContext, CanopyCluster> {
+public class Writer implements Callable<Collection<CanopyCluster>> {
 
     private static final Logger logger = Logger.getLogger(Writer.class);
 
     private final Map<Integer, Record> records;
     private final ReentrantReadWriteLock.WriteLock writeLock;
     private final ReentrantReadWriteLock.ReadLock readLock;
+    private final ArrayBlockingQueue<Reader.SearchResultContext> queue;
     private Set<Record> recordsPool;
     private double T2;
     private double T1;
 
-    public Writer(Map<Integer, Record> records, Set<Record> recordsPool, double t2, double t1, ReentrantReadWriteLock lock) {
+    public Writer(Map<Integer, Record> records, Set<Record> recordsPool, double t2, double t1, ReentrantReadWriteLock lock, ArrayBlockingQueue<Reader.SearchResultContext> queue) {
         this.records = records;
         this.recordsPool = recordsPool;
         T2 = t2;
         T1 = t1;
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
+        this.queue = queue;
     }
 
     @Override
-    public CanopyCluster apply(Reader.SearchResultContext searchResultContext) {
-        logger.debug("New 'Writer' has started");
-        Record rootRecord = searchResultContext.getRootRecord();
-        List<SearchResult> searchResults = searchResultContext.getSearchResults();
-        if (searchResults.isEmpty()) {
-            logger.error("The search engine has failed to find any records, even the one that was submitted to search");
-//            throw new InvalidSearchResultException("The search engine has failed to find any records, even the one that was submitted to search");
+    public Collection<CanopyCluster> call() throws Exception {
+        ArrayList<CanopyCluster> canopies = new ArrayList<>();
+        while (!recordsPool.isEmpty()) {
+            Reader.SearchResultContext searchResultContext = queue.poll(1, TimeUnit.SECONDS);
+            queue.notifyAll();
+            if (searchResultContext != null) {
+                Record rootRecord = searchResultContext.getRootRecord();
+                List<SearchResult> searchResults = searchResultContext.getSearchResults();
+                if (searchResults.isEmpty()) {
+                    logger.error("The search engine has failed to find any records, even the one that was submitted to search");
+                }
+                List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
+                candidateRecordsForCanopy = retainLegalCandidates(candidateRecordsForCanopy);
+                //can extract this to another future
+                long startWait = System.nanoTime();
+                writeLock.lock();
+                logWaitTimeForLock(startWait);
+                try {
+                    logger.debug("Creating a Canopy with input records of size " + candidateRecordsForCanopy.size());
+                    if (doesAllCandidatesRecordsStillEists(candidateRecordsForCanopy)) {
+                        CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
+                        canopyCluster.removeRecordsBelowT2();
+                        canopyCluster.removeRecordsBelowT1();
+                        List<CanopyRecord> tightRecords = canopyCluster.getTightRecords();
+                        logger.debug(String.format("Created Canopy cluster with %d records and seed of %d records",
+                                canopyCluster.getAllRecords().size(), canopyCluster.getTightRecords().size()));
+                        removeRecords(rootRecord, tightRecords);
+                        canopies.add(canopyCluster);
+                    } else {
+                        logger.debug("One of the records contained in the candidate for the Canopy no longer exists. " +
+                                "This might happen if the candidates were created before one of them was removed by another thread");
+                    }
+                } catch (CanopyParametersException e) {
+                    logger.error("Failed to create Canopy", e);
+                } finally {
+                    writeLock.unlock();
+                }
+            }
         }
-        List<CanopyRecord> candidateRecordsForCanopy = fetchRecordsBasedOnIDs(searchResults);
-        candidateRecordsForCanopy = retainLegalCandidates(candidateRecordsForCanopy);
 
-        //can extract this to another future
-        long startWait = System.nanoTime();
-        writeLock.lock();
+        return canopies;
+    }
+
+    private void logWaitTimeForLock(long startWait) {
         long endWait = System.nanoTime();
         long waitInMils = TimeUnit.NANOSECONDS.toMillis(endWait - startWait);
         logger.debug(String.format("Waiting time till obtained lock and removed from the pool records " +
                 "in T1 of Canopy is: %d Millis", waitInMils));
-        try {
-            logger.debug("Creating a Canopy with input records of size " + candidateRecordsForCanopy.size());
-            if (doesAllCandidatesRecordsStillEists(candidateRecordsForCanopy)) {
-                CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, T2, T1);
-                canopyCluster.removeRecordsBelowT2();
-                canopyCluster.removeRecordsBelowT1();
-                List<CanopyRecord> tightRecords = canopyCluster.getTightRecords();
-                logger.debug(String.format("Created Canopy cluster with %d records and seed of %d records",
-                        canopyCluster.getAllRecords().size(), canopyCluster.getTightRecords().size()));
-                removeRecords(rootRecord, tightRecords);
-                return canopyCluster;
-            } else {
-                logger.debug("One of the records contained in the candidate for the Canopy no longer exists. " +
-                        "This might happen if the candidates were created before one of them was removed by another thread");
-            }
-        } catch (CanopyParametersException e) {
-            logger.error("Failed to create Canopy", e);
-        } finally {
-            writeLock.unlock();
-        }
-        return null;
     }
 
     private boolean doesAllCandidatesRecordsStillEists(List<CanopyRecord> candidateRecordsForCanopy) {

@@ -16,7 +16,9 @@ import il.ac.technion.ie.search.module.DocInteraction;
 import il.ac.technion.ie.search.search.ISearch;
 import org.apache.log4j.Logger;
 
+import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -70,58 +72,36 @@ public class Canopy {
     public List<CanopyCluster> createCanopies() throws InvalidSearchResultException {
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
         ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
-        Collection<ListenableFuture<CanopyCluster>> futureCanopies = new ArrayList<>();
         List<CanopyCluster> canopies = new ArrayList<>();
-        long poolWaitTimeInMillis = (long)(Math.log10(recordsPool.size()) * 1000);
 
         try {
 
-            while (!recordsPool.isEmpty()) {
-                List<Reader> readers = new ArrayList<>();
-                for (int i = 0; i < cores; i++) {
-                    Reader reader = new Reader(recordsPool, searchEngine, searcher, readLock);
-                    readers.add(reader);
-                }
+            ArrayBlockingQueue<Reader.SearchResultContext> queue = new ArrayBlockingQueue<>(Integer.MAX_VALUE, true);
+            Set<ListenableFuture<Collection<CanopyCluster>>> listenableFutures = new HashSet<>();
 
-                final Object waitForReader = new Object();
-                for (Reader reader : readers) {
-                    logger.debug("Executing new 'reader' job ");
-                    ListenableFuture<Reader.SearchResultContext> futureSearchResultContext = listeningReadersExecutorService.submit(reader);
-                    futureSearchResultContext.addListener(new Runnable() {
-                        @Override
-                        public void run() {
-                            synchronized (waitForReader) {
-                                waitForReader.notifyAll();
-                            }
-                        }
-                    }, listeningReadersExecutorService);
-                    ListenableFuture<CanopyCluster> futureCanopy = Futures.transform(
-                            futureSearchResultContext, new Writer(records, recordsPool, T2, T1, lock), listeningWritersExecutorService);
-                    futureCanopies.add(futureCanopy);
-                }
-                synchronized (waitForReader) {
-                    waitForReader.wait();
-                }
-
+            for (int i = 0; i < cores; i++) {
+                Reader reader = new Reader(recordsPool, searchEngine, searcher, readLock, queue);
+                logger.debug("Executing new 'reader' job ");
+                ListenableFuture<BigInteger> futureSearchResultContext = listeningReadersExecutorService.submit(reader);
             }
-            ListenableFuture<List<CanopyCluster>> successfulCanopyClusters = Futures.successfulAsList(futureCanopies);
-            logger.debug("Start waiting for all threads to finish");
+            Thread.sleep(TimeUnit.SECONDS.toMillis(10));
+            for (int i = 0; i < cores; i++) {
+                Writer writer = new Writer(records, recordsPool, T2, T1, lock, queue);
+                logger.debug("Executing new 'writer' job ");
+                ListenableFuture<Collection<CanopyCluster>> canopyClusterListenableFuture = listeningWritersExecutorService.submit(writer);
+                listenableFutures.add(canopyClusterListenableFuture);
+            }
+
+            ListenableFuture<List<Collection<CanopyCluster>>> listListenableFuture = Futures.allAsList(listenableFutures);
+            logger.info("Start waiting for all threads to finish");
             long startTime = System.nanoTime();
-            Thread.sleep(poolWaitTimeInMillis);
-            int cancelledCanopies = 0,
-                    completedCanopies = 0;
-            for (ListenableFuture<CanopyCluster> futureCanopy : futureCanopies) {
-                if (!futureCanopy.isDone()) {
-                    futureCanopy.cancel(true);
-                    cancelledCanopies++;
-                } else {
-                    completedCanopies++;
+            List<Collection<CanopyCluster>> collectionsOfCanopies = listListenableFuture.get();
+            for (Collection<CanopyCluster> collectionOfCanopy : collectionsOfCanopies) {
+                if (collectionOfCanopy != null) {
+                    canopies.addAll(collectionOfCanopy);
                 }
             }
-
-            canopies = successfulCanopyClusters.get();
             long endTime = System.nanoTime();
-            logger.info("Out of " + futureCanopies.size() + " canopies, " + completedCanopies + " were created successfully");
             logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
             logger.info("Created total of " + canopies.size() + " canopies");
             return canopies;

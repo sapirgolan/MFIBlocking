@@ -1,10 +1,10 @@
 package il.ac.technion.ie.canopy.search;
 
 import com.google.common.base.Joiner;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.search.core.LuceneUtils;
 import il.ac.technion.ie.search.module.SearchResult;
@@ -12,6 +12,7 @@ import il.ac.technion.ie.search.search.ISearch;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -19,13 +20,11 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.util.Version;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Created by I062070 on 20/11/2015.
@@ -46,8 +45,11 @@ public class SearchCanopy implements ISearch {
     public List<SearchResult> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms) {
 
         List<SearchResult> recordsIDs = Collections.synchronizedList(new ArrayList<SearchResult>());
-        listeningExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
-        List<ListenableFuture<List<SearchResult>>> futureRecordIDs = new ArrayList<>();
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("searchLucene-%d")
+                .setDaemon(true)
+                .build();
+        listeningExecutorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(6, threadFactory));
 
         try {
             // Instantiate a query parser
@@ -75,34 +77,72 @@ public class SearchCanopy implements ISearch {
 
                     // create a future job for processing the results of the query
                     //this is where the "magic" happens. Here we pass the search results and build List<SearchResult>
-                    createFutureForDocsProcessing(searcher, futureRecordIDs, scoreDocs);
+                    List<SearchResult> docsInCanopy = RetriveDocsFromCanopy(searcher, scoreDocs);
+                    recordsIDs.addAll(docsInCanopy);
+                    
                     //perform the actual search on documents
                     topDocs = performSearch(q, searcher, lastScoreDoc);
-                }
-                ListenableFuture<List<List<SearchResult>>> successfulRecordIDs = Futures.successfulAsList(futureRecordIDs);
-                logger.debug("Start waiting for all threads to finish");
-                long startTime = System.nanoTime();
-                List<List<SearchResult>> lists = successfulRecordIDs.get();
-                logger.debug("Out of " + futureRecordIDs.size() + " jobs, " + lists.size() + " were successful");
-                long endTime = System.nanoTime();
-                logger.debug("All threads finished after: " + TimeUnit.NANOSECONDS.toMillis(endTime - startTime) + " millis");
-                for (List<SearchResult> list : lists) {
-                    logger.debug("Adding '" + list.size() + "' docs to result from Search Engine");
-                    recordsIDs.addAll(list);
                 }
             } else {
                 logger.warn("failed to create query from terms: " + Joiner.on(" ").join(terms));
             }
         } catch (IOException e) {
             logger.error("Failed to perform search", e);
-        } catch (InterruptedException e) {
-            logger.error("Failed to perform search", e);
-        } catch (ExecutionException e) {
-            logger.error("Failed to perform search", e);
         } finally {
             listeningExecutorService.shutdown();
         }
         return recordsIDs;
+    }
+
+    private List<SearchResult> RetriveDocsFromCanopy(IndexSearcher searcher, ScoreDoc[] scoreDocs) {
+        CacheWrapper cacheWrapper = CacheWrapper.getInstance();
+        List<SearchResult> results = new ArrayList<>(scoreDocs.length);
+        //do processing on results
+        logger.debug("Found " + scoreDocs.length + " hits. Now fetching those hits as records");
+
+        Map<Integer, Float> docIdToScore = getAllDocsIDs(scoreDocs);
+        logger.debug("Fetching data in 'batch' from cache");
+        ImmutableMap<Integer, Document> allPresentDocuments = cacheWrapper.getAll(docIdToScore.keySet());
+        logger.debug("fetched " + allPresentDocuments.size() + " items from cache");
+        logger.debug((docIdToScore.size() - allPresentDocuments.size()) + " items are not in cache.");
+
+        for (Map.Entry<Integer, Document> entry : allPresentDocuments.entrySet()) {
+            Integer docId = entry.getKey();
+            Document document = entry.getValue();
+            Float score = docIdToScore.get(docId);
+            SearchResult searchResult = this.buildSearchResultFromDocument(document, score);
+            results.add(searchResult);
+        }
+
+        docIdToScore.keySet().removeAll(allPresentDocuments.keySet());
+
+        logger.debug("Fetching " + docIdToScore.size() + " Items from Lucene");
+        for (Integer docId : docIdToScore.keySet()) {
+            try {
+                Document document = cacheWrapper.get(docId, new DocumentCallable(docId, searcher));
+                Float score = docIdToScore.get(docId);
+                SearchResult searchResult = buildSearchResultFromDocument(document, score);
+                results.add(searchResult);
+            } catch (ExecutionException e) {
+                logger.error("Failed to find a record in canopy", e);
+            }
+        }
+        logger.debug("Finished searching for records in Lucene");
+        return results;
+    }
+
+    private Map<Integer, Float> getAllDocsIDs(ScoreDoc[] scoreDocs) {
+        Map<Integer, Float> docIdToScore = new HashMap<>(scoreDocs.length);
+        for (ScoreDoc scoreDoc : scoreDocs) {
+            docIdToScore.put(scoreDoc.doc, scoreDoc.score);
+        }
+        return docIdToScore;
+    }
+
+    private SearchResult buildSearchResultFromDocument(Document document, Float score) {
+        logger.trace(String.format("Received document with content '%s'", document.get(CanopyInteraction.CONTENT)));
+        String recordID = document.get(CanopyInteraction.ID);
+        return new SearchResult(recordID, score);
     }
 
     private TopDocs performSearch(Query q, IndexSearcher searcher) throws IOException {
@@ -112,7 +152,11 @@ public class SearchCanopy implements ISearch {
 
     private TopDocs performSearch(Query q, IndexSearcher searcher, ScoreDoc lastScoreDoc) throws IOException {
         TopScoreDocCollector collector = TopScoreDocCollector.create(maxHits, lastScoreDoc, true);
-        return retriveDocs(q, searcher, collector);
+        TopDocs topDocs;
+        logger.debug("Trying to obtain sync on searchIndex");
+        logger.debug("Submitting query to search engine");
+        topDocs = retriveDocs(q, searcher, collector);
+        return topDocs;
     }
 
     private TopDocs retriveDocs(Query q, IndexSearcher searcher, TopScoreDocCollector collector) throws IOException {
@@ -125,12 +169,6 @@ public class SearchCanopy implements ISearch {
             logger.error("Failed to perform query", e);
         }
         return null;
-    }
-
-    private void createFutureForDocsProcessing(IndexSearcher searcher, List<ListenableFuture<List<SearchResult>>> futureRecordIDs, ScoreDoc[] scoreDocs) {
-        ProcessResultsFuture future = new ProcessResultsFuture(scoreDocs, searcher);
-        ListenableFuture<List<SearchResult>> submit = listeningExecutorService.submit(future);
-        futureRecordIDs.add(submit);
     }
 
     private int determineHitsPerPage(Integer hitsPerPage) {
@@ -180,6 +218,21 @@ public class SearchCanopy implements ISearch {
             if (StringUtils.isEmpty(next)) {
                 iterator.remove();
             }
+        }
+    }
+
+    public class DocumentCallable implements Callable<Document> {
+        private final int docId;
+        private final IndexSearcher searcher;
+
+        public DocumentCallable(int docId, IndexSearcher searcher) {
+            this.docId = docId;
+            this.searcher = searcher;
+        }
+
+        @Override
+        public Document call() throws Exception {
+            return searcher.doc(docId);
         }
     }
 }

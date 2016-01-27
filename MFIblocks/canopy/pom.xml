@@ -33,6 +33,12 @@
             <artifactId>commons-math3</artifactId>
             <version>3.5</version>
         </dependency>
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>1.0</version>
+        </dependency>
+
 
     </dependencies>
 

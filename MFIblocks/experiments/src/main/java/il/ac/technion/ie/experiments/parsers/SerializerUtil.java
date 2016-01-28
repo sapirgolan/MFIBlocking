@@ -4,7 +4,7 @@ import il.ac.technion.ie.canopy.model.CanopyCluster;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Created by I062070 on 22/01/2016.
@@ -13,7 +13,7 @@ public class SerializerUtil {
 
     private static final Logger logger = Logger.getLogger(SerializerUtil.class);
 
-    public static boolean serializeCanopies(File canopiesFile, List<CanopyCluster> canopies) {
+    public static boolean serializeCanopies(File canopiesFile, Collection<CanopyCluster> canopies) {
         boolean wasSerialized = false;
 
         try (FileOutputStream outputStream = new FileOutputStream(canopiesFile)) {
@@ -32,12 +32,12 @@ public class SerializerUtil {
         return wasSerialized;
     }
 
-    public static List<CanopyCluster> deSerializeCanopies(File canopiesFile) {
-        List<CanopyCluster> canopies = null;
+    public static Collection<CanopyCluster> deSerializeCanopies(File canopiesFile) {
+        Collection<CanopyCluster> canopies = null;
 
         try (FileInputStream inputStream = new FileInputStream(canopiesFile)) {
             try (ObjectInputStream ois = new ObjectInputStream(inputStream)) {
-                canopies = (List<CanopyCluster>) ois.readObject();
+                canopies = (Collection<CanopyCluster>) ois.readObject();
                 ois.close();
             } catch (IOException | ClassNotFoundException e) {
                 logger.error("Failed to read canopies to: '" + canopiesFile.getAbsolutePath() + "'", e);

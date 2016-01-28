@@ -8,6 +8,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,7 +41,7 @@ public class SerializerUtilTest {
         assertThat(SerializerUtil.serializeCanopies(canopiesFile, canopies), is(true));
 
         //execute
-        List<CanopyCluster> canopyClusters = SerializerUtil.deSerializeCanopies(canopiesFile);
+        Collection<CanopyCluster> canopyClusters = SerializerUtil.deSerializeCanopies(canopiesFile);
 
         //assert
         assertThat(canopyClusters, hasSize(canopies.size()));

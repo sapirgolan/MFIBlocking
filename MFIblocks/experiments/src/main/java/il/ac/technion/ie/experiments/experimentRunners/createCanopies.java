@@ -49,7 +49,7 @@ public class CreateCanopies extends CanopyExperiment {
                             String FileName = "Canopy_" + i;
                             File canopiesFile = new File(directory, FileName);
 
-                            List<CanopyCluster> canopies = super.createCaniopies(cleanBlocks);
+                            Collection<CanopyCluster> canopies = super.createCaniopies(cleanBlocks);
                             logger.debug(canopies.size() + " were created");
                             SerializerUtil.serializeCanopies(canopiesFile, canopies);
                             logger.debug("Finished serializing Canopies");

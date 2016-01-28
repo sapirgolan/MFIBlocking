@@ -21,10 +21,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by I062070 on 30/12/2015.
@@ -57,7 +54,7 @@ public class CanopyExperiment extends AbstractExperiment {
     }
 
     protected DuplicateReductionContext canopyCoreExperiment(List<BlockWithData> cleanBlocks) throws CanopyParametersException, InvalidSearchResultException {
-        List<CanopyCluster> canopies = createCaniopies(cleanBlocks);
+        Collection<CanopyCluster> canopies = createCaniopies(cleanBlocks);
         List<BlockWithData> dirtyBlocks = canopyService.convertCanopiesToBlocks(canopies);
         logger.info("Converted " + dirtyBlocks.size() + " canopies to blocks. " + (canopies.size() - dirtyBlocks.size()) + " were of size 1 and therefore removed");
         super.calculateMillerResults(dirtyBlocks);
@@ -96,11 +93,11 @@ public class CanopyExperiment extends AbstractExperiment {
         return reductionContext;
     }
 
-    protected List<CanopyCluster> createCaniopies(List<BlockWithData> cleanBlocks) throws CanopyParametersException, InvalidSearchResultException {
+    protected Collection<CanopyCluster> createCaniopies(List<BlockWithData> cleanBlocks) throws CanopyParametersException, InvalidSearchResultException {
         List<Record> records = getRecordsFromBlcoks(cleanBlocks);
         Canopy canopy = new Canopy(records, 0.15, 0.05);
         canopy.initSearchEngine(new CanopyInteraction());
-        List<CanopyCluster> canopies = canopy.createCanopies();
+        Collection<CanopyCluster> canopies = canopy.createCanopies();
         logger.info("There are " + canopies.size() + " canopies in dataset");
         return canopies;
     }

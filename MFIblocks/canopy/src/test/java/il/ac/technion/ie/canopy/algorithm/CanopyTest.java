@@ -23,10 +23,7 @@ import org.mockito.Spy;
 import org.powermock.reflect.Whitebox;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -144,7 +141,7 @@ public class CanopyTest {
         List<Record> records = UtilitiesForBlocksAndRecords.createRecordsFromTestFile(pathToBigRecordsFile);
         classUnderTest = new Canopy(records, 0.15, 0.05);
         classUnderTest.initSearchEngine(new CanopyInteraction());
-        List<CanopyCluster> canopies = classUnderTest.createCanopies();
+        Collection<CanopyCluster> canopies = classUnderTest.createCanopies();
         assertThat(canopies, not(empty()));
         assertThat(canopies, not(hasSize(records.size())));
         assertThat(canopies.size(), lessThan(records.size()));

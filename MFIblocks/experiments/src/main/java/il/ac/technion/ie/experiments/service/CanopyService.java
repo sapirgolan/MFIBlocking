@@ -121,7 +121,7 @@ public class CanopyService {
         return records;
     }
 
-    public List<BlockWithData> convertCanopiesToBlocks(List<CanopyCluster> canopies) {
+    public List<BlockWithData> convertCanopiesToBlocks(Collection<CanopyCluster> canopies) {
         List<BlockWithData> list = new ArrayList<>();
         for (CanopyCluster canopy : canopies) {
             if (canopy != null) {

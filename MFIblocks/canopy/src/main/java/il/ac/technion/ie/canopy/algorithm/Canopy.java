@@ -15,6 +15,8 @@ import org.apache.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -67,9 +69,17 @@ public class Canopy {
         SearchContext searchContext = new SearchContext(recordsPool, recordsPoolLock, executedRecordsPool, executedRecordsPoolLock, searchEngine, searcher, records, T2, T1);
         WorkersManager workersManager = new WorkersManager(queue, searchContext);
 
-        jobCreatorManager.start();
+        Future<Boolean> finishedStatus = jobCreatorManager.start();
         Collection<CanopyCluster> canopyClusters = workersManager.start();
+
+        try {
+            boolean wereAllJobsCreated = finishedStatus.get();
+            logger.info("Were all jobs created? - " + wereAllJobsCreated);
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Failed to determine if all jobs were created. Got an exception in Future.get()", e);
+        }
         jobCreatorManager.shutdown();
+
         return canopyClusters;
     }
 

@@ -28,11 +28,11 @@ public class JobCreatorManager {
         this.queue = queue;
     }
 
-    public void start() {
+    public Future<Boolean> start() {
         executorService = Executors.newSingleThreadExecutor(getThreadFactory());
         JobCreatorCallable creatorCallable = new JobCreatorCallable(readLock, recordsPool, queue);
         logger.info("Submitting JobCreatorCallable");
-        Future<Boolean> booleanFuture = executorService.submit(creatorCallable);
+        return executorService.submit(creatorCallable);
 //            Boolean wereAllJobsCreated = booleanFuture.get();
 //            logger.info("Were all jobs created? - " + wereAllJobsCreated);
 //        } catch (InterruptedException | ExecutionException e) {

@@ -20,6 +20,7 @@ public class JobCreatorManager {
     private final Set<Record> recordsPool;
     private final ArrayBlockingQueue<Record> queue;
     private final Lock readLock;
+    private ExecutorService executorService;
 
     public JobCreatorManager(ReentrantReadWriteLock lock, Set<Record> recordsPool, ArrayBlockingQueue<Record> queue) {
         this.readLock = lock.readLock();
@@ -28,24 +29,25 @@ public class JobCreatorManager {
     }
 
     public void start() {
-        ExecutorService executorService = Executors.newSingleThreadExecutor(getThreadFactory());
+        executorService = Executors.newSingleThreadExecutor(getThreadFactory());
         JobCreatorCallable creatorCallable = new JobCreatorCallable(readLock, recordsPool, queue);
         logger.info("Submitting JobCreatorCallable");
         Future<Boolean> booleanFuture = executorService.submit(creatorCallable);
+//            Boolean wereAllJobsCreated = booleanFuture.get();
+//            logger.info("Were all jobs created? - " + wereAllJobsCreated);
+//        } catch (InterruptedException | ExecutionException e) {
+//            logger.error("Failed to determine if all jobs were created. Got an exception in Future.get()", e);
+    }
+
+    public void shutdown() {
+        executorService.shutdown();
         try {
-            Boolean wereAllJobsCreated = booleanFuture.get();
-            logger.info("Were all jobs created? - " + wereAllJobsCreated);
-        } catch (InterruptedException | ExecutionException e) {
-            logger.error("Failed to determine if all jobs were created. Got an exception in Future.get()", e);
-        } finally {
-            executorService.shutdown();
-            try {
-                boolean wasJobsExecutorServiceClosed = executorService.awaitTermination(1, TimeUnit.MINUTES);
-                logger.debug("was Jobs Executor Service Closed ? " + wasJobsExecutorServiceClosed);
-            } catch (InterruptedException e) {
-                logger.error("Failed to wait till reviling if JobsExecutorServiceClosed was closed", e);
-            }
+            boolean wasJobsExecutorServiceClosed = executorService.awaitTermination(1, TimeUnit.MINUTES);
+            logger.debug("was Jobs Executor Service Closed ? " + wasJobsExecutorServiceClosed);
+        } catch (InterruptedException e) {
+            logger.error("Failed to wait till reviling if JobsExecutorServiceClosed was closed", e);
         }
+
     }
 
     private ThreadFactory getThreadFactory() {

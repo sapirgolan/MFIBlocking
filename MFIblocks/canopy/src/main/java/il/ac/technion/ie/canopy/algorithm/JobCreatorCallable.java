@@ -1,6 +1,7 @@
 package il.ac.technion.ie.canopy.algorithm;
 
 import il.ac.technion.ie.model.Record;
+import net.jcip.annotations.GuardedBy;
 import org.apache.log4j.Logger;
 
 import java.util.Set;
@@ -15,9 +16,8 @@ import java.util.concurrent.locks.Lock;
 public class JobCreatorCallable implements Callable<Boolean> {
     private static final Logger logger = Logger.getLogger(JobCreatorCallable.class);
 
-
     private final Lock readLock;
-    private final Set<Record> recordsPool;
+    @GuardedBy("readLock") private final Set<Record> recordsPool;
     private final ArrayBlockingQueue<Record> queue;
 
     public JobCreatorCallable(Lock readLock, Set<Record> recordsPool, ArrayBlockingQueue<Record> queue) {
@@ -37,24 +37,24 @@ public class JobCreatorCallable implements Callable<Boolean> {
         boolean response = false;
         try {
             do {
-                readLock.unlock();
-                logger.trace("Released reading lock from 'recordsPool'");
                 Record record = this.sampleRecordRandomly();
                 if (record != null) {
                     logger.debug("Creating a new job for record: " + record);
                     boolean wasInserted = false;
                     while (!wasInserted) {
-                        logger.trace("Trying to add job into jobs pool");
-                        wasInserted = queue.offer(record);
+                        logger.trace("Trying to 'put' job into jobs pool");
+                        queue.put(record);
+                        wasInserted = true;
+                        logger.trace("new job was added into the pool");
+                        /*wasInserted = queue.offer(record);
                         if (!wasInserted) {
                             logger.trace("pool is full. Skipping current thread using 'yield()'");
+                            Thread.
                             Thread.yield();
                         } else {
                             logger.trace("new job was added into the pool");
-                        }
+                        }*/
                     }
-                    logger.trace("locking for reading 'recordsPool'");
-                    readLock.lock();
                 }
             } while (!recordsPool.isEmpty());
             response = true;

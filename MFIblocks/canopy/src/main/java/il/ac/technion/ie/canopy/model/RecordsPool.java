@@ -13,6 +13,18 @@ public class RecordsPool<T> extends HashSet<T> {
     }
 
     /**
+     * Constructs a new, empty set; the backing <tt>HashMap</tt> instance has
+     * the specified initial capacity and default load factor (0.75).
+     *
+     * @param initialCapacity the initial capacity of the hash table
+     * @throws IllegalArgumentException if the initial capacity is less
+     *                                            than zero
+     */
+    public RecordsPool(int initialCapacity) {
+        super(initialCapacity);
+    }
+
+    /**
      * This method is thread safe <br>
      * Returns <tt>true</tt> if this set contains no elements.
      *

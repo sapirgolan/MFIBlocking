@@ -27,21 +27,31 @@ public class CanopyCluster implements Serializable{
     private static final Logger logger = Logger.getLogger(CanopyCluster.class);
 
 
-    public CanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
+    private CanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
         CanopyUtils.assertT1andT2(t1, t2);
         candidateRecords = candidateRecordsForCanopy;
+        logger.debug("Obtained " + candidateRecordsForCanopy.size() + " as candidates for canopy");
         double localMaxScore = 0;
         double localMinScore = 0;
         for (CanopyRecord canopyRecord : candidateRecordsForCanopy) {
             localMinScore = Math.min(localMinScore, canopyRecord.getScore());
             localMaxScore = Math.max(localMaxScore, canopyRecord.getScore());
         }
+        logger.debug("local Max score is: " + localMaxScore);
+        logger.debug("local Min score is: " + localMinScore);
         this.range = localMaxScore - localMinScore;
         this.minScore = localMinScore;
         this.t2 = t2;
         this.t1 = t1;
         allRecords = new ArrayList<>();
         tightRecords = new ArrayList<>();
+    }
+
+    public static CanopyCluster newCanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
+        CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, t2, t1);
+        canopyCluster.removeRecordsBelowT2();
+        canopyCluster.removeRecordsBelowT1();
+        return canopyCluster;
     }
 
     public void removeRecordsBelowT2() {

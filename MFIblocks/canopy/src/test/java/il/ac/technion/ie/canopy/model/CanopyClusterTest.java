@@ -8,7 +8,6 @@ import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -33,8 +32,7 @@ public class CanopyClusterTest {
         List<CanopyRecord> canopyRecords = generateSimScoresOnRecords(subList, Lists.newArrayList(0.77, 0.88, 0.65, 0.7, 0.2));
 
         //execute
-        CanopyCluster canopyCluster = new CanopyCluster(canopyRecords, 0.3, 0.6);
-        canopyCluster.removeRecordsBelowT2();
+        CanopyCluster canopyCluster = CanopyCluster.newCanopyCluster(canopyRecords, 0.3, 0.6);
         assertThat(canopyCluster.getAllRecords(), hasSize(4));
     }
 
@@ -76,9 +74,7 @@ public class CanopyClusterTest {
         List<CanopyRecord> canopyRecords = generateSimScoresOnRecords(subList, simScores);
 
         //execute
-        CanopyCluster canopyCluster = new CanopyCluster(canopyRecords, t2, t1);
-        canopyCluster.removeRecordsBelowT2();
-        canopyCluster.removeRecordsBelowT1();
+        CanopyCluster canopyCluster = CanopyCluster.newCanopyCluster(canopyRecords, t2, t1);
         assertThat(canopyCluster.getTightRecords(), hasSize(numberRelevantRecords));
     }
 
@@ -95,17 +91,9 @@ public class CanopyClusterTest {
     @Test
     public void testCanopyNotContainAllCandidateRecords() throws Exception {
         CanopyCluster cluster = createCluster();
-        List<CanopyRecord> candidateRecords = Whitebox.getInternalState(cluster, "candidateRecords");
-        candidateRecords = new ArrayList<>(candidateRecords);
 
-        cluster.removeRecordsBelowT2();
         List<CanopyRecord> allRecords = cluster.getAllRecords();
-        candidateRecords.removeAll(allRecords);
-        assertThat(candidateRecords, hasSize(1));
-
-        for (CanopyRecord record : candidateRecords) {
-            assertThat("record with ID '" + record.toString() + "' should NOT have been in cluster but it is not", !cluster.contains(record));
-        }
+        assertThat(allRecords, hasSize(4));
     }
 
     @Test
@@ -159,7 +147,7 @@ public class CanopyClusterTest {
         List<CanopyRecord> canopyRecords = generateSimScoresOnRecords(subList, Lists.newArrayList(0.77, 0.88, 0.65, 0.7, 0.2));
 
         //execute
-        CanopyCluster canopyCluster = new CanopyCluster(canopyRecords, 0.3, 0.6);
+        CanopyCluster canopyCluster = CanopyCluster.newCanopyCluster(canopyRecords, 0.3, 0.6);
         return canopyCluster;
     }
 

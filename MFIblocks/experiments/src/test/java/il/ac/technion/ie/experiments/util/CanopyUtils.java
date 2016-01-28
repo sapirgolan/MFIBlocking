@@ -1,7 +1,6 @@
 package il.ac.technion.ie.experiments.util;
 
 import com.google.common.collect.Lists;
-import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.model.CanopyRecord;
 import il.ac.technion.ie.model.Record;
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class CanopyUtils {
 
-    public static CanopyCluster createCanopy(List<List<Record>> records) throws CanopyParametersException {
+    public static CanopyCluster createCanopy(List<List<Record>> records) throws Exception {
 
         List<CanopyRecord> canopyRecords = new ArrayList<>();
         for (List<Record> sublist : records) {
@@ -23,13 +22,13 @@ public class CanopyUtils {
                 canopyRecords.add(new CanopyRecord(record, 0.0));
             }
         }
-        CanopyCluster canopyCluster = new CanopyCluster(canopyRecords, 0.01, 0.2);
+        CanopyCluster canopyCluster = Whitebox.invokeConstructor(CanopyCluster.class, canopyRecords, 0.01, 0.2);
         Whitebox.setInternalState(canopyCluster, "allRecords", canopyRecords);
 
         return canopyCluster;
     }
 
-    public static CanopyCluster createCanopy(List<List<Record>> records, List<Double> scores) throws CanopyParametersException {
+    public static CanopyCluster createCanopy(List<List<Record>> records, List<Double> scores) throws Exception {
 
         List<CanopyRecord> canopyRecords = new ArrayList<>();
         int index = 0;
@@ -39,17 +38,17 @@ public class CanopyUtils {
                 index++;
             }
         }
-        CanopyCluster canopyCluster = new CanopyCluster(canopyRecords, 0.01, 0.2);
+        CanopyCluster canopyCluster = Whitebox.invokeConstructor(CanopyCluster.class, canopyRecords, 0.01, 0.2);
         Whitebox.setInternalState(canopyCluster, "allRecords", canopyRecords);
 
         return canopyCluster;
     }
 
-    public static CanopyCluster createCanopySingleList(List<Record> records) throws CanopyParametersException {
+    public static CanopyCluster createCanopySingleList(List<Record> records) throws Exception {
         return createCanopy(Lists.<List<Record>>newArrayList(records));
     }
 
-    public static CanopyCluster createCanopySingleList(List<Record> records, List<Double> scores) throws CanopyParametersException {
+    public static CanopyCluster createCanopySingleList(List<Record> records, List<Double> scores) throws Exception {
         return createCanopy(Lists.<List<Record>>newArrayList(records), scores);
     }
 }

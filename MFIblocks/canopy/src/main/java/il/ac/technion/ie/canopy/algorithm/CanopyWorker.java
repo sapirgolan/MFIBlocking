@@ -82,7 +82,7 @@ public class CanopyWorker implements Callable<Collection<CanopyCluster>>{
                 logger.error("The search engine has failed to find any records, even the one that was submitted to search");
             }
 
-            List<CanopyRecord> candidateRecordsForCanopy = findCandidateRecordsForCanopy(searchResults);
+            Collection<CanopyRecord> candidateRecordsForCanopy = findCandidateRecordsForCanopy(searchResults);
             logger.debug("There are " + candidateRecordsForCanopy.size() + " candidate for the canopy");
 
             long startWait = System.nanoTime();
@@ -131,22 +131,22 @@ public class CanopyWorker implements Callable<Collection<CanopyCluster>>{
         return isCanopyValid;
     }
 
-    private List<CanopyRecord> findCandidateRecordsForCanopy(List<SearchResult> searchResults) {
-        List<CanopyRecord> canopyRecords = fetchRecordsBasedOnIDs(searchResults);
+    private Collection<CanopyRecord> findCandidateRecordsForCanopy(List<SearchResult> searchResults) {
+        Collection<CanopyRecord> canopyRecords = fetchRecordsBasedOnIDs(searchResults);
         logger.debug("Transformed " + canopyRecords.size() + " SearchResult records into canopyRecords");
         canopyRecords = retainLegalCandidates(canopyRecords);
         logger.debug("There are " + canopyRecords.size() + " candidates for a canopy");
         return canopyRecords;
     }
 
-    private List<CanopyRecord> fetchRecordsBasedOnIDs(List<SearchResult> searchResults) {
-        ArrayList<CanopyRecord> list = new ArrayList<>();
+    private Collection<CanopyRecord> fetchRecordsBasedOnIDs(List<SearchResult> searchResults) {
+        Collection<CanopyRecord> canopyRecords = new ArrayList<>(searchResults.size());
         for (SearchResult searchResult : searchResults) {
             try {
                 int intID = Integer.parseInt(searchResult.getID());
                 Record record = records.get(intID);
                 if (record != null) {
-                    list.add(new CanopyRecord(record, searchResult.getScore()));
+                    canopyRecords.add(new CanopyRecord(record, searchResult.getScore()));
                 } else {
                     logger.warn(String.format("Didn't find a records that corresponds to ID: '%d'", intID));
                 }
@@ -154,7 +154,7 @@ public class CanopyWorker implements Callable<Collection<CanopyCluster>>{
                 logger.error(String.format("Failed to retrieve record corresponds to ID '%s'", searchResult), e);
             }
         }
-        return list;
+        return canopyRecords;
     }
 
     /**
@@ -164,12 +164,14 @@ public class CanopyWorker implements Callable<Collection<CanopyCluster>>{
      * specified collection.
      * @param candidateRecordsForCanopy List with all elements
      */
-    private List<CanopyRecord> retainLegalCandidates(List<CanopyRecord> candidateRecordsForCanopy) {
+    private List<CanopyRecord> retainLegalCandidates(Collection<CanopyRecord> candidateRecordsForCanopy) {
         executedRecordsPoolLock.readLock().lock();
         int initialSize = candidateRecordsForCanopy.size();
-        candidateRecordsForCanopy.removeAll(executedRecordsPool);
+        HashSet<CanopyRecord> remaingRecords = new HashSet<>(candidateRecordsForCanopy);
+        remaingRecords.removeAll(executedRecordsPool);
+//        candidateRecordsForCanopy.removeAll(executedRecordsPool);
         executedRecordsPoolLock.readLock().unlock();
-        List<CanopyRecord> recordsForCanopyCluster = new ArrayList<>(candidateRecordsForCanopy);
+        List<CanopyRecord> recordsForCanopyCluster = new ArrayList<>(remaingRecords);
         logger.debug("Removed " + (initialSize - candidateRecordsForCanopy.size()) + " records since they're already assigned to canopies");
         return recordsForCanopyCluster;
     }
@@ -187,7 +189,7 @@ public class CanopyWorker implements Callable<Collection<CanopyCluster>>{
      * @param candidateRecordsForCanopy
      * @return
      */
-    private boolean doesAllCandidatesRecordsStillExists(List<CanopyRecord> candidateRecordsForCanopy) {
+    private boolean doesAllCandidatesRecordsStillExists(Collection<CanopyRecord> candidateRecordsForCanopy) {
         executedRecordsPoolLock.readLock().lock();
         Sets.SetView<Record> intersection = Sets.intersection(executedRecordsPool, new HashSet<>(candidateRecordsForCanopy));
         boolean areAllCandidatesStillValid = intersection.isEmpty();

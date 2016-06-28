@@ -2,6 +2,7 @@ package il.ac.technion.ie.canopy.search;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -21,10 +22,7 @@ import org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 
 /**
  * Created by I062070 on 20/11/2015.
@@ -40,6 +38,11 @@ public class SearchCanopy implements ISearch {
     public static final String OR = " OR ";
     private ListeningExecutorService listeningExecutorService;
     private int maxHits;
+    private final ListeningExecutorService executor;
+
+    public SearchCanopy() {
+        executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
+    }
 
     @Override
     public List<SearchResult> search(Analyzer analyzer, IndexReader index, Integer hitsPerPage, List<String> terms) {
@@ -77,7 +80,7 @@ public class SearchCanopy implements ISearch {
 
                     // create a future job for processing the results of the query
                     //this is where the "magic" happens. Here we pass the search results and build List<SearchResult>
-                    List<SearchResult> docsInCanopy = RetriveDocsFromCanopy(searcher, scoreDocs);
+                    List<SearchResult> docsInCanopy = retrieveDocsFromCanopy(searcher, scoreDocs);
                     recordsIDs.addAll(docsInCanopy);
                     
                     //perform the actual search on documents
@@ -94,7 +97,7 @@ public class SearchCanopy implements ISearch {
         return recordsIDs;
     }
 
-    private List<SearchResult> RetriveDocsFromCanopy(IndexSearcher searcher, ScoreDoc[] scoreDocs) {
+    private List<SearchResult> retrieveDocsFromCanopy(IndexSearcher searcher, ScoreDoc[] scoreDocs) {
         CacheWrapper cacheWrapper = CacheWrapper.getInstance();
         List<SearchResult> results = new ArrayList<>(scoreDocs.length);
         //do processing on results
@@ -102,16 +105,23 @@ public class SearchCanopy implements ISearch {
 
         Map<Integer, Float> docIdToScore = getAllDocsIDs(scoreDocs);
         logger.debug("Fetching data in 'batch' from cache");
-        ImmutableMap<Integer, Document> allPresentDocuments = cacheWrapper.getAll(docIdToScore.keySet());
+        ImmutableMap<Integer, Future<Document>> allPresentDocuments = cacheWrapper.getAll(docIdToScore.keySet());
         logger.debug("fetched " + allPresentDocuments.size() + " items from cache");
         logger.debug((docIdToScore.size() - allPresentDocuments.size()) + " items are not in cache.");
 
-        for (Map.Entry<Integer, Document> entry : allPresentDocuments.entrySet()) {
+        for (Map.Entry<Integer, Future<Document>> entry : allPresentDocuments.entrySet()) {
             Integer docId = entry.getKey();
-            Document document = entry.getValue();
-            Float score = docIdToScore.get(docId);
-            SearchResult searchResult = this.buildSearchResultFromDocument(document, score);
-            results.add(searchResult);
+            try {
+                Document document = entry.getValue().get();
+                Float score = docIdToScore.get(docId);
+                SearchResult searchResult = this.buildSearchResultFromDocument(document, score);
+                results.add(searchResult);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.warn("Thread had been Interrupted", e);
+            } catch (ExecutionException e) {
+                logger.error("Failed to build search result fro document", e);
+            }
         }
 
         docIdToScore.keySet().removeAll(allPresentDocuments.keySet());
@@ -119,12 +129,16 @@ public class SearchCanopy implements ISearch {
         logger.debug("Fetching " + docIdToScore.size() + " Items from Lucene");
         for (Integer docId : docIdToScore.keySet()) {
             try {
-                Document document = cacheWrapper.get(docId, new DocumentCallable(docId, searcher));
+                Future<Document> documentFuture = cacheWrapper.get(docId, new DocumentCallable(docId, searcher));
                 Float score = docIdToScore.get(docId);
+                Document document = documentFuture.get();
                 SearchResult searchResult = buildSearchResultFromDocument(document, score);
                 results.add(searchResult);
             } catch (ExecutionException e) {
                 logger.error("Failed to find a record in canopy", e);
+            } catch (InterruptedException e) {
+                logger.warn("Thread has been interrupted", e);
+                Thread.currentThread().interrupt();
             }
         }
         logger.debug("Finished searching for records in Lucene");
@@ -221,7 +235,7 @@ public class SearchCanopy implements ISearch {
         }
     }
 
-    public class DocumentCallable implements Callable<Document> {
+    public class DocumentCallable implements Callable<Future<Document>> {
         private final int docId;
         private final IndexSearcher searcher;
 
@@ -231,8 +245,14 @@ public class SearchCanopy implements ISearch {
         }
 
         @Override
-        public Document call() throws Exception {
-            return searcher.doc(docId);
+        public Future<Document> call() throws Exception {
+            ListenableFuture<Document> documentFuture = executor.submit(new Callable<Document>() {
+                @Override
+                public Document call() throws Exception {
+                    return searcher.doc(docId);
+                }
+            });
+            return documentFuture;
         }
     }
 }

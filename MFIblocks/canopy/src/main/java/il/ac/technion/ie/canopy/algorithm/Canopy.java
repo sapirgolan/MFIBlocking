@@ -63,7 +63,7 @@ public class Canopy {
     public Collection<CanopyCluster> createCanopies() throws InvalidSearchResultException {
         ReentrantReadWriteLock recordsPoolLock = new ReentrantReadWriteLock(true);
         ReentrantReadWriteLock executedRecordsPoolLock = new ReentrantReadWriteLock(true);
-        ArrayBlockingQueue<Record> queue = new ArrayBlockingQueue<>(100, false);
+        ArrayBlockingQueue<Record> queue = new ArrayBlockingQueue<>(Math.min(1000, recordsPool.size() / 10), false);
 
         JobCreatorManager jobCreatorManager = new JobCreatorManager(recordsPoolLock, recordsPool, queue);
         SearchContext searchContext = new SearchContext(recordsPool, recordsPoolLock, executedRecordsPool, executedRecordsPoolLock, searchEngine, searcher, records, T2, T1);

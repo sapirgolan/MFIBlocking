@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
+import il.ac.technion.ie.experiments.apiAccess.TimeLogger;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.parsers.SerializerUtil;
 import il.ac.technion.ie.experiments.service.Measurements;
@@ -48,8 +49,9 @@ public class CreateCanopies extends CanopyExperiment {
                         try {
                             String FileName = "Canopy_" + i;
                             File canopiesFile = new File(directory, FileName);
-
+                            long startTime = System.nanoTime();
                             Collection<CanopyCluster> canopies = super.createCaniopies(cleanBlocks);
+                            TimeLogger.logDurationInSeconds(startTime, "Creation of canopies with some configuration took");
                             logger.debug(canopies.size() + " were created");
                             SerializerUtil.serializeCanopies(canopiesFile, canopies);
                             logger.debug("Finished serializing Canopies");

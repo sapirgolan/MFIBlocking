@@ -16,7 +16,7 @@ import java.util.List;
  * Created by I062070 on 22/11/2015.
  */
 public class CanopyCluster implements Serializable{
-    private final List<CanopyRecord> candidateRecords;
+    private final Collection<CanopyRecord> candidateRecords;
     private final double t2;
     private final double t1;
     private final double range;
@@ -27,7 +27,7 @@ public class CanopyCluster implements Serializable{
     private static final Logger logger = Logger.getLogger(CanopyCluster.class);
 
 
-    private CanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
+    private CanopyCluster(Collection<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
         CanopyUtils.assertT1andT2(t1, t2);
         candidateRecords = candidateRecordsForCanopy;
         logger.debug("Obtained " + candidateRecordsForCanopy.size() + " as candidates for canopy");
@@ -47,7 +47,7 @@ public class CanopyCluster implements Serializable{
         tightRecords = new ArrayList<>();
     }
 
-    public static CanopyCluster newCanopyCluster(List<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
+    public static CanopyCluster newCanopyCluster(Collection<CanopyRecord> candidateRecordsForCanopy, double t2, double t1) throws CanopyParametersException {
         CanopyCluster canopyCluster = new CanopyCluster(candidateRecordsForCanopy, t2, t1);
         canopyCluster.removeRecordsBelowT2();
         canopyCluster.removeRecordsBelowT1();

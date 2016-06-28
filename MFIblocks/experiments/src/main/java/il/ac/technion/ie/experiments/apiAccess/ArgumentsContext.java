@@ -16,11 +16,13 @@ class ArgumentsContext {
 
     static final Logger logger = Logger.getLogger(ArgumentsContext.class);
 
+    private boolean profilingMode;
 
     public ArgumentsContext(String... args) {
         this.args = args;
         thresholds = new ArrayList<>();
     }
+
 
     public ArgumentsContext invoke() {
         synchronized (this) {
@@ -29,6 +31,9 @@ class ArgumentsContext {
                 System.exit(-1);
             }
             pathToDataset = args[0];
+            if (args[args.length-1].equalsIgnoreCase("perf")) {
+                this.profilingMode = true;
+            }
             if (args.length > 1) {
                 parseThresholds();
             }
@@ -67,5 +72,9 @@ class ArgumentsContext {
             return 1;
         }
         return 2;
+    }
+
+    public boolean isProfilingMode() {
+        return profilingMode;
     }
 }

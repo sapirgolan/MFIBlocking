@@ -1,27 +1,14 @@
 package il.ac.technion.ie.canopy.search;
 
-import il.ac.technion.ie.canopy.model.CanopyInteraction;
-import il.ac.technion.ie.search.module.SearchResult;
-import il.ac.technion.ie.utils.MockIterator;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Document.class, ScoreDoc.class})
@@ -34,7 +21,7 @@ public class ProcessResultsFutureTest {
     @Mock
     private IndexSearcher searcher;
 
-    @InjectMocks
+/*    @InjectMocks
     private ProcessResultsFuture classUnderTest;
 
     @Before
@@ -66,5 +53,5 @@ public class ProcessResultsFutureTest {
         assertThat(results, hasSize(NUMBER_OF_DOCS));
         assertThat(results, contains(expected.toArray(new SearchResult[expected.size()])));
 
-    }
+    }*/
 }

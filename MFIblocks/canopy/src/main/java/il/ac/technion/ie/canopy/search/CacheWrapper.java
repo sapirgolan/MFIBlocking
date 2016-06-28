@@ -8,6 +8,7 @@ import org.apache.lucene.document.Document;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,7 +20,7 @@ public class CacheWrapper {
     public static volatile CacheWrapper instance = null;
 
     private static final Object lock = new Object();
-    private Cache<Integer, Document> cache;
+    private Cache<Integer, Future<Document>> cache;
 
     public static CacheWrapper getInstance() {
         CacheWrapper r = instance; //temp variable
@@ -46,7 +47,7 @@ public class CacheWrapper {
                 .build();
     }
 
-    public synchronized Document get(int docId, Callable<Document> callable) throws ExecutionException {
+    public Future<Document> get(int docId, Callable<Future<Document>> callable) throws ExecutionException {
         return cache.get(docId, callable);
     }
 
@@ -55,7 +56,7 @@ public class CacheWrapper {
      * @param docIDs
      * @return
      */
-    public synchronized ImmutableMap<Integer, Document> getAll(Collection<Integer> docIDs) {
+    public ImmutableMap<Integer, Future<Document>> getAll(Collection<Integer> docIDs) {
         return cache.getAllPresent(docIDs);
     }
 }

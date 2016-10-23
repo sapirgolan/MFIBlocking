@@ -92,6 +92,7 @@ public class ExprimentsService {
         if (sourceDir.isDirectory()) {
             files = FileUtils.listFiles(sourceDir, new String[]{"csv"}, recursiveSearch);
         }
+        logger.info(String.format("There are %d files under %s", files.size(), pathToDir));
         return files;
     }
 

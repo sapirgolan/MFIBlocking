@@ -1,9 +1,11 @@
 package il.ac.technion.ie.model;
 
+import java.io.Serializable;
+
 /**
  * Created by I062070 on 21/08/2015.
  */
-public class Field {
+public class Field implements Serializable{
     private String name;
     private String value;
 

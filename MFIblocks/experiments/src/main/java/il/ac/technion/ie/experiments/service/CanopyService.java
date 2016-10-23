@@ -122,7 +122,7 @@ public class CanopyService {
     }
 
     public List<BlockWithData> convertCanopiesToBlocks(Collection<CanopyCluster> canopies) {
-        List<BlockWithData> list = new ArrayList<>();
+        List<BlockWithData> list = new ArrayList<>(canopies.size());
         for (CanopyCluster canopy : canopies) {
             if (canopy != null) {
                 if (canopy.size() >= 2) {

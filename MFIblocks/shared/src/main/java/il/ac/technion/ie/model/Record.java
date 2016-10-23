@@ -3,6 +3,7 @@ package il.ac.technion.ie.model;
 import il.ac.technion.ie.utils.MathUtils;
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.TreeMap;
 /**
  * Created by I062070 on 21/08/2015.
  */
-public class Record {
+public class Record implements Serializable{
     protected Map<String, Field> fields;
     protected Integer recordID;
     protected String recordName;

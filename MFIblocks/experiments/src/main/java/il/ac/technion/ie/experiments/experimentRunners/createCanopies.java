@@ -31,7 +31,6 @@ public class CreateCanopies extends CanopyExperiment {
     public void runExperiments(String pathToDatasetFile) {
         logger.info("Starting Febrl Experiment");
         Collection<File> datasets = exprimentsService.findDatasets(pathToDatasetFile, true);
-        logger.info(String.format("There're %d under experiment", datasets.size()));
         Table<String, List<BlockWithData>, Integer> dirToDatasetToFebrlParamTable = parseDatasetsToListsOfBlocks(datasets);
 
         //for each dataset, the experiment NUMBER_OF_EXPERIMENTS

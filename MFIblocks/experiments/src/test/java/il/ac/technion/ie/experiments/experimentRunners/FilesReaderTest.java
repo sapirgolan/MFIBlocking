@@ -1,5 +1,7 @@
 package il.ac.technion.ie.experiments.experimentRunners;
 
+import com.google.common.collect.Table;
+import il.ac.technion.ie.canopy.algorithm.Canopy;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -10,9 +12,12 @@ import org.powermock.reflect.Whitebox;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -23,23 +28,33 @@ public class FilesReaderTest {
     public TemporaryFolder folder = new TemporaryFolder();
     private File root;
     private FilesReader classUnderTest;
+    private List<File> filesCreated = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
+        //root
+        //--01_NumberOfOriginalRecords
+        //----permutationWith_parameter=25
+        //------canopy_0
+        //------canopy_1
+        //...
+        //------canopy_6
         root = folder.newFolder("root");
         String path = root.getAbsolutePath();
-        File permutationWithParam = new File(path + File.separator + "permutationOfFiledModifications" + File.separator
-                + "permutationWithParam_7");
+        File permutationWithParam = new File(path + File.separator + "01_NumberOfOriginalRecords" + File.separator
+                + "permutationWith_parameter=25");
         assertTrue(permutationWithParam.mkdirs());
         for (int i = 0; i < 7; i++) {
             File file = new File(permutationWithParam, "canopy_" + i);
             assertTrue(file.createNewFile());
+            filesCreated.add(file);
         }
         classUnderTest = new FilesReader(root.getPath());
     }
 
     @After
     public void cleanup() throws IOException {
+        filesCreated.clear();
         FileUtils.cleanDirectory(root);
     }
 
@@ -47,6 +62,16 @@ public class FilesReaderTest {
     public void listAllCanopies_someRootPath() throws Exception {
         Collection<File> allFiles =  Whitebox.invokeMethod(classUnderTest, "listAllCanopies");
         assertThat(allFiles, hasSize(7));
-
     }
+
+    @Test
+    public void getAllCanopies() {
+        Table<String, String, Set<File>> canopiesTable = classUnderTest.getAllCanopies();
+        assertThat(canopiesTable.rowKeySet(), hasItem("01_NumberOfOriginalRecords"));
+        assertThat(canopiesTable.columnKeySet(), hasItem("permutationWith_parameter=25"));
+        assertThat(canopiesTable.get("01_NumberOfOriginalRecords", "permutationWith_parameter=25"), hasSize(filesCreated.size()));
+        assertThat(canopiesTable.get("01_NumberOfOriginalRecords", "permutationWith_parameter=25"),
+                containsInAnyOrder(filesCreated.toArray(new File[filesCreated.size()])));
+    }
+
 }

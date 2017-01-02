@@ -60,36 +60,23 @@ public class CanopyExperiment extends AbstractExperiment {
         super.calculateMillerResults(dirtyBlocks);
         Multimap<Record, BlockWithData> millerRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
         DuplicateReductionContext reductionContext = null;
-        try {
-            boolean convexBP = super.runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
-            if (!convexBP) {
-                logger.error("Failed to run ConvexBP on canopy clusters");
-                System.exit(1);
-            }
-            Multimap<Record, BlockWithData> convexBPRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
-            reductionContext = measurements.representativesDuplicateElimination(
-                    millerRepresentatives, convexBPRepresentatives);
-            BiMap<Record, BlockWithData> trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
-            measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
-            measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
-            measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(convexBPRepresentatives.values()), reductionContext);
-            measurements.calcAverageBlockSize(dirtyBlocks, reductionContext);
-            reductionContext.setNumberOfDirtyBlocks(dirtyBlocks.size());
-            double dupsRealRepresentatives = measurements.duplicatesRealRepresentatives(millerRepresentatives, convexBPRepresentatives, trueRepsMap);
-            reductionContext.setDuplicatesRealRepresentatives(dupsRealRepresentatives);
-
-        } catch (SizeNotEqualException e) {
-            logger.error("Failed to create probabilities matrices for convexBP");
-            e.printStackTrace();
-        } catch (IOException e) {
-            logger.error("Cannot create context for ConvexBP algorithm", e);
-        } catch (OSNotSupportedException e) {
-            logger.error("Cannot run ConvexBP algorithm on current machine", e);
-        } catch (InterruptedException e) {
-            logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
-        } catch (NoValueExistsException e) {
-            logger.error("Failed to consume new probabilities", e);
+        boolean convexBP = super.runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
+        if (!convexBP) {
+            logger.error("Failed to run ConvexBP on canopy clusters");
+            System.exit(1);
         }
+        Multimap<Record, BlockWithData> convexBPRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
+        reductionContext = measurements.representativesDuplicateElimination(
+                millerRepresentatives, convexBPRepresentatives);
+        BiMap<Record, BlockWithData> trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
+        measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
+        measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+        measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(convexBPRepresentatives.values()), reductionContext);
+        measurements.calcAverageBlockSize(dirtyBlocks, reductionContext);
+        reductionContext.setNumberOfDirtyBlocks(dirtyBlocks.size());
+        double dupsRealRepresentatives = measurements.duplicatesRealRepresentatives(millerRepresentatives, convexBPRepresentatives, trueRepsMap);
+        reductionContext.setDuplicatesRealRepresentatives(dupsRealRepresentatives);
+
         return reductionContext;
     }
 

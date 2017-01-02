@@ -56,18 +56,10 @@ public abstract class AbstractExperiment {
             }
         } catch (SizeNotEqualException e) {
             logger.error("Failed to split blocks since #blocs<>#splitProbabilities", e);
-        } catch (IOException e) {
-            logger.error("Cannot create context for ConvexBP algorithm", e);
-        } catch (InterruptedException e) {
-            logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
-        } catch (OSNotSupportedException e) {
-            logger.error("Cannot run ConvexBP algorithm on current machine", e);
-        } catch (NoValueExistsException e) {
-            logger.error("Failed to consume new probabilities", e);
         }
     }
 
-    protected boolean runConvexBP(CommandExacter commandExacter, Double threshold, List<BlockWithData> splitedBlocks) throws SizeNotEqualException, IOException, OSNotSupportedException, InterruptedException, NoValueExistsException {
+    private boolean runConvexBPInternally (CommandExacter commandExacter, Double threshold, List<BlockWithData> splitedBlocks) throws SizeNotEqualException, IOException, OSNotSupportedException, InterruptedException, NoValueExistsException {
         UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
         logger.debug("creating UAI file");
         UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
@@ -86,6 +78,24 @@ public abstract class AbstractExperiment {
             return true;
         }
         return false;
+    }
+    protected boolean runConvexBP(CommandExacter commandExacter, Double threshold, List<BlockWithData> splitedBlocks) {
+        boolean didConvexBPRan = false;
+        try {
+            didConvexBPRan = this.runConvexBPInternally(commandExacter, threshold, splitedBlocks);
+        }
+        catch (SizeNotEqualException e) {
+            logger.error("Failed to create probabilities matrices for convexBP");
+        } catch (IOException e) {
+            logger.error("Cannot create context for ConvexBP algorithm", e);
+        } catch (OSNotSupportedException e) {
+            logger.error("Cannot run ConvexBP algorithm on current machine", e);
+        } catch (InterruptedException e) {
+            logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
+        } catch (NoValueExistsException e) {
+            logger.error("Failed to consume new probabilities", e);
+        }
+        return didConvexBPRan;
     }
 
     protected void calculateMillerResults(List<BlockWithData> blockWithDatas) {

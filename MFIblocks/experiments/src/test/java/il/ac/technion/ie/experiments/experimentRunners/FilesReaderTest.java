@@ -1,7 +1,10 @@
 package il.ac.technion.ie.experiments.experimentRunners;
 
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import il.ac.technion.ie.canopy.algorithm.Canopy;
+import il.ac.technion.ie.experiments.util.ZipExtractor;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -12,6 +15,7 @@ import org.powermock.reflect.Whitebox;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,6 +33,13 @@ public class FilesReaderTest {
     private File root;
     private FilesReader classUnderTest;
     private List<File> filesCreated = new ArrayList<>();
+    private Set<String> expectedFileNames = Sets.newHashSet("25_75_5_5_16_uniform_all_0_parameter=25.csv",
+            "45_75_5_5_16_uniform_all_0_parameter=45.csv",
+            "30_75_5_5_16_uniform_all_0_parameter=30.csv",
+            "50_75_5_5_16_uniform_all_0_parameter=50.csv",
+            "35_75_5_5_16_uniform_all_0_parameter=35.csv",
+            "55_75_5_5_16_uniform_all_0_parameter=55.csv",
+            "40_75_5_5_16_uniform_all_0_parameter=40.csv");
 
     @Before
     public void setUp() throws Exception {
@@ -77,6 +88,18 @@ public class FilesReaderTest {
         assertThat(canopiesTable.get("01_NumberOfOriginalRecords", "permutationWith_parameter=25"), hasSize(filesCreated.size()));
         assertThat(canopiesTable.get("01_NumberOfOriginalRecords", "permutationWith_parameter=25"),
                 containsInAnyOrder(filesCreated.toArray(new File[filesCreated.size()])));
+    }
+
+
+    @Test
+    public void getAllDataSets() throws ZipException, IOException, URISyntaxException {
+        ZipExtractor.extractZipFromResources(root, "/01_NumberOfOriginalRecords_datasets.zip");
+        Collection<File> datasets = classUnderTest.getAllDatasets();
+
+        assertThat(datasets, hasSize(7));
+        for (File dataset : datasets) {
+            assertThat(expectedFileNames, hasItem(dataset.getName()));
+        }
     }
 
 }

@@ -9,9 +9,6 @@ import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
-import il.ac.technion.ie.experiments.exception.NoValueExistsException;
-import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
-import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.service.CanopyService;
 import il.ac.technion.ie.experiments.service.Measurements;
@@ -20,7 +17,6 @@ import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -60,7 +56,7 @@ public class CanopyExperiment extends AbstractExperiment {
         super.calculateMillerResults(dirtyBlocks);
         Multimap<Record, BlockWithData> millerRepresentatives = exprimentsService.fetchRepresentatives(dirtyBlocks);
         DuplicateReductionContext reductionContext = null;
-        boolean convexBP = super.runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
+        boolean convexBP = convexBPService.runConvexBP(new CommandExacter(), 0.0, dirtyBlocks);
         if (!convexBP) {
             logger.error("Failed to run ConvexBP on canopy clusters");
             System.exit(1);

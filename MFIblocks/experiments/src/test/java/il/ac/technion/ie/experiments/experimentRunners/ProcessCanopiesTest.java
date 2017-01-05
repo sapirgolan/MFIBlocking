@@ -2,24 +2,18 @@ package il.ac.technion.ie.experiments.experimentRunners;
 
 import com.google.common.collect.BiMap;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
-import net.lingala.zip4j.exception.ZipException;
-import org.hamcrest.Matchers;
+import il.ac.technion.ie.experiments.util.ZipExtractor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Collection;
-
-import net.lingala.zip4j.core.ZipFile;
 import org.powermock.reflect.Whitebox;
 
+import java.io.File;
+import java.util.Collection;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by I062070 on 02/01/2017.
@@ -35,20 +29,14 @@ public class ProcessCanopiesTest {
     @Before
     public void setUp() throws Exception {
         classUnderTest = new ProcessCanopies();
-        extractZipFromResources();
-    }
-
-    private void extractZipFromResources() throws IOException, URISyntaxException, ZipException {
         rootFolder = temporaryFolder.newFolder("root");
-        File tesZip = new File( this.getClass().getResource("/01_NumberOfOriginalRecords.zip").toURI() );
-        ZipFile zipFile = new ZipFile(tesZip);
-        zipFile.extractAll(rootFolder.getAbsolutePath());
+        ZipExtractor.extractZipFromResources(rootFolder, "/01_NumberOfOriginalRecords_canopies.zip");
     }
 
     @Test
     public void readAndParseCanopiesFromDir_hasAllCanopyFiles() throws Exception {
         Whitebox.invokeMethod(classUnderTest, "readAndParseCanopiesFromDir", rootFolder.getAbsolutePath());
-        BiMap<File, Collection<CanopyCluster>> fileToCanopies = Whitebox.getInternalState(classUnderTest, BiMap.class);
+        BiMap<File, Collection<CanopyCluster>> fileToCanopies = Whitebox.getInternalState(classUnderTest, "fileToCanopies");
 
         assertThat(fileToCanopies.entrySet(), hasSize(35));
         assertThat(fileToCanopies.inverse().entrySet(), hasSize(35));

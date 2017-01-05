@@ -32,14 +32,18 @@ public class FilesReaderTest {
 
     @Before
     public void setUp() throws Exception {
-        //root
-        //--01_NumberOfOriginalRecords
-        //----permutationWith_parameter=25
-        //------canopy_0
-        //------canopy_1
-        //...
-        //------canopy_6
         root = folder.newFolder("root");
+        classUnderTest = new FilesReader(root.getPath());
+    }
+
+    //root
+    //--01_NumberOfOriginalRecords
+    //----permutationWith_parameter=25
+    //------canopy_0
+    //------canopy_1
+    //...
+    //------canopy_6
+    private void createCanopiesFiles() throws IOException {
         String path = root.getAbsolutePath();
         File permutationWithParam = new File(path + File.separator + "01_NumberOfOriginalRecords" + File.separator
                 + "permutationWith_parameter=25");
@@ -49,7 +53,6 @@ public class FilesReaderTest {
             assertTrue(file.createNewFile());
             filesCreated.add(file);
         }
-        classUnderTest = new FilesReader(root.getPath());
     }
 
     @After
@@ -60,12 +63,14 @@ public class FilesReaderTest {
 
     @Test
     public void listAllCanopies_someRootPath() throws Exception {
+        createCanopiesFiles();
         Collection<File> allFiles =  Whitebox.invokeMethod(classUnderTest, "listAllCanopies");
         assertThat(allFiles, hasSize(7));
     }
 
     @Test
-    public void getAllCanopies() {
+    public void getAllCanopies() throws IOException {
+        createCanopiesFiles();
         Table<String, String, Set<File>> canopiesTable = classUnderTest.getAllCanopies();
         assertThat(canopiesTable.rowKeySet(), hasItem("01_NumberOfOriginalRecords"));
         assertThat(canopiesTable.columnKeySet(), hasItem("permutationWith_parameter=25"));

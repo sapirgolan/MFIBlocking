@@ -5,86 +5,128 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
-import il.ac.technion.ie.experiments.exception.NoValueExistsException;
-import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
-import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
+import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.parsers.SerializerUtil;
-import il.ac.technion.ie.experiments.service.CanopyService;
-import il.ac.technion.ie.experiments.service.ExprimentsService;
-import il.ac.technion.ie.experiments.service.ProbabilityService;
+import il.ac.technion.ie.experiments.service.*;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
 import il.ac.technion.ie.model.Record;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by I062070 on 23/10/2016.
  */
-public class ProcessCanopies extends AbstractExperiment {
+public class ProcessCanopies {
 
     private static final Logger logger = Logger.getLogger(ProcessCanopies.class);
 
     private CanopyService canopyService;
+    private ConvexBPService convexBPService;
     private ProbabilityService probabilityService;
     private BiMap<File, List<BlockWithData>> fileToCanopies;
     private Table<String, String, Set<File>> allCanopies;
     private ExprimentsService exprimentsService;
+    private IMeasurements measurements;
+    private BiMap<Record, BlockWithData> trueRepsMap;
 
     public ProcessCanopies() {
         canopyService = new CanopyService();
+        convexBPService = new ConvexBPService();
         probabilityService = new ProbabilityService();
         exprimentsService = new ExprimentsService();
     }
 
-    @Override
-    public void runExperiments(String pathToDatasetFile) {
-        String pathToDirFolder = pathToDatasetFile;
-        this.readAndParseCanopiesFromDir(pathToDirFolder);
+    public void runExperiments(String pathToDirFolder, String pathToOriginalDatasetFile) {
+        this.readAndInitCanopiesFromDir(pathToDirFolder);
+//        initMembersThatDepandsOnOriginalDataset(pathToOriginalDatasetFile);
         //for each dataset
         //for each permutation
         //for random generation of canopies
-        for (List<BlockWithData> blocks : fileToCanopies.values()) {
-            this.calculateBaselineResults(blocks);
-            this.getBaselineRepresentatives(blocks);
-            this.executeConvexBP(blocks);
+        /*In order to avoid performance penalty of extracting each dataset over & over
+        * and not to save each extraction --> the iteration should be done by each datase*/
+        for (String datasetStr_rowKey : allCanopies.rowKeySet()) {
+            logger.info(String.format("running experiments on 'dataset' - %s ", datasetStr_rowKey));
+            Map<String, Set<File>> permutationsToCanopies = allCanopies.row(datasetStr_rowKey);
+            for (String permutationStr : permutationsToCanopies.keySet()) {
+                logger.info(String.format("running experiments on permutation - '%s'", permutationStr));
+                Set<File> canopiesFiles = permutationsToCanopies.get(permutationStr);
+                for (File canopiesFile : canopiesFiles) {
+                    logger.info(String.format("running experiments on canopy - '%s'", canopiesFile.getName()));
+                    this.performExperimentComparison();
+                }
+            }
         }
-        this.getBcbpRepresentatives(null);
-        this.calculateMeasurements(null);
+        /*for (List<BlockWithData> blocks : fileToCanopies.values()) {
+            this.calculateBaselineResults(blocks);
+            Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
+            boolean continueExecution = this.executeConvexBP(blocks);
+            if (continueExecution) {
+                calculateMeasurements(blocks, baselineRepresentatives);
+            } else {
+                logger.fatal(String.format("Can't continue with execution of experiment for %s since execution of BCP has failed",
+                        fileToCanopies.inverse().get(blocks).getName()));
+            }
+            DuplicateReductionContext results = this.calculateMeasurements(blocks, baselineRepresentatives);
+        }*/
 
     }
 
-    private void readAndParseCanopiesFromDir(String dirPath) {
+    private void performExperimentComparison() {
+    }
+
+    private void initMembersThatDepandsOnOriginalDataset(String pathToOriginalDatasetFile) {
+        ParsingService parsingService = new ParsingService();
+        List<BlockWithData> cleanBlocks = parsingService.parseDataset(pathToOriginalDatasetFile);
+        this.trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
+        this.measurements = new Measurements(cleanBlocks.size());
+    }
+
+    private DuplicateReductionContext calculateMeasurements(List<BlockWithData> blocks, Multimap<Record, BlockWithData> baselineRepresentatives) {
+        Multimap<Record, BlockWithData> bcbpRepresentatives = this.getRepresentatives(blocks);
+        DuplicateReductionContext resultContext = measurements.representativesDuplicateElimination(
+                baselineRepresentatives, bcbpRepresentatives);
+        measurements.representationDiff(trueRepsMap.keySet(), bcbpRepresentatives.keySet(), resultContext);
+        measurements.calcPowerOfRep(trueRepsMap, bcbpRepresentatives, resultContext);
+        measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(bcbpRepresentatives.values()), resultContext);
+        measurements.calcAverageBlockSize(blocks, resultContext);
+        double dupsRealRepresentatives = measurements.duplicatesRealRepresentatives(baselineRepresentatives, bcbpRepresentatives, trueRepsMap);
+
+        resultContext.setNumberOfDirtyBlocks(blocks.size());
+        resultContext.setDuplicatesRealRepresentatives(dupsRealRepresentatives);
+
+        return resultContext;
+    }
+
+    private void readAndInitCanopiesFromDir(String dirPath) {
         FilesReader filesReader = new FilesReader(dirPath);
         allCanopies = filesReader.getAllCanopies();
-        fileToCanopies = HashBiMap.create(allCanopies.size());
+        fileToCanopies = mapCanopyFileToBlocks();
+    }
+
+    private HashBiMap<File, List<BlockWithData>> mapCanopyFileToBlocks() {
+        HashBiMap<File, List<BlockWithData>> canopyFileToBlocks = HashBiMap.create(allCanopies.size());
         //each combination of (parameterUnderTest + ParamValue) has several seized canopies
         for (Set<File> files : allCanopies.values()) {
             for (File file : files) {
                 Collection<CanopyCluster> canopyClusters = SerializerUtil.deSerializeCanopies(file);
                 List<BlockWithData> blockWithDatas = canopyService.convertCanopiesToBlocks(canopyClusters);
-                fileToCanopies.put(file, blockWithDatas);
+                canopyFileToBlocks.put(file, blockWithDatas);
                 logger.info(String.format("Finished converting File '%s' to '%d' blocks", file.getName(), blockWithDatas.size()) );
             }
         }
+        return canopyFileToBlocks;
     }
 
     private void calculateBaselineResults(List<BlockWithData> blocks) {
         probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(blocks);
 
     }
-    private Multimap<Record, BlockWithData> getBaselineRepresentatives(List<BlockWithData> blocks) {
-        return exprimentsService.fetchRepresentatives(blocks);
-    }
 
     private boolean executeConvexBP(List<BlockWithData> blocks) {
-        boolean convexBP = super.runConvexBP(new CommandExacter(), 0.0, blocks);
+        boolean convexBP = convexBPService.runConvexBP(new CommandExacter(), 0.0, blocks);
         if (!convexBP) {
             logger.error("Failed to run ConvexBP on canopy clusters");
             return false;
@@ -92,11 +134,7 @@ public class ProcessCanopies extends AbstractExperiment {
         return true;
     }
 
-    private Multimap<Record, BlockWithData> getBcbpRepresentatives(List<BlockWithData> blocks) {
-        return null;
-    }
-
-    private void calculateMeasurements(List<BlockWithData> blocks) {
-
+    private Multimap<Record, BlockWithData> getRepresentatives(List<BlockWithData> blocks) {
+        return exprimentsService.fetchRepresentatives(blocks);
     }
 }

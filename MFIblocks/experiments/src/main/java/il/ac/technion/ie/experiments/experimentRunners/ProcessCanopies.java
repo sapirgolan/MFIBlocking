@@ -41,7 +41,7 @@ public class ProcessCanopies {
 
     public void runExperiments(String pathToDirFolder, String pathToOriginalDatasetFile) {
         this.readAndInitCanopiesFromDir(pathToDirFolder);
-//        initMembersThatDepandsOnOriginalDataset(pathToOriginalDatasetFile);
+        Collection<File> allDatasetPermutations = new FilesReader(pathToOriginalDatasetFile).getAllDatasets();
         //for each dataset
         //for each permutation
         //for random generation of canopies
@@ -53,33 +53,37 @@ public class ProcessCanopies {
             for (String permutationStr : permutationsToCanopies.keySet()) {
                 logger.info(String.format("running experiments on permutation - '%s'", permutationStr));
                 Set<File> canopiesFiles = permutationsToCanopies.get(permutationStr);
+                this.initMembersThatDependsOnOriginalDataset(permutationStr, allDatasetPermutations);
                 for (File canopiesFile : canopiesFiles) {
                     logger.info(String.format("running experiments on canopy - '%s'", canopiesFile.getName()));
-                    this.performExperimentComparison();
+                    this.performExperimentComparison(canopiesFile);
                 }
             }
         }
-        /*for (List<BlockWithData> blocks : fileToCanopies.values()) {
-            this.calculateBaselineResults(blocks);
-            Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
-            boolean continueExecution = this.executeConvexBP(blocks);
-            if (continueExecution) {
-                calculateMeasurements(blocks, baselineRepresentatives);
-            } else {
-                logger.fatal(String.format("Can't continue with execution of experiment for %s since execution of BCP has failed",
-                        fileToCanopies.inverse().get(blocks).getName()));
-            }
+    }
+
+    private void performExperimentComparison(File canopiesFile) {
+        List<BlockWithData> blocks = fileToCanopies.get(canopiesFile);
+        this.calculateBaselineResults(blocks);
+        Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
+        boolean continueExecution = this.executeConvexBP(blocks);
+        if (continueExecution) {
             DuplicateReductionContext results = this.calculateMeasurements(blocks, baselineRepresentatives);
-        }*/
-
+        } else {
+            logger.fatal(String.format("Can't continue with execution of experiment for %s since execution of BCP has failed",
+                    fileToCanopies.inverse().get(blocks).getName()));
+        }
     }
 
-    private void performExperimentComparison() {
-    }
+    private void initMembersThatDependsOnOriginalDataset(String permutationStr, Collection<File> allDatasetPermutations) {
+        File datasetFile = DatasetMapper.getDatasetFile(permutationStr, allDatasetPermutations);
 
-    private void initMembersThatDepandsOnOriginalDataset(String pathToOriginalDatasetFile) {
         ParsingService parsingService = new ParsingService();
-        List<BlockWithData> cleanBlocks = parsingService.parseDataset(pathToOriginalDatasetFile);
+        if (datasetFile == null) {
+            logger.error(String.format("no dataset exists for permutation %s", permutationStr));
+            return;
+        }
+        List<BlockWithData> cleanBlocks = parsingService.parseDataset(datasetFile.getAbsolutePath());
         this.trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
         this.measurements = new Measurements(cleanBlocks.size());
     }

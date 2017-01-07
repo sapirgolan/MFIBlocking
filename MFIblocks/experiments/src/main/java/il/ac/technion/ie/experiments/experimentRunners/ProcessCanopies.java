@@ -1,9 +1,6 @@
 package il.ac.technion.ie.experiments.experimentRunners;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Table;
+import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
@@ -42,6 +39,7 @@ public class ProcessCanopies {
     public void runExperiments(String pathToDirFolder, String pathToOriginalDatasetFile) {
         this.readAndInitCanopiesFromDir(pathToDirFolder);
         Collection<File> allDatasetPermutations = new FilesReader(pathToOriginalDatasetFile).getAllDatasets();
+        Multimap<String, DuplicateReductionContext> results = ArrayListMultimap.create();
         //for each dataset
         //for each permutation
         //for random generation of canopies
@@ -53,31 +51,37 @@ public class ProcessCanopies {
             for (String permutationStr : permutationsToCanopies.keySet()) {
                 logger.info(String.format("running experiments on permutation - '%s'", permutationStr));
                 Set<File> canopiesFiles = permutationsToCanopies.get(permutationStr);
-                this.initMembersThatDependsOnOriginalDataset(permutationStr, allDatasetPermutations);
+                File datasetFile = DatasetMapper.getDatasetFile(permutationStr, allDatasetPermutations);
+                this.initMembersThatDependsOnOriginalDataset(datasetFile, permutationStr);
                 for (File canopiesFile : canopiesFiles) {
                     logger.info(String.format("running experiments on canopy - '%s'", canopiesFile.getName()));
-                    this.performExperimentComparison(canopiesFile);
+                    DuplicateReductionContext context = this.performExperimentComparison(canopiesFile);
+                    results.put(datasetFile.getName(), context);
                 }
             }
         }
+        saveResultsToFS(results);
     }
 
-    private void performExperimentComparison(File canopiesFile) {
+    private void saveResultsToFS(Multimap<String, DuplicateReductionContext> results) {
+        PersistResult.saveConvexBPResultsToCsv(results);
+    }
+
+    private DuplicateReductionContext performExperimentComparison(File canopiesFile) {
         List<BlockWithData> blocks = fileToCanopies.get(canopiesFile);
         this.calculateBaselineResults(blocks);
         Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
         boolean continueExecution = this.executeConvexBP(blocks);
         if (continueExecution) {
-            DuplicateReductionContext results = this.calculateMeasurements(blocks, baselineRepresentatives);
+            return this.calculateMeasurements(blocks, baselineRepresentatives);
         } else {
             logger.fatal(String.format("Can't continue with execution of experiment for %s since execution of BCP has failed",
                     fileToCanopies.inverse().get(blocks).getName()));
         }
+        return null;
     }
 
-    private void initMembersThatDependsOnOriginalDataset(String permutationStr, Collection<File> allDatasetPermutations) {
-        File datasetFile = DatasetMapper.getDatasetFile(permutationStr, allDatasetPermutations);
-
+    private void initMembersThatDependsOnOriginalDataset(File datasetFile, String permutationStr) {
         ParsingService parsingService = new ParsingService();
         if (datasetFile == null) {
             logger.error(String.format("no dataset exists for permutation %s", permutationStr));

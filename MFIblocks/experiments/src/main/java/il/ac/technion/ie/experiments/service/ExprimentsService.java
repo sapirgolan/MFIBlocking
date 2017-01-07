@@ -24,7 +24,7 @@ public class ExprimentsService {
     static final Logger logger = Logger.getLogger(ExprimentsService.class);
     public static final String PARAMETER_NAME = "parameter=";
     public static final String CLOSE = ".";
-    public static final int WAIT_INTERVAL_IN_SECONDS = 5;
+    public static final int WAIT_INTERVAL_IN_SECONDS = 10;
     public static final String DCBP_DIR = "C:\\technion";
 
     /**

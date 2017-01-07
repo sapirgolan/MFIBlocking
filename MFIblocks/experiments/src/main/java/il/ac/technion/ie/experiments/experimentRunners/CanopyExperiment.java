@@ -8,7 +8,6 @@ import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.CanopyInteraction;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
-import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.service.CanopyService;
 import il.ac.technion.ie.experiments.service.Measurements;
@@ -16,7 +15,6 @@ import il.ac.technion.ie.experiments.threads.CommandExacter;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -45,7 +43,7 @@ public class CanopyExperiment extends AbstractExperiment {
             logger.error("Failed to execute experiment", e);
         }
         if (reductionContext != null) {
-            saveConvexBPResultsToCsv(reductionContext);
+            PersistResult.saveConvexBPResultsToCsv(reductionContext);
         }
     }
 
@@ -83,17 +81,6 @@ public class CanopyExperiment extends AbstractExperiment {
         Collection<CanopyCluster> canopies = canopy.createCanopies();
         logger.info("There are " + canopies.size() + " canopies in dataset");
         return canopies;
-    }
-
-    private void saveConvexBPResultsToCsv(DuplicateReductionContext duplicateReductionContext) {
-        File expResults = ExpFileUtils.createOutputFile("convexBPResults.csv");
-        if (expResults != null) {
-            logger.info("saving results of ExperimentsWithCanopy");
-            parsingService.writeExperimentsMeasurements(duplicateReductionContext, expResults);
-        } else {
-            logger.warn("Failed to create file for measurements therefore no results are results will be given");
-        }
-        logger.info("Finished saving results of ExperimentsWithCanopy");
     }
 
     private List<Record> getRecordsFromBlcoks(List<BlockWithData> cleanBlocks) {

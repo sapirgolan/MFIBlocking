@@ -4,60 +4,26 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.service.ConvexBPService;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
-import il.ac.technion.ie.experiments.util.ZipExtractor;
 import il.ac.technion.ie.model.Record;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
+import static org.powermock.api.mockito.PowerMockito.*;
 
 /**
  * Created by I062070 on 02/01/2017.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ProcessCanopies.class})
-public class ProcessCanopiesTest {
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    private ProcessCanopies classUnderTest;
-
-    private ConvexBPService convexBPService = PowerMockito.spy(new ConvexBPService());
-
-    private File canopiesRootFolder;
-    private File datasetsRootFolder;
-    private final int numberOfCanopiesInTest = 35;
-
-    @Before
-    public void setUp() throws Exception {
-        classUnderTest = PowerMockito.spy(new ProcessCanopies());
-        Whitebox.setInternalState(classUnderTest, "convexBPService", convexBPService);
-
-        canopiesRootFolder = temporaryFolder.newFolder("root_canopies");
-        datasetsRootFolder = temporaryFolder.newFolder("root_datasetsPermutation");
-        ZipExtractor.extractZipFromResources(canopiesRootFolder, "/01_NumberOfOriginalRecords_canopies.zip");
-        ZipExtractor.extractZipFromResources(datasetsRootFolder, "/01_NumberOfOriginalRecords_datasets.zip");
-    }
+public class ProcessCanopiesTest extends AbstractProcessCanopiesTest {
 
     @Test
     public void readAndParseCanopiesFromDir_hasAllCanopyFiles() throws Exception {
@@ -70,7 +36,9 @@ public class ProcessCanopiesTest {
 
     @Test
     public void runExperiments_verifyExperimentIsExecutedForEachCanopy() throws Exception {
-        PowerMockito.doNothing().when(classUnderTest, "performExperimentComparison", Mockito.any(File.class));
+        PowerMockito.doReturn(null).when(classUnderTest, "performExperimentComparison", Mockito.any(File.class));
+        doNothing().when(classUnderTest, "saveResultsToFS", Mockito.any(Multimap.class));
+
         classUnderTest.runExperiments(canopiesRootFolder.getAbsolutePath(), datasetsRootFolder.getAbsolutePath());
         verifyPrivate(classUnderTest, Mockito.times(numberOfCanopiesInTest)).invoke("performExperimentComparison", Mockito.any(File.class));
     }
@@ -98,8 +66,9 @@ public class ProcessCanopiesTest {
     @Test
     public void initMembersThatDependsOnOriginalDataset() throws Exception {
         Collection<File> allDatasetPermutations = FileUtils.listFiles(datasetsRootFolder, null, false);
-
-        Whitebox.invokeMethod(classUnderTest, "initMembersThatDependsOnOriginalDataset", "FebrlParam_40", allDatasetPermutations);
+        String permutation = "FebrlParam_40";
+        File datasetFile = DatasetMapper.getDatasetFile(permutation, allDatasetPermutations);
+        Whitebox.invokeMethod(classUnderTest, "initMembersThatDependsOnOriginalDataset", datasetFile, permutation);
 
         BiMap<Record, BlockWithData> trueRepsMap = Whitebox.getInternalState(classUnderTest, "trueRepsMap");
         assertThat(trueRepsMap, notNullValue());
@@ -110,33 +79,11 @@ public class ProcessCanopiesTest {
     @Test
     public void runExperiments_measurmentsNotCalculatedIfConvexBpFails() throws Exception {
         doReturn(false).when(classUnderTest, "executeConvexBP", Mockito.anyListOf(BlockWithData.class));
+        doNothing().when(classUnderTest, "saveResultsToFS", Mockito.any(Multimap.class));
 
         classUnderTest.runExperiments(canopiesRootFolder.getAbsolutePath(), datasetsRootFolder.getAbsolutePath());
 
         verifyPrivate(classUnderTest, Mockito.never())
                 .invoke("calculateMeasurements", Mockito.anyListOf(BlockWithData.class), Mockito.any(Multimap.class));
-    }
-
-    @Test
-    public void runExperiments_convexBpRuns() throws Exception {
-        reduceDatasetSizeTo(datasetsRootFolder, 2);
-        reduceDatasetSizeTo(canopiesRootFolder, 2);
-
-        classUnderTest.runExperiments(canopiesRootFolder.getAbsolutePath(), datasetsRootFolder.getAbsolutePath());
-
-        verifyPrivate(classUnderTest, Mockito.times(10))
-                .invoke("calculateMeasurements", Mockito.anyListOf(BlockWithData.class), Mockito.any(Multimap.class));
-    }
-
-    private void reduceDatasetSizeTo(File datasetRootFolder, int reduceToSize) throws IOException {
-        File[] files = datasetRootFolder.listFiles();
-        for (int i = files.length -1; i > reduceToSize - 1; i--) {
-            File deteleTarget = files[i];
-            if (deteleTarget.isDirectory()) {
-                FileUtils.deleteDirectory(deteleTarget);
-            } else {
-                deteleTarget.delete();
-            }
-        }
     }
 }

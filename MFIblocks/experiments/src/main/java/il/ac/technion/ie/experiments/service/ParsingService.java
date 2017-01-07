@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvWriter;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
@@ -35,6 +36,7 @@ public class ParsingService {
     public static final String FILE_NAME = "File Name";
     public static final String NUMBER_OF_BLOCKS = "# Blocks";
     public static final String AVG_BLOCK_SIZE = "Avg Block Size";
+    private static final String DATASET_NAME = "Dataset Name";
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
@@ -112,18 +114,6 @@ public class ParsingService {
         csvWriter.close();
     }
 
-/*    public void writeExperimentsMeasurements(Map<Integer, FebrlMeasuresContext> measures, File tempFile) {
-        CsvWriter csvWriter = dataParser.preparOutputFile(tempFile);
-        csvWriter.writeHeaders(FEBERL_PARAMETER, AVERAGE_RANKED_VALUE, AVERAGE_MRR);
-        for (Map.Entry<Integer, FebrlMeasuresContext> febrlMeasuresContextEntry : measures.entrySet()) {
-            csvWriter.writeValue(FEBERL_PARAMETER, febrlMeasuresContextEntry.getKey());
-            csvWriter.writeValue(AVERAGE_RANKED_VALUE, febrlMeasuresContextEntry.getValue().getAverageRankedValue());
-            csvWriter.writeValue(AVERAGE_MRR, febrlMeasuresContextEntry.getValue().getAverageMRR());
-            csvWriter.writeValuesToRow();
-        }
-        csvWriter.close();
-    }*/
-
     private Double getMillerMRRValue(List<Double> mrrValues) {
         if (!mrrValues.isEmpty()) {
             return mrrValues.get(0);
@@ -155,23 +145,21 @@ public class ParsingService {
         }
     }
 
-    public void writeStatistics(List<DatasetStatistics> datasetStatisticses, File outputFile) {
-        CsvWriter csvWriter = dataParser.preparOutputFile(outputFile);
-        csvWriter.writeHeaders(FILE_NAME, NUMBER_OF_BLOCKS, AVG_BLOCK_SIZE);
-        for (DatasetStatistics statistics : datasetStatisticses) {
-            csvWriter.writeValue(FILE_NAME, statistics.getFileName());
-            csvWriter.writeValue(NUMBER_OF_BLOCKS, statistics.getNumberOfBlocks());
-            csvWriter.writeValue(AVG_BLOCK_SIZE, statistics.getAvgBlockSize());
-            csvWriter.writeValuesToRow();
-        }
-        csvWriter.close();
-    }
-
     public void writeExperimentsMeasurements(DuplicateReductionContext duplicateReductionContext, File file) {
         CsvWriter csvWriter = dataParser.preparOutputFile(file);
         csvWriter.writeHeaders("diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
                 "duplicatesRemoved");
         writeDuplicateReductionContext(duplicateReductionContext, csvWriter);
+        csvWriter.close();
+    }
+
+    public void writeExperimentsMeasurements(List<DuplicateReductionContext> results, File file) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(file);
+        csvWriter.writeHeaders("diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
+                "duplicatesRemoved");
+        for (DuplicateReductionContext reductionContext : results) {
+            writeDuplicateReductionContext(reductionContext, csvWriter);
+        }
         csvWriter.close();
     }
 
@@ -198,5 +186,19 @@ public class ParsingService {
             this.writeDuplicateReductionContext(entry.getValue(), csvWriter);
         }
         csvWriter.close();
+    }
+
+    public void writeExperimentsMeasurements(Multimap<String, DuplicateReductionContext> results, File expResults) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
+        csvWriter.writeHeaders(DATASET_NAME, "diff of true representation vs found",
+                "Power of real representatives in soft clusters", "wisdom of the crowd",
+                "duplicatesRemoved", "% of Duplicates that're Real Representatives",
+                "Average block size", "Average number of blocks");
+        for (Map.Entry<String, DuplicateReductionContext> entry : results.entries()) {
+            csvWriter.writeValue(DATASET_NAME, entry.getKey());
+            this.writeDuplicateReductionContext(entry.getValue(), csvWriter);
+        }
+        csvWriter.close();
+
     }
 }

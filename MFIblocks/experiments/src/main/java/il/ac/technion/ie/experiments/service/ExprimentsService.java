@@ -25,6 +25,7 @@ public class ExprimentsService {
     public static final String PARAMETER_NAME = "parameter=";
     public static final String CLOSE = ".";
     public static final int WAIT_INTERVAL_IN_SECONDS = 5;
+    public static final String DCBP_DIR = "C:\\technion";
 
     /**
      * The method filters the blocks whose chosen representative is not the True Representative of the block.
@@ -67,7 +68,6 @@ public class ExprimentsService {
     }
 
     public ConvexBPContext createConvexBPContext(UaiVariableContext context) throws IOException {
-        final String DCBP_DIR = "C:\\Users\\i062070\\Downloads\\dcBP\\x64\\Debug";
         File uaiVariableContextFile = context.getUaiFile();
         if (uaiVariableContextFile == null || !uaiVariableContextFile.exists()) {
             throw new FileNotFoundException("uaiVariableContextFile doesn't exist in given UaiVariableContext");

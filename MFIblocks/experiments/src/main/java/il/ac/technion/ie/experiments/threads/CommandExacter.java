@@ -33,6 +33,7 @@ public class CommandExacter {
             logger.debug(String.format("Executing read UAI file by command: '%s'", command));
 
             long startTime = System.nanoTime();
+            logger.info(String.format("Running convexBP with following command%s", command));
             Process process = runtime.exec(command, new String[]{}, new File(this.context.getDir()));
             long afterExecTime = System.currentTimeMillis();
             Thread thread = new Thread(new ProcessTimeoutThread(process, afterExecTime, this.context.getWaitInterval()));

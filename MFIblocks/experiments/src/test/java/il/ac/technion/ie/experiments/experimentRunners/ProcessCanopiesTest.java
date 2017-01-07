@@ -14,10 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -39,17 +36,15 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by I062070 on 02/01/2017.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(ProcessCanopies.class)
+@PrepareForTest({ProcessCanopies.class})
 public class ProcessCanopiesTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @InjectMocks
     private ProcessCanopies classUnderTest;
 
-    @Mock
-    private ConvexBPService convexBPService;
+    private ConvexBPService convexBPService = PowerMockito.spy(new ConvexBPService());
 
     private File canopiesRootFolder;
     private File datasetsRootFolder;
@@ -57,8 +52,9 @@ public class ProcessCanopiesTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        classUnderTest = PowerMockito.spy(classUnderTest);
+        classUnderTest = PowerMockito.spy(new ProcessCanopies());
+        Whitebox.setInternalState(classUnderTest, "convexBPService", convexBPService);
+
         canopiesRootFolder = temporaryFolder.newFolder("root_canopies");
         datasetsRootFolder = temporaryFolder.newFolder("root_datasetsPermutation");
         ZipExtractor.extractZipFromResources(canopiesRootFolder, "/01_NumberOfOriginalRecords_canopies.zip");
@@ -83,16 +79,20 @@ public class ProcessCanopiesTest {
 
     @Test
     public void executeConvexBP_convexBpRunFail() throws Exception {
-        when(convexBPService.runConvexBP(Mockito.any(CommandExacter.class), Mockito.anyDouble(), Mockito.anyListOf(BlockWithData.class)))
-                .thenReturn(false);
+        doReturn(false)
+                .when(convexBPService)
+                .runConvexBP(Mockito.any(CommandExacter.class), Mockito.anyDouble(), Mockito.anyListOf(BlockWithData.class));
+
         boolean convexBPExecuted = Whitebox.invokeMethod(classUnderTest, "executeConvexBP", new ArrayList<BlockWithData>());
         assertThat(convexBPExecuted, is(false));
     }
 
     @Test
     public void executeConvexBP_convexBpRunSucced() throws Exception {
-        when(convexBPService.runConvexBP(Mockito.any(CommandExacter.class), Mockito.anyDouble(), Mockito.anyListOf(BlockWithData.class)))
-                .thenReturn(true);
+        doReturn(true)
+                .when(convexBPService)
+                .runConvexBP(Mockito.any(CommandExacter.class), Mockito.anyDouble(), Mockito.anyListOf(BlockWithData.class));
+
         boolean convexBPExecuted = Whitebox.invokeMethod(classUnderTest, "executeConvexBP", new ArrayList<BlockWithData>());
         assertThat(convexBPExecuted, is(true));
     }
@@ -113,6 +113,14 @@ public class ProcessCanopiesTest {
     public void runExperiments_measurmentsNotCalculatedIfConvexBpFails() throws Exception {
         doReturn(false).when(classUnderTest, "executeConvexBP", Mockito.anyListOf(BlockWithData.class));
 
+        classUnderTest.runExperiments(canopiesRootFolder.getAbsolutePath(), datasetsRootFolder.getAbsolutePath());
+
+        verifyPrivate(classUnderTest, Mockito.never())
+                .invoke("calculateMeasurements", Mockito.anyListOf(BlockWithData.class), Mockito.any(Multimap.class));
+    }
+
+//    @Test
+    public void runExperiments_convexBpRuns() throws Exception {
         classUnderTest.runExperiments(canopiesRootFolder.getAbsolutePath(), datasetsRootFolder.getAbsolutePath());
 
         verifyPrivate(classUnderTest, Mockito.never())

@@ -143,8 +143,7 @@ public class UaiBuilder {
     }
 
     private File createOutputFile() {
-        String filePath = ExpFileUtils.getOutputFilePath("Blocks", UAI);
-        return ExpFileUtils.createFile(filePath);
+        return ExpFileUtils.createOutputFile(String.format("Blocks%s", UAI));
     }
 
     /**

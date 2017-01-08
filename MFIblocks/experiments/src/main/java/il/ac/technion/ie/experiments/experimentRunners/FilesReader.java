@@ -19,17 +19,17 @@ public class FilesReader {
 
     private File root;
 
-    public FilesReader(String rootPath) {
+    public FilesReader(String rootDir) {
 
-        File file = new File(rootPath);
+        File file = new File(rootDir);
         if (file.exists()) {
             root = file;
         } else {
-            logger.error(rootPath + " folder doesn't exists");
+            logger.error(rootDir + " folder doesn't exists");
         }
     }
 
-    private Collection<File> listAllCanopies() {
+    private Collection<File> listAllFiles() {
         return FileUtils.listFiles(root, null, true);
     }
 
@@ -44,7 +44,7 @@ public class FilesReader {
      */
     public Table<String, String, Set<File>> getAllCanopies() {
         Table<String, String, Set<File>> canopiesTable = HashBasedTable.create();
-        Collection<File> allCanopiesFiles = this.listAllCanopies();
+        Collection<File> allCanopiesFiles = this.listAllFiles();
         for (File canopyFile : allCanopiesFiles) {
             String permutationWithParam_columnKey = canopyFile.getParentFile().getName();
             String datasetPermutation_rowKey = canopyFile.getParentFile().getParentFile().getName();
@@ -59,6 +59,6 @@ public class FilesReader {
     }
 
     public Collection<File> getAllDatasets() {
-        return this.listAllCanopies();
+        return this.listAllFiles();
     }
 }

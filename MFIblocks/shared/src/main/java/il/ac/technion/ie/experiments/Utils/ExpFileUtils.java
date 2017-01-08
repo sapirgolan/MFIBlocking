@@ -38,7 +38,7 @@ public class ExpFileUtils {
     public static File createOutputFile(String filename) {
         File expResults = null;
         try {
-            expResults = new File(filename);
+            expResults = new File(FileUtils.getUserDirectoryPath(), filename);
             if (expResults.exists()) {
                 FileUtils.forceDelete(expResults);
             }

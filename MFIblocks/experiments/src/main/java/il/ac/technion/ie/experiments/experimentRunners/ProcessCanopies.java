@@ -36,8 +36,8 @@ public class ProcessCanopies {
         exprimentsService = new ExprimentsService();
     }
 
-    public void runExperiments(String pathToDirFolder, String pathToOriginalDatasetFile) {
-        this.readAndInitCanopiesFromDir(pathToDirFolder);
+    public void runExperiments(String pathToCanopiesFolder, String pathToOriginalDatasetFile) {
+        this.readAndInitCanopiesFromDir(pathToCanopiesFolder);
         Collection<File> allDatasetPermutations = new FilesReader(pathToOriginalDatasetFile).getAllDatasets();
         Multimap<String, DuplicateReductionContext> results = ArrayListMultimap.create();
         //for each dataset

@@ -4,6 +4,7 @@ import il.ac.technion.ie.canopy.exception.CanopyParametersException;
 import il.ac.technion.ie.canopy.exception.InvalidSearchResultException;
 import il.ac.technion.ie.experiments.experimentRunners.AbstractExperiment;
 import il.ac.technion.ie.experiments.experimentRunners.CreateCanopies;
+import il.ac.technion.ie.experiments.experimentRunners.ProcessCanopies;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -18,7 +19,6 @@ public class ExperimentRunner {
     public static void main(String[] args) throws CanopyParametersException, InvalidSearchResultException {
         ArgumentsContext context = new ArgumentsContext(args).invoke();
 
-        AbstractExperiment experiment = new CreateCanopies();
         logger.info("Starting an experiment");
         if (context.isProfilingMode()) {
             logger.info("Entering Profiling mode");
@@ -30,11 +30,24 @@ public class ExperimentRunner {
         }
         long startTime = System.nanoTime();
         try {
-            experiment.runExperiments(context.getPathToDataset());
+            if (isProcessCanopiesExperiment(context)) {
+                ProcessCanopies processCanopies = new ProcessCanopies();
+                processCanopies.runExperiments(context.getPathToCanapies(), context.getPathToDataset());
+            } else {
+                AbstractExperiment experiment = new CreateCanopies();
+                experiment.runExperiments(context.getPathToDataset());
+            }
         } catch (Throwable e) {
             logger.error("There was an exception!", e);
         }
         TimeLogger.logDurationInSeconds(startTime, "Creating all canopies took");
         System.exit(0);
+    }
+
+    private static boolean isProcessCanopiesExperiment(ArgumentsContext context) {
+        if (context.getPathToDataset() != null && context.getPathToCanapies() != null) {
+            return true;
+        }
+        return false;
     }
 }

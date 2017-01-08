@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 
@@ -15,62 +16,45 @@ public class ArgumentsContextTest {
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
-    private File tempFile;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
     public void setUp() throws Exception {
-        tempFile = File.createTempFile("temporerFile", null);
     }
 
     @Test
-    public void testReceivePathToDataset() throws Exception {
-        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath()).invoke();
-        assertThat(argumentsContext.getPathToDataset(), is(tempFile.getAbsolutePath()));
+    public void receivePathToDataset() throws Exception {
+        File datasetFile = temporaryFolder.newFile("temporerFile");
+        ArgumentsContext argumentsContext = new ArgumentsContext(datasetFile.getAbsolutePath()).invoke();
+        assertThat(argumentsContext.getPathToDataset(), is(datasetFile.getAbsolutePath()));
     }
 
-
     @Test
-    public void testSystemExitWhenNoArgumentsPassed() throws Exception {
+    public void systemExitWhenNoArgumentsPassed() throws Exception {
         exit.expectSystemExitWithStatus(-1);
         ArgumentsContext argumentsContext = new ArgumentsContext(null);
         argumentsContext.invoke();
     }
 
     @Test
-    public void testReceiveThreshold() throws Exception {
-        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath(), "0.2").invoke();
-        assertThat(argumentsContext.getThreshold(), closeTo(0.2, 0.0001));
+    public void receivePathToDadasetAndCanopies() throws Exception {
+        File datasetRootFoler = temporaryFolder.newFolder("rootDataset");
+        File canopiesRootFolder = temporaryFolder.newFolder("canopiesDataset");
+        ArgumentsContext argumentsContext = new ArgumentsContext(datasetRootFoler.getAbsolutePath(), canopiesRootFolder.getAbsolutePath()).invoke();
+
+        assertThat(argumentsContext.getPathToDataset(), is(datasetRootFoler.getAbsolutePath()));
+        assertThat(argumentsContext.getPathToCanapies(), is(canopiesRootFolder.getAbsolutePath()));
+        assertThat(argumentsContext.isProfilingMode(), is(false));
     }
 
     @Test
-    public void testThresholdIsZeroWhenNotPassAsParameter() throws Exception {
-        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath()).invoke();
-        assertThat(argumentsContext.getThreshold(), closeTo(0.0, 0.0001));
-    }
+    public void createCanopiesInPerf() throws Exception {
+        File datasetRootFoler = temporaryFolder.newFolder("rootDataset");
+        ArgumentsContext argumentsContext = new ArgumentsContext(datasetRootFoler.getAbsolutePath(), "perf").invoke();
 
-    @Test
-    public void testReceiveMultipleThresholds() throws Exception {
-        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath(), "0.2, 0.3").invoke();
-        assertThat(argumentsContext.getThreshold(), closeTo(0.2, 0.0001));
-        assertThat(argumentsContext.getThresholds(), containsInAnyOrder(closeTo(0.2, 0.0001), closeTo(0.3, 0.0001)));
-    }
-
-    @Test
-    public void testReceiveMultipleValuesNotThreshold() throws Exception {
-        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath(), "0.2, 0.3, p.9").invoke();
-        assertThat(argumentsContext.getThreshold(), closeTo(0.2, 0.0001));
-        assertThat(argumentsContext.getThresholds(), containsInAnyOrder(closeTo(0.2, 0.0001), closeTo(0.3, 0.0001)));
-    }
-
-    @Test
-    public void testTwoArgumentsExist() throws Exception {
-        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath(), "0.2, 0.3").invoke();
-        assertThat(argumentsContext.size(), is(2));
-    }
-
-    @Test
-    public void testOneArgumentsExist() throws Exception {
-        ArgumentsContext argumentsContext = new ArgumentsContext(tempFile.getAbsolutePath()).invoke();
-        assertThat(argumentsContext.size(), is(1));
+        assertThat(argumentsContext.getPathToDataset(), is(datasetRootFoler.getAbsolutePath()));
+        assertThat(argumentsContext.getPathToCanapies(), nullValue());
+        assertThat(argumentsContext.isProfilingMode(), is(true));
     }
 }

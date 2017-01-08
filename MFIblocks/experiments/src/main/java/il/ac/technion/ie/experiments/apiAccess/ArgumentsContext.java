@@ -1,28 +1,21 @@
 package il.ac.technion.ie.experiments.apiAccess;
 
-import com.google.common.base.Splitter;
 import org.apache.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by I062070 on 29/10/2015.
  */
 class ArgumentsContext {
-    private String[] args;
-    private String pathToDataset;
-    private List<Double> thresholds;
-
     static final Logger logger = Logger.getLogger(ArgumentsContext.class);
 
+    private String[] args;
+    private String pathToDataset;
     private boolean profilingMode;
+    private String pathToCanapies;
 
     public ArgumentsContext(String... args) {
         this.args = args;
-        thresholds = new ArrayList<>();
     }
-
 
     public ArgumentsContext invoke() {
         synchronized (this) {
@@ -31,50 +24,31 @@ class ArgumentsContext {
                 System.exit(-1);
             }
             pathToDataset = args[0];
-            if (args[args.length-1].equalsIgnoreCase("perf")) {
-                this.profilingMode = true;
-            }
             if (args.length > 1) {
-                parseThresholds();
+                if (!isEqualToPerf(args, 1)) {
+                    pathToCanapies = args[1];
+                }
+                if (isEqualToPerf(args, args.length-1)) {
+                    this.profilingMode = true;
+                }
             }
         }
         return this;
     }
 
-    private void parseThresholds() {
-        List<String> thresholdsString = Splitter.on(',').trimResults().omitEmptyStrings().splitToList(args[1]);
-        for (String thresholdStr : thresholdsString) {
-            try {
-                thresholds.add(Double.valueOf(thresholdStr));
-            } catch (NumberFormatException e) {
-                logger.error(String.format("Following threshold '%s' is not a number:", thresholdStr));
-            }
-        }
+    private boolean isEqualToPerf(String[] argsArray, int index) {
+        return argsArray[index].equalsIgnoreCase("perf");
+    }
+
+    public boolean isProfilingMode() {
+        return profilingMode;
     }
 
     public String getPathToDataset() {
         return pathToDataset;
     }
 
-    public double getThreshold() {
-        if (thresholds.isEmpty()) {
-            return 0;
-        }
-        return thresholds.get(0);
-    }
-
-    public List<Double> getThresholds() {
-        return thresholds;
-    }
-
-    public int size() {
-        if (thresholds.isEmpty()) {
-            return 1;
-        }
-        return 2;
-    }
-
-    public boolean isProfilingMode() {
-        return profilingMode;
+    public String getPathToCanapies() {
+        return pathToCanapies;
     }
 }

@@ -8,6 +8,7 @@ import il.ac.technion.ie.experiments.model.ConvexBPContext;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import il.ac.technion.ie.experiments.parsers.UaiBuilder;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
+import il.ac.technion.ie.experiments.utils.ExperimentUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -43,6 +44,7 @@ public class ConvexBPService {
             FileUtils.forceDeleteOnExit(outputFile);
             logger.debug("Applying new probabilities on blocks");
             uaiConsumer.applyNewProbabilities(splitedBlocks);
+            ExperimentUtils.printBlocks(splitedBlocks, "Blocks and their Representatives according to ConvexBP");
             return true;
         }
         return false;

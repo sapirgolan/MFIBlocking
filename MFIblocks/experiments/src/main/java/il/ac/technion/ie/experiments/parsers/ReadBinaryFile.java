@@ -77,37 +77,4 @@ public class ReadBinaryFile {
             throw new FileNotFoundException("binary file doesn't exists at: " + binaryFile.getAbsolutePath());
         }
     }
-
-
-   /* public static void main(String[] args) {
-        // The name of the file to open.
-//        String fileName = "C:\\Users\\i062070\\Downloads\\dcBP\\x64\\Debug\\LocalBeliefs.txt";
-        String fileName = "C:\\Users\\i062070\\Downloads\\dcBP\\x64\\Debug\\MillerBlocks.txt";
-
-        try {
-            // Use this for reading the data.
-            DataInputStream data_in = new DataInputStream(
-                    new BufferedInputStream(
-                            new FileInputStream(fileName)));
-
-            while(true) {
-                try {
-                    System.out.println(EndianUtils.readSwappedDouble(data_in));
-                    *//*double t = data_in.readDouble();
-                    System.out.println(t + "-" + EndianUtils.swapDouble(t)) ;*//*
-                } catch (EOFException eof) {
-                    System.out.println("\n Finished reading file");
-                    break;
-                }
-            }
-        }
-        catch (FileNotFoundException ex) {
-            System.err.println( "Unable to open file '" +  fileName + "'");
-        } catch (IOException ex) {
-            System.err.println( "Error reading file '" + fileName + "'");
-            // Or we could just do this:
-            // ex.printStackTrace();
-        }
-    }*/
-
 }

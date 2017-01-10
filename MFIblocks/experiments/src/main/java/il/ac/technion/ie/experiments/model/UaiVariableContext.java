@@ -52,6 +52,7 @@ public class UaiVariableContext {
 
         int variableIndex = 0;
         for (BlockWithData block : blocks) {
+            logger.debug(String.format("mapping %d<-->%d", variableIndex, block.getId()));
             variableIdToBlockId.put(variableIndex, block.getId());
             variableIdToSizeMap.put(variableIndex, block.size());
             variableIdToBlocksMultimap.put(variableIndex, block.getId());

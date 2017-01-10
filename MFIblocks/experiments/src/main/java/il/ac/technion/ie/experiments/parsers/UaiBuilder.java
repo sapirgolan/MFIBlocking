@@ -59,6 +59,11 @@ public class UaiBuilder {
 
         UaiVariableContext variableContext = UaiVariableContext.createUaiVariableContext(blocks, matricesWithContext, uaiFile);
 
+        generateUaiFileContent(numberOfVariables, variableContext);
+        return variableContext;
+    }
+
+    private void generateUaiFileContent(int numberOfVariables, UaiVariableContext variableContext) {
         try {
             writeMarkov();
             writeNumberOfVariables(numberOfVariables);
@@ -71,12 +76,12 @@ public class UaiBuilder {
         } catch (IOException | KeyNotExistException | SizeNotEqualException | NoValueExistsException e) {
             logger.error("Failed to create UAI File", e);
         }
-        return variableContext;
     }
 
     private void writeCliquesSharedMatrix(UaiVariableContext variableContext) throws IOException, SizeNotEqualException, NoValueExistsException {
         String cliquesSharedMatrix = buildCliquesAndSharedMatrix(variableContext);
         this.appendStringToFile(cliquesSharedMatrix);
+        logger.debug(cliquesSharedMatrix);
     }
 
     private String buildCliquesAndSharedMatrix(UaiVariableContext variableContext) throws SizeNotEqualException, NoValueExistsException {
@@ -106,7 +111,8 @@ public class UaiBuilder {
 
     private void writeBlocksProbabilities(UaiVariableContext variableContext) throws KeyNotExistException, IOException, SizeNotEqualException {
         String stringOfBlocksAndProbabilities = buildStringOfBlocksAndProbabilities(variableContext);
-        this.appendStringToFile(stringOfBlocksAndProbabilities.toString());
+        this.appendStringToFile(stringOfBlocksAndProbabilities);
+        logger.debug(stringOfBlocksAndProbabilities);
     }
 
     private String buildStringOfBlocksAndProbabilities(UaiVariableContext variableContext) throws KeyNotExistException, SizeNotEqualException {
@@ -186,7 +192,9 @@ public class UaiBuilder {
     }
 
     private void writeMarkov() throws IOException {
-        FileUtils.writeStringToFile(uaiFile, "MARKOV" + "\n", Charset.defaultCharset());
+        String text = "MARKOV" + System.lineSeparator();
+        FileUtils.writeStringToFile(uaiFile, text, Charset.defaultCharset());
+        logger.debug(text);
     }
 
     private void writeNumberOfVariables(int numberOfVariables) throws IOException {
@@ -200,12 +208,15 @@ public class UaiBuilder {
             builder.append(" ");
         }
         builder.deleteCharAt(builder.length() - 1);
-        appendStringToFile(builder.toString());
+        String text = builder.toString();
+        appendStringToFile(text);
+        logger.debug(text);
     }
 
     private void writeVariableSizeAndIndecies(Multimap<Integer, Integer> sizeAndIndexOfVariables) throws IOException, NoValueExistsException {
         String sizeAndIndecies = buildStringOfVariableSizeAndIndecies(sizeAndIndexOfVariables);
         appendStringToFile(sizeAndIndecies);
+        logger.debug(sizeAndIndecies);
     }
 
     private String buildStringOfVariableSizeAndIndecies(Multimap<Integer, Integer> sizeAndIndexOfVariables) throws NoValueExistsException {
@@ -248,6 +259,8 @@ public class UaiBuilder {
     }
 
     private void appendStringToFile(String str) throws IOException {
-        FileUtils.writeStringToFile(uaiFile, str + "\n", Charset.defaultCharset(), true);
+        String text = str + System.lineSeparator();
+        FileUtils.writeStringToFile(uaiFile, text, Charset.defaultCharset(), true);
+        logger.debug(text);
     }
 }

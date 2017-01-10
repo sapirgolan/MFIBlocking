@@ -1,6 +1,7 @@
 package il.ac.technion.ie.potential.logic;
 
 import com.google.common.collect.Sets;
+import il.ac.technion.ie.exception.NotImplementedYetException;
 import il.ac.technion.ie.model.AbstractBlock;
 import il.ac.technion.ie.model.Record;
 import il.ac.technion.ie.potential.model.*;
@@ -179,6 +180,7 @@ public class PotentialLogic implements iPotentialLogic {
             for (Object member : blockMembers) {
                 Integer memberId = PotentialUtil.convertToId(member);
                 if (recordBlockMap.containsKey(memberId)) {
+                    logger.debug(String.format("Record %s is contained in more than one block", resolveRecordName(member)));
                     recordBlockMap.get(memberId).add(blockId);
                 } else {
                     recordBlockMap.put(memberId, Sets.newHashSet(blockId));
@@ -186,6 +188,18 @@ public class PotentialLogic implements iPotentialLogic {
             }
         }
         return recordBlockMap;
+    }
+
+    private String resolveRecordName(Object member) {
+        String recordName;
+        if (member instanceof Record) {
+            Record record = (Record) member;
+            recordName = record.getRecordName();
+        } else {
+            throw new NotImplementedYetException(String.format("Retrieving recordId from type %s is not supported yet",
+                    member.getClass().getSimpleName()));
+        }
+        return recordName;
     }
 
     private List<AbstractBlock> filterBlockBySize(List<? extends AbstractBlock> blocks, int filterSize) {

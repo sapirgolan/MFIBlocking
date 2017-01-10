@@ -112,10 +112,13 @@ public class UaiConsumer {
 
     private void mapBlocksToProbabilities() {
         blockIdToProbabilities = ArrayListMultimap.create();
+        //iterate on all variables that were defined in UAI file
         for (Integer variableId : variableIdToProbabilities.keySet()) {
             Integer blockId = variableContext.getBlockIdByVariableId(variableId);
             if (blockId != null) {
-                blockIdToProbabilities.putAll(blockId, variableIdToProbabilities.get(variableId));
+                List<Double> newProbabilities = variableIdToProbabilities.get(variableId);
+                blockIdToProbabilities.putAll(blockId, newProbabilities);
+                logger.debug(String.format("The new probabilities for block #%d, are: %s", blockId, newProbabilities));
             }
         }
     }

@@ -27,6 +27,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -34,7 +35,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by I062070 on 08/01/2017.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(ExperimentUtils.class)
+@PrepareForTest({ExperimentUtils.class, BlockWithData.class})
 public class ExperimentUtilsTest {
     public static final int INDEX_OF_BLOCK_WITH_DUPLICATE_AS_REPRESENTATIVE = 1;
     @Rule
@@ -89,7 +90,19 @@ public class ExperimentUtilsTest {
         BlockWithData block_3 = createBlockAndSetRepresentativeID(17);
 
         List<BlockWithData> blocks = Lists.newArrayList(block_1, block_2, block_3);
-        ExperimentUtils.sortBlocksByTrueRepID(blocks);
+        ExperimentUtils.sortBlocksByTrueRep(blocks);
+
+        assertThat(blocks, contains(block_3, block_1, block_2));
+    }
+
+    @Test
+    public void sortBlocks_oneOfBlocksDontHaveTrueRepresentative() throws Exception {
+        BlockWithData block_1 = createBlockAndSetRepresentativeID(88);
+        BlockWithData block_2 = mock(BlockWithData.class);;
+        BlockWithData block_3 = createBlockAndSetRepresentativeID(17);
+
+        List<BlockWithData> blocks = Lists.newArrayList(block_1, block_2, block_3);
+        ExperimentUtils.sortBlocksByTrueRep(blocks);
 
         assertThat(blocks, contains(block_3, block_1, block_2));
     }
@@ -116,7 +129,7 @@ public class ExperimentUtilsTest {
         Logger logger = Logger.getLogger(ExperimentUtils.class);
         logger.setLevel(Level.ALL);
         String expectedPrint = "Blocks of experiment JUnit" + System.lineSeparator() +
-                "block rec-10-org" + System.lineSeparator() +
+                "block rec-10-org, #12345" + System.lineSeparator() +
                 "====================================================" + System.lineSeparator() +
                 "0.17070405 rec-10-dup-0" + System.lineSeparator() +
                 "0.1700955 rec-10-dup-4" + System.lineSeparator() +
@@ -124,13 +137,20 @@ public class ExperimentUtilsTest {
                 "0.16457209 rec-10-dup-2" + System.lineSeparator() +
                 "0.16453668 rec-10-dup-3" + System.lineSeparator() +
                 "0.1626906 rec-10-dup-1" + System.lineSeparator() +
-                "block rec-15-org" + System.lineSeparator() +
+                "block rec-15-org, #12345" + System.lineSeparator() +
                 "====================================================" + System.lineSeparator() +
                 "0.34593725 rec-15-org" + System.lineSeparator() +
                 "0.32729614 rec-15-dup-1" + System.lineSeparator() +
                 "0.32676664 rec-15-dup-0" + System.lineSeparator();
 
-        String printedBlocks = ExperimentUtils.printBlocks(getRealBlocks().subList(0, 2), "Blocks of experiment JUnit");
+        List<BlockWithData> blocks = getRealBlocks().subList(0, 2);
+        for (int i = 0; i < blocks.size(); i++) {
+            BlockWithData spy = PowerMockito.spy(blocks.get(i));
+            doReturn(12345).when(spy).getId();
+            blocks.set(i, spy);
+        }
+
+        String printedBlocks = ExperimentUtils.printBlocks(blocks, "Blocks of experiment JUnit");
 
         assertThat(printedBlocks, equalToIgnoringWhiteSpace(expectedPrint));
     }
@@ -149,10 +169,10 @@ public class ExperimentUtilsTest {
         return blocks;
     }
 
-    private BlockWithData createBlockAndSetRepresentativeID(Integer representativeID) {
+    private BlockWithData createBlockAndSetRepresentativeID(Integer blockNumder) {
         BlockWithData block = mock(BlockWithData.class);
         Record block1TrueRep = mock(Record.class);
-        when(block1TrueRep.getRecordID()).thenReturn(representativeID);
+        when(block1TrueRep.getRecordName()).thenReturn("rec-" + blockNumder + "-org");
         when(block.getTrueRepresentative()).thenReturn(block1TrueRep);
         return block;
     }

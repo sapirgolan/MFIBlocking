@@ -7,6 +7,7 @@ import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.parsers.SerializerUtil;
 import il.ac.technion.ie.experiments.service.*;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
+import il.ac.technion.ie.experiments.utils.ExperimentUtils;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
 
@@ -71,6 +72,7 @@ public class ProcessCanopies {
         List<BlockWithData> blocks = fileToCanopies.get(canopiesFile);
         this.calculateBaselineResults(blocks);
         Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
+        ExperimentUtils.printBlocks(blocks, "Blocks and their Representatives according to Miller");
         boolean continueExecution = this.executeConvexBP(blocks);
         if (continueExecution) {
             return this.calculateMeasurements(blocks, baselineRepresentatives);
@@ -122,7 +124,7 @@ public class ProcessCanopies {
                 Collection<CanopyCluster> canopyClusters = SerializerUtil.deSerializeCanopies(file);
                 List<BlockWithData> blockWithDatas = canopyService.convertCanopiesToBlocks(canopyClusters);
                 canopyFileToBlocks.put(file, blockWithDatas);
-                logger.info(String.format("Finished converting File '%s' to '%d' blocks", file.getName(), blockWithDatas.size()) );
+                logger.info(String.format("Finished converting File '%s' to '%d' blocks", file.getName(), blockWithDatas.size()));
             }
         }
         return canopyFileToBlocks;

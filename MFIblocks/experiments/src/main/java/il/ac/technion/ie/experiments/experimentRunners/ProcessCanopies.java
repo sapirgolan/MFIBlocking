@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by I062070 on 23/10/2016.
@@ -57,7 +58,9 @@ public class ProcessCanopies {
                 for (File canopiesFile : canopiesFiles) {
                     logger.info(String.format("running experiments on canopy - '%s'", canopiesFile.getName()));
                     DuplicateReductionContext context = this.performExperimentComparison(canopiesFile);
-                    results.put(datasetFile.getName(), context);
+                    if (context != null) {
+                        results.put(datasetFile.getName(), context);
+                    }
                 }
             }
         }
@@ -70,12 +73,23 @@ public class ProcessCanopies {
 
     private DuplicateReductionContext performExperimentComparison(File canopiesFile) {
         List<BlockWithData> blocks = fileToCanopies.get(canopiesFile);
+        long start = System.nanoTime();
+        logger.info("Starting to process baseline");
         this.calculateBaselineResults(blocks);
+        long baselineDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+        logger.info("finding baseline representatives");
         Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
+        logger.info("Finished processing baseline");
         ExperimentUtils.printBlocks(blocks, "Blocks and their Representatives according to Miller");
+        start = System.nanoTime();
+        logger.debug("Starting to run ConvexBP");
         boolean continueExecution = this.executeConvexBP(blocks);
+        long bcbpDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
         if (continueExecution) {
-            return this.calculateMeasurements(blocks, baselineRepresentatives);
+            DuplicateReductionContext duplicateReductionContext = this.calculateMeasurements(blocks, baselineRepresentatives);
+            duplicateReductionContext.setBaselineDuration(baselineDuration);
+            duplicateReductionContext.setBcbpDuration(bcbpDuration);
+            return duplicateReductionContext;
         } else {
             logger.fatal(String.format("Can't continue with execution of experiment for %s since execution of BCP has failed",
                     fileToCanopies.inverse().get(blocks).getName()));

@@ -20,6 +20,8 @@ public class DuplicateReductionContext {
     private double numberOfDirtyBlocks;
     private double duplicatesRealRepresentatives;
     private double averageBlockSize;
+    private long baselineDuration;
+    private long bcbpDuration;
 
     public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -82,5 +84,21 @@ public class DuplicateReductionContext {
 
     public void setAverageBlockSize(double averageBlockSize) {
         this.averageBlockSize = averageBlockSize;
+    }
+
+    public void setBaselineDuration(long baselineDuration) {
+        this.baselineDuration = baselineDuration;
+    }
+
+    public long getBaselineDuration() {
+        return baselineDuration;
+    }
+
+    public long getBcbpDuration() {
+        return bcbpDuration;
+    }
+
+    public void setBcbpDuration(long bcbpDuration) {
+        this.bcbpDuration = bcbpDuration;
     }
 }

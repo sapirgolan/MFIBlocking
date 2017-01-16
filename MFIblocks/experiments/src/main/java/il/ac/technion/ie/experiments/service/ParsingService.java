@@ -193,10 +193,14 @@ public class ParsingService {
         csvWriter.writeHeaders(DATASET_NAME, "diff of true representation vs found",
                 "Power of real representatives in soft clusters", "wisdom of the crowd",
                 "duplicatesRemoved", "% of Duplicates that're Real Representatives",
-                "Average block size", "Average number of blocks");
+                "Average block size", "Average number of blocks",
+                "baseline Duration (mil)", "bcbp Duration (mil)");
         for (Map.Entry<String, DuplicateReductionContext> entry : results.entries()) {
             csvWriter.writeValue(DATASET_NAME, entry.getKey());
-            this.writeDuplicateReductionContext(entry.getValue(), csvWriter);
+            DuplicateReductionContext reductionContext = entry.getValue();
+            this.writeDuplicateReductionContext(reductionContext, csvWriter);
+            csvWriter.writeValue("baseline Duration (mil)", reductionContext.getBaselineDuration());
+            csvWriter.writeValue("bcbp Duration (mil)", reductionContext.getBcbpDuration());
         }
         csvWriter.close();
 

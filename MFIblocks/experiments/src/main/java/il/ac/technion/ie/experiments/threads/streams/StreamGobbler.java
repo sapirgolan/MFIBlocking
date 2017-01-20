@@ -1,4 +1,4 @@
-package il.ac.technion.ie.experiments.threads;
+package il.ac.technion.ie.experiments.threads.streams;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -16,7 +16,7 @@ public class StreamGobbler extends Thread {
     private InputStream is;
     private ChanelType type;
 
-    StreamGobbler(InputStream is, ChanelType type) {
+    public StreamGobbler(InputStream is, ChanelType type) {
         this.is = is;
         this.type = type;
     }

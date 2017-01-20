@@ -24,7 +24,7 @@ public class ExprimentsService {
     static final Logger logger = Logger.getLogger(ExprimentsService.class);
     public static final String PARAMETER_NAME = "parameter=";
     public static final String CLOSE = ".";
-    public static final int WAIT_INTERVAL_IN_SECONDS = 10;
+    public static final int WAIT_INTERVAL_IN_SECONDS = 760;
     public static final String DCBP_DIR = "C:\\technion";
 
     /**
@@ -83,7 +83,7 @@ public class ExprimentsService {
         String outputFileName = "Out_" + System.nanoTime() + ".txt";
         logger.trace("outputFileName for binary file is: " + outputFileName);
         logger.debug("Create ConvexBPContext with waitIntervalInSeconds of " + WAIT_INTERVAL_IN_SECONDS);
-        return new ConvexBPContext(DCBP_DIR, uaiFileName, outputFileName, WAIT_INTERVAL_IN_SECONDS);
+        return new ConvexBPContext(DCBP_DIR, uaiVariableContextFile.getAbsolutePath(), outputFileName, WAIT_INTERVAL_IN_SECONDS);
     }
 
     public Collection<File> findDatasets(String pathToDir, boolean recursiveSearch) {

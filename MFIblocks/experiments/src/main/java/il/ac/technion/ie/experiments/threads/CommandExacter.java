@@ -2,6 +2,8 @@ package il.ac.technion.ie.experiments.threads;
 
 import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
 import il.ac.technion.ie.experiments.model.ConvexBPContext;
+import il.ac.technion.ie.experiments.threads.streams.StreamGobbler;
+import il.ac.technion.ie.experiments.utils.ExperimentUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -14,17 +16,18 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by I062070 on 26/09/2015.
  */
-public class CommandExacter {
+public class CommandExacter implements IConvexBPExecutor{
 
     static final Logger logger = Logger.getLogger(CommandExacter.class);
     public static final int MAX_NUMBER_OF_EXECUTIONS = 3;
     private ConvexBPContext context;
 
+    @Override
     public File execute(ConvexBPContext context) throws IOException, OSNotSupportedException, InterruptedException {
         File outputFile;
         int numberOfExecutions = 1;
         this.context = context;
-        checkOS();
+        ExperimentUtils.checkOS();
         Runtime runtime = Runtime.getRuntime();
         String command = createCommand();
 
@@ -84,15 +87,8 @@ public class CommandExacter {
         return context.getCommand();
     }
 
-    private void checkOS() throws OSNotSupportedException {
-        String osName = System.getProperty("os.name");
-        if (StringUtils.indexOfIgnoreCase(osName, "windows") == -1) {
-            throw new OSNotSupportedException(String.format("Only 'Windows NT' is supported, this OS is: '%s'", osName));
-        }
-    }
-
     private File copyBadUaiFile()  {
-        File uaiFile = new File(context.getDir() + File.separator + context.getUaiFileName());
+        File uaiFile = new File( context.getUaiFileName());
         String absolutePath = uaiFile.getAbsolutePath();
         File destFile = new File(buildBadUaiFileName(absolutePath));
         try {

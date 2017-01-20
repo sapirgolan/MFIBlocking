@@ -56,7 +56,8 @@ public class ProcessCanopies {
                 File datasetFile = DatasetMapper.getDatasetFile(permutationStr, allDatasetPermutations);
                 this.initMembersThatDependsOnOriginalDataset(datasetFile, permutationStr);
                 for (File canopiesFile : canopiesFiles) {
-                    logger.info(String.format("running experiments on canopy - '%s'", canopiesFile.getName()));
+                    logger.info(String.format("running experiments on canopy - '%s'. HeapSize = %s",
+                            canopiesFile.getName(), ExperimentUtils.humanReadableByteCount()));
                     DuplicateReductionContext context = this.performExperimentComparison(canopiesFile);
                     if (context != null) {
                         results.put(datasetFile.getName(), context);
@@ -74,15 +75,15 @@ public class ProcessCanopies {
     private DuplicateReductionContext performExperimentComparison(File canopiesFile) {
         List<BlockWithData> blocks = fileToCanopies.get(canopiesFile);
         long start = System.nanoTime();
-        logger.info("Starting to process baseline");
+        logger.info("Starting to process baseline. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         this.calculateBaselineResults(blocks);
         long baselineDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-        logger.info("finding baseline representatives");
+        logger.info("finding baseline representatives. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
         logger.info("Finished processing baseline");
         ExperimentUtils.printBlocks(blocks, "Blocks and their Representatives according to Miller");
         start = System.nanoTime();
-        logger.debug("Starting to run ConvexBP");
+        logger.debug("Starting to run ConvexBP. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         boolean continueExecution = this.executeConvexBP(blocks);
         long bcbpDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
         if (continueExecution) {

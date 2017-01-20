@@ -31,8 +31,10 @@ public class ConvexBPService {
     private boolean runConvexBPInternally (CommandExacter commandExacter, Double threshold, List<BlockWithData> splitedBlocks) throws SizeNotEqualException, IOException, OSNotSupportedException, InterruptedException, NoValueExistsException {
         UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
         logger.debug("creating UAI file");
+        logger.info("Create UAI context. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         UaiVariableContext uaiVariableContext = uaiBuilder.createUaiContext();
         logger.debug("UAI file was created at: " + uaiVariableContext.getUaiFile().getAbsoluteFile());
+        logger.info("Create convexBP context. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         ConvexBPContext convexBPContext = exprimentsService.createConvexBPContext(uaiVariableContext);
         convexBPContext.setThreshold(threshold);
         //critical section - cannot be multi-thread

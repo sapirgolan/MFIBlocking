@@ -6,7 +6,7 @@ import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.experiments.parsers.SerializerUtil;
 import il.ac.technion.ie.experiments.service.*;
-import il.ac.technion.ie.experiments.threads.CommandExacter;
+import il.ac.technion.ie.experiments.threads.ApacheExecutor;
 import il.ac.technion.ie.experiments.utils.ExperimentUtils;
 import il.ac.technion.ie.model.Record;
 import org.apache.log4j.Logger;
@@ -151,7 +151,7 @@ public class ProcessCanopies {
     }
 
     private boolean executeConvexBP(List<BlockWithData> blocks) {
-        boolean convexBP = convexBPService.runConvexBP(new CommandExacter(), 0.0, blocks);
+        boolean convexBP = convexBPService.runConvexBP(new ApacheExecutor(), 0.0, blocks);
         if (!convexBP) {
             logger.error("Failed to run ConvexBP on canopy clusters");
             return false;

@@ -8,6 +8,7 @@ import il.ac.technion.ie.experiments.model.ConvexBPContext;
 import il.ac.technion.ie.experiments.model.UaiVariableContext;
 import il.ac.technion.ie.experiments.parsers.UaiBuilder;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
+import il.ac.technion.ie.experiments.threads.IConvexBPExecutor;
 import il.ac.technion.ie.experiments.utils.ExperimentUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -15,6 +16,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by I062070 on 04/01/2017.
@@ -28,7 +30,7 @@ public class ConvexBPService {
         this.exprimentsService = new ExprimentsService();
     }
 
-    private boolean runConvexBPInternally (CommandExacter commandExacter, Double threshold, List<BlockWithData> splitedBlocks) throws SizeNotEqualException, IOException, OSNotSupportedException, InterruptedException, NoValueExistsException {
+    private boolean runConvexBPInternally (IConvexBPExecutor commandExacter, Double threshold, List<BlockWithData> splitedBlocks) throws SizeNotEqualException, IOException, OSNotSupportedException, InterruptedException, NoValueExistsException, ExecutionException {
         UaiBuilder uaiBuilder = new UaiBuilder(splitedBlocks);
         logger.debug("creating UAI file");
         logger.info("Create UAI context. HeapSize = " + ExperimentUtils.humanReadableByteCount());
@@ -52,7 +54,7 @@ public class ConvexBPService {
         return false;
     }
 
-    public boolean runConvexBP(CommandExacter commandExacter, Double threshold, List<BlockWithData> splitedBlocks) {
+    public boolean runConvexBP(IConvexBPExecutor commandExacter, Double threshold, List<BlockWithData> splitedBlocks) {
         boolean didConvexBPRan = false;
         try {
             didConvexBPRan = this.runConvexBPInternally(commandExacter, threshold, splitedBlocks);
@@ -67,6 +69,8 @@ public class ConvexBPService {
             logger.error("Failed to wait till the execution of ConvexBP algorithm has finished", e);
         } catch (NoValueExistsException e) {
             logger.error("Failed to consume new probabilities", e);
+        } catch (ExecutionException e) {
+            logger.error("Failed to execute convexBP as a command line", e);
         }
         return didConvexBPRan;
     }

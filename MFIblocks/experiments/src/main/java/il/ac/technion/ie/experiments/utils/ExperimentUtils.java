@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.utils;
 
+import il.ac.technion.ie.experiments.exception.OSNotSupportedException;
 import il.ac.technion.ie.experiments.model.BlockWithData;
 import il.ac.technion.ie.model.Record;
 import org.apache.commons.lang.StringUtils;
@@ -117,5 +118,12 @@ public class ExperimentUtils {
         int exp = (int) (Math.log(bytes) / Math.log(unit));
         String pre = "KMGTPE".charAt(exp-1) + "";
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public static void checkOS() throws OSNotSupportedException {
+        String osName = System.getProperty("os.name");
+        if (StringUtils.indexOfIgnoreCase(osName, "windows") == -1) {
+            throw new OSNotSupportedException(String.format("Only 'Windows NT' is supported, this OS is: '%s'", osName));
+        }
     }
 }

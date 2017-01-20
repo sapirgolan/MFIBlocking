@@ -30,7 +30,7 @@ public class ConvexBPContext {
     }
 
     public String getPathToOutputFile() {
-        return dir + File.separator + binaryOutputFile;
+        return binaryOutputFile;
     }
 
     public long getWaitInterval() {

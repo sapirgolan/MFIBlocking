@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Created by I062070 on 20/01/2017.
  */
 public class ApacheExecutor implements IConvexBPExecutor {
-    private final int WAIT_TIMEOUT_SECONDS = 760;
+    private final int WAIT_TIMEOUT_MINUTES = 30;
 
     static final Logger logger = Logger.getLogger(ApacheExecutor.class);
 
@@ -29,7 +29,7 @@ public class ApacheExecutor implements IConvexBPExecutor {
         CommandLine commandLine = buildCommandLine(context);
         long startTime = System.nanoTime();
 
-        Future<Long> longFuture = ProcessExecutor.runProcess(commandLine, TimeUnit.SECONDS.toMillis(WAIT_TIMEOUT_SECONDS),
+        Future<Long> longFuture = ProcessExecutor.runProcess(commandLine, TimeUnit.MINUTES.toMillis(WAIT_TIMEOUT_MINUTES),
                 new IProcessOutputHandler() {
                     @Override
                     public void onStandardOutput(String msg) {
@@ -46,7 +46,7 @@ public class ApacheExecutor implements IConvexBPExecutor {
         Long exitValue = longFuture.get();
         long endTime = System.nanoTime();
 
-        logger.info(String.format("Total execution time of convexBP: %d", TimeUnit.NANOSECONDS.toSeconds(endTime - startTime)));
+        logger.info(String.format("Total execution time of convexBP: %d seconds", TimeUnit.NANOSECONDS.toSeconds(endTime - startTime)));
         logger.info(String.format("Execution of convexBP has finished with status: %d", exitValue));
         return new File(context.getPathToOutputFile());
     }

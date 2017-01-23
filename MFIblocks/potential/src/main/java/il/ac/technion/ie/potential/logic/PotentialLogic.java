@@ -22,7 +22,7 @@ public class PotentialLogic implements iPotentialLogic {
         for (AbstractBlock block : blocks) {
             if (block.size() > 1) {
                 logger.debug("calculating local potential of Block: " + block.toString());
-                result.add( new BlockPotential(block));
+                result.add(new BlockPotential(block));
             }
         }
         logger.info(String.format("Calculated log local Potential in total of #%d blocks", result.size()));
@@ -55,17 +55,19 @@ public class PotentialLogic implements iPotentialLogic {
     private List<MatrixContext<SharedMatrix>> getMatrixContexts(List<? extends AbstractBlock> blocks) {
         List<AbstractBlock> filteredBlocks = filterBlockBySize(blocks, 2);
         int filteredBlockCount = blocks.size() - filteredBlocks.size();
-        if (filteredBlockCount > 0 && logger.isDebugEnabled()) {
+        if (filteredBlockCount > 0) {
             logger.debug(String.format("Filtered out total of:%d blocks!", filteredBlockCount));
-            List<AbstractBlock> copyOfBlocks = new ArrayList<>(blocks);
-            copyOfBlocks.removeAll(filteredBlocks);
-            StringBuilder builder = new StringBuilder();
-            for (AbstractBlock copyOfBlock : copyOfBlocks) {
-                Record record = (Record) copyOfBlock.getMembers().get(0);
-                builder.append(record.getRecordName());
-                builder.append(',');
+            if (logger.isDebugEnabled()) {
+                List<AbstractBlock> copyOfBlocks = new ArrayList<>(blocks);
+                copyOfBlocks.removeAll(filteredBlocks);
+                StringBuilder builder = new StringBuilder();
+                for (AbstractBlock copyOfBlock : copyOfBlocks) {
+                    Record record = (Record) copyOfBlock.getMembers().get(0);
+                    builder.append(record.getRecordName());
+                    builder.append(',');
+                }
+                logger.debug("The filtered records are: " + builder.toString());
             }
-            logger.warn("The filtered records are: " + builder.toString());
         }
 
         //A mapping for each recordID. For each record we store a Set with all
@@ -148,6 +150,7 @@ public class PotentialLogic implements iPotentialLogic {
      * The method is responsible of building the {@link AdjustedMatrix}.
      * An AdjustedMatrix is a matric where rows and columns represents blocks.
      * If a record appear both in blockI and blockJ then AdjustedMatrix{i,j} = 1
+     *
      * @param recordBlockMap - a mapping between records and block. It tells for each record
      *                       the blocks it is in
      * @param filteredBlocks - Blocks that have more than one record
@@ -180,7 +183,9 @@ public class PotentialLogic implements iPotentialLogic {
             for (Object member : blockMembers) {
                 Integer memberId = PotentialUtil.convertToId(member);
                 if (recordBlockMap.containsKey(memberId)) {
-                    logger.debug(String.format("Record %s is contained in more than one block", resolveRecordName(member)));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(String.format("Record %s is contained in more than one block", resolveRecordName(member)));
+                    }
                     recordBlockMap.get(memberId).add(blockId);
                 } else {
                     recordBlockMap.put(memberId, Sets.newHashSet(blockId));

@@ -1,14 +1,9 @@
 package il.ac.technion.ie.experiments.utils;
 
 import com.google.common.collect.Lists;
-import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.parsers.SerializerUtil;
-import il.ac.technion.ie.experiments.service.CanopyService;
-import il.ac.technion.ie.experiments.service.ProbabilityService;
-import il.ac.technion.ie.experiments.util.ZipExtractor;
+import il.ac.technion.ie.experiments.util.ExperimentsUtils;
 import il.ac.technion.ie.model.Record;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -22,7 +17,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import java.io.File;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -116,7 +110,7 @@ public class ExperimentUtilsTest {
                 "0.16453668 rec-10-dup-3" + System.lineSeparator() +
                 "0.1626906 rec-10-dup-1" + System.lineSeparator();
 
-        List<BlockWithData> realBlocks = getRealBlocks();
+        List<BlockWithData> realBlocks = ExperimentsUtils.getRealBlocks(temporaryFolder);
         BlockWithData block = realBlocks.get(INDEX_OF_BLOCK_WITH_DUPLICATE_AS_REPRESENTATIVE);
 
         String blockTextRepresentation = ExperimentUtils.getBlockTextRepresentation(block);
@@ -143,7 +137,7 @@ public class ExperimentUtilsTest {
                 "0.32729614 rec-15-dup-1" + System.lineSeparator() +
                 "0.32676664 rec-15-dup-0" + System.lineSeparator();
 
-        List<BlockWithData> blocks = getRealBlocks().subList(0, 2);
+        List<BlockWithData> blocks = ExperimentsUtils.getRealBlocks(temporaryFolder).subList(0, 2);
         for (int i = 0; i < blocks.size(); i++) {
             BlockWithData spy = PowerMockito.spy(blocks.get(i));
             doReturn(12345).when(spy).getId();
@@ -155,18 +149,33 @@ public class ExperimentUtilsTest {
         assertThat(printedBlocks, equalToIgnoringWhiteSpace(expectedPrint));
     }
 
-    private List<BlockWithData> getRealBlocks() throws Exception {
-        CanopyService canopyService = new CanopyService();
-        ProbabilityService probabilityService = new ProbabilityService();
+    @Test
+    public void printAllBlocks_ForDebuggingOnly() throws Exception {
+        Logger logger = Logger.getLogger(ExperimentUtils.class);
+        logger.setLevel(Level.ALL);
+        String expectedPrint = "Blocks of experiment JUnit" + System.lineSeparator() +
+                "block rec-10-org, #12345" + System.lineSeparator() +
+                "====================================================" + System.lineSeparator() +
+                "0.17070405 rec-10-dup-0" + System.lineSeparator() +
+                "0.1700955 rec-10-dup-4" + System.lineSeparator() +
+                "0.1674011 rec-10-org" + System.lineSeparator() +
+                "0.16457209 rec-10-dup-2" + System.lineSeparator() +
+                "0.16453668 rec-10-dup-3" + System.lineSeparator() +
+                "0.1626906 rec-10-dup-1" + System.lineSeparator() +
+                "block rec-15-org, #12345" + System.lineSeparator() +
+                "====================================================" + System.lineSeparator() +
+                "0.34593725 rec-15-org" + System.lineSeparator() +
+                "0.32729614 rec-15-dup-1" + System.lineSeparator() +
+                "0.32676664 rec-15-dup-0" + System.lineSeparator();
 
-        File canopiesRootFolder = temporaryFolder.newFolder("root_canopies");
-        ZipExtractor.extractZipFromResources(canopiesRootFolder, "/01_NumberOfOriginalRecords_canopies.zip");
+        List<BlockWithData> blocks = ExperimentsUtils.getRealBlocks(temporaryFolder);
+        for (int i = 0; i < blocks.size(); i++) {
+            BlockWithData spy = PowerMockito.spy(blocks.get(i));
+            doReturn(12345).when(spy).getId();
+            blocks.set(i, spy);
+        }
 
-        List<File> canopiesFiles = new ArrayList<>(FileUtils.listFiles(canopiesRootFolder, null, true));
-        Collection<CanopyCluster> canopyClusters = SerializerUtil.deSerializeCanopies(canopiesFiles.get(0));
-        List<BlockWithData> blocks = canopyService.convertCanopiesToBlocks(canopyClusters);
-        probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(blocks);
-        return blocks;
+        ExperimentUtils.printBlocks(blocks, "Blocks of experiment JUnit");
     }
 
     private BlockWithData createBlockAndSetRepresentativeID(Integer blockNumder) {

@@ -1,21 +1,23 @@
 package il.ac.technion.ie.experiments.util;
 
+import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.parsers.SerializerUtil;
+import il.ac.technion.ie.experiments.service.CanopyService;
 import il.ac.technion.ie.experiments.service.FuzzyService;
 import il.ac.technion.ie.experiments.service.ParsingService;
 import il.ac.technion.ie.experiments.service.ProbabilityService;
 import il.ac.technion.ie.utils.UtilitiesForBlocksAndRecords;
+import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
+import org.junit.rules.TemporaryFolder;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.api.mockito.PowerMockito;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by I062070 on 24/08/2015.
@@ -74,4 +76,17 @@ public class ExperimentsUtils {
         return fuzzyService;
     }
 
+    public static List<BlockWithData> getRealBlocks(TemporaryFolder temporaryFolder) throws Exception {
+        CanopyService canopyService = new CanopyService();
+        ProbabilityService probabilityService = new ProbabilityService();
+
+        File canopiesRootFolder = temporaryFolder.newFolder("root_canopies");
+        ZipExtractor.extractZipFromResources(canopiesRootFolder, "/01_NumberOfOriginalRecords_canopies.zip");
+
+        List<File> canopiesFiles = new ArrayList<>(FileUtils.listFiles(canopiesRootFolder, null, true));
+        Collection<CanopyCluster> canopyClusters = SerializerUtil.deSerializeCanopies(canopiesFiles.get(0));
+        List<BlockWithData> blocks = canopyService.convertCanopiesToBlocks(canopyClusters);
+        probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(blocks);
+        return blocks;
+    }
 }

@@ -113,9 +113,9 @@ public class ProcessCanopies {
         Multimap<Record, BlockWithData> bcbpRepresentatives = this.getRepresentatives(blocks);
         DuplicateReductionContext resultContext = measurements.representativesDuplicateElimination(
                 baselineRepresentatives, bcbpRepresentatives);
-        measurements.representationDiff(trueRepsMap.keySet(), bcbpRepresentatives.keySet(), resultContext);
-        measurements.calcPowerOfRep(trueRepsMap, bcbpRepresentatives, resultContext);
-        measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(bcbpRepresentatives.values()), resultContext);
+        measurements.missingRealRepresentatives(trueRepsMap.keySet(), bcbpRepresentatives.keySet(), resultContext);
+        measurements.calcPowerOfRep_Recall(trueRepsMap, bcbpRepresentatives, resultContext);
+        measurements.calcWisdomCrowd_Precision(trueRepsMap.values(), new HashSet<>(bcbpRepresentatives.values()), resultContext);
         measurements.calcAverageBlockSize(blocks, resultContext);
         double dupsRealRepresentatives = measurements.duplicatesRealRepresentatives(baselineRepresentatives, bcbpRepresentatives, trueRepsMap);
 

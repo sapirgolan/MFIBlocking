@@ -340,7 +340,7 @@ public class MeasurementsTest {
         DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
         //execution
-        classUnderTest.representationDiff(source, other, reductionContext);
+        classUnderTest.missingRealRepresentatives(source, other, reductionContext);
 
         //assertion
         assertThat(reductionContext.getRepresentationDiff(), closeTo(3.0 / 8, 0.01));
@@ -365,7 +365,7 @@ public class MeasurementsTest {
 
         DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
-        classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+        classUnderTest.calcPowerOfRep_Recall(trueRepsMap, convexBPRepresentatives, reductionContext);
 
         assertThat(logging.getAllLogsAbove(Level.WARN), empty());
         assertThat(reductionContext.getRepresentativesPower(), closeTo(0.366666667, 0.0001));
@@ -386,7 +386,7 @@ public class MeasurementsTest {
 
         DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
-        classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+        classUnderTest.calcPowerOfRep_Recall(trueRepsMap, convexBPRepresentatives, reductionContext);
 
         assertThat(logging.getAllLogsAbove(Level.WARN), empty());
         assertThat(reductionContext.getRepresentativesPower(), closeTo(0.333333, 0.0001));
@@ -408,7 +408,7 @@ public class MeasurementsTest {
 
         DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
 
-        classUnderTest.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
+        classUnderTest.calcPowerOfRep_Recall(trueRepsMap, convexBPRepresentatives, reductionContext);
 
         assertThat(logging.getAllLogsAbove(Level.WARN), empty());
         assertThat(reductionContext.getRepresentativesPower(), closeTo(0.58333333, 0.0001));
@@ -439,7 +439,7 @@ public class MeasurementsTest {
         }
 
         //execution
-        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0));
+        double wisdomCrowds = classUnderTest.calcWisdomCrowd_Precision(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0));
 
         //assertion
         assertThat(wisdomCrowds, closeTo(0.25, 0.0001));
@@ -476,7 +476,7 @@ public class MeasurementsTest {
         }
 
         //execution
-        double wisdomCrowds = classUnderTest.calcWisdomCrowds(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0));
+        double wisdomCrowds = classUnderTest.calcWisdomCrowd_Precision(getCleanBlocks(), dirtyBlocks, new DuplicateReductionContext(0));
 
         //assertion
         assertThat(wisdomCrowds, closeTo(0.0, 0.0001));

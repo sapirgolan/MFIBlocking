@@ -63,9 +63,9 @@ public class CanopyExperiment extends AbstractExperiment {
         reductionContext = measurements.representativesDuplicateElimination(
                 millerRepresentatives, convexBPRepresentatives);
         BiMap<Record, BlockWithData> trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
-        measurements.representationDiff(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
-        measurements.calcPowerOfRep(trueRepsMap, convexBPRepresentatives, reductionContext);
-        measurements.calcWisdomCrowds(trueRepsMap.values(), new HashSet<>(convexBPRepresentatives.values()), reductionContext);
+        measurements.missingRealRepresentatives(trueRepsMap.keySet(), convexBPRepresentatives.keySet(), reductionContext);
+        measurements.calcPowerOfRep_Recall(trueRepsMap, convexBPRepresentatives, reductionContext);
+        measurements.calcWisdomCrowd_Precision(trueRepsMap.values(), new HashSet<>(convexBPRepresentatives.values()), reductionContext);
         measurements.calcAverageBlockSize(dirtyBlocks, reductionContext);
         reductionContext.setNumberOfDirtyBlocks(dirtyBlocks.size());
         double dupsRealRepresentatives = measurements.duplicatesRealRepresentatives(millerRepresentatives, convexBPRepresentatives, trueRepsMap);

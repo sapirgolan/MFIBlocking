@@ -6,9 +6,9 @@ package il.ac.technion.ie.canopy.model;
  * The class has four members. each one store a value that was calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements}
  * <ol>
  * <li>duplicatesRemoved - calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements#representativesDuplicateElimination}</li>
- * <li>representationDiff - calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements#representationDiff(java.util.Set, java.util.Set, DuplicateReductionContext)}</li>
- * <li>representativesPower - calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements#calcPowerOfRep(java.util.Map, com.google.common.collect.Multimap, DuplicateReductionContext)}</li>
- * <li>wisdomCrowds - calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements#calcWisdomCrowds(java.util.Set, java.util.Set, DuplicateReductionContext)}  </li>
+ * <li>missingRealRepresentatives - calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements#missingRealRepresentatives(java.util.Set, java.util.Set, DuplicateReductionContext)}</li>
+ * <li>representativesPower - calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements#calcPowerOfRep_Recall(java.util.Map, com.google.common.collect.Multimap, DuplicateReductionContext)}</li>
+ * <li>wisdomCrowds - calculated by {@link il.ac.technion.ie.experiments.service.IMeasurements#calcWisdomCrowd_Precision(java.util.Set, java.util.Set, DuplicateReductionContext)}  </li>
  * </ol>
  * duplicatesRemoved
  */

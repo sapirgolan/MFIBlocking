@@ -168,15 +168,29 @@ public class Measurements implements IMeasurements {
     }
 
     @Override
-    public void representationDiff(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext) {
-        Set<Record> sourceCopy = new HashSet<>(source);
-        Set<Record> otherCopy = new HashSet<>(other);
-        sourceCopy.removeAll(otherCopy);
-        reductionContext.setRepresentationDiff(sourceCopy.size());
+    public void missingRealRepresentatives(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext) {
+        int missingRealRepresentatives = this.missingRealRepresentatives(source, other);
+        reductionContext.setRepresentationDiff(missingRealRepresentatives);
     }
 
     @Override
-    public double calcPowerOfRep(Map<Record, BlockWithData> trueRepsMap, Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext) {
+    public int missingRealRepresentatives(Set<Record> source, Set<Record> other) {
+        Set<Record> sourceCopy = new HashSet<>(source);
+        Set<Record> otherCopy = new HashSet<>(other);
+        sourceCopy.removeAll(otherCopy);
+        return sourceCopy.size();
+    }
+
+    @Override
+    public double calcPowerOfRep_Recall(Map<Record, BlockWithData> trueRepsMap, Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext) {
+        double recall = this.calcPowerOfRep_Recall(trueRepsMap, convexBPRepresentatives);
+        reductionContext.setRepresentativesPower(recall);
+
+        return recall;
+    }
+
+    @Override
+    public double calcPowerOfRep_Recall(Map<Record, BlockWithData> trueRepsMap, Multimap<Record, BlockWithData> convexBPRepresentatives) {
         int numberOfRecords = 0;
         double sumOfPowerOfRecord = 0;
         Set<Record> trueReps = trueRepsMap.keySet();
@@ -201,12 +215,11 @@ public class Measurements implements IMeasurements {
         }
         double power = sumOfPowerOfRecord / numberOfRecords;
         logger.info("The total average power of all representatives is: " + power);
-        reductionContext.setRepresentativesPower(power);
         return power;
     }
 
     @Override
-    public double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext) {
+    public double calcWisdomCrowd_Precision(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks) {
         //todo: for performance, we can change BlockWithData to its hashCode
         final Map<Record, BlockWithData> recordToBlockMap = initRecordToBlockMap(cleanBlocks);
         Multimap<BlockWithData, BlockCounter> globalBlockCounters = ArrayListMultimap.create();
@@ -224,8 +237,14 @@ public class Measurements implements IMeasurements {
         }
 
         double wisdomCrowds = representativesIdentical / (double) cleanBlocks.size();
-        reductionContext.setWisdomCrowds(wisdomCrowds);
         return wisdomCrowds;
+    }
+
+    @Override
+    public double calcWisdomCrowd_Precision(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext) {
+        double precision = this.calcWisdomCrowd_Precision(cleanBlocks, dirtyBlocks);
+        reductionContext.setWisdomCrowds(precision);
+        return precision;
     }
 
     @Override

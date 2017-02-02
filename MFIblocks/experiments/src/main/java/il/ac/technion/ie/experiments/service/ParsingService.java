@@ -147,7 +147,7 @@ public class ParsingService {
 
     public void writeExperimentsMeasurements(DuplicateReductionContext duplicateReductionContext, File file) {
         CsvWriter csvWriter = dataParser.preparOutputFile(file);
-        csvWriter.writeHeaders("diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
+        csvWriter.writeHeaders("Missing Real Representatives", "Power of Real Reap - Recall", "Wisdom of the crowd - Precision",
                 "duplicatesRemoved");
         writeDuplicateReductionContext(duplicateReductionContext, csvWriter);
         csvWriter.close();
@@ -155,7 +155,7 @@ public class ParsingService {
 
     public void writeExperimentsMeasurements(List<DuplicateReductionContext> results, File file) {
         CsvWriter csvWriter = dataParser.preparOutputFile(file);
-        csvWriter.writeHeaders("diff of true representation vs found", "Power of real representatives in soft clusters", "wisdom of the crowd",
+        csvWriter.writeHeaders("Missing Real Representatives", "Power of Real Reap - Recall", "Wisdom of the crowd - Precision",
                 "duplicatesRemoved");
         for (DuplicateReductionContext reductionContext : results) {
             writeDuplicateReductionContext(reductionContext, csvWriter);
@@ -164,11 +164,11 @@ public class ParsingService {
     }
 
     private void writeDuplicateReductionContext(DuplicateReductionContext duplicateReductionContext, CsvWriter csvWriter) {
-        csvWriter.writeValue("diff of true representation vs found", duplicateReductionContext.getRepresentationDiff());
-        csvWriter.writeValue("% of Duplicates that're Real Representatives", duplicateReductionContext.getDuplicatesRealRepresentatives());
+        csvWriter.writeValue("Missing Real Representatives", duplicateReductionContext.getRepresentationDiff());
+        csvWriter.writeValue("Duplicates Real Representatives", duplicateReductionContext.getDuplicatesRealRepresentatives());
         csvWriter.writeValue("duplicatesRemoved", duplicateReductionContext.getDuplicatesRemoved());
-        csvWriter.writeValue("Power of real representatives in soft clusters", duplicateReductionContext.getRepresentativesPower());
-        csvWriter.writeValue("wisdom of the crowd", duplicateReductionContext.getWisdomCrowds());
+        csvWriter.writeValue("Power of Real Reap - Recall", duplicateReductionContext.getRepresentativesPower());
+        csvWriter.writeValue("Wisdom of the crowd - Precision", duplicateReductionContext.getWisdomCrowds());
         csvWriter.writeValue("Average number of blocks", duplicateReductionContext.getNumberOfDirtyBlocks());
         csvWriter.writeValue("Average block size", duplicateReductionContext.getAverageBlockSize());
 
@@ -177,9 +177,9 @@ public class ParsingService {
 
     public void writeExperimentsMeasurements(Map<Integer, DuplicateReductionContext> map, File expResults) {
         CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
-        csvWriter.writeHeaders(FEBERL_PARAMETER, "diff of true representation vs found",
-                "Power of real representatives in soft clusters", "wisdom of the crowd",
-                "duplicatesRemoved", "% of Duplicates that're Real Representatives",
+        csvWriter.writeHeaders(FEBERL_PARAMETER, "Missing Real Representatives",
+                "Power of Real Reap - Recall", "Wisdom of the crowd - Precision",
+                "duplicatesRemoved", "Duplicates Real Representatives",
                 "Average block size", "Average number of blocks");
         for (Map.Entry<Integer, DuplicateReductionContext> entry : map.entrySet()) {
             csvWriter.writeValue(FEBERL_PARAMETER, entry.getKey());
@@ -190,9 +190,9 @@ public class ParsingService {
 
     public void writeExperimentsMeasurements(Multimap<String, DuplicateReductionContext> results, File expResults) {
         CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
-        csvWriter.writeHeaders(DATASET_NAME, "diff of true representation vs found",
-                "Power of real representatives in soft clusters", "wisdom of the crowd",
-                "duplicatesRemoved", "% of Duplicates that're Real Representatives",
+        csvWriter.writeHeaders(DATASET_NAME, "Missing Real Representatives",
+                "Power of Real Reap - Recall", "Wisdom of the crowd - Precision - Precision",
+                "duplicatesRemoved", "Duplicates Real Representatives",
                 "Average block size", "Average number of blocks",
                 "baseline Duration (mil)", "bcbp Duration (mil)");
         for (Map.Entry<String, DuplicateReductionContext> entry : results.entries()) {

@@ -70,7 +70,9 @@ public interface IMeasurements {
      * @param other            records from other source, preferably the representatives that were found in blocks
      * @param reductionContext context to store the result
      */
-    void representationDiff(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext);
+    void missingRealRepresentatives(final Set<Record> source, final Set<Record> other, DuplicateReductionContext reductionContext);
+
+    int missingRealRepresentatives(final Set<Record> source, final Set<Record> other);
 
     /**
      * This method calculates for each block representative that is also true representative of some block the number
@@ -82,7 +84,9 @@ public interface IMeasurements {
      * @param reductionContext        context to store the result
      * @return the calculated value
      */
-    double calcPowerOfRep(final Map<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext);
+    double calcPowerOfRep_Recall(final Map<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives, DuplicateReductionContext reductionContext);
+
+    double calcPowerOfRep_Recall(final Map<Record, BlockWithData> trueRepsMap, final Multimap<Record, BlockWithData> convexBPRepresentatives);
 
     /**
      * There is one 'dirty' block that is most similar to some clean block.
@@ -99,7 +103,9 @@ public interface IMeasurements {
      * @param reductionContext context to store the result
      * @return the calculated value
      */
-    double calcWisdomCrowds(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
+    double calcWisdomCrowd_Precision(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
+
+    double calcWisdomCrowd_Precision(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks);
 
     void calcAverageBlockSize(List<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
 }

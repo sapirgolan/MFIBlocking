@@ -31,12 +31,23 @@ public class ParsingService {
     private static final String MILLER_RANKED_VALUE = "Miller Ranked Value";
     private static final String MILLER_MRR_VALUE = "Miller MRR Value";
     public static final String FEBERL_PARAMETER = "Feberl parameter";
-    public static final String AVERAGE_RANKED_VALUE = "Average Ranked Value";
-    public static final String AVERAGE_MRR = "Average MRR";
-    public static final String FILE_NAME = "File Name";
-    public static final String NUMBER_OF_BLOCKS = "# Blocks";
-    public static final String AVG_BLOCK_SIZE = "Avg Block Size";
     private static final String DATASET_NAME = "Dataset Name";
+    private static final String[] HEADERS_SINGLE_BLOCK_SET = {DATASET_NAME, "Missing Real Representatives",
+            "Power of Real Reap - Recall", "Wisdom of the crowd - Precision - Precision",
+            "duplicatesRemoved", "Duplicates Real Representatives",
+            "Average block size", "Average number of blocks",
+            "baseline Duration (mil)", "bcbp Duration (mil)"};
+    private static final String[] HEADERS_BASELINE_AND_ALG = {DATASET_NAME,
+            "Power of Real Reap - Recall - Baseline",
+            "Wisdom of the crowd - Precision - Precision - Baseline",
+            "Power of Real Reap - Recall - Alg",
+            "Wisdom of the crowd - Precision - Precision - Alg",
+            "Missing Real Representatives - Baseline",
+            "Missing Real Representatives - Alg",
+            "Duplicates Real Representatives",
+            "duplicatesRemoved",
+            "Average block size", "Average number of blocks",
+            "baseline Duration (mil)", "bcbp Duration (mil)"};
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
@@ -153,16 +164,6 @@ public class ParsingService {
         csvWriter.close();
     }
 
-    public void writeExperimentsMeasurements(List<DuplicateReductionContext> results, File file) {
-        CsvWriter csvWriter = dataParser.preparOutputFile(file);
-        csvWriter.writeHeaders("Missing Real Representatives", "Power of Real Reap - Recall", "Wisdom of the crowd - Precision",
-                "duplicatesRemoved");
-        for (DuplicateReductionContext reductionContext : results) {
-            writeDuplicateReductionContext(reductionContext, csvWriter);
-        }
-        csvWriter.close();
-    }
-
     private void writeDuplicateReductionContext(DuplicateReductionContext duplicateReductionContext, CsvWriter csvWriter) {
         csvWriter.writeValue("Missing Real Representatives", duplicateReductionContext.getRepresentationDiff());
         csvWriter.writeValue("Duplicates Real Representatives", duplicateReductionContext.getDuplicatesRealRepresentatives());
@@ -190,11 +191,7 @@ public class ParsingService {
 
     public void writeExperimentsMeasurements(Multimap<String, DuplicateReductionContext> results, File expResults) {
         CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
-        csvWriter.writeHeaders(DATASET_NAME, "Missing Real Representatives",
-                "Power of Real Reap - Recall", "Wisdom of the crowd - Precision - Precision",
-                "duplicatesRemoved", "Duplicates Real Representatives",
-                "Average block size", "Average number of blocks",
-                "baseline Duration (mil)", "bcbp Duration (mil)");
+        csvWriter.writeHeaders(HEADERS_SINGLE_BLOCK_SET);
         for (Map.Entry<String, DuplicateReductionContext> entry : results.entries()) {
             csvWriter.writeValue(DATASET_NAME, entry.getKey());
             DuplicateReductionContext reductionContext = entry.getValue();
@@ -204,5 +201,35 @@ public class ParsingService {
         }
         csvWriter.close();
 
+    }
+
+    public void writeExperimentsMeasurementsForTwoBlockTypes(Multimap<String, DuplicateReductionContext> results, File expResults) {
+        CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
+        csvWriter.writeHeaders(HEADERS_BASELINE_AND_ALG);
+
+        for (Map.Entry<String, DuplicateReductionContext> entry : results.entries()) {
+            csvWriter.writeValue(DATASET_NAME, entry.getKey());
+            DuplicateReductionContext reductionContext = entry.getValue();
+            this.writeResultsToCsvTwoBlockTypes(reductionContext, csvWriter);
+            csvWriter.writeValue("baseline Duration (mil)", reductionContext.getBaselineDuration());
+            csvWriter.writeValue("bcbp Duration (mil)", reductionContext.getBcbpDuration());
+        }
+        csvWriter.close();
+    }
+
+    private void writeResultsToCsvTwoBlockTypes(DuplicateReductionContext reductionContext, CsvWriter csvWriter) {
+        csvWriter.writeValue("Power of Real Reap - Recall - Baseline", reductionContext.getBaselineRecall());
+        csvWriter.writeValue("Wisdom of the crowd - Precision - Precision - Baseline", reductionContext.getBaselinePrecision());
+        csvWriter.writeValue("Power of Real Reap - Recall - Alg", reductionContext.getBcbpRecall());
+        csvWriter.writeValue("Wisdom of the crowd - Precision - Precision - Alg", reductionContext.getBcbpPrecision());
+        csvWriter.writeValue("Missing Real Representatives - Baseline", reductionContext.getBaselineMrr());
+        csvWriter.writeValue("Missing Real Representatives - Alg", reductionContext.getBcbpMrr());
+
+        csvWriter.writeValue("Duplicates Real Representatives", reductionContext.getDuplicatesRealRepresentatives());
+        csvWriter.writeValue("duplicatesRemoved", reductionContext.getDuplicatesRemoved());
+        csvWriter.writeValue("Average number of blocks", reductionContext.getNumberOfDirtyBlocks());
+        csvWriter.writeValue("Average block size", reductionContext.getAverageBlockSize());
+
+        csvWriter.writeValuesToRow();
     }
 }

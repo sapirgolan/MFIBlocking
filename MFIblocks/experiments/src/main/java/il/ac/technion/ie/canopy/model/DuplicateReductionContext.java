@@ -22,6 +22,12 @@ public class DuplicateReductionContext {
     private double averageBlockSize;
     private long baselineDuration;
     private long bcbpDuration;
+    private int baselineMrr;
+    private int bcbpMrr;
+    private double baselineRecall;
+    private double bcbpRecall;
+    private double baselinePrecision;
+    private double bcbpPrecision;
 
     public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -100,5 +106,53 @@ public class DuplicateReductionContext {
 
     public void setBcbpDuration(long bcbpDuration) {
         this.bcbpDuration = bcbpDuration;
+    }
+
+    public void setBaselineMrr(int baselineMrr) {
+        this.baselineMrr = baselineMrr;
+    }
+
+    public void setBcbpMrr(int bcbpMrr) {
+        this.bcbpMrr = bcbpMrr;
+    }
+
+    public void setBaselineRecall(double baselineRecall) {
+        this.baselineRecall = baselineRecall;
+    }
+
+    public void setBcbpRecall(double bcbpRecall) {
+        this.bcbpRecall = bcbpRecall;
+    }
+
+    public void setBaselinePrecision(double baselinePrecision) {
+        this.baselinePrecision = baselinePrecision;
+    }
+
+    public void setBcbpPrecision(double bcbpPrecision) {
+        this.bcbpPrecision = bcbpPrecision;
+    }
+
+    public int getBaselineMrr() {
+        return baselineMrr;
+    }
+
+    public int getBcbpMrr() {
+        return bcbpMrr;
+    }
+
+    public double getBaselineRecall() {
+        return baselineRecall;
+    }
+
+    public double getBcbpRecall() {
+        return bcbpRecall;
+    }
+
+    public double getBaselinePrecision() {
+        return baselinePrecision;
+    }
+
+    public double getBcbpPrecision() {
+        return bcbpPrecision;
     }
 }

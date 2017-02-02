@@ -69,7 +69,7 @@ public class ProcessCanopies {
     }
 
     private void saveResultsToFS(Multimap<String, DuplicateReductionContext> results) {
-        PersistResult.saveConvexBPResultsToCsv(results);
+        PersistResult.saveConvexBPResultsToCsv(results, false);
     }
 
     private DuplicateReductionContext performExperimentComparison(File canopiesFile) {
@@ -113,9 +113,25 @@ public class ProcessCanopies {
         Multimap<Record, BlockWithData> bcbpRepresentatives = this.getRepresentatives(blocks);
         DuplicateReductionContext resultContext = measurements.representativesDuplicateElimination(
                 baselineRepresentatives, bcbpRepresentatives);
-        measurements.missingRealRepresentatives(trueRepsMap.keySet(), bcbpRepresentatives.keySet(), resultContext);
-        measurements.calcPowerOfRep_Recall(trueRepsMap, bcbpRepresentatives, resultContext);
-        measurements.calcWisdomCrowd_Precision(trueRepsMap.values(), new HashSet<>(bcbpRepresentatives.values()), resultContext);
+
+        //MRR
+        int bcbpMissingRealRepresentatives = measurements.missingRealRepresentatives(trueRepsMap.keySet(), bcbpRepresentatives.keySet());
+        int baselineMissingRealRepresentatives = measurements.missingRealRepresentatives(trueRepsMap.keySet(), baselineRepresentatives.keySet());
+        resultContext.setBaselineMrr(baselineMissingRealRepresentatives);
+        resultContext.setBcbpMrr(bcbpMissingRealRepresentatives);
+
+        //Recall
+        double bcbpRecall = measurements.calcPowerOfRep_Recall(trueRepsMap, bcbpRepresentatives);
+        double baselineRecall = measurements.calcPowerOfRep_Recall(trueRepsMap, baselineRepresentatives);
+        resultContext.setBaselineRecall(baselineRecall);
+        resultContext.setBcbpRecall(bcbpRecall);
+
+        //Precision
+        double bcbpPrecision = measurements.calcWisdomCrowd_Precision(trueRepsMap.values(), new HashSet<>(bcbpRepresentatives.values()));
+        double baselinePrecision = measurements.calcWisdomCrowd_Precision(trueRepsMap.values(), new HashSet<>(baselineRepresentatives.values()));
+        resultContext.setBaselinePrecision(baselinePrecision);
+        resultContext.setBcbpPrecision(bcbpPrecision);
+
         measurements.calcAverageBlockSize(blocks, resultContext);
         double dupsRealRepresentatives = measurements.duplicatesRealRepresentatives(baselineRepresentatives, bcbpRepresentatives, trueRepsMap);
 

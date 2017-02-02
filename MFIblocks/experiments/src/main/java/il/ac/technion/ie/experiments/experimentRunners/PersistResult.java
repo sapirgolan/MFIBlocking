@@ -32,15 +32,21 @@ public class PersistResult {
                 time.getMillisOfSecond());
     }
 
-    public static void saveConvexBPResultsToCsv(Multimap<String, DuplicateReductionContext> results) {
+    public static void saveConvexBPResultsToCsv(Multimap<String, DuplicateReductionContext> results, boolean printSingleBlocsType) {
         File expResults = ExpFileUtils.createOutputFile(generateFileName());
 
         if (expResults != null) {
             logger.info("saving results of ExperimentsWithCanopy");
-            new ParsingService().writeExperimentsMeasurements(results, expResults);
+            ParsingService parsingService = new ParsingService();
+            if (printSingleBlocsType) {
+                parsingService.writeExperimentsMeasurements(results, expResults);
+            } else {
+                parsingService.writeExperimentsMeasurementsForTwoBlockTypes(results, expResults);
+            }
         } else {
             logger.warn("Failed to create file for measurements therefore no results are results will be given");
         }
         logger.info("Finished saving results of ExperimentsWithCanopy");
+
     }
 }

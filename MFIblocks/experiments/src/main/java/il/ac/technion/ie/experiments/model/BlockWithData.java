@@ -6,12 +6,13 @@ import il.ac.technion.ie.model.Record;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by I062070 on 21/08/2015.
  */
-public class BlockWithData extends AbstractBlock<Record>{
+public class BlockWithData extends AbstractBlock<Record> implements Serializable{
 
     private static final Logger logger = Logger.getLogger(BlockWithData.class);
 

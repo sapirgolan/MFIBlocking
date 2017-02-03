@@ -14,23 +14,29 @@ public class SerializerUtil {
     private static final Logger logger = Logger.getLogger(SerializerUtil.class);
 
     public static boolean serializeCanopies(File canopiesFile, Collection<CanopyCluster> canopies) {
+        return serialize(canopiesFile, canopies);
+    }
+
+    public static <T> boolean serialize(File serializeFile, Collection<T> entities) {
         boolean wasSerialized = false;
 
-        try (FileOutputStream outputStream = new FileOutputStream(canopiesFile)) {
+        try (FileOutputStream outputStream = new FileOutputStream(serializeFile)) {
             try (ObjectOutputStream oos = new ObjectOutputStream(outputStream)) {
-                oos.writeObject(canopies);
+                oos.writeObject(entities);
                 oos.close();
             } catch (IOException e) {
-                logger.error("Failed to write canopies to: '" + canopiesFile.getAbsolutePath() + "'", e);
+                logger.error("Failed to write entities to: '" + serializeFile.getAbsolutePath() + "'", e);
             }
-            logger.info("Successfully written canopies to: '" + canopiesFile.getAbsolutePath() + "'");
+            logger.info("Successfully written entities to: '" + serializeFile.getAbsolutePath() + "'");
             wasSerialized = true;
             outputStream.close();
         } catch (IOException e) {
-            logger.error("Failed to open OutputStream from: '" + canopiesFile.getAbsolutePath() + "'", e);
+            logger.error("Failed to open OutputStream from: '" + serializeFile.getAbsolutePath() + "'", e);
         }
         return wasSerialized;
     }
+
+
 
     public static Collection<CanopyCluster> deSerializeCanopies(File canopiesFile) {
         Collection<CanopyCluster> canopies = null;

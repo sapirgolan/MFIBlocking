@@ -61,7 +61,6 @@ public interface IMeasurements {
 
     /**
      * This method finds the number of records in @param source that were not present in @param other.
-     * It then calculate the percentage of those records from the total number of records in @param source.
      * The result is stored in @param reductionContext.
      * <br><br>
      * Also know as measurement #1

@@ -323,33 +323,19 @@ public class MeasurementsTest {
 
     @Test
     public void testRepresentationDiff() throws Exception {
-        Set<Record> source = new HashSet<>();
-        Set<Record> other = new HashSet<>();
-        //create common records
-        Set<Record> commonRecords = new HashSet<>();
-        createMockRecords(commonRecords, 5);
-
-        //create onlySourceRecords records
-        createMockRecords(source, 3);
-        source.addAll(commonRecords);
-
-        //create onlyOtherRecords
-        other.addAll(commonRecords);
-        createMockRecords(other, 1);
-
-        DuplicateReductionContext reductionContext = new DuplicateReductionContext(0);
+        /*
+        * There are common 3 records.
+        * 5 records from "source" are not present in "other"
+        * */
+        //
+        Set<Record> source = new HashSet<>(recordsFromCsv.subList(0, 8));
+        Set<Record> other = new HashSet<>(recordsFromCsv.subList(5, 8));
 
         //execution
-        classUnderTest.missingRealRepresentatives(source, other, reductionContext);
+        int missingRealRepresentatives = classUnderTest.missingRealRepresentatives(source, other);
 
         //assertion
-        assertThat(reductionContext.getRepresentationDiff(), closeTo(3.0 / 8, 0.01));
-    }
-
-    private void createMockRecords(Set<Record> set, int numberOfRecords) {
-        for (int i = 0; i < numberOfRecords; i++) {
-            set.add(mock(Record.class));
-        }
+        assertThat(missingRealRepresentatives, is(5));
     }
 
     @Test

@@ -4,7 +4,7 @@ import il.ac.technion.ie.canopy.model.CanopyCluster;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Created by I062070 on 22/01/2016.

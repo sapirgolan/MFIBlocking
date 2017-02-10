@@ -765,7 +765,7 @@ public class MeasurementsTest {
     @Test
     public void removedGroundTruthReps_repsWereRemoved() throws Exception {
         /*
-        * There are 5 ground truth reps,
+        * There are 4 ground truth reps,
         * baseline contains 3 ground truth reps
         * bcbp contains 2 ground truth reps
         */
@@ -780,9 +780,77 @@ public class MeasurementsTest {
     }
 
     @Test
+    public void removedGroundTruthReps_repsWereAddedAndRemoved() throws Exception {
+        /*
+        * There are 4 ground truth reps,
+        * baseline contains 2 ground truth reps
+        * bcbp contains 3 ground truth reps, only one from baseline
+        */
+        List<Record> groundTruth = recordsFromCsv.subList(0, 4);
+        Set<Record> baseline = new HashSet<>(recordsFromCsv.subList(4, 10));
+        assertTrue(baseline.addAll(groundTruth.subList(0, 2)));
+        Set<Record> bcbp = new HashSet<>(recordsFromCsv.subList(10, 12));
+        assertTrue(bcbp.addAll(groundTruth.subList(1, 4)));
+
+        int removedGroundTruthReps = classUnderTest.removedGroundTruthReps(baseline, bcbp, new HashSet<>(groundTruth));
+        assertThat(removedGroundTruthReps, is(1));
+    }
+
+    @Test
     public void removedGroundTruthReps_repsWereAdded() throws Exception {
         /*
-        * There are 5 ground truth reps,
+        * There are 4 ground truth reps,
+        * baseline contains 2 ground truth reps
+        * bcbp contains 3 ground truth reps, all exist in baseline
+        */
+        List<Record> groundTruth = recordsFromCsv.subList(0, 4);
+        Set<Record> baseline = new HashSet<>(recordsFromCsv.subList(4, 10));
+        assertTrue(baseline.addAll(groundTruth.subList(0, 2)));
+        Set<Record> bcbp = new HashSet<>(recordsFromCsv.subList(10, 12));
+        assertTrue(bcbp.addAll(groundTruth.subList(0, 3)));
+
+        int removedGroundTruthReps = classUnderTest.removedGroundTruthReps(baseline, bcbp, new HashSet<>(groundTruth));
+        assertThat(removedGroundTruthReps, is(0));
+    }
+
+    @Test
+    public void newAddedReps_notAddedNewReps() throws Exception {
+        /*
+        * There are 4 ground truth reps,
+        * baseline contains 2 ground truth reps
+        * bcbp contains 2 ground truth reps
+        */
+        List<Record> groundTruth = recordsFromCsv.subList(0, 4);
+        Set<Record> baseline = new HashSet<>(recordsFromCsv.subList(4, 10));
+        assertTrue(baseline.addAll(groundTruth.subList(0, 2)));
+        Set<Record> bcbp = new HashSet<>(recordsFromCsv.subList(10, 12));
+        assertTrue(bcbp.addAll(groundTruth.subList(0, 1)));
+
+        int newAddedReps = classUnderTest.newAddedReps(baseline, bcbp, new HashSet<>(groundTruth));
+        assertThat(newAddedReps, is(0));
+    }
+
+    @Test
+    public void newAddedReps_addedNewRepNotContainedInBaseline() throws Exception {
+        /*
+        * There are 4 ground truth reps,
+        * baseline contains 2 ground truth reps
+        * bcbp contains 3 ground truth reps
+        */
+        List<Record> groundTruth = recordsFromCsv.subList(0, 4);
+        Set<Record> baseline = new HashSet<>(recordsFromCsv.subList(4, 10));
+        assertTrue(baseline.addAll(groundTruth.subList(0, 2)));
+        Set<Record> bcbp = new HashSet<>(recordsFromCsv.subList(10, 12));
+        assertTrue(bcbp.addAll(groundTruth.subList(0, 3)));
+
+        int newAddedReps = classUnderTest.newAddedReps(baseline, bcbp, new HashSet<>(groundTruth));
+        assertThat(newAddedReps, is(1));
+    }
+
+    @Test
+    public void newAddedReps_addedNewRepNotContainedInBaseline_andRemovedSomeThereWereContained() throws Exception {
+        /*
+        * There are 4 ground truth reps,
         * baseline contains 2 ground truth reps
         * bcbp contains 3 ground truth reps
         */
@@ -792,8 +860,8 @@ public class MeasurementsTest {
         Set<Record> bcbp = new HashSet<>(recordsFromCsv.subList(10, 12));
         assertTrue(bcbp.addAll(groundTruth.subList(1, 4)));
 
-        int removedGroundTruthReps = classUnderTest.removedGroundTruthReps(baseline, bcbp, new HashSet<>(groundTruth));
-        assertThat(removedGroundTruthReps, is(0));
+        int newAddedReps = classUnderTest.newAddedReps(baseline, bcbp, new HashSet<>(groundTruth));
+        assertThat(newAddedReps, is(2));
     }
 
     private List<BlockWithData> generateBlocks(int size) {

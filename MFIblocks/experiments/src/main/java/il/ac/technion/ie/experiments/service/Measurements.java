@@ -263,9 +263,15 @@ public class Measurements implements IMeasurements {
 
     @Override
     public int removedGroundTruthReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps) {
-        int baselineTrueRepsSize = Sets.intersection(groundTruthReps, baselineRepresentatives).size();
-        int bcbpTrueRepsSize = Sets.intersection(groundTruthReps, bcbpRepresentatives).size();
-        return Math.max(0, baselineTrueRepsSize - bcbpTrueRepsSize);
+        Sets.SetView<Record> baselineTrueReps = Sets.intersection(groundTruthReps, baselineRepresentatives);
+        Sets.SetView<Record> bcbpTrueReps = Sets.intersection(groundTruthReps, bcbpRepresentatives);
+        return Math.max(0, Sets.difference(baselineTrueReps, bcbpTrueReps).size() );
+    }
+
+    @Override
+    public int newAddedReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps) {
+        Sets.SetView<Record> addedByBcbp = Sets.difference(bcbpRepresentatives, baselineRepresentatives);
+        return Sets.intersection(addedByBcbp, groundTruthReps).size();
     }
 
     private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {

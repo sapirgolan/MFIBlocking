@@ -123,4 +123,12 @@ public interface IMeasurements {
      * but not in bcbpRepresentatives.
      */
     int removedGroundTruthReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps);
+
+    /**
+     * @param baselineRepresentatives
+     * @param bcbpRepresentatives
+     * @param groundTruthReps
+     * @return the number of newly added true reps
+     */
+    int newAddedReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps);
 }

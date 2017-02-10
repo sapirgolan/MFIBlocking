@@ -26,6 +26,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyList;
 import static org.powermock.api.mockito.PowerMockito.*;
 
@@ -759,6 +760,40 @@ public class MeasurementsTest {
 
         float trueRepsPercentage = classUnderTest.trueRepsPercentage(groundTruthReps, algReps);
         assertThat(trueRepsPercentage, is(0.4F));
+    }
+
+    @Test
+    public void removedGroundTruthReps_repsWereRemoved() throws Exception {
+        /*
+        * There are 5 ground truth reps,
+        * baseline contains 3 ground truth reps
+        * bcbp contains 2 ground truth reps
+        */
+        List<Record> groundTruth = recordsFromCsv.subList(0, 4);
+        Set<Record> baseline = new HashSet<>(recordsFromCsv.subList(4, 10));
+        assertTrue(baseline.addAll(groundTruth.subList(0, 3)));
+        Set<Record> bcbp = new HashSet<>(recordsFromCsv.subList(10, 12));
+        assertTrue(bcbp.addAll(groundTruth.subList(0, 2)));
+
+        int removedGroundTruthReps = classUnderTest.removedGroundTruthReps(baseline, bcbp, new HashSet<>(groundTruth));
+        assertThat(removedGroundTruthReps, is(1));
+    }
+
+    @Test
+    public void removedGroundTruthReps_repsWereAdded() throws Exception {
+        /*
+        * There are 5 ground truth reps,
+        * baseline contains 2 ground truth reps
+        * bcbp contains 3 ground truth reps
+        */
+        List<Record> groundTruth = recordsFromCsv.subList(0, 4);
+        Set<Record> baseline = new HashSet<>(recordsFromCsv.subList(4, 10));
+        assertTrue(baseline.addAll(groundTruth.subList(0, 2)));
+        Set<Record> bcbp = new HashSet<>(recordsFromCsv.subList(10, 12));
+        assertTrue(bcbp.addAll(groundTruth.subList(1, 4)));
+
+        int removedGroundTruthReps = classUnderTest.removedGroundTruthReps(baseline, bcbp, new HashSet<>(groundTruth));
+        assertThat(removedGroundTruthReps, is(0));
     }
 
     private List<BlockWithData> generateBlocks(int size) {

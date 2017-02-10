@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class Measurements implements IMeasurements {
 
-    static final Logger logger = Logger.getLogger(Measurements.class);
+    private static final Logger logger = Logger.getLogger(Measurements.class);
 
     public static final double VALUE_NOT_EXISTS = -1.0;
     private iMeasurService measurService;
@@ -259,6 +259,13 @@ public class Measurements implements IMeasurements {
     @Override
     public float trueRepsPercentage(Set<Record> groundTruthReps, Set<Record> algReps) {
         return (float) Sets.intersection(groundTruthReps, algReps).size() / groundTruthReps.size();
+    }
+
+    @Override
+    public int removedGroundTruthReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps) {
+        int baselineTrueRepsSize = Sets.intersection(groundTruthReps, baselineRepresentatives).size();
+        int bcbpTrueRepsSize = Sets.intersection(groundTruthReps, bcbpRepresentatives).size();
+        return Math.max(0, baselineTrueRepsSize - bcbpTrueRepsSize);
     }
 
     private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {

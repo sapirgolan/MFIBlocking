@@ -114,4 +114,13 @@ public interface IMeasurements {
      * @return the percentage of representatives which also contained in ground truth set.
      */
     float trueRepsPercentage(Set<Record> groundTruthReps, Set<Record> algReps);
+
+    /**
+     * @param baselineRepresentatives
+     * @param bcbpRepresentatives
+     * @param groundTruthReps
+     * @return the number of ground truth representatives that were eliminated by BCBP. This records are present in baselineRepresentatives
+     * but not in bcbpRepresentatives.
+     */
+    int removedGroundTruthReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps);
 }

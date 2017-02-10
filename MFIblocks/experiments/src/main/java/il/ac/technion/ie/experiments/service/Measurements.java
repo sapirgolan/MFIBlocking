@@ -236,8 +236,7 @@ public class Measurements implements IMeasurements {
             }
         }
 
-        double wisdomCrowds = representativesIdentical / (double) cleanBlocks.size();
-        return wisdomCrowds;
+        return representativesIdentical / (double) cleanBlocks.size();
     }
 
     @Override
@@ -255,6 +254,11 @@ public class Measurements implements IMeasurements {
         }
         size = (size / dirtyBlocks.size());
         reductionContext.setAverageBlockSize(size);
+    }
+
+    @Override
+    public float trueRepsPercentage(Set<Record> groundTruthReps, Set<Record> algReps) {
+        return (float) Sets.intersection(groundTruthReps, algReps).size() / groundTruthReps.size();
     }
 
     private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {
@@ -339,7 +343,7 @@ public class Measurements implements IMeasurements {
         for (Map.Entry<Record, Collection<BlockWithData>> entry : duplicates.asMap().entrySet()) {
             if (entry.getValue().size() >= 2) {
                 StringBuilder message = new StringBuilder();
-                message.append(entry.getKey() + " represents more than one block: ");
+                message.append(entry.getKey()).append(" represents more than one block: ");
                 for (BlockWithData blockWithData : entry.getValue()) {
                     message.append(blockWithData);
                 }

@@ -445,7 +445,7 @@ public class MeasurementsTest {
         assertThat(wisdomCrowds, closeTo(0.25, 0.0001));
     }
 
-    private final Set<BlockWithData> getCleanBlocks() {
+    private Set<BlockWithData> getCleanBlocks() {
         BlockWithData blockOne = new BlockWithData(recordsFromCsv.subList(0, 4));
         BlockWithData blockTwo = new BlockWithData(recordsFromCsv.subList(4, 8));
         BlockWithData blockThree = new BlockWithData(recordsFromCsv.subList(8, 13));
@@ -764,7 +764,15 @@ public class MeasurementsTest {
         // execute your test
         double duplicatesRealRepresentatives = classUnderTest.duplicatesRealRepresentatives(duplicates, cleaned, trueReps);
         assertThat(duplicatesRealRepresentatives, closeTo(0.0, 0.00001));
+    }
 
+    @Test
+    public void trueRepsPercentage() throws Exception {
+        Set<Record> groundTruthReps = new HashSet<>(recordsFromCsv.subList(0, 10));
+        Set<Record> algReps = new HashSet<>(recordsFromCsv.subList(6, 14));
+
+        float trueRepsPercentage = classUnderTest.trueRepsPercentage(groundTruthReps, algReps);
+        assertThat(trueRepsPercentage, is(0.4F));
     }
 
     private List<BlockWithData> generateBlocks(int size) {

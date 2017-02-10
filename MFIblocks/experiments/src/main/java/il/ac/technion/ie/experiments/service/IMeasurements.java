@@ -108,4 +108,11 @@ public interface IMeasurements {
     double calcWisdomCrowd_Precision(Set<BlockWithData> cleanBlocks, Set<BlockWithData> dirtyBlocks);
 
     void calcAverageBlockSize(List<BlockWithData> dirtyBlocks, DuplicateReductionContext reductionContext);
+
+    /**
+     * @param groundTruthReps a <code>Set</code> of {@link Record} that are the groundTruth representatives
+     * @param algReps a <code>Set</code> of {@link Record} that are the representatives who were found by an algorithm
+     * @return the percentage of representatives which also contained in ground truth set.
+     */
+    float trueRepsPercentage(Set<Record> groundTruthReps, Set<Record> algReps);
 }

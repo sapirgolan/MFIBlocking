@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Created by I062070 on 20/01/2017.
  */
 public class ApacheExecutor implements IConvexBPExecutor {
-    private final int WAIT_TIMEOUT_MINUTES = 30;
+    private final int WAIT_TIMEOUT_MINUTES = 45;
 
     static final Logger logger = Logger.getLogger(ApacheExecutor.class);
 

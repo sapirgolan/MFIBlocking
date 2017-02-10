@@ -77,7 +77,12 @@ public class DatasetParser {
     }
 
     public CsvWriter preparOutputFile(File file) {
+        return this.preparOutputFile(file, null);
+    }
+
+    public CsvWriter preparOutputFile(File file, CsvWriterSettings settings) {
         CsvWriter writer = null;
+        settings = settings == null ? new CsvWriterSettings() : settings;
 
         if (!file.exists() || !file.canWrite()) {
             logger.warn("Can't write output to file. Either it doesn't exists or nothing can be written");
@@ -88,7 +93,7 @@ public class DatasetParser {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             Writer outputWriter = new OutputStreamWriter(fileOutputStream);
 
-            writer = new CsvWriter(outputWriter, new CsvWriterSettings());
+            writer = new CsvWriter(outputWriter, settings);
         } catch (FileNotFoundException e) {
             logger.error("Output File doesn't exists", e);
         }

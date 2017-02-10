@@ -3,11 +3,15 @@ package il.ac.technion.ie.experiments.experimentRunners;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.Utils.ExpFileUtils;
+import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.parsers.SerializerUtil;
 import il.ac.technion.ie.experiments.service.ParsingService;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class PersistResult {
 
@@ -41,12 +45,22 @@ public class PersistResult {
             if (printSingleBlocsType) {
                 parsingService.writeExperimentsMeasurements(results, expResults);
             } else {
-                parsingService.writeExperimentsMeasurementsForTwoBlockTypes(results, expResults);
+                parsingService.writeComparisonExperimentsMeasurements(results, expResults);
             }
         } else {
             logger.warn("Failed to create file for measurements therefore no results are results will be given");
         }
         logger.info("Finished saving results of ExperimentsWithCanopy");
 
+    }
+
+    public static void saveBlocksToDisk(List<BlockWithData> blocks, String datasetName, String blockNamePrefix) {
+        try {
+            File blocksFolder = ExpFileUtils.createOrGetFolder(datasetName);
+            File blocksSerializeFile = ExpFileUtils.createBlocksFile(blocksFolder, blockNamePrefix);
+            SerializerUtil.serialize(blocksSerializeFile, blocks);
+        } catch (IOException e) {
+            logger.error("Failed to serialize blocks", e);
+        }
     }
 }

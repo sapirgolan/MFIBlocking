@@ -2,7 +2,9 @@ package il.ac.technion.ie.experiments.service;
 
 import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
+import il.ac.technion.ie.experiments.model.BlockResults;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
 import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
@@ -272,6 +274,30 @@ public class Measurements implements IMeasurements {
     public int newAddedReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps) {
         Sets.SetView<Record> addedByBcbp = Sets.difference(bcbpRepresentatives, baselineRepresentatives);
         return Sets.intersection(addedByBcbp, groundTruthReps).size();
+    }
+
+    @Override
+    public BlockResults calculateBlockResults(BiMap<Record, BlockWithData> groundTruthMap, Multimap<Record, BlockWithData> algBlocks) {
+        //Recall
+        double recall = this.calcPowerOfRep_Recall(groundTruthMap, algBlocks);
+        //Precision
+        double precision = this.calcWisdomCrowd_Precision(groundTruthMap.values(), new HashSet<>(algBlocks.values()));
+        //TrueReps
+        float trueRepsPercentage = this.trueRepsPercentage(groundTruthMap.keySet(), algBlocks.keySet());
+        //MRR
+        int mrr = this.missingRealRepresentatives(groundTruthMap.keySet(), algBlocks.keySet());
+
+        return new BlockResults(recall, precision, trueRepsPercentage, mrr);
+    }
+
+    @Override
+    public CompareAlgorithmResults compareBaselineToBcbp(Multimap<Record, BlockWithData> baselineRepresentatives, Multimap<Record, BlockWithData> bcbpRepresentatives, BiMap<Record, BlockWithData> groundTruthMap) {
+        int removedGroundTruthReps = this.removedGroundTruthReps(baselineRepresentatives.keySet(), bcbpRepresentatives.keySet(), groundTruthMap.keySet());
+        int newAddedReps = this.newAddedReps(baselineRepresentatives.keySet(), bcbpRepresentatives.keySet(), groundTruthMap.keySet());
+        //DRR
+        double drr = this.duplicatesRealRepresentatives(baselineRepresentatives, bcbpRepresentatives, groundTruthMap);
+
+        return new CompareAlgorithmResults(removedGroundTruthReps, newAddedReps, drr);
     }
 
     private boolean isTrueRepIdenticalToDirtyBlockRep(Multimap<BlockWithData, BlockCounter> globalBlockCounters, BlockWithData cleanBlock) {

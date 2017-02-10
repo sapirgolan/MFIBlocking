@@ -3,7 +3,9 @@ package il.ac.technion.ie.experiments.service;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
+import il.ac.technion.ie.experiments.model.BlockResults;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
 import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
 import il.ac.technion.ie.model.Record;
 
@@ -131,4 +133,22 @@ public interface IMeasurements {
      * @return the number of newly added true reps
      */
     int newAddedReps(Set<Record> baselineRepresentatives, Set<Record> bcbpRepresentatives, Set<Record> groundTruthReps);
+
+    /**
+     * Calculate all Recall, Precision, MRR and number of true reps
+     * @param groundTruthMap
+     * @param algBlocks
+     * @return a context object with all information
+     *
+     *
+     */
+    BlockResults calculateBlockResults(BiMap<Record, BlockWithData> groundTruthMap, Multimap<Record, BlockWithData> algBlocks);
+
+    /**
+     * Calculate measures of difference between baseline and BCBP algorithm
+     * @param baselineRepresentatives
+     * @param bcbpRepresentatives
+     * @param groundTruthMap
+     */
+    CompareAlgorithmResults compareBaselineToBcbp(Multimap<Record, BlockWithData> baselineRepresentatives, Multimap<Record, BlockWithData> bcbpRepresentatives, BiMap<Record, BlockWithData> groundTruthMap);
 }

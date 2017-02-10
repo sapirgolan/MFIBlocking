@@ -3,7 +3,9 @@ package il.ac.technion.ie.experiments.experimentRunners;
 import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
+import il.ac.technion.ie.experiments.model.BlockResults;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
 import il.ac.technion.ie.experiments.parsers.SerializerUtil;
 import il.ac.technion.ie.experiments.service.*;
 import il.ac.technion.ie.experiments.threads.ApacheExecutor;
@@ -58,7 +60,7 @@ public class ProcessCanopies {
                 for (File canopiesFile : canopiesFiles) {
                     logger.info(String.format("running experiments on canopy - '%s'. HeapSize = %s",
                             canopiesFile.getName(), ExperimentUtils.humanReadableByteCount()));
-                    DuplicateReductionContext context = this.performExperimentComparison(canopiesFile);
+                    DuplicateReductionContext context = this.performExperimentComparison(canopiesFile, datasetFile.getName());
                     if (context != null) {
                         results.put(datasetFile.getName(), context);
                     }
@@ -72,12 +74,13 @@ public class ProcessCanopies {
         PersistResult.saveConvexBPResultsToCsv(results, false);
     }
 
-    private DuplicateReductionContext performExperimentComparison(File canopiesFile) {
+    private DuplicateReductionContext performExperimentComparison(File canopiesFile, String datasetName) {
         List<BlockWithData> blocks = fileToCanopies.get(canopiesFile);
         long start = System.nanoTime();
         logger.info("Starting to process baseline. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         this.calculateBaselineResults(blocks);
         long baselineDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+        PersistResult.saveBlocksToDisk(blocks, datasetName, "baseline");
         logger.info("finding baseline representatives. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
         logger.info("Finished processing baseline");
@@ -87,6 +90,7 @@ public class ProcessCanopies {
         boolean continueExecution = this.executeConvexBP(blocks);
         long bcbpDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
         if (continueExecution) {
+            PersistResult.saveBlocksToDisk(blocks, datasetName, "bcbp");
             DuplicateReductionContext duplicateReductionContext = this.calculateMeasurements(blocks, baselineRepresentatives);
             duplicateReductionContext.setBaselineDuration(baselineDuration);
             duplicateReductionContext.setBcbpDuration(bcbpDuration);
@@ -109,34 +113,22 @@ public class ProcessCanopies {
         this.measurements = new Measurements(cleanBlocks.size());
     }
 
-    private DuplicateReductionContext calculateMeasurements(List<BlockWithData> blocks, Multimap<Record, BlockWithData> baselineRepresentatives) {
-        Multimap<Record, BlockWithData> bcbpRepresentatives = this.getRepresentatives(blocks);
-        DuplicateReductionContext resultContext = measurements.representativesDuplicateElimination(
-                baselineRepresentatives, bcbpRepresentatives);
+    private DuplicateReductionContext calculateMeasurements(List<BlockWithData> blocks, Multimap<Record, BlockWithData> baselineReps) {
+        Multimap<Record, BlockWithData> bcbpReps = this.getRepresentatives(blocks);
+        DuplicateReductionContext resultContext = measurements.representativesDuplicateElimination(baselineReps, bcbpReps);
 
-        //MRR
-        int bcbpMissingRealRepresentatives = measurements.missingRealRepresentatives(trueRepsMap.keySet(), bcbpRepresentatives.keySet());
-        int baselineMissingRealRepresentatives = measurements.missingRealRepresentatives(trueRepsMap.keySet(), baselineRepresentatives.keySet());
-        resultContext.setBaselineMrr(baselineMissingRealRepresentatives);
-        resultContext.setBcbpMrr(bcbpMissingRealRepresentatives);
+        BlockResults baselineBlockResults = measurements.calculateBlockResults(trueRepsMap, baselineReps);
+        resultContext.setBaselineResults(baselineBlockResults);
 
-        //Recall
-        double bcbpRecall = measurements.calcPowerOfRep_Recall(trueRepsMap, bcbpRepresentatives);
-        double baselineRecall = measurements.calcPowerOfRep_Recall(trueRepsMap, baselineRepresentatives);
-        resultContext.setBaselineRecall(baselineRecall);
-        resultContext.setBcbpRecall(bcbpRecall);
+        BlockResults bcbpBlockResults = measurements.calculateBlockResults(trueRepsMap, bcbpReps);
+        resultContext.setBcbpResults(bcbpBlockResults);
 
-        //Precision
-        double bcbpPrecision = measurements.calcWisdomCrowd_Precision(trueRepsMap.values(), new HashSet<>(bcbpRepresentatives.values()));
-        double baselinePrecision = measurements.calcWisdomCrowd_Precision(trueRepsMap.values(), new HashSet<>(baselineRepresentatives.values()));
-        resultContext.setBaselinePrecision(baselinePrecision);
-        resultContext.setBcbpPrecision(bcbpPrecision);
+        //compares between baseline and BCBP representatives
+        CompareAlgorithmResults compareAlgResults = measurements.compareBaselineToBcbp(baselineReps, bcbpReps, trueRepsMap);
+        resultContext.setCompareAlgsResults(compareAlgResults);
 
         measurements.calcAverageBlockSize(blocks, resultContext);
-        double dupsRealRepresentatives = measurements.duplicatesRealRepresentatives(baselineRepresentatives, bcbpRepresentatives, trueRepsMap);
-
         resultContext.setNumberOfDirtyBlocks(blocks.size());
-        resultContext.setDuplicatesRealRepresentatives(dupsRealRepresentatives);
 
         return resultContext;
     }

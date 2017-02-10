@@ -1,5 +1,8 @@
 package il.ac.technion.ie.canopy.model;
 
+import il.ac.technion.ie.experiments.model.BlockResults;
+import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
+
 /**
  * Created by I062070 on 18/12/2015.
  * <p/>
@@ -28,6 +31,9 @@ public class DuplicateReductionContext {
     private double bcbpRecall;
     private double baselinePrecision;
     private double bcbpPrecision;
+    private BlockResults baselineResults;
+    private BlockResults bcbpResults;
+    private CompareAlgorithmResults compareAlgsResults;
 
     public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -154,5 +160,29 @@ public class DuplicateReductionContext {
 
     public double getBcbpPrecision() {
         return bcbpPrecision;
+    }
+
+    public void setBaselineResults(BlockResults baselineResults) {
+        this.baselineResults = baselineResults;
+    }
+
+    public void setBcbpResults(BlockResults bcbpResults) {
+        this.bcbpResults = bcbpResults;
+    }
+
+    public void setCompareAlgsResults(CompareAlgorithmResults compareAlgsResults) {
+        this.compareAlgsResults = compareAlgsResults;
+    }
+
+    public BlockResults getBaselineResults() {
+        return baselineResults;
+    }
+
+    public BlockResults getBcbpResults() {
+        return bcbpResults;
+    }
+
+    public CompareAlgorithmResults getCompareAlgsResults() {
+        return compareAlgsResults;
     }
 }

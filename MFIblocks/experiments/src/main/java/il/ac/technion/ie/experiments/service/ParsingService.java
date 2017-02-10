@@ -3,12 +3,14 @@ package il.ac.technion.ie.experiments.service;
 import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.builder.FebrlBlockBuilder;
 import il.ac.technion.ie.experiments.builder.iBlockBuilder;
 import il.ac.technion.ie.experiments.exception.SizeNotEqualException;
+import il.ac.technion.ie.experiments.model.BlockResults;
 import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.DatasetStatistics;
+import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
 import il.ac.technion.ie.experiments.parsers.DatasetParser;
 import il.ac.technion.ie.model.Record;
 
@@ -38,16 +40,20 @@ public class ParsingService {
             "Average block size", "Average number of blocks",
             "baseline Duration (mil)", "bcbp Duration (mil)"};
     private static final String[] HEADERS_BASELINE_AND_ALG = {DATASET_NAME,
-            "Power of Real Reap - Recall - Baseline",
-            "Wisdom of the crowd - Precision - Precision - Baseline",
-            "Power of Real Reap - Recall - Alg",
-            "Wisdom of the crowd - Precision - Precision - Alg",
+            "True Reps % - Baseline",
+            "True Reps % - BCBP",
+            "Recall - Baseline",
+            "Recall - BCBP",
+            "Precision - Baseline",
+            "Precision - BCBP",
             "Missing Real Representatives - Baseline",
-            "Missing Real Representatives - Alg",
+            "Missing Real Representatives - BCBP",
             "Duplicates Real Representatives",
-            "duplicatesRemoved",
+            "New added ground truth reps by BCBP",
+            "removed ground truth reps by BCBP",
+            "Duplicates Removed",
             "Average block size", "Average number of blocks",
-            "baseline Duration (mil)", "bcbp Duration (mil)"};
+            "Baseline Duration (mil)", "BCBP Duration (mil)"};
     private DatasetParser dataParser;
     private iBlockBuilder blockBuilder;
 
@@ -203,33 +209,54 @@ public class ParsingService {
 
     }
 
-    public void writeExperimentsMeasurementsForTwoBlockTypes(Multimap<String, DuplicateReductionContext> results, File expResults) {
-        CsvWriter csvWriter = dataParser.preparOutputFile(expResults);
-        csvWriter.writeHeaders(HEADERS_BASELINE_AND_ALG);
+    public void writeComparisonExperimentsMeasurements(Multimap<String, DuplicateReductionContext> results, File expResults) {
+        CsvWriterSettings settings = new CsvWriterSettings();
+        settings.setHeaders(HEADERS_BASELINE_AND_ALG);
+        settings.selectFields(HEADERS_BASELINE_AND_ALG);
+
+        CsvWriter csvWriter = dataParser.preparOutputFile(expResults, settings);
+        csvWriter.writeHeaders();
 
         for (Map.Entry<String, DuplicateReductionContext> entry : results.entries()) {
-            csvWriter.writeValue(DATASET_NAME, entry.getKey());
-            DuplicateReductionContext reductionContext = entry.getValue();
-            this.writeResultsToCsvTwoBlockTypes(reductionContext, csvWriter);
-            csvWriter.writeValue("baseline Duration (mil)", reductionContext.getBaselineDuration());
-            csvWriter.writeValue("bcbp Duration (mil)", reductionContext.getBcbpDuration());
+            csvWriter.writeRow(buildComparisonRow(entry));
         }
         csvWriter.close();
     }
 
-    private void writeResultsToCsvTwoBlockTypes(DuplicateReductionContext reductionContext, CsvWriter csvWriter) {
-        csvWriter.writeValue("Power of Real Reap - Recall - Baseline", reductionContext.getBaselineRecall());
-        csvWriter.writeValue("Wisdom of the crowd - Precision - Precision - Baseline", reductionContext.getBaselinePrecision());
-        csvWriter.writeValue("Power of Real Reap - Recall - Alg", reductionContext.getBcbpRecall());
-        csvWriter.writeValue("Wisdom of the crowd - Precision - Precision - Alg", reductionContext.getBcbpPrecision());
-        csvWriter.writeValue("Missing Real Representatives - Baseline", reductionContext.getBaselineMrr());
-        csvWriter.writeValue("Missing Real Representatives - Alg", reductionContext.getBcbpMrr());
+    private List<Object> buildComparisonRow(Map.Entry<String, DuplicateReductionContext> entry) {
+        DuplicateReductionContext reductionContext = entry.getValue();
+        BlockResults baselineResults = reductionContext.getBaselineResults();
+        BlockResults bcbpResults = reductionContext.getBcbpResults();
+        CompareAlgorithmResults compareAlgsResults = reductionContext.getCompareAlgsResults();
 
-        csvWriter.writeValue("Duplicates Real Representatives", reductionContext.getDuplicatesRealRepresentatives());
-        csvWriter.writeValue("duplicatesRemoved", reductionContext.getDuplicatesRemoved());
-        csvWriter.writeValue("Average number of blocks", reductionContext.getNumberOfDirtyBlocks());
-        csvWriter.writeValue("Average block size", reductionContext.getAverageBlockSize());
+        List<Object> rowContent = new ArrayList<>();
+        rowContent.add(entry.getKey());
+        //TrueRepsPercentage
+        rowContent.add(baselineResults.getTrueRepsPercentage());
+        rowContent.add(bcbpResults.getTrueRepsPercentage());
+        //Recall
+        rowContent.add(baselineResults.getRecall());
+        rowContent.add(bcbpResults.getRecall());
+        //Precision
+        rowContent.add(baselineResults.getPrecision());
+        rowContent.add(bcbpResults.getPrecision());
+        //MRR
+        rowContent.add(baselineResults.getMrr());
+        rowContent.add(bcbpResults.getMrr());
 
-        csvWriter.writeValuesToRow();
+        //DRR
+        rowContent.add(compareAlgsResults.getDrr());
+
+        rowContent.add(compareAlgsResults.getNewAddedReps());
+        rowContent.add(compareAlgsResults.getRemovedGroundTruthReps());
+
+        rowContent.add(reductionContext.getDuplicatesRemoved());
+        rowContent.add(reductionContext.getNumberOfDirtyBlocks());
+        rowContent.add(reductionContext.getAverageBlockSize());
+
+        rowContent.add(reductionContext.getBaselineDuration());
+        rowContent.add(reductionContext.getBcbpDuration());
+
+        return rowContent;
     }
 }

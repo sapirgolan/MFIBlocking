@@ -3,6 +3,7 @@ package il.ac.technion.ie.experiments.experimentRunners;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import il.ac.technion.ie.experiments.model.BlocksMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -29,7 +30,7 @@ public class FilesReader {
         }
     }
 
-    private Collection<File> listAllFiles() {
+    protected Collection<File> listAllFiles() {
         return FileUtils.listFiles(root, null, true);
     }
 
@@ -40,6 +41,7 @@ public class FilesReader {
      * ----permutationWith_parameter=25 (permutation)
      * ------canopy_0 (files that fits to scenario + permutation)
      * ------canopy_1 (files that fits to scenario + permutation)
+     *
      * @return
      */
     public Table<String, String, Set<File>> getAllCanopies() {
@@ -60,5 +62,14 @@ public class FilesReader {
 
     public Collection<File> getAllDatasets() {
         return this.listAllFiles();
+    }
+
+    public BlocksMapper getAllBlocks() {
+        Collection<File> allBlockFiles = this.listAllFiles();
+        BlocksMapper blocksMapper = new BlocksMapper();
+        for (File blockFile : allBlockFiles) {
+            blocksMapper.add(blockFile);
+        }
+        return blocksMapper;
     }
 }

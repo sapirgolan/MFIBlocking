@@ -5,6 +5,7 @@ import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
 import il.ac.technion.ie.experiments.model.BlockResults;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.BlocksMapper;
 import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
 import il.ac.technion.ie.experiments.parsers.SerializerUtil;
 import il.ac.technion.ie.experiments.service.*;
@@ -80,7 +81,7 @@ public class ProcessCanopies {
         logger.info("Starting to process baseline. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         this.calculateBaselineResults(blocks);
         long baselineDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-        PersistResult.saveBlocksToDisk(blocks, datasetName, "baseline");
+        PersistResult.saveBlocksToDisk(blocks, datasetName, BlocksMapper.BASELINE_PREFIX);
         logger.info("finding baseline representatives. HeapSize = " + ExperimentUtils.humanReadableByteCount());
         Multimap<Record, BlockWithData> baselineRepresentatives = this.getRepresentatives(blocks);
         logger.info("Finished processing baseline");

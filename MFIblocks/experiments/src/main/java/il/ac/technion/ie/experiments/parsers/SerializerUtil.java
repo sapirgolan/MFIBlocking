@@ -1,5 +1,6 @@
 package il.ac.technion.ie.experiments.parsers;
 
+import com.google.common.collect.Lists;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import org.apache.log4j.Logger;
 
@@ -36,23 +37,26 @@ public class SerializerUtil {
         return wasSerialized;
     }
 
+    public static <T> Collection<T> deSerialize(File file) {
+        Collection<T> serializedObjects = null;
+
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            try (ObjectInputStream ois = new ObjectInputStream(inputStream)) {
+                serializedObjects = (Collection<T>) ois.readObject();
+                ois.close();
+            } catch (IOException | ClassNotFoundException e) {
+                logger.error("Failed to read serialized Objects to: '" + file.getAbsolutePath() + "'", e);
+            }
+            logger.debug("Successfully read serialized Objects to: '" + file.getAbsolutePath() + "'");
+            inputStream.close();
+        } catch (IOException e) {
+            logger.error("Failed to open InputStream from: '" + file.getAbsolutePath() + "'", e );
+        }
+        return serializedObjects;
+    }
 
 
     public static Collection<CanopyCluster> deSerializeCanopies(File canopiesFile) {
-        Collection<CanopyCluster> canopies = null;
-
-        try (FileInputStream inputStream = new FileInputStream(canopiesFile)) {
-            try (ObjectInputStream ois = new ObjectInputStream(inputStream)) {
-                canopies = (Collection<CanopyCluster>) ois.readObject();
-                ois.close();
-            } catch (IOException | ClassNotFoundException e) {
-                logger.error("Failed to read canopies to: '" + canopiesFile.getAbsolutePath() + "'", e);
-            }
-            logger.debug("Successfully read canopies to: '" + canopiesFile.getAbsolutePath() + "'");
-            inputStream.close();
-        } catch (IOException e) {
-            logger.error("Failed to open InputStream from: '" + canopiesFile.getAbsolutePath() + "'", e );
-        }
-        return canopies;
+        return SerializerUtil.deSerialize(canopiesFile);
     }
 }

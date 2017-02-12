@@ -48,6 +48,9 @@ public class SerializerUtilTest {
 
         //assert
         assertThat(canopyClusters, hasSize(canopies.size()));
+        for (CanopyCluster canopyCluster : canopyClusters) {
+            assertThat(canopyCluster, is(instanceOf(CanopyCluster.class)));
+        }
     }
 
     @Test

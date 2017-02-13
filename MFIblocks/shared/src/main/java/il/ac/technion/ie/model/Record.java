@@ -13,6 +13,8 @@ import java.util.TreeMap;
  * Created by I062070 on 21/08/2015.
  */
 public class Record implements Serializable{
+    private static final long serialVersionUID = -876573946949774502L;
+
     protected Map<String, Field> fields;
     protected Integer recordID;
     protected String recordName;

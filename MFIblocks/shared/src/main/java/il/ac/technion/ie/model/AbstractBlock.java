@@ -1,5 +1,6 @@
 package il.ac.technion.ie.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,9 @@ import java.util.Map;
  * Generic version of the Block class.
  * @param <T> the type of the members in the block
  */
-public abstract class AbstractBlock<T> {
+public abstract class AbstractBlock<T> implements Serializable {
+    private static final long serialVersionUID = -7521516540392119359L;
+
     protected List<T> members;
     protected Map<T, Float> membersScores;
     protected Map<T, Float> membersProbability;
@@ -21,6 +24,12 @@ public abstract class AbstractBlock<T> {
         membersProbability = new HashMap<>();
         membersScores = new HashMap<>();
         blockRepresentatives = null;
+    }
+
+    /**
+     * Constructor for deSerialize only
+     */
+    public AbstractBlock() {
     }
 
     @Override

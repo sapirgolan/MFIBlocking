@@ -14,9 +14,17 @@ import java.util.*;
  */
 public class BlockWithData extends AbstractBlock<Record> implements Serializable{
 
+    private static final long serialVersionUID = -1877800168633562862L;
     private static final Logger logger = Logger.getLogger(BlockWithData.class);
 
     private Record trueRepresentative;
+
+    /**
+     * Constructor for deSerialize only
+     */
+    public BlockWithData() {
+        super();
+    }
 
     public BlockWithData(List<Record> members) {
         super(members);

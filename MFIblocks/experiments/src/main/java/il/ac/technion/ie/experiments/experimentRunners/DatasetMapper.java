@@ -20,4 +20,8 @@ public class DatasetMapper {
         }
         return null;
     }
+
+    public static String getBlockMapperKey(File datasetPermutation) {
+        return datasetPermutation.getName();
+    }
 }

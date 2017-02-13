@@ -20,8 +20,11 @@ public class BlockPair {
         return baseline;
     }
 
-
     public File getBcbp() {
         return bcbp;
+    }
+
+    public String getName() {
+        return baseline.getName() + ", " + bcbp.getName();
     }
 }

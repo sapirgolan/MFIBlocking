@@ -24,18 +24,15 @@ public class BlocksMapper {
     private Map<String, BiMap<Integer, File>> datasetPermutationToBcbpBlocks;
     private final Pattern pattern = Pattern.compile("^\\w+_(\\d)");
     private Map<String, Deque<BlockPair>> pairDequeMap;
-//    private Deque<BlockPair> pairDeque;
     private static final Logger logger = Logger.getLogger(BlocksMapper.class);
 
     public BlocksMapper() {
         this.datasetPermutationToBaselineBlocks = new HashMap<>();
         this.datasetPermutationToBcbpBlocks = new HashMap<>();
         pairDequeMap = new HashMap<>();
-//        pairDeque = new LinkedList<>();
     }
 
     public void add(File blockFile) {
-//        String datasetPermutationName = FilenameUtils.getBaseName(blockFile.getParentFile().getName());
         String datasetPermutationName = blockFile.getParentFile().getName();
         boolean wasInserted = addBlock(blockFile, datasetPermutationName);
         if (wasInserted) {

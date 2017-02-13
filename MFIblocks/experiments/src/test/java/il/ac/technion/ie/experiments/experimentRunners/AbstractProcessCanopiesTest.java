@@ -19,23 +19,21 @@ import java.io.File;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ProcessCanopies.class)
 public class AbstractProcessCanopiesTest {
-    protected final int numberOfCanopiesInTest = 35;
+    protected final int NUMBER_OF_CANOPIES_IN_TEST = 35;
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    protected ProcessCanopies classUnderTest;
-    protected ConvexBPService convexBPService = PowerMockito.spy(new ConvexBPService());
     protected File canopiesRootFolder;
     protected File datasetsRootFolder;
+    protected File blocksRootFolder;
 
     @Before
     public void setUp() throws Exception {
-        classUnderTest = PowerMockito.spy(new ProcessCanopies());
-        Whitebox.setInternalState(classUnderTest, "convexBPService", convexBPService);
-
         canopiesRootFolder = temporaryFolder.newFolder("root_canopies");
         datasetsRootFolder = temporaryFolder.newFolder("root_datasetsPermutation");
+        blocksRootFolder = temporaryFolder.newFolder("root_blocks");
         ZipExtractor.extractZipFromResources(canopiesRootFolder, "/01_NumberOfOriginalRecords_canopies.zip");
         ZipExtractor.extractZipFromResources(datasetsRootFolder, "/01_NumberOfOriginalRecords_datasets.zip");
+        ZipExtractor.extractZipFromResources(blocksRootFolder, "/01_NumberOfOriginalRecords_blocks.zip");
     }
 }

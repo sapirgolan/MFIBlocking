@@ -21,24 +21,17 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by I062070 on 23/10/2016.
  */
-public class ProcessCanopies {
+public class ProcessCanopies extends AbstractProcessor {
 
     private static final Logger logger = Logger.getLogger(ProcessCanopies.class);
 
-    private CanopyService canopyService;
     private ConvexBPService convexBPService;
-    private ProbabilityService probabilityService;
     private BiMap<File, List<BlockWithData>> fileToCanopies;
     private Table<String, String, Set<File>> allCanopies;
-    private ExprimentsService exprimentsService;
-    private IMeasurements measurements;
-    private BiMap<Record, BlockWithData> trueRepsMap;
 
     public ProcessCanopies() {
-        canopyService = new CanopyService();
+        super();
         convexBPService = new ConvexBPService();
-        probabilityService = new ProbabilityService();
-        exprimentsService = new ExprimentsService();
     }
 
     public void runExperiments(String pathToCanopiesFolder, String pathToOriginalDatasetFile) {
@@ -71,10 +64,6 @@ public class ProcessCanopies {
         saveResultsToFS(results);
     }
 
-    private void saveResultsToFS(Multimap<String, DuplicateReductionContext> results) {
-        PersistResult.saveConvexBPResultsToCsv(results, false);
-    }
-
     private DuplicateReductionContext performExperimentComparison(File canopiesFile, String datasetName) {
         List<BlockWithData> blocks = fileToCanopies.get(canopiesFile);
         long start = System.nanoTime();
@@ -103,37 +92,6 @@ public class ProcessCanopies {
         return null;
     }
 
-    private void initMembersThatDependsOnOriginalDataset(File datasetFile, String permutationStr) {
-        ParsingService parsingService = new ParsingService();
-        if (datasetFile == null) {
-            logger.error(String.format("no dataset exists for permutation %s", permutationStr));
-            return;
-        }
-        List<BlockWithData> cleanBlocks = parsingService.parseDataset(datasetFile.getAbsolutePath());
-        this.trueRepsMap = canopyService.getAllTrueRepresentatives(cleanBlocks);
-        this.measurements = new Measurements(cleanBlocks.size());
-    }
-
-    private DuplicateReductionContext calculateMeasurements(List<BlockWithData> blocks, Multimap<Record, BlockWithData> baselineReps) {
-        Multimap<Record, BlockWithData> bcbpReps = this.getRepresentatives(blocks);
-        DuplicateReductionContext resultContext = measurements.representativesDuplicateElimination(baselineReps, bcbpReps);
-
-        BlockResults baselineBlockResults = measurements.calculateBlockResults(trueRepsMap, baselineReps);
-        resultContext.setBaselineResults(baselineBlockResults);
-
-        BlockResults bcbpBlockResults = measurements.calculateBlockResults(trueRepsMap, bcbpReps);
-        resultContext.setBcbpResults(bcbpBlockResults);
-
-        //compares between baseline and BCBP representatives
-        CompareAlgorithmResults compareAlgResults = measurements.compareBaselineToBcbp(baselineReps, bcbpReps, trueRepsMap);
-        resultContext.setCompareAlgsResults(compareAlgResults);
-
-        measurements.calcAverageBlockSize(blocks, resultContext);
-        resultContext.setNumberOfDirtyBlocks(blocks.size());
-
-        return resultContext;
-    }
-
     private void readAndInitCanopiesFromDir(String dirPath) {
         FilesReader filesReader = new FilesReader(dirPath);
         allCanopies = filesReader.getAllCanopies();
@@ -154,11 +112,6 @@ public class ProcessCanopies {
         return canopyFileToBlocks;
     }
 
-    private void calculateBaselineResults(List<BlockWithData> blocks) {
-        probabilityService.calcSimilaritiesAndProbabilitiesOfRecords(blocks);
-
-    }
-
     private boolean executeConvexBP(List<BlockWithData> blocks) {
         boolean convexBP = convexBPService.runConvexBP(new ApacheExecutor(), 0.0, blocks);
         if (!convexBP) {
@@ -168,7 +121,4 @@ public class ProcessCanopies {
         return true;
     }
 
-    private Multimap<Record, BlockWithData> getRepresentatives(List<BlockWithData> blocks) {
-        return exprimentsService.fetchRepresentatives(blocks);
-    }
 }

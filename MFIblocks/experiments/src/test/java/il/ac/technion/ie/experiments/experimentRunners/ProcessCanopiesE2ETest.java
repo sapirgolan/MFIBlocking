@@ -2,12 +2,14 @@ package il.ac.technion.ie.experiments.experimentRunners;
 
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.service.ConvexBPService;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.reflect.Whitebox;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,15 @@ import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
  * Created by I062070 on 07/01/2017.
  */
 public class ProcessCanopiesE2ETest extends AbstractProcessCanopiesTest{
+
+    protected ProcessCanopies classUnderTest;
+    protected ConvexBPService convexBPService = PowerMockito.spy(new ConvexBPService());
+
+    @Before
+    public void setUp_E2E() throws Exception {
+        classUnderTest = PowerMockito.spy(new ProcessCanopies());
+        Whitebox.setInternalState(classUnderTest, "convexBPService", convexBPService);
+    }
 
     @After
     public void tearDown() throws Exception {
@@ -39,7 +50,7 @@ public class ProcessCanopiesE2ETest extends AbstractProcessCanopiesTest{
     public void runExperiments_onSevenDatasets() throws Exception {
         classUnderTest.runExperiments(canopiesRootFolder.getAbsolutePath(), datasetsRootFolder.getAbsolutePath());
 
-        verifyPrivate(classUnderTest, Mockito.times(35))
+        verifyPrivate(classUnderTest, Mockito.times(NUMBER_OF_CANOPIES_IN_TEST))
                 .invoke("calculateMeasurements", Mockito.anyListOf(BlockWithData.class), Mockito.any(Multimap.class));
     }
 

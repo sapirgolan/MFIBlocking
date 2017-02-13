@@ -4,9 +4,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.CanopyCluster;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.service.ConvexBPService;
 import il.ac.technion.ie.experiments.threads.CommandExacter;
 import il.ac.technion.ie.model.Record;
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -25,13 +27,22 @@ import static org.powermock.api.mockito.PowerMockito.*;
  */
 public class ProcessCanopiesTest extends AbstractProcessCanopiesTest {
 
+    protected ProcessCanopies classUnderTest;
+    protected ConvexBPService convexBPService = PowerMockito.spy(new ConvexBPService());
+
+    @Before
+    public void setUp_unitTest() throws Exception {
+        classUnderTest = PowerMockito.spy(new ProcessCanopies());
+        Whitebox.setInternalState(classUnderTest, "convexBPService", convexBPService);
+    }
+
     @Test
     public void readAndParseCanopiesFromDir_hasAllCanopyFiles() throws Exception {
         Whitebox.invokeMethod(classUnderTest, "readAndInitCanopiesFromDir", canopiesRootFolder.getAbsolutePath());
         BiMap<File, Collection<CanopyCluster>> fileToCanopies = Whitebox.getInternalState(classUnderTest, "fileToCanopies");
 
-        assertThat(fileToCanopies.entrySet(), hasSize(numberOfCanopiesInTest));
-        assertThat(fileToCanopies.inverse().entrySet(), hasSize(numberOfCanopiesInTest));
+        assertThat(fileToCanopies.entrySet(), hasSize(NUMBER_OF_CANOPIES_IN_TEST));
+        assertThat(fileToCanopies.inverse().entrySet(), hasSize(NUMBER_OF_CANOPIES_IN_TEST));
     }
 
     @Test
@@ -40,7 +51,7 @@ public class ProcessCanopiesTest extends AbstractProcessCanopiesTest {
         doNothing().when(classUnderTest, "saveResultsToFS", Mockito.any(Multimap.class));
 
         classUnderTest.runExperiments(canopiesRootFolder.getAbsolutePath(), datasetsRootFolder.getAbsolutePath());
-        verifyPrivate(classUnderTest, Mockito.times(numberOfCanopiesInTest)).invoke("performExperimentComparison", Mockito.any(File.class));
+        verifyPrivate(classUnderTest, Mockito.times(NUMBER_OF_CANOPIES_IN_TEST)).invoke("performExperimentComparison", Mockito.any(File.class));
     }
 
     @Test

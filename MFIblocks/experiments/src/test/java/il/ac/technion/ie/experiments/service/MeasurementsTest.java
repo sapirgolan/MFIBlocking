@@ -1,8 +1,15 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
+import il.ac.technion.ie.experiments.experimentRunners.FilesReader;
+import il.ac.technion.ie.experiments.experimentRunners.ProcessBlocks;
+import il.ac.technion.ie.experiments.model.BlockPair;
 import il.ac.technion.ie.experiments.model.BlockWithData;
+import il.ac.technion.ie.experiments.model.BlocksMapper;
+import il.ac.technion.ie.experiments.parsers.SerializerUtil;
+import il.ac.technion.ie.experiments.util.ZipExtractor;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
 import il.ac.technion.ie.model.Record;
@@ -15,13 +22,20 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import java.io.File;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,13 +44,18 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyList;
 import static org.powermock.api.mockito.PowerMockito.*;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Measurements.class)
 public class MeasurementsTest {
 
+    private static final String DATASET_PERMUTATION_NAME = "25_75_5_5_16_uniform_all_0_parameter=25.csv";
     @Rule
     public Logging logging = new Logging();
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @InjectMocks
-    private Measurements classUnderTest;
+    private Measurements classUnderTest = new Measurements(0);
 
     @Spy
     private iMeasurService measurService = new MeasurService();
@@ -48,8 +67,9 @@ public class MeasurementsTest {
     }
 
     @Before
-    public void setUp() throws Exception {
-        classUnderTest = spy(new Measurements(0));
+    public void setUp_test() throws Exception {
+//        recordsFromCsv = UtilitiesForBlocksAndRecords.getRecordsFromCsv();
+        classUnderTest = spy(classUnderTest);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -261,7 +281,7 @@ public class MeasurementsTest {
     @Test
     public void testGetAverageRankedValue_threeValues() throws Exception {
         //mocking
-        doReturn(0.3).doReturn(0.6).doReturn(0.9).when(measurService).calcRankedValue(anyList());
+        when(measurService.calcRankedValue(anyList())).thenReturn(0.3, 0.6, 0.9);
         suppress(methods(classUnderTest.getClass(), "calcMRR"));
 
         double threshold = 0.4;
@@ -276,7 +296,7 @@ public class MeasurementsTest {
     @Test
     public void testGetAverageMRR_randomValues() throws Exception {
         //mocking
-        doReturn(0.2).doReturn(0.7).doReturn(0.3).when(measurService).calcMRR(anyList());
+        when(measurService.calcMRR(anyList())).thenReturn(0.2, 0.7, 0.3);
         suppress(methods(classUnderTest.getClass(), "calcRankedValue"));
 
         double threshold = 0.2;
@@ -862,6 +882,255 @@ public class MeasurementsTest {
 
         int newAddedReps = classUnderTest.newAddedReps(baseline, bcbp, new HashSet<>(groundTruth));
         assertThat(newAddedReps, is(2));
+    }
+
+    @Test
+    public void findBlocksThatShouldRemain() throws Exception {
+        Multimap<Record, BlockWithData> baselineBlocks = getBaselineBlocks();
+        List<BlockWithData> blocks = new ArrayList<>(baselineBlocks.values());
+
+        final Record record_20_org = blocks.get(0).getTrueRepresentative();
+        float record_20_org_probability = blocks.get(0).getMemberProbability(record_20_org);
+        blocks.get(12).setMemberProbability(record_20_org, record_20_org_probability - 0.001F);
+        baselineBlocks.putAll(record_20_org, Lists.newArrayList(blocks.get(0), blocks.get(12)));
+
+        final Record record_15_org = blocks.get(7).getTrueRepresentative();
+        float record_15_org_probability = blocks.get(7).getMemberProbability(record_15_org);
+        blocks.get(4).setMemberProbability(record_15_org, record_15_org_probability - 0.001F);
+        baselineBlocks.put(record_15_org, blocks.get(4));
+
+        Multimap<Record, BlockWithData> filteredBaselineBlocks = Multimaps.filterKeys(baselineBlocks, new Predicate<Record>() {
+            @Override
+            public boolean apply(Record input) {
+                return input.equals(record_15_org) || input.equals(record_20_org);
+            }
+        });
+        Multimap<Record, BlockWithData> blocksThatShouldRemain = Whitebox.invokeMethod(classUnderTest, "findBlocksThatShouldRemain", filteredBaselineBlocks);
+        assertThat(blocksThatShouldRemain.values(), hasSize(2));
+        assertThat(blocksThatShouldRemain.get(record_15_org), contains(blocks.get(7)));
+        assertThat(blocksThatShouldRemain.get(record_20_org), contains(blocks.get(0)));
+    }
+
+    @Test
+    public void percentageOfRecordsPulledFromGroundTruth_noMatchingRecords() throws Exception {
+        Multimap<Record, BlockWithData> bcbpReps = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> blocksShouldRemain = ArrayListMultimap.create();
+        bcbpReps.put(mock(Record.class), mock(BlockWithData.class));
+        blocksShouldRemain.put(mock(Record.class), mock(BlockWithData.class));
+        double percentageOfPulled = classUnderTest.percentageOfRecordsPulledFromGroundTruth(bcbpReps, blocksShouldRemain, null);
+        assertThat(percentageOfPulled, is(0.0));
+    }
+
+    @Test
+    public void percentageOfRecordsPulledFromGroundTruth_groundTruthRepWasAssignedToWrongBlock() throws Exception {
+        Multimap<Record, BlockWithData> bcbpReps = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> blocksShouldRemain = ArrayListMultimap.create();
+        BiMap<Record, BlockWithData> biMap = HashBiMap.create();
+
+        Record rep = mock(Record.class);
+        bcbpReps.put(rep, mock(BlockWithData.class));
+        biMap.put(rep, mock(BlockWithData.class));
+        blocksShouldRemain.put(rep, biMap.get(rep));
+
+        double percentageOfPulled = classUnderTest.percentageOfRecordsPulledFromGroundTruth(bcbpReps, blocksShouldRemain, biMap);
+        assertThat(percentageOfPulled, is(0.0));
+    }
+
+    @Test
+    public void percentageOfRecordsPulledFromGroundTruth_groundTruthRepWasAssignedToBcbpBlock() throws Exception {
+        final ImmutableList<Record> commonRecords = ImmutableList.copyOf(recordsFromCsv.subList(0, 4));
+        Record rep = mock(Record.class);
+
+        List<Record> groundTruthRecords = buildBlockRecords(commonRecords, recordsFromCsv.subList(4, 5), rep);
+        List<Record> bcbpRecords = buildBlockRecords(commonRecords, recordsFromCsv.subList(5, 7), rep);
+
+        BlockWithData algBlock = mock(BlockWithData.class);
+        when(algBlock.getMembers()).thenReturn(bcbpRecords);
+
+        BlockWithData gTBlock = mock(BlockWithData.class);
+        when(gTBlock.getMembers()).thenReturn(groundTruthRecords);
+
+
+        Multimap<Record, BlockWithData> bcbpReps = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> blocksShouldRemain = ArrayListMultimap.create();
+        bcbpReps.put(rep, algBlock);
+        blocksShouldRemain.put(rep, algBlock);
+
+        BiMap<Record, BlockWithData> biMap = HashBiMap.create();
+        biMap.put(rep, gTBlock);
+
+        double percentageOfPulled = classUnderTest.percentageOfRecordsPulledFromGroundTruth(bcbpReps, blocksShouldRemain, biMap);
+        assertThat(percentageOfPulled, is(commonRecords.size() / (groundTruthRecords.size() - 1.0)));
+    }
+
+    @Test
+    public void percentageOfRecordsPulledFromGroundTruth_GTBlockIsSingleton() throws Exception {
+        final ImmutableList<Record> commonRecords = ImmutableList.copyOf(recordsFromCsv.subList(0, 1));
+        Record rep = mock(Record.class);
+
+        List<Record> groundTruthRecords = Lists.newArrayList(rep);
+        List<Record> bcbpRecords = buildBlockRecords(commonRecords, rep);
+
+        BlockWithData algBlock = mock(BlockWithData.class);
+        when(algBlock.getMembers()).thenReturn(bcbpRecords);
+
+        BlockWithData gTBlock = mock(BlockWithData.class);
+        when(gTBlock.getMembers()).thenReturn(groundTruthRecords);
+
+        Multimap<Record, BlockWithData> bcbpReps = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> blocksShouldRemain = ArrayListMultimap.create();
+        bcbpReps.put(rep, algBlock);
+        blocksShouldRemain.put(rep, algBlock);
+
+        BiMap<Record, BlockWithData> biMap = HashBiMap.create();
+        biMap.put(rep, gTBlock);
+
+        double percentageOfPulled = classUnderTest.percentageOfRecordsPulledFromGroundTruth(bcbpReps, blocksShouldRemain, biMap);
+        assertThat(percentageOfPulled, is(0.0));
+        PowerMockito.verifyPrivate(classUnderTest, Mockito.never())
+                .invoke("getNumberOfPulledRecordsFromGroundTruthPercentage", Mockito.anyListOf(Record.class), Mockito.anyListOf(Record.class));
+    }
+
+    private List<Record> buildBlockRecords(ImmutableList<Record> commonRecords, Record rep) {
+        return this.buildBlockRecords(commonRecords, new ArrayList<Record>(), rep);
+    }
+
+    private List<Record> buildBlockRecords(ImmutableList<Record> commonRecords, List<Record> records, Record trueRep) {
+        List<Record> result = new ArrayList<>(records);
+        result.addAll(commonRecords);
+        result.add(trueRep);
+        return result;
+    }
+
+    @Test
+    public void percentageOfRecordsPulledFromGroundTruth_withSeveralReps() throws Exception {
+        BiMap<Record, BlockWithData> trueReps = getTrueReps();
+        Multimap<Record, BlockWithData> baselineBlocks = getBaselineBlocks();
+
+        List<BlockWithData> algBlocks = new ArrayList<>(baselineBlocks.values());
+        List<BlockWithData> gtBlocks = new ArrayList<>(trueReps.values());
+
+        Multimap<Record, BlockWithData> bcbpReps = ArrayListMultimap.create();
+        Multimap<Record, BlockWithData> blocksShouldRemain = ArrayListMultimap.create();
+        BiMap<Record, BlockWithData> biMap = HashBiMap.create();
+
+        // record-15-org is set as representative of 2 blocks
+        bcbpReps.put(algBlocks.get(7).getTrueRepresentative(), algBlocks.get(7));
+        bcbpReps.put(algBlocks.get(4).getTrueRepresentative(), algBlocks.get(4));
+
+        // records: record-15-org & record-10-org and blocks they should represent
+        blocksShouldRemain.put(algBlocks.get(7).getTrueRepresentative(), algBlocks.get(7));
+        blocksShouldRemain.put(algBlocks.get(13).getTrueRepresentative(), algBlocks.get(13));
+        blocksShouldRemain.put(algBlocks.get(4).getTrueRepresentative(), algBlocks.get(4));
+
+        //record record-15-org ground truth block
+        biMap.put(gtBlocks.get(20).getTrueRepresentative(), gtBlocks.get(20));
+        //record record-22-org ground truth block
+        biMap.put(gtBlocks.get(4).getTrueRepresentative(), gtBlocks.get(4));
+
+        double percentageOfPulled = classUnderTest.percentageOfRecordsPulledFromGroundTruth(bcbpReps, blocksShouldRemain, biMap);
+        assertThat(percentageOfPulled, is(1.0 / 2));
+    }
+
+    @Test
+    public void findBlocksThatShouldNotRemain() throws Exception {
+        List<BlockWithData> blocks = generateBlocks(20);
+        List<Record> records = generateRecords(20);
+        Multimap<Record, BlockWithData> baselineFiltered = ArrayListMultimap.create();
+        //record_0 --> block_0 & block_10
+        baselineFiltered.putAll(records.get(0), Lists.newArrayList(blocks.get(0), blocks.get(10)));
+        //record_1 --> block_1 & block_11
+        baselineFiltered.putAll(records.get(1), Lists.newArrayList(blocks.get(1), blocks.get(11)));
+        //record_2 --> block_2 & block_12 && block_13
+        baselineFiltered.putAll(records.get(2), Lists.newArrayList(blocks.get(2), blocks.get(12), blocks.get(13)));
+
+
+        Multimap<Record, BlockWithData> blocksThatShouldRemain = ArrayListMultimap.create();
+        //record_0 --> block_0
+        blocksThatShouldRemain.put(records.get(0), blocks.get(0));
+        //record_1 --> block_1 & block_11
+        blocksThatShouldRemain.putAll(records.get(1), Lists.newArrayList(blocks.get(1), blocks.get(11)));
+        //record_2 --> block_2 & block_12
+        blocksThatShouldRemain.putAll(records.get(2), Lists.newArrayList(blocks.get(2), blocks.get(12)));
+
+        //execute
+        Multimap<Record, BlockWithData> blocksThatShouldNotRemain = Whitebox.invokeMethod(classUnderTest, "findBlocksThatShouldNotRemain", baselineFiltered, blocksThatShouldRemain);
+
+        //assert
+        assertThat(blocksThatShouldNotRemain.get(records.get(0)), contains(blocks.get(10)));
+        assertThat(blocksThatShouldNotRemain.asMap(), not(hasKey(records.get(1))));
+        assertThat(blocksThatShouldNotRemain.get(records.get(2)), contains(blocks.get(13)));
+    }
+
+    @Test
+    public void percentageOfRecordsPulledFromGroundTruth_forWrongAssignmentOfRecordToRep() throws Exception {
+        BiMap<Record, BlockWithData> trueReps = getTrueReps();
+        Multimap<Record, BlockWithData> baselineBlocks = getBaselineBlocks();
+
+        List<BlockWithData> algBlocks = new ArrayList<>(baselineBlocks.values());
+        List<Record> records = new ArrayList<>(trueReps.keySet());
+        List<BlockWithData> trueBlocks = new ArrayList<>(trueReps.values());
+
+        //modify memners
+        algBlocks.get(13).getMembers().remove(1);
+        algBlocks.get(13).getMembers().remove(3);
+        algBlocks.get(12).getMembers().remove(6);
+
+        Multimap<Record, BlockWithData> bcbpReps = ArrayListMultimap.create();
+        //record_0 --> block_0 (wrong)
+        bcbpReps.put(records.get(0), algBlocks.get(0));
+        //record_1 --> block_1 & block_11 (correct partially)
+        bcbpReps.putAll(records.get(1), Lists.newArrayList(algBlocks.get(1), algBlocks.get(11)));
+        //record_2 --> block_2 (wrong)
+        bcbpReps.put(records.get(2), algBlocks.get(12));
+        //record_3 --> block_3 (wrong)
+        bcbpReps.put(records.get(3), algBlocks.get(13));
+        //record_3 --> block_3 (wrong)
+        bcbpReps.put(records.get(4), algBlocks.get(4));
+
+        BiMap<Record, BlockWithData> biMap = HashBiMap.create();
+        biMap.put(records.get(1), algBlocks.get(1));
+        biMap.put(records.get(2), trueBlocks.get(2));
+        biMap.put(records.get(3), trueBlocks.get(3));
+        biMap.put(records.get(4), algBlocks.get(4));
+
+        Multimap<Record, BlockWithData> blocksunderMeasure = ArrayListMultimap.create();
+        //record_0 is not GT rep
+        blocksunderMeasure.put(records.get(2), algBlocks.get(12));
+        blocksunderMeasure.put(records.get(3), algBlocks.get(13));
+
+        //execute
+        double percentageOfPulled = classUnderTest.percentageOfRecordsPulledFromGroundTruth(bcbpReps, blocksunderMeasure, biMap);
+
+        //assert
+        assertThat(percentageOfPulled, closeTo(0.55, 0.0001));
+    }
+
+    private BiMap<Record, BlockWithData> getTrueReps() throws Exception {
+        File datasetsRootFolder = temporaryFolder.newFolder("root_datasetsPermutation");
+        ;
+        ZipExtractor.extractZipFromResources(datasetsRootFolder, "/01_NumberOfOriginalRecords_datasets.zip");
+
+        Collection<File> allDatasetPermutations = new FilesReader(datasetsRootFolder.getAbsolutePath()).getAllDatasets();
+        for (File datasetFile : allDatasetPermutations) {
+            if (DATASET_PERMUTATION_NAME.equals(datasetFile.getName())) {
+                List<BlockWithData> cleanBlocks = new ParsingService().parseDataset(datasetFile.getAbsolutePath());
+                return new CanopyService().getAllTrueRepresentatives(cleanBlocks);
+            }
+        }
+
+        return null;
+    }
+
+    private Multimap<Record, BlockWithData> getBaselineBlocks() throws Exception {
+        File blocksRootFolder = temporaryFolder.newFolder("root_blocks");
+        ZipExtractor.extractZipFromResources(blocksRootFolder, "/01_NumberOfOriginalRecords_blocks.zip");
+
+        BlocksMapper blocksMapper = new FilesReader(blocksRootFolder.getAbsolutePath()).getAllBlocks();
+        BlockPair blockPair = blocksMapper.getNext(DATASET_PERMUTATION_NAME);
+        List<BlockWithData> baselineBlocks = new ArrayList<>(SerializerUtil.<BlockWithData>deSerialize(blockPair.getBaseline()));
+        ProcessBlocks processBlocks = new ProcessBlocks();
+        return Whitebox.invokeMethod(processBlocks, "getRepresentatives", baselineBlocks);
     }
 
     private List<BlockWithData> generateBlocks(int size) {

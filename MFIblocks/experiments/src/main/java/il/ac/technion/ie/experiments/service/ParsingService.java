@@ -52,6 +52,8 @@ public class ParsingService {
             "New added ground truth reps by BCBP",
             "removed ground truth reps by BCBP",
             "Duplicates Removed",
+            "% pulled records, rep should remain",
+            "% pulled records, rep should NOT remain",
             "Average block size", "Average number of blocks",
             "Baseline Duration (mil)", "BCBP Duration (mil)"};
     private DatasetParser dataParser;
@@ -251,6 +253,11 @@ public class ParsingService {
         rowContent.add(compareAlgsResults.getRemovedGroundTruthReps());
 
         rowContent.add(reductionContext.getDuplicatesRemoved());
+
+        //% pulled records by representatives that should and should not remain
+        rowContent.add(reductionContext.getBlockShouldRemainPulled());
+        rowContent.add(reductionContext.getBlockShouldNotRemainPulled());
+
         rowContent.add(reductionContext.getNumberOfDirtyBlocks());
         rowContent.add(reductionContext.getAverageBlockSize());
 

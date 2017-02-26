@@ -44,7 +44,7 @@ public class ArgumentsContextTest {
         ArgumentsContext argumentsContext = new ArgumentsContext(datasetRootFoler.getAbsolutePath(), canopiesRootFolder.getAbsolutePath()).invoke();
 
         assertThat(argumentsContext.getPathToDataset(), is(datasetRootFoler.getAbsolutePath()));
-        assertThat(argumentsContext.getPathToCanapies(), is(canopiesRootFolder.getAbsolutePath()));
+        assertThat(argumentsContext.getPathToSerializedFiles(), is(canopiesRootFolder.getAbsolutePath()));
         assertThat(argumentsContext.isProfilingMode(), is(false));
     }
 
@@ -54,7 +54,7 @@ public class ArgumentsContextTest {
         ArgumentsContext argumentsContext = new ArgumentsContext(datasetRootFoler.getAbsolutePath(), "perf").invoke();
 
         assertThat(argumentsContext.getPathToDataset(), is(datasetRootFoler.getAbsolutePath()));
-        assertThat(argumentsContext.getPathToCanapies(), nullValue());
+        assertThat(argumentsContext.getPathToSerializedFiles(), nullValue());
         assertThat(argumentsContext.isProfilingMode(), is(true));
     }
 }

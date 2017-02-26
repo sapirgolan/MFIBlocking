@@ -3,10 +3,7 @@ package il.ac.technion.ie.experiments.service;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
-import il.ac.technion.ie.experiments.model.BlockResults;
-import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
-import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
+import il.ac.technion.ie.experiments.model.*;
 import il.ac.technion.ie.model.Record;
 
 import java.util.List;
@@ -151,4 +148,8 @@ public interface IMeasurements {
      * @param groundTruthMap
      */
     CompareAlgorithmResults compareBaselineToBcbp(Multimap<Record, BlockWithData> baselineRepresentatives, Multimap<Record, BlockWithData> bcbpRepresentatives, BiMap<Record, BlockWithData> groundTruthMap);
+
+    double percentageOfRecordsPulledFromGroundTruth(Multimap<Record, BlockWithData> bcbpReps, Multimap<Record, BlockWithData> blocksThatShouldRemain, BiMap<Record, BlockWithData> trueRepsMap);
+
+    BlocksPair findBaselineBlocksForEvaluation(Multimap<Record, BlockWithData> baselineFiltered);
 }

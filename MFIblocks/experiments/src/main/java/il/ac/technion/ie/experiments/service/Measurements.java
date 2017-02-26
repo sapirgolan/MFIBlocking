@@ -1,11 +1,9 @@
 package il.ac.technion.ie.experiments.service;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import il.ac.technion.ie.canopy.model.DuplicateReductionContext;
-import il.ac.technion.ie.experiments.model.BlockResults;
-import il.ac.technion.ie.experiments.model.BlockWithData;
-import il.ac.technion.ie.experiments.model.CompareAlgorithmResults;
-import il.ac.technion.ie.experiments.model.FebrlMeasuresContext;
+import il.ac.technion.ie.experiments.model.*;
 import il.ac.technion.ie.measurements.service.MeasurService;
 import il.ac.technion.ie.measurements.service.iMeasurService;
 import il.ac.technion.ie.model.Record;
@@ -410,6 +408,83 @@ public class Measurements implements IMeasurements {
         return getMeasureSortedByThreshold(normalizedMRRValues);
     }
 
+    private Multimap<Record, BlockWithData> findBlocksThatShouldRemain(Multimap<Record, BlockWithData> baselineRepsFiltered) {
+        Multimap<Record, BlockWithData> mapBlocksThatShouldRemain = ArrayListMultimap.create();
+        //iterate according to groundTruthRepsRepresentDualBlocks
+        for (final Record representDualBlock : baselineRepsFiltered.keySet()) {
+            Collection<BlockWithData> allBlocksOfRep = baselineRepsFiltered.get(representDualBlock);
+            BlockWithData blockWithMaxProbabilityForRep = Collections.max(allBlocksOfRep, new Comparator<BlockWithData>() {
+                @Override
+                public int compare(BlockWithData left, BlockWithData right) {
+                    float leftMemberProbability = left.getMemberProbability(representDualBlock);
+                    float rightMemberProbability = right.getMemberProbability(representDualBlock);
+                    return Float.compare(leftMemberProbability, rightMemberProbability);
+                }
+            });
+            final float repMaxProbability = blockWithMaxProbabilityForRep.getMemberProbability(representDualBlock);
+            Collection<BlockWithData> blocksThatShouldRemain = Collections2.filter(allBlocksOfRep, new Predicate<BlockWithData>() {
+                @Override
+                public boolean apply(BlockWithData input) {
+                    return input.getMemberProbability(representDualBlock) >= repMaxProbability;
+                }
+            });
+            mapBlocksThatShouldRemain.putAll(representDualBlock, blocksThatShouldRemain);
+        }
+        return mapBlocksThatShouldRemain;
+    }
+
+    @Override
+    public double percentageOfRecordsPulledFromGroundTruth(Multimap<Record, BlockWithData> bcbpReps, Multimap<Record, BlockWithData> blocks, final BiMap<Record, BlockWithData> trueRepsMap) {
+        double totalRecordsPulledPercentage = 0;
+        int counter = 0;
+        for (Record groundTruthRep : blocks.keySet()) {
+            if (bcbpReps.containsKey(groundTruthRep)) {
+                Collection<BlockWithData> bcbpBlocksByRep = bcbpReps.get(groundTruthRep);
+                Collection<BlockWithData> blocksUnderMeasure = blocks.get(groundTruthRep);
+                if (groundTruthNotSingleton(trueRepsMap, groundTruthRep)) {
+                    /*if (trueRepsMap.containsKey(groundTruthRep) && trueRepsMap.get(groundTruthRep).size() > 1)*/
+                    List<Record> membersFromGroundTruth = trueRepsMap.get(groundTruthRep).getMembers();
+                    for (BlockWithData blockUnderMeasure : blocksUnderMeasure) {
+                        boolean isRepOfBlockFromBaselineAndBcbp = bcbpBlocksByRep.contains(blockUnderMeasure);
+                        if (isRepOfBlockFromBaselineAndBcbp) {
+                            List<Record> membersFromBlockingAlg = blockUnderMeasure.getMembers();
+                            totalRecordsPulledPercentage += getNumberOfPulledRecordsFromGroundTruthPercentage(membersFromGroundTruth, membersFromBlockingAlg);
+                            counter++;
+                        }
+                    }
+                }
+            } else {
+                logger.warn(String.format("Ground Truth representative %s is set a representative of several block on baseline, but of NONE after BCBP ran", groundTruthRep));
+            }
+        }
+        return counter > 0 ? (totalRecordsPulledPercentage / counter) : counter;
+    }
+
+    private boolean groundTruthNotSingleton(BiMap<Record, BlockWithData> trueRepsMap, Record groundTruthRep) {
+        return trueRepsMap.containsKey(groundTruthRep) && trueRepsMap.get(groundTruthRep).getMembers().size() > 1;
+    }
+
+    private Multimap<Record, BlockWithData> findBlocksThatShouldNotRemain(Multimap<Record, BlockWithData> baselineFiltered, final Multimap<Record, BlockWithData> blocksThatShouldRemain) {
+        return Multimaps.filterEntries(baselineFiltered, new Predicate<Map.Entry<Record, BlockWithData>>() {
+            @Override
+            public boolean apply(Map.Entry<Record, BlockWithData> input) {
+                return !blocksThatShouldRemain.containsEntry(input.getKey(), input.getValue());
+            }
+        });
+    }
+
+    @Override
+    public BlocksPair findBaselineBlocksForEvaluation(Multimap<Record, BlockWithData> baselineFiltered) {
+        Multimap<Record, BlockWithData> blocksThatShouldRemain = this.findBlocksThatShouldRemain(baselineFiltered);
+        Multimap<Record, BlockWithData> blocksThatShouldNotRemain = this.findBlocksThatShouldNotRemain(baselineFiltered, blocksThatShouldRemain);
+        return new BlocksPair(blocksThatShouldRemain, blocksThatShouldNotRemain);
+    }
+
+    private double getNumberOfPulledRecordsFromGroundTruthPercentage(List<Record> membersFromGroundTruth, List<Record> membersFromBlockingAlg) {
+        double pulledRecordSize = Sets.intersection(new HashSet<>(membersFromGroundTruth), new HashSet<>(membersFromBlockingAlg)).size() - 1.0;
+        return pulledRecordSize / (membersFromGroundTruth.size() - 1);
+    }
+
     protected class BlockCounter {
 
         private final BlockWithData block;
@@ -428,4 +503,5 @@ public class Measurements implements IMeasurements {
             return block;
         }
     }
+
 }

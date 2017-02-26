@@ -34,6 +34,8 @@ public class DuplicateReductionContext {
     private BlockResults baselineResults;
     private BlockResults bcbpResults;
     private CompareAlgorithmResults compareAlgsResults;
+    private double blockShouldRemainPulled;
+    private double blockShouldNotRemainPulled;
 
     public DuplicateReductionContext(int duplicatesRemoved) {
         this.duplicatesRemoved = duplicatesRemoved;
@@ -184,5 +186,21 @@ public class DuplicateReductionContext {
 
     public CompareAlgorithmResults getCompareAlgsResults() {
         return compareAlgsResults;
+    }
+
+    public void setBlockShouldRemainPulled(double blockShouldRemainPulled) {
+        this.blockShouldRemainPulled = blockShouldRemainPulled;
+    }
+
+    public void setBlockShouldNotRemainPulled(double blockShouldNotRemainPulled) {
+        this.blockShouldNotRemainPulled = blockShouldNotRemainPulled;
+    }
+
+    public double getBlockShouldRemainPulled() {
+        return blockShouldRemainPulled;
+    }
+
+    public double getBlockShouldNotRemainPulled() {
+        return blockShouldNotRemainPulled;
     }
 }

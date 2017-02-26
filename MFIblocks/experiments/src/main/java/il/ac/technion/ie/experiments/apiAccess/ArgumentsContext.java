@@ -11,7 +11,8 @@ class ArgumentsContext {
     private String[] args;
     private String pathToDataset;
     private boolean profilingMode;
-    private String pathToCanapies;
+    private String pathToSerializedFiles;
+    private boolean shouldProcessBlocks;
 
     public ArgumentsContext(String... args) {
         this.args = args;
@@ -26,7 +27,10 @@ class ArgumentsContext {
             pathToDataset = args[0];
             if (args.length > 1) {
                 if (!isEqualToPerf(args, 1)) {
-                    pathToCanapies = args[1];
+                    pathToSerializedFiles = args[1];
+                }
+                if (args.length > 2 && !isEqualToPerf(args, 2)) {
+                    shouldProcessBlocks = Boolean.valueOf(args[2]);
                 }
                 if (isEqualToPerf(args, args.length-1)) {
                     this.profilingMode = true;
@@ -48,7 +52,11 @@ class ArgumentsContext {
         return pathToDataset;
     }
 
-    public String getPathToCanapies() {
-        return pathToCanapies;
+    public String getPathToSerializedFiles() {
+        return pathToSerializedFiles;
+    }
+
+    public boolean shouldProcessBlocks() {
+        return shouldProcessBlocks;
     }
 }
